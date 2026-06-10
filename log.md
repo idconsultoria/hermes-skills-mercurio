@@ -23,4 +23,7 @@ Repositório git iniciado em /opt/data/skills/. AGENTS.md, index.md e log.md cri
 Removed: agy CLI config (→ agy skill), Pi version/providers (→ pi-agent-coordination), IAF pipeline v1.4 (→ iaf-newsletter-pipeline), Fish Speech (→ text-to-speech), Gemini TTS API (→ text-to-speech), Charon persona (→ text-to-speech)
 Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode Go, Google Workspace
 
-## [2026-06-10] update | AGENTS.md updated: evolve steps now include report writing, offload includes cleaning overly specific learnings, reports dir documented with plan+report pattern
+## [2026-06-10] update | AGENTS.md updated: evolve steps now include report writing, reports dir documented with plan+report pattern
+
+## [2026-06-10] update | index.md regenerated with full spec — added summary + relations + per-skill descriptions for all 93 skills
+**Diff:** +858 / -222 lines, 39KB total. Every skill now has: summary (~80 chars), full description paragraph, relations (similar/uses/used_by). 60/93 skills have at least one relation. Inferred via automated content scan + frontmatter metadata.
