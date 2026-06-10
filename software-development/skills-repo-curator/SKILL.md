@@ -62,7 +62,11 @@ Analisa todo o portfólio buscando:
 - **Sobreposição de trigger:** skills que disparam no mesmo comando do usuário
 - **Alinhamento com memória:** facts procedurais na memória que deveriam estar em skills
 
-Regra MECE: cada skill com responsabilidade única. Se duas skills compartilham >40% do conteúdo ou gatilho, é candidato a merge.
+**Critério de merge:** Duas skills conectadas (similar/uses) só devem permanecer separadas se descreverem fluxos de trabalho realmente distintos — que não podem ou não faz sentido incorporar um ao outro. Se ambas descrevem o mesmo domínio com padrões de orquestração idênticos, devem ser fundidas. Se operam em níveis de abstração diferentes (receita técnica vs workflow estratégico) ou com toolchains fundamentalmente distintas, devem permanecer separadas. A conexão no grafo (`similar`, `uses`) é evidência, não sentença — o julgamento final é sobre o workflow descrito.
+
+**Ferramenta:** Usar `delegate_task` com 3 subagentes paralelos para ler skills em lotes e determinar merge viability. Cada subagente lê ~28 skills, analisa semanticamente, retorna JSON com recomendações.
+
+Regra MECE: cada skill com responsabilidade única. Se duas skills compartilham o mesmo domínio com padrões idênticos, é candidato a merge.
 
 ### 6. Salva plano em reports/evolve-<YYYY-MM-DD-HHMM>.md
 Documenta: alvos de delete, alvos de merge, impacto estimado (skills perdidas vs mantidas).
@@ -202,7 +206,5 @@ Features: nodes por categoria, arestas tracejadas (similar) e sólidas (uses), m
 ⚠️ **Offload ≠ limpeza de skills.** Offload remove fatos procedurais da memória persistente. Limpeza de aprendizado excessivamente específico DENTRO das skills acontece no passo 7 (execução). Não confundir.
 
 ⚠️ **Descrições de skills são auditadas no passo 7**, não depois. Skills consolidadas (merges) têm prioridade na auditoria de description. Skills não modificadas podem ser corrigidas em lote se tiverem descrições pobres.
-
-⚠️ **Offload é distinto da limpeza de skills.** Offload só cuida da memória persistente — remove de lá o que já está documentado em skills. A limpeza de aprendizados excessivamente específicos DENTRO das skills (debug transcripts, error messages pontuais, workarounds temporários) acontece no passo 7 (execução do plano), não no offload.
 
 
