@@ -88,9 +88,9 @@ Sincronização do index.md com o estado atual das skills. Executado quando:
 **Método:** O index.md é regenerado do zero escaneando todas as skills no repositório. A diff gerada é comparada com o último commit do Git para detectar o que mudou — skills adicionadas, removidas ou com metadados alterados.
 
 **Passos:**
-1. Escaneia todas as skills no repositório
-2. Regera o index.md completo (adiciona, edita, remove entradas)
-3. Compara diff com o último commit do Git para extrair resumo de mudanças
+1. **Verifica mudanças no repositório** via `git status` e `git diff` entre o último commit e o estado atual — skills adicionadas, removidas, modificadas ou com metadados alterados. Este diff é o ponto de partida para saber o que precisa ser atualizado no index.md.
+2. Escaneia todas as skills no repositório
+3. Regera o index.md completo (adiciona, edita, remove entradas)
 4. Registra no log.md com prefixo `update` incluindo o resumo
 5. **Audita conformidade de descrições** — varre todas as SKILL.md e verifica se cada uma está no formato esperado:
    - **Sumário de uma linha (~80 chars):** descrição concisa do que a skill faz, sem truncamentos (sem `...`). Deve ser auto-contido: quem lê entende na hora se deve carregar a skill ou não.
