@@ -111,7 +111,8 @@ Ciclo de consolidação inteligente. Analisa o portfólio e propõe merges, remo
 9. **Offload** — limpa da memória persistente informações que já estão documentadas em skills; revisa a memória restante para garantir que só contém fatos não cobertos por skills
 10. **Atualiza** o index.md pós-transformação
 11. **Registra** no log.md com prefixo `evolve`
-12. **Stage + commit** final
+12. **Gera grafo HTML interativo** — extrai dados do index.md, constrói grafo D3.js com relações (similar/uses/used_by/parent), salva em `skills_graph.html` na raiz do repositório. Nós coloridos por categoria, arestas tracejadas para similar e sólidas com seta para uses. Modal com summary + description ao clicar no nó. Responsivo para mobile.
+13. **Stage + commit** final
 
 ### offload
 
