@@ -85,7 +85,7 @@ Sincronização do index.md com o estado atual das skills. Executado quando:
 - Skills são adicionadas ou removidas manualmente
 - Metadados de skills mudam
 
-**Método:** O index.md é regenerado do zero escaneando todas as skills no repositório. A diff gerada é comparada com o último commit do Git para detectar o que mudou — skills adicionadas, removidas ou com metadados alterados.
+**Método:** O index.md evolui commit a commit — nunca é regenerado do zero. O agente usa `git diff` entre o último commit e o estado atual para detectar skills adicionadas, removidas ou com metadados alterados, depois aplica patches cirúrgicos no index.md existente usando ferramentas LLM (`read_file`, `patch`, `write_file`). Cada commit adiciona uma camada ao index.md sem destruir o histórico.
 
 **Passos:**
 1. **Verifica mudanças no repositório** via `git status` e `git diff` entre o último commit e o estado atual — skills adicionadas, removidas, modificadas ou com metadados alterados. Este diff é o ponto de partida para saber o que precisa ser atualizado no index.md.
