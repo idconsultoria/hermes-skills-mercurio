@@ -131,15 +131,17 @@ Hermes cross-platform messaging: platform quirks, JID/ID formats, bridge workaro
 - `parent` → `autonomous-ai-agents/hermes-agent`
 
 ### Pi Agent (Local)
-
 - **Nome:** `autonomous-ai-agents/pi-agent-coordination`
 - **Arquivo:** `autonomous-ai-agents/pi-agent-coordination/SKILL.md`
-- **Tamanho:** 26,294 chars
+- **Tamanho:** 26,843 chars
 - **Resumo:** Invoke Pi Agent locally from Hermes: provider/model hierarchy, session recovery, stall detection, fallback patterns.
 
 Invoke Pi Agent locally from Hermes: provider/model hierarchy, session recovery, stall detection, fallback patterns.
 
 Comprehensive reference for running Pi Coder Agent (v0.78.1) as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code tasks), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring. Includes GoUsageLimitError handling, pre-launch session reuse checks, and model drift awareness for Pi best.
+
+**Relações:**
+- `uses` → `mlops/pi-session-audit`
 
 **Relações:**
 - `similar` → `autonomous-ai-agents/autonomous-ai-agents`
@@ -758,6 +760,9 @@ vLLM: high-throughput LLM serving, OpenAI API, quantization.
 - **Resumo:** ~/
 
 ~/.pi/agent/sessions/--<path-normalizado>--/<timestamp>_<uuid>.jsonl Onde `<path-normalizado>` é o diretório de trabalho com `/` substituído por `-`. Ex: `--opt-data-code-workstation-taskflow--`
+
+**Relações:**
+- `used_by` → `autonomous-ai-agents/pi-agent-coordination`
 
 
 ## Note Taking

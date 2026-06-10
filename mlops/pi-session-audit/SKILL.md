@@ -5,6 +5,9 @@ description: >-
   arquivos .jsonl de sessão. Script de extração e cálculo de custo por
   provider.
 category: mlops
+metadata:
+  hermes:
+    related_skills: [autonomous-ai-agents/pi-agent-coordination]
 ---
 
 # Pi Agent Session Audit
