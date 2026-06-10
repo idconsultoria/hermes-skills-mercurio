@@ -171,29 +171,25 @@ A etapa evolve analisa o portfólio e propõe merges, remoções e spin-offs par
 **Critério de merge:** Duas skills conectadas (similar/uses) só devem permanecer separadas se descreverem fluxos de trabalho realmente distintos — que não podem ou não faz sentido incorporar um ao outro. Se ambas descrevem o mesmo domínio com padrões de orquestração idênticos, devem ser fundidas. Se operam em níveis de abstração diferentes (receita técnica vs workflow estratégico) ou com toolchains fundamentalmente distintas, devem permanecer separadas. A conexão no grafo (`similar`, `uses`) é evidência, não sentença — o julgamento final é sobre o workflow descrito.
 
 **Passos:**
-1. **Lista** mudanças de skills desde o último evolve
-2. **Atualiza** o index.md com as mudanças
-3. **Registra** no log.md
-4. **Stage + commit** (checkpoint pré-plano)
-5. **Estuda** o index.md completo e elabora plano de evolução
-6. **Salva** o plano em `reports/evolve-<YYYY-MM-DD-HHMM>.md`
-7. **Executa** o plano (merges, deletes, consolidação de conteúdo). Durante a execução:
+1. **Estuda** o index.md completo e elabora plano de evolução
+2. **Salva** o plano em `reports/evolve-<YYYY-MM-DD-HHMM>.md`
+3. **Executa** o plano (merges, deletes, consolidação de conteúdo). Durante a execução:
    - Limpa aprendizados excessivamente específicos das skills — dados de debugging pontual, mensagens de erro de sessões passadas, workarounds temporários, informações transientes que não agregam numa próxima execução do workflow. Mantém o padrão geral, não o caso específico.
    - **Audita descrições das skills** — verifica se cada SKILL.md tem cabeçalhos de descrição adequados: resumo de uma linha (~80 chars) seguido de parágrafo descritivo completo. Skills com descrições ausentes, truncadas ou genéricas demais devem ser corrigidas para que o conteúdo alimente bem o index.md. O resumo é extraído como `summary` e o parágrafo como `description`. Skills já consolidadas (merges) têm prioridade. Skills não modificadas podem ser corrigidas em lote.
-8. **Revisa skills órfãs** — skills sem relações no grafo. Para cada uma:
+4. **Revisa skills órfãs** — skills sem relações no grafo. Para cada uma:
    - Tenta encontrar conexão semântica com outras skills (lendo ambos os SKILL.md). Se encontrar, adiciona relação.
    - Se não encontrar conexão, avalia se a skill é importante o suficiente para existir isolada. Skills genuinamente de nicho (API de terceiros, CLI específico, data source exótico) podem ficar órfãs com justificativa.
    - Se a skill não tem conexão E não é claramente importante, considera merge com skill genérica ou delete.
-9. **Escreve relatório denso** em `reports/evolve-<YYYY-MM-DD>-report.md` com:
+5. **Escreve relatório denso** em `reports/evolve-<YYYY-MM-DD>-report.md` com:
    - Estado inicial vs final (skills, memória, disco)
    - Tabela de deleções com motivos
    - Tabela de merges com o que foi absorvido
    - Git diff summary
    - **Lista de skills órfãs** e decisão tomada (relacionada / justificada como nicho / deletada)
-10. **Atualiza** o index.md pós-transformação
-11. **Registra** no log.md com prefixo `evolve`
-12. **Gera grafo HTML interativo** — extrai dados do index.md, constrói grafo D3.js com relações (similar/uses/used_by/parent), salva em `skills_graph.html` na raiz do repositório. Nós coloridos por categoria, arestas tracejadas para similar e sólidas com seta para uses. Modal com summary + description ao clicar no nó. Responsivo para mobile.
-13. **Stage + commit** final
+6. **Atualiza** o index.md pós-transformação
+7. **Registra** no log.md com prefixo `evolve`
+8. **Gera grafo HTML interativo** — extrai dados do index.md, constrói grafo D3.js com relações (similar/uses/used_by/parent), salva em `skills_graph.html` na raiz do repositório. Nós coloridos por categoria, arestas tracejadas para similar e sólidas com seta para uses. Modal com summary + description ao clicar no nó. Responsivo para mobile.
+9. **Stage + commit** final
 
 ---
 
