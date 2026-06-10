@@ -27,3 +27,6 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 
 ## [2026-06-10] update | index.md regenerated with full spec — added summary + relations + per-skill descriptions for all 93 skills
 **Diff:** +858 / -222 lines, 39KB total. Every skill now has: summary (~80 chars), full description paragraph, relations (similar/uses/used_by). 60/93 skills have at least one relation. Inferred via automated content scan + frontmatter metadata.
+
+## [2026-06-10] update | index.md relations replaced with LLM-inferred semantic analysis. 207 edges, 76/93 skills
+3 parallel subagents read every SKILL.md, determined relations by understanding content (not regex). Types: similar, uses, used_by, parent. 45KB total. Replaced automated-heuristic relations from previous version.
