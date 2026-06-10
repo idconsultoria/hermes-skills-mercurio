@@ -1,36 +1,47 @@
 # OGG Conversion Pattern
 
-O script `hermes-tts.py` sempre gera OGG (Opus) como formato final, independente do caminho de saída.
+O script `hermes-tts.py` sempre gera OGG (Opus) como formato final.
 
-## Fluxo
+## Fluxo atual
 
 ```
-Gemini TTS → PCM/WAV bruto → arquivo .tmp.wav
-                                    ↓
-                            ffmpeg -i .tmp.wav -c:a libopus .tmp.ogg
-                                    ↓
-                            os.replace(.tmp.ogg → args.output)
+Gemini TTS -> PCM/WAV bruto -> arquivo.wav (temporario)
+                                |
+                        ffmpeg -i arquivo.wav -c:a libopus args.output (.ogg)
 ```
 
-## Por que não WAV direto?
+Nao ha `os.replace()` — o ffmpeg escreve direto no `args.output` que ja
+termina em `.ogg` (definido por `output_format: ogg` no config.yaml).
 
-- WAV é grande (~384 kbps para 24kHz 16-bit mono)
-- OGG Opus é ~64 kbps — ~6x menor com qualidade similar
-- Telegram toca OGG inline como áudio; WAV chega como arquivo para download
+## O bug do wav_temp (ja corrigido)
+
+O script usava `wav_temp = args.output + ".wav"` para criar o arquivo
+WAV temporario. Quando `args.output` termina em `.ogg` (ex: `tts.ogg`),
+isso gerava `tts.ogg.wav` — funcional, mas feio.
+
+A correcao foi trocar para `args.output.rsplit(".", 1)[0] + ".wav"`:
+`tts.ogg` -> `tts.wav`. Clean.
 
 ## O gotcha do ffmpeg
 
-ffmpeg escolhe o muxer pela **extensão do arquivo de saída**:
+ffmpeg escolhe o muxer pela **extensao do arquivo de saida**:
 
 ```
-ffmpeg -i input.wav -c:a libopus output.wav    → ERRO (exit 218)
+ffmpeg -i input.wav -c:a libopus output.wav    -> ERRO (exit 218)
   # "Codec opus not supported in WAVE format"
 
-ffmpeg -i input.wav -c:a libopus output.ogg    → OK
+ffmpeg -i input.wav -c:a libopus output.ogg    -> OK
 ```
 
-Solução: escrever para `.ogg` primeiro, depois mover com `os.replace()` para o path final.
+Solucao: garantir que `output_format` no config.yaml seja `ogg` para que
+a ferramenta `text_to_speech` gere caminho `.ogg` e o ffmpeg use o muxer
+OGG corretamente.
 
-## O path final termina em .wav mas é OGG
+## O config certo vs o config distracao
 
-A ferramenta `text_to_speech` gera o path com base em `output_format` do config.yaml. Mesmo com `output_format: ogg`, o Hermes pode gerar `.wav` se cacheou o config antigo. O conteúdo real é sempre OGG — o player detecta pelo magic bytes (`OggS`), não pela extensão.
+`load_config()` le de `$HERMES_HOME/config.yaml` (aqui: `/opt/data/config.yaml`).
+O arquivo em `/opt/data/.hermes/config.yaml` NAO e lido pela tool — e uma
+config secundaria/legacy.
+
+Sempre verificar o config REAL quando o output_format nao parece estar
+sendo respeitado.

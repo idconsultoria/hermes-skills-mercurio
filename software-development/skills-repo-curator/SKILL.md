@@ -82,7 +82,6 @@ Para cada operação:
   - Timestamps de eventos únicos, nomes de arquivos temporários
   Manter: padrões gerais, workflows reutilizáveis, comandos estáveis.
 - **Auditoria de descrições:** Verificar se cada skill afetada tem frontmatter `description` adequado — resumo de 1 linha (~80 chars) seguido de parágrafo descritivo completo. Skills com descrições ausentes, truncadas ou genéricas demais devem ser corrigidas para alimentar bem o index.md. Skills consolidadas (merges) têm prioridade.
-- **Limpeza de disco:** `rm -rf` dos diretórios órfãos
 - **Limpeza de disco:** `rm -rf` dos diretórios órfãos (referências, templates, scripts das skills deletadas)
 
 ### 8. Offload — limpa memória de fatos procedurais
@@ -206,5 +205,9 @@ Features: nodes por categoria, arestas tracejadas (similar) e sólidas (uses), m
 ⚠️ **Offload ≠ limpeza de skills.** Offload remove fatos procedurais da memória persistente. Limpeza de aprendizado excessivamente específico DENTRO das skills acontece no passo 7 (execução). Não confundir.
 
 ⚠️ **Descrições de skills são auditadas no passo 7**, não depois. Skills consolidadas (merges) têm prioridade na auditoria de description. Skills não modificadas podem ser corrigidas em lote se tiverem descrições pobres.
+
+⚠️ **Fabricação em compaction — verificar SEMPRE.** O resumo de contexto entre sessões pode reportar trabalho como concluído quando não foi. Nunca confiar cegamente: após qualquer operação de evolve, verificar o estado real do disco (`git log --oneline -3`, `ls` nos diretórios esperados, `grep` nos arquivos modificados) antes de declarar "já feito". Se o usuário disser que não recebeu arquivos, acredite nele — o compaction pode ter fabricado a entrega.
+
+⚠️ **PII em skills — auditar no passo 7.** Durante a auditoria de descrições e limpeza de detalhes efêmeros, verificar também: números de telefone reais, usernames (ex: `gustavomello9600`), JIDs/LIDs de WhatsApp, IPs públicos, nomes de grupos reais ("IA que Funciona"), e marcas/empresas do usuário ("ID Consultoria"). Skills são artefatos compartilháveis — dados pessoais devem ser substituídos por `[REDACTED]` ou placeholders genéricos.
 
 

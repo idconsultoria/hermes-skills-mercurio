@@ -152,6 +152,8 @@ Pick the closest existing category. Don't invent new top-level categories casual
 
 7. **Linking to skills that don't exist in-repo.** `related_skills: [some-user-local-skill]` works for you but breaks for other clones. Prefer only in-repo links.
 
+8. **PII contamination.** Skills are shared, committed artifacts. Never include real personal data — phone numbers, email addresses, usernames (e.g., `gustavomello9600`), WhatsApp JIDs/LIDs, public IPs, or the user's own brand/company names. Use `[REDACTED]` for sensitive values, generic placeholders like `[username]` or `[brand]` for user-specific references, and `120363XXXXX@g.us` for group IDs. Any data that would identify a real person or organization must be stripped before committing.
+
 ## Verification Checklist
 
 - [ ] File is at `skills/<category>/<name>/SKILL.md` (not in `~/.hermes/skills/`)
@@ -162,6 +164,7 @@ Pick the closest existing category. Don't invent new top-level categories casual
 - [ ] Total file ≤ 100,000 chars (aim for 8-15k)
 - [ ] Structure: `# Title` → `## Overview` → `## When to Use` → body → `## Common Pitfalls` → `## Verification Checklist`
 - [ ] `related_skills` references resolve in-repo (or are explicitly OK to be user-local)
+- [ ] No PII present: phone numbers, real names, usernames, JIDs/LIDs, public IPs, user brand names — all stripped or replaced with [REDACTED]/placeholders
 - [ ] `git add skills/<category>/<name>/ && git commit` completed on the intended branch
 
 ## DESIGN.md Token Specs *(merged from design-md)*

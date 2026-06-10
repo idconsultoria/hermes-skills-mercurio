@@ -16,6 +16,11 @@
 
 Manage Apple Notes via memo CLI: create, search, edit.
 
+**Relações:**
+- `similar` → `apple/apple-reminders`
+- `similar` → `apple/imessage`
+- `similar` → `apple/findmy`
+
 ### Apple Reminders
 
 - **Nome:** `apple/apple-reminders`
@@ -27,6 +32,8 @@ Apple Reminders via remindctl: add, list, complete.
 
 **Relações:**
 - `similar` → `apple/apple-notes`
+- `similar` → `apple/imessage`
+- `uses` → `autonomous-ai-agents/product-pipeline`
 
 ### Find My (Apple)
 
@@ -38,7 +45,9 @@ Apple Reminders via remindctl: add, list, complete.
 Track Apple devices/AirTags via FindMy.app on macOS.
 
 **Relações:**
-- `uses` → `apple/macos-computer-use`
+- `similar` → `apple/imessage`
+- `similar` → `apple/macos-computer-use`
+- `similar` → `apple/apple-notes`
 
 ### iMessage
 
@@ -49,6 +58,11 @@ Track Apple devices/AirTags via FindMy.app on macOS.
 
 Send and receive iMessages/SMS via the imsg CLI on macOS.
 
+**Relações:**
+- `similar` → `autonomous-ai-agents/messaging-platforms`
+- `similar` → `apple/apple-notes`
+- `similar` → `apple/apple-reminders`
+
 ### macOS Computer Use (universal, any-model)
 
 - **Nome:** `apple/macos-computer-use`
@@ -57,6 +71,12 @@ Send and receive iMessages/SMS via the imsg CLI on macOS.
 - **Resumo:** You have a `computer_use` tool that drives the Mac in the **background**
 
 Drive macOS desktop in background — screenshots, mouse, keyboard, scroll, drag — without stealing cursor, focus, or Space. Works with any model. Load when computer_use tool is available.
+
+**Relações:**
+- `uses` → `autonomous-ai-agents/messaging-platforms`
+- `similar` → `apple/findmy`
+- `similar` → `creative/excalidraw`
+- `similar` → `creative/claude-design`
 
 
 ## Autonomous Ai Agents
@@ -70,6 +90,12 @@ Drive macOS desktop in background — screenshots, mouse, keyboard, scroll, drag
 
 Delegate tasks to autonomous AI coding agent CLIs via Hermes. One-shot, PR review, and session orchestration patterns.
 
+**Relações:**
+- `similar` → `autonomous-ai-agents/pi-agent-coordination`
+- `similar` → `autonomous-ai-agents/hermes-agent`
+- `parent` → `autonomous-ai-agents/product-pipeline`
+- `similar` → `autonomous-ai-agents/messaging-platforms`
+
 ### Hermes Agent
 
 - **Nome:** `autonomous-ai-agents/hermes-agent`
@@ -79,6 +105,16 @@ Delegate tasks to autonomous AI coding agent CLIs via Hermes. One-shot, PR revie
 
 Configure, extend, or contribute to Hermes Agent.
 
+**Relações:**
+- `parent` → `autonomous-ai-agents/messaging-platforms`
+- `parent` → `autonomous-ai-agents/autonomous-ai-agents`
+- `parent` → `autonomous-ai-agents/product-pipeline`
+- `parent` → `autonomous-ai-agents/pi-agent-coordination`
+- `parent` → `content-production/text-to-speech`
+- `parent` → `content-production/iaf-newsletter-pipeline`
+- `similar` → `creative/brand-studio-forge`
+- `similar` → `creative/humanizer`
+
 ### Messaging Platforms
 
 - **Nome:** `autonomous-ai-agents/messaging-platforms`
@@ -87,6 +123,12 @@ Configure, extend, or contribute to Hermes Agent.
 - **Resumo:** Hermes cross-platform message sending — platform-specific quirks, JID/ID format require...
 
 Hermes cross-platform messaging: platform quirks, JID/ID formats, bridge workarounds for Telegram, WhatsApp, more.
+
+**Relações:**
+- `similar` → `apple/imessage`
+- `used_by` → `apple/macos-computer-use`
+- `used_by` → `autonomous-ai-agents/product-pipeline`
+- `parent` → `autonomous-ai-agents/hermes-agent`
 
 ### Pi Agent (Local)
 
@@ -99,6 +141,11 @@ Invoke Pi Agent locally from Hermes: provider/model hierarchy, session recovery,
 
 Comprehensive reference for running Pi Coder Agent (v0.78.1) as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code tasks), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring. Includes GoUsageLimitError handling, pre-launch session reuse checks, and model drift awareness for Pi best.
 
+**Relações:**
+- `similar` → `autonomous-ai-agents/autonomous-ai-agents`
+- `used_by` → `autonomous-ai-agents/product-pipeline`
+- `parent` → `autonomous-ai-agents/hermes-agent`
+
 ### Product Development Pipeline
 
 - **Nome:** `autonomous-ai-agents/product-pipeline`
@@ -107,6 +154,14 @@ Comprehensive reference for running Pi Coder Agent (v0.78.1) as a local npm bina
 - **Resumo:** ┌───────────────────────────────────────────────────┐ │                     Hermes     ...
 
 Multi-agent product pipeline from raw idea to MVP with iterative sprints. Orchestrated by Hermes, executed by Pi Agent + Antigravity.
+
+**Relações:**
+- `uses` → `autonomous-ai-agents/pi-agent-coordination`
+- `uses` → `autonomous-ai-agents/autonomous-ai-agents`
+- `uses` → `autonomous-ai-agents/messaging-platforms`
+- `similar` → `content-production/iaf-newsletter-pipeline`
+- `uses` → `creative/copywriting`
+- `uses` → `creative/humanizer`
 
 
 ## Content Production
@@ -120,6 +175,13 @@ Multi-agent product pipeline from raw idea to MVP with iterative sprints. Orches
 
 Umbrella skill for newsletter/briefing/digest pipelines: IAF Manhã Aumentada, Daily AI Digest, editorial curation, cron scheduling. Covers multi-source collection, ranking, HTML→PDF, delivery.
 
+**Relações:**
+- `uses` → `creative/copywriting`
+- `uses` → `creative/humanizer`
+- `similar` → `autonomous-ai-agents/product-pipeline`
+- `similar` → `creative/style-guide-consultation`
+- `uses` → `creative/text-to-speech`
+
 ### Text-to-Speech (TTS)
 
 - **Nome:** `content-production/text-to-speech`
@@ -128,6 +190,13 @@ Umbrella skill for newsletter/briefing/digest pipelines: IAF Manhã Aumentada, D
 - **Resumo:** Umbrella skill
 
 Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback, self-hosted Fish Speech, and Hermes TTS provider. Full lifecycle from persona to audio.
+
+**Relações:**
+- `parent` → `autonomous-ai-agents/hermes-agent`
+- `similar` → `creative/songwriting-and-ai-music`
+- `similar` → `creative/ascii-video`
+- `similar` → `creative/manim-video`
+- `uses` → `creative/humanizer`
 
 
 ## Creative
@@ -141,6 +210,13 @@ Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback,
 
 Dark-themed SVG architecture/cloud/infra diagrams as HTML.
 
+**Relações:**
+- `similar` → `creative/excalidraw`
+- `similar` → `creative/claude-design`
+- `similar` → `creative/brand-studio-forge`
+- `similar` → `creative/baoyu-infographic`
+- `similar` → `creative/pretext`
+
 ### ASCII Art Skill
 
 - **Nome:** `creative/ascii-art`
@@ -152,6 +228,9 @@ ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.
 
 **Relações:**
 - `similar` → `creative/ascii-video`
+- `similar` → `creative/pretext`
+- `similar` → `creative/p5js`
+- `similar` → `creative/manim-video`
 
 ### ASCII Video Production Pipeline
 
@@ -162,6 +241,13 @@ ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.
 
 ASCII video: convert video/audio to colored ASCII MP4/GIF.
 
+**Relações:**
+- `uses` → `creative/ascii-art`
+- `similar` → `creative/p5js`
+- `similar` → `creative/manim-video`
+- `uses` → `creative/text-to-speech`
+- `similar` → `creative/pretext`
+
 ### Infographic Generator
 
 - **Nome:** `creative/baoyu-infographic`
@@ -170,6 +256,13 @@ ASCII video: convert video/audio to colored ASCII MP4/GIF.
 - **Resumo:** Infographics: 21 layouts x 21 styles (信息图, 可视化)
 
 Infographics: 21 layouts x 21 styles (信息图, 可视化).
+
+**Relações:**
+- `similar` → `creative/architecture-diagram`
+- `similar` → `creative/brand-studio-forge`
+- `similar` → `creative/excalidraw`
+- `similar` → `creative/claude-design`
+- `similar` → `creative/comfyui`
 
 ### brand-studio-forge
 
@@ -182,8 +275,12 @@ Use when the user wants to create, refine, or evolve a brand identity. Covers br
 
 **Relações:**
 - `uses` → `creative/claude-design`
-- `uses` → `creative/style-guide-consultation`
 - `uses` → `creative/popular-web-designs`
+- `uses` → `creative/style-guide-consultation`
+- `similar` → `creative/claude-design`
+- `similar` → `creative/style-guide-consultation`
+- `similar` → `creative/baoyu-infographic`
+- `uses` → `creative/copywriting`
 
 ### Claude Design for CLI/API Agents
 
@@ -194,6 +291,15 @@ Use when the user wants to create, refine, or evolve a brand identity. Covers br
 
 Design one-off HTML artifacts (landing, deck, prototype). Includes Sketch Mode for throwaway variant comparison.
 
+**Relações:**
+- `uses` → `creative/popular-web-designs`
+- `similar` → `creative/architecture-diagram`
+- `similar` → `creative/excalidraw`
+- `similar` → `creative/brand-studio-forge`
+- `similar` → `creative/style-guide-consultation`
+- `similar` → `creative/pretext`
+- `similar` → `creative/p5js`
+
 ### ComfyUI
 
 - **Nome:** `creative/comfyui`
@@ -202,6 +308,11 @@ Design one-off HTML artifacts (landing, deck, prototype). Includes Sketch Mode f
 - **Resumo:** Generate images, video, and audio with ComfyUI — install, launch, manage nodes/models, ...
 
 Generate images, video, and audio with ComfyUI. Install, manage nodes/models, run workflows via comfy-cli and direct REST/WebSocket API.
+
+**Relações:**
+- `similar` → `creative/baoyu-infographic`
+- `similar` → `creative/ascii-video`
+- `similar` → `creative/p5js`
 
 ### Copywriting
 
@@ -216,6 +327,9 @@ Load this skill when the user needs marketing copy — landing pages, homepage s
 
 **Relações:**
 - `similar` → `creative/humanizer`
+- `used_by` → `content-production/iaf-newsletter-pipeline`
+- `used_by` → `creative/brand-studio-forge`
+- `used_by` → `autonomous-ai-agents/product-pipeline`
 
 ### Excalidraw Diagram Skill
 
@@ -225,6 +339,14 @@ Load this skill when the user needs marketing copy — landing pages, homepage s
 - **Resumo:** Hand-drawn Excalidraw JSON diagrams (arch, flow, seq)
 
 Hand-drawn Excalidraw JSON diagrams (arch, flow, seq).
+
+**Relações:**
+- `similar` → `creative/architecture-diagram`
+- `similar` → `creative/claude-design`
+- `similar` → `creative/baoyu-infographic`
+- `similar` → `creative/pretext`
+- `similar` → `creative/p5js`
+- `similar` → `creative/brand-studio-forge`
 
 ### Humanizer: Remove AI Writing Patterns
 
@@ -237,6 +359,10 @@ Humanize text: strip AI-isms and add real voice.
 
 **Relações:**
 - `similar` → `creative/copywriting`
+- `used_by` → `content-production/iaf-newsletter-pipeline`
+- `used_by` → `autonomous-ai-agents/product-pipeline`
+- `used_by` → `creative/brand-studio-forge`
+- `used_by` → `creative/copywriting`
 
 ### Manim Video Production Pipeline
 
@@ -247,6 +373,13 @@ Humanize text: strip AI-isms and add real voice.
 
 Manim CE animations: 3Blue1Brown math/algo videos.
 
+**Relações:**
+- `similar` → `creative/p5js`
+- `similar` → `creative/ascii-video`
+- `uses` → `creative/text-to-speech`
+- `similar` → `creative/ascii-art`
+- `similar` → `creative/pretext`
+
 ### p5.js Production Pipeline
 
 - **Nome:** `creative/p5js`
@@ -255,6 +388,15 @@ Manim CE animations: 3Blue1Brown math/algo videos.
 - **Resumo:** p5
 
 p5.js sketches: gen art, shaders, interactive, 3D.
+
+**Relações:**
+- `similar` → `creative/ascii-video`
+- `similar` → `creative/manim-video`
+- `similar` → `creative/excalidraw`
+- `similar` → `creative/pretext`
+- `similar` → `creative/claude-design`
+- `similar` → `creative/brand-studio-forge`
+- `similar` → `creative/comfyui`
 
 ### Popular Web Designs
 
@@ -265,6 +407,12 @@ p5.js sketches: gen art, shaders, interactive, 3D.
 
 54 real design systems (Stripe, Linear, Vercel) as HTML/CSS.
 
+**Relações:**
+- `uses` → `creative/claude-design`
+- `used_by` → `creative/brand-studio-forge`
+- `similar` → `creative/style-guide-consultation`
+- `similar` → `creative/claude-design`
+
 ### Pretext Creative Demos
 
 - **Nome:** `creative/pretext`
@@ -273,6 +421,15 @@ p5.js sketches: gen art, shaders, interactive, 3D.
 - **Resumo:** Use when building creative browser demos with @chenglou/pretext — DOM-free text layout ...
 
 Creative browser demos with @chenglou/pretext: DOM-free text layout for ASCII art, kinetic typography, text-as-geometry games, and generative art. Single-file HTML output.
+
+**Relações:**
+- `similar` → `creative/p5js`
+- `similar` → `creative/claude-design`
+- `similar` → `creative/excalidraw`
+- `similar` → `creative/architecture-diagram`
+- `similar` → `creative/ascii-art`
+- `similar` → `creative/ascii-video`
+- `similar` → `creative/manim-video`
 
 ### Songwriting & AI Music Generation
 
@@ -283,6 +440,12 @@ Creative browser demos with @chenglou/pretext: DOM-free text layout for ASCII ar
 
 Songwriting craft and Suno AI music prompts.
 
+**Relações:**
+- `similar` → `creative/text-to-speech`
+- `similar` → `creative/copywriting`
+- `similar` → `creative/humanizer`
+- `similar` → `creative/brand-studio-forge`
+
 ### Style Guide Consultation
 
 - **Nome:** `creative/style-guide-consultation`
@@ -291,6 +454,12 @@ Songwriting craft and Suno AI music prompts.
 - **Resumo:** Catálogo e consulta de guias de estilo: Hermes Agent (padrão), ID Consultoria, IAF Comu...
 
 Catálogo e consulta de guias de estilo: Hermes Agent (padrão), ID Consultoria, IAF Comunidade, IAF Newsletter. Carrega o guia correto para qualquer tarefa visual.
+
+**Relações:**
+- `uses` → `creative/brand-studio-forge`
+- `similar` → `creative/popular-web-designs`
+- `similar` → `creative/claude-design`
+- `similar` → `creative/brand-studio-forge`
 
 
 ## Data Science
@@ -328,6 +497,11 @@ Himalaya CLI: IMAP/SMTP email from terminal.
 
 Multi-layered codebase diagnostics: structural mapping, dependency audit, git history, metrics, and health reports.
 
+**Relações:**
+- `similar` → `github/github-code-review`
+- `uses` → `github/github-repo-management`
+- `similar` → `dogfood/dogfood`
+
 ### GitHub Authentication Setup
 
 - **Nome:** `github/github-auth`
@@ -336,6 +510,13 @@ Multi-layered codebase diagnostics: structural mapping, dependency audit, git hi
 - **Resumo:** GitHub auth setup: HTTPS tokens, SSH keys, gh CLI login
 
 GitHub auth setup: HTTPS tokens, SSH keys, gh CLI login.
+
+**Relações:**
+- `used_by` → `github/github-code-review`
+- `used_by` → `github/github-issues`
+- `used_by` → `github/github-pr-workflow`
+- `used_by` → `github/github-repo-management`
+- `used_by` → `infrastructure/deployment-pipeline`
 
 ### GitHub Code Review
 
@@ -346,6 +527,11 @@ GitHub auth setup: HTTPS tokens, SSH keys, gh CLI login.
 
 Review PRs: diffs, inline comments via gh or REST.
 
+**Relações:**
+- `uses` → `github/github-auth`
+- `used_by` → `github/github-pr-workflow`
+- `similar` → `github/codebase-inspection`
+
 ### GitHub Issues Management
 
 - **Nome:** `github/github-issues`
@@ -354,6 +540,11 @@ Review PRs: diffs, inline comments via gh or REST.
 - **Resumo:** Create, triage, label, assign GitHub issues via gh or REST
 
 Create, triage, label, assign GitHub issues via gh or REST.
+
+**Relações:**
+- `uses` → `github/github-auth`
+- `used_by` → `github/github-pr-workflow`
+- `similar` → `github/github-repo-management`
 
 ### GitHub Pull Request Workflow
 
@@ -365,8 +556,11 @@ Create, triage, label, assign GitHub issues via gh or REST.
 GitHub PR lifecycle: branch, commit, open, CI, merge.
 
 **Relações:**
+- `uses` → `github/github-auth`
+- `uses` → `github/github-code-review`
 - `uses` → `infrastructure/deployment-pipeline`
 - `uses` → `infrastructure/oracle-host-access`
+- `similar` → `github/github-repo-management`
 
 ### GitHub Repository Management
 
@@ -378,7 +572,10 @@ GitHub PR lifecycle: branch, commit, open, CI, merge.
 Clone/create/fork repos; manage remotes, releases.
 
 **Relações:**
-- `uses` → `github/codebase-inspection`
+- `uses` → `github/github-auth`
+- `similar` → `github/github-pr-workflow`
+- `similar` → `github/github-issues`
+- `used_by` → `github/codebase-inspection`
 
 
 ## Infrastructure
@@ -392,6 +589,11 @@ Clone/create/fork repos; manage remotes, releases.
 
 Self-host TTS models (OmniVoice, Qwen3-TTS, Fish Speech) on Oracle ARM64 with Docker. Python and C++ inference patterns, OpenAI-compatible endpoints, Hermes TTS provider integration.
 
+**Relações:**
+- `uses` → `infrastructure/oracle-host-access`
+- `uses` → `mlops/huggingface-hub`
+- `similar` → `mlops/inference/llama-cpp`
+
 ### Deployment Pipeline — Docker + GitHub Actions + SSH Deploy
 
 - **Nome:** `infrastructure/deployment-pipeline`
@@ -400,6 +602,12 @@ Self-host TTS models (OmniVoice, Qwen3-TTS, Fish Speech) on Oracle ARM64 with Do
 - **Resumo:** CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr
 
 CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr.io → SSH deploy to bare metal. Covers workflow design, registry auth, tag strategy, deploy key setup, migration management, and common pitfalls.
+
+**Relações:**
+- `uses` → `github/github-auth`
+- `uses` → `infrastructure/oracle-host-access`
+- `used_by` → `github/github-pr-workflow`
+- `similar` → `infrastructure/vercel-deploy`
 
 ### Oracle VM — SSH Access from Hermes Container
 
@@ -411,8 +619,9 @@ CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr.io → SSH deploy 
 SSH access from a Hermes Docker container to its Oracle Linux host. Covers key setup, SSH config quirks, Docker host discovery, and host diagnostics.
 
 **Relações:**
-- `uses` → `infrastructure/deployment-pipeline`
-- `uses` → `infrastructure/ai-voice-selfhost`
+- `used_by` → `infrastructure/deployment-pipeline`
+- `used_by` → `infrastructure/ai-voice-selfhost`
+- `used_by` → `github/github-pr-workflow`
 
 ### Vercel Deploy — Skill
 
@@ -422,6 +631,9 @@ SSH access from a Hermes Docker container to its Oracle Linux host. Covers key s
 - **Resumo:** Deploy static sites and frontend apps to Vercel — from zero to production
 
 Deploy static sites and frontend apps to Vercel — from zero to production. Covers CLI install, device-flow authentication, project creation, deploy, custom domains, env vars, and common pitfalls. Works in restricted environments (no root, npm global install with custom prefix).
+
+**Relações:**
+- `similar` → `infrastructure/deployment-pipeline`
 
 
 ## Media
@@ -435,6 +647,9 @@ Deploy static sites and frontend apps to Vercel — from zero to production. Cov
 
 node --version          # needs 22+ ffmpeg -version         # needs ffmpeg npx hyperframes --version  # should print version
 
+**Relações:**
+- `similar` → `media/youtube-content`
+
 ### YouTube Content Tool
 
 - **Nome:** `media/youtube-content`
@@ -443,6 +658,10 @@ node --version          # needs 22+ ffmpeg -version         # needs ffmpeg npx h
 - **Resumo:** YouTube transcripts to summaries, threads, blogs
 
 YouTube transcripts to summaries, threads, blogs.
+
+**Relações:**
+- `similar` → `media/hyperframes-video-production`
+- `uses` → `research/llm-wiki`
 
 
 ## Messaging Platforms
@@ -470,6 +689,11 @@ Local Node.js HTTP bridge on port 3000 for WhatsApp operations via @whiskeysocke
 
 lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.).
 
+**Relações:**
+- `uses` → `mlops/inference/vllm`
+- `uses` → `mlops/huggingface-hub`
+- `similar` → `mlops/evaluation/weights-and-biases`
+
 ### Weights & Biases: ML Experiment Tracking & MLOps
 
 - **Nome:** `mlops/evaluation/weights-and-biases`
@@ -478,6 +702,10 @@ lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.).
 - **Resumo:** W&B: log ML experiments, sweeps, model registry, dashboards
 
 W&B: log ML experiments, sweeps, model registry, dashboards.
+
+**Relações:**
+- `uses` → `mlops/huggingface-hub`
+- `similar` → `mlops/evaluation/lm-evaluation-harness`
 
 ### Hugging Face CLI (`hf`) Reference Guide
 
@@ -488,6 +716,12 @@ W&B: log ML experiments, sweeps, model registry, dashboards.
 
 HuggingFace hf CLI: search/download/upload models, datasets.
 
+**Relações:**
+- `used_by` → `mlops/evaluation/lm-evaluation-harness`
+- `used_by` → `mlops/inference/llama-cpp`
+- `used_by` → `mlops/inference/vllm`
+- `used_by` → `infrastructure/ai-voice-selfhost`
+
 ### llama.cpp + GGUF
 
 - **Nome:** `mlops/inference/llama-cpp`
@@ -497,6 +731,11 @@ HuggingFace hf CLI: search/download/upload models, datasets.
 
 llama.cpp local GGUF inference + HF Hub model discovery.
 
+**Relações:**
+- `uses` → `mlops/huggingface-hub`
+- `similar` → `mlops/inference/vllm`
+- `similar` → `infrastructure/ai-voice-selfhost`
+
 ### vLLM - High-Performance LLM Serving
 
 - **Nome:** `mlops/inference/vllm`
@@ -505,6 +744,11 @@ llama.cpp local GGUF inference + HF Hub model discovery.
 - **Resumo:** vLLM: high-throughput LLM serving, OpenAI API, quantization
 
 vLLM: high-throughput LLM serving, OpenAI API, quantization.
+
+**Relações:**
+- `uses` → `mlops/huggingface-hub`
+- `used_by` → `mlops/evaluation/lm-evaluation-harness`
+- `similar` → `mlops/inference/llama-cpp`
 
 ### Pi Agent Session Audit
 
@@ -527,6 +771,9 @@ vLLM: high-throughput LLM serving, OpenAI API, quantization.
 
 Read, search, create, and edit notes in the Obsidian vault.
 
+**Relações:**
+- `used_by` → `research/llm-wiki`
+
 
 ## Productivity
 
@@ -539,7 +786,9 @@ Read, search, create, and edit notes in the Obsidian vault.
 
 Airtable REST API via curl. Records CRUD, filters, upserts.
 
-**Relações:** notion, google-workspace
+**Relações:**
+- `similar` → `productivity/notion`
+- `similar` → `productivity/google-workspace`
 
 ### Google Workspace
 
@@ -550,7 +799,9 @@ Airtable REST API via curl. Records CRUD, filters, upserts.
 
 Google OAuth2 client credentials (downloaded from Google Cloud Console)
 
-**Relações:** himalaya, airtable, ocr-and-documents
+**Relações:**
+- `similar` → `productivity/airtable`
+- `uses` → `productivity/ocr-and-documents`
 
 ### HTML Report — Hermes Design System
 
@@ -563,6 +814,12 @@ Render research reports as dark-themed HTML with SVG charts and Tufte-inspired t
 
 Two design systems in one skill: Hermes CRT (amber/blue inversion, scanlines, terminal aesthetic) for visual showcases and landing pages, and Hermes Official (blue royal on white, Inter + Space Mono, clean cards) for data reports, benchmarks, and dashboards. Covers CRT overlay mechanics, inverted color coding, component library, report structure templates, Telegram delivery via ZIP, and the agy pipeline for complex CRT pages. Activates automatically when the user needs structured visual output.
 
+**Relações:**
+- `uses` → `software-development/agy`
+- `uses` → `productivity/html-to-pdf-chromium`
+- `used_by` → `productivity/relatorio-de-custos`
+- `used_by` → `productivity/html-to-pdf-chromium`
+
 ### HTML → PDF com Chromium Headless
 
 - **Nome:** `productivity/html-to-pdf-chromium`
@@ -572,7 +829,10 @@ Two design systems in one skill: Hermes CRT (amber/blue inversion, scanlines, te
 
 Convert HTML files to high-fidelity PDF using Chromium headless (via Debian .deb extraction, no root or Playwright required). Use when weasyprint or other tools lose CSS features like gradients, webkit-background-clip, grid, and glow effects.
 
-**Relações:** html-report-hermes, iaf-newsletter-pipeline
+**Relações:**
+- `uses` → `productivity/html-report-hermes`
+- `used_by` → `productivity/html-report-hermes`
+- `used_by` → `productivity/nano-pdf`
 
 ### Maps Skill
 
@@ -583,7 +843,8 @@ Convert HTML files to high-fidelity PDF using Chromium headless (via Debian .deb
 
 Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.
 
-**Relações:** taskflow-mcp, findmy
+**Relações:**
+- No relations found in this batch analysis. Maps is a standalone location intelligence skill with no confirmed reciprocal relations to other skills in scope.
 
 ### nano-pdf
 
@@ -594,7 +855,10 @@ Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.
 
 Edit PDF text/typos/titles via nano-pdf CLI (NL prompts).
 
-**Relações:** ocr-and-documents, html-to-pdf-chromium
+**Relações:**
+- `uses` → `productivity/ocr-and-documents`
+- `uses` → `productivity/html-to-pdf-chromium`
+- `similar` → `productivity/ocr-and-documents`
 
 ### Notion
 
@@ -605,7 +869,9 @@ Edit PDF text/typos/titles via nano-pdf CLI (NL prompts).
 
 Notion API + ntn CLI: pages, databases, markdown, Workers.
 
-**Relações:** airtable, taskflow-mcp
+**Relações:**
+- `similar` → `productivity/airtable`
+- `similar` → `productivity/taskflow-mcp`
 
 ### PDF & Document Extraction
 
@@ -616,7 +882,13 @@ Notion API + ntn CLI: pages, databases, markdown, Workers.
 
 Extract text from PDFs/scans (pymupdf, marker-pdf).
 
-**Relações:** powerpoint, nano-pdf
+**Relações:**
+- `uses` → `productivity/powerpoint`
+- `uses` → `productivity/nano-pdf`
+- `used_by` → `productivity/google-workspace`
+- `used_by` → `productivity/nano-pdf`
+- `similar` → `productivity/nano-pdf`
+- `used_by` → `productivity/powerpoint`
 
 ### Powerpoint Skill
 
@@ -627,7 +899,9 @@ Extract text from PDFs/scans (pymupdf, marker-pdf).
 
 Create, read, edit .pptx decks, slides, notes, templates.
 
-**Relações:** ocr-and-documents
+**Relações:**
+- `uses` → `productivity/ocr-and-documents`
+- `used_by` → `productivity/ocr-and-documents`
 
 ### Relatório de Custos — Skill de Geração
 
@@ -638,6 +912,10 @@ Create, read, edit .pptx decks, slides, notes, templates.
 
 Usuário pede relatório de custos do projeto X, breakdown de gastos, quanto custou o MVP. sqlite3 /opt/data/state.db " SELECT id, title, source, model,
 
+**Relações:**
+- `uses` → `software-development/agy`
+- `uses` → `productivity/html-report-hermes`
+
 ### TaskFlow MCP — Ferramentas e Workflows
 
 - **Nome:** `productivity/taskflow-mcp`
@@ -646,6 +924,9 @@ Usuário pede relatório de custos do projeto X, breakdown de gastos, quanto cus
 - **Resumo:** TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Pr...
 
 TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Protocol). Conecta-se via SSE (StreamableHTTP POST não funciona — SSE deve ser explícito). Transport: SSE (StreamableHTTP POST padrão do Hermes não funciona)
+
+**Relações:**
+- `similar` → `productivity/notion`
 
 
 ## Research
@@ -659,6 +940,10 @@ TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Co
 
 Search arXiv papers by keyword, author, category, or ID.
 
+**Relações:**
+- `used_by` → `research/deep-research`
+- `similar` → `research/llm-wiki`
+
 ### Blogwatcher
 
 - **Nome:** `research/blogwatcher`
@@ -667,6 +952,10 @@ Search arXiv papers by keyword, author, category, or ID.
 - **Resumo:** Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool
 
 Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool.
+
+**Relações:**
+- `similar` → `read-reddit/read-reddit`
+- `used_by` → `research/deep-research`
 
 ### Deep Research Skill
 
@@ -679,6 +968,11 @@ Multi-agent deep research pipeline: decompose topics, dispatch parallel agents, 
 
 Inspired by GPT-Researcher, this pipeline decomposes complex questions into sub-queries, dispatches parallel research agents across web, GitHub, news, and academic sources, runs independent reviewers for source verification, then conducts cross-validation and a roundtable discussion. Produces a final cited report with confidence-graded findings (HIGH/MEDIUM/LOW/CONTESTED). Supports three depth levels (Quick, Standard, Deep), adaptive phase skipping, local codebase analysis as Phase 0.5, and a bug-to-fix pipeline pattern.
 
+**Relações:**
+- `uses` → `research/arxiv`
+- `uses` → `research/blogwatcher`
+- `similar` → `research/llm-wiki`
+
 ### Karpathy's LLM Wiki
 
 - **Nome:** `research/llm-wiki`
@@ -687,6 +981,11 @@ Inspired by GPT-Researcher, this pipeline decomposes complex questions into sub-
 - **Resumo:** Karpathy's LLM Wiki: build/query interlinked markdown KB
 
 Karpathy's LLM Wiki: build/query interlinked markdown KB.
+
+**Relações:**
+- `similar` → `research/arxiv`
+- `similar` → `research/deep-research`
+- `uses` → `note-taking/obsidian`
 
 ### Polymarket — Prediction Market Data
 
@@ -708,6 +1007,9 @@ Read-only access to Polymarket prediction market data via three public REST APIs
 
 Write ML papers for NeurIPS/ICML/ICLR: design→submit.
 
+**Relações:**
+- `uses` → `software-development/plan`
+
 ### Tech Trend Discovery
 
 - **Nome:** `research/tech-trend-discovery`
@@ -726,6 +1028,9 @@ Discover what the tech/AI community is discussing right now — trending topics,
 
 - During the Research phase (Fase 2) of the product pipeline - Understanding user needs, pain points, and behaviors - Before defining personas or user stories
 
+**Relações:**
+- `used_by` → `software-development/ideation-drilling`
+- `used_by` → `software-development/backlog-and-sprint`
 
 ## Social Media
 
@@ -759,6 +1064,10 @@ X/Twitter via xurl CLI: post, search, DM, media, v2 API.
 
 Google Antigravity CLI (agy) — instalação, autenticação OAuth via tmux, e workflows de design (image generation, prototipagem, subagentes paralelos, HTML reports).
 
+**Relações:**
+- `used_by` → `software-development/backlog-and-sprint`
+- `used_by` → `productivity/relatorio-de-custos`
+
 ### Backlog & Sprint
 
 - **Nome:** `software-development/backlog-and-sprint`
@@ -767,6 +1076,11 @@ Google Antigravity CLI (agy) — instalação, autenticação OAuth via tmux, e 
 - **Resumo:** Usuário dá feedback │ ▼
 
 Usuário dá feedback │ ▼
+
+**Relações:**
+- `uses` → `software-development/agy`
+- `uses` → `research/user-interview`
+- `used_by` → `software-development/ideation-drilling`
 
 ### Authoring Hermes-Agent Skills (in-repo)
 
@@ -777,6 +1091,11 @@ Usuário dá feedback │ ▼
 
 Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structure. Merged with design-md skill.
 
+**Relações:**
+- `uses` → `software-development/plan`
+- `used_by` → `software-development/skill-curation`
+- `used_by` → `software-development/skills-repo-curator`
+
 ### Ideation Drilling (Hermes — Orchestrator)
 
 - **Nome:** `software-development/ideation-drilling`
@@ -785,6 +1104,10 @@ Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structu
 - **Resumo:** - O usuário diz: "Tenho uma ideia para um produto/feature" - O usuário pede: "Me ajude ...
 
 - O usuário diz: "Tenho uma ideia para um produto/feature" - O usuário pede: "Me ajude a refinar essa ideia" - Início do pipeline de produto (Fase 1)
+
+**Relações:**
+- `uses` → `research/user-interview`
+- `parent` → `software-development/backlog-and-sprint`
 
 ### Plan Mode
 
@@ -795,6 +1118,15 @@ Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structu
 
 Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bite-sized tasks, exact paths, complete code.
 
+**Relações:**
+- `uses` → `software-development/test-driven-development`
+- `used_by` → `software-development/spike`
+- `used_by` → `software-development/hermes-agent-skill-authoring`
+- `used_by` → `research/research-paper-writing`
+- `used_by` → `software-development/systematic-debugging`
+- `used_by` → `software-development/backlog-and-sprint`
+- `similar` → `software-development/spike`
+
 ### Skill Curation — Discover, Evaluate & Install Hermes Skills
 
 - **Nome:** `software-development/skill-curation`
@@ -803,6 +1135,10 @@ Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bi
 - **Resumo:** Hermes Agent has a rich ecosystem of **70+ bundled skills** and **hundreds of community...
 
 Hermes Agent has a rich ecosystem of **70+ bundled skills** and **hundreds of community skills** across GitHub, HermesHub (`hermeshub.xyz`), Hermes Atlas (`hermesatlas.com`), and the `skills.sh` marketplace. The challenge is not finding skills — it's finding the **right** skill and evaluating whether it's production-grade. This skill covers the full curation workflow: User request → Web search for skills → Extract details from repos
+
+**Relações:**
+- `uses` → `software-development/hermes-agent-skill-authoring`
+- `similar` → `software-development/skills-repo-curator`
 
 ### Skills Repository Curator
 
@@ -813,6 +1149,10 @@ Hermes Agent has a rich ecosystem of **70+ bundled skills** and **hundreds of co
 
 Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidação MECE, index.md/log.md/reports, offload de memória, e manutenção de AGENTS.md. Executa o processo completo de análise, merge, delete, relatório e commit.
 
+**Relações:**
+- `uses` → `software-development/hermes-agent-skill-authoring`
+- `similar` → `software-development/skill-curation`
+
 ### Spike
 
 - **Nome:** `software-development/spike`
@@ -821,6 +1161,10 @@ Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidaç�
 - **Resumo:** Throwaway experiments to validate an idea before build
 
 Throwaway experiments to validate an idea before build.
+
+**Relações:**
+- `uses` → `software-development/plan`
+- `similar` → `software-development/plan`
 
 ### Systematic Debugging
 
@@ -831,6 +1175,11 @@ Throwaway experiments to validate an idea before build.
 
 4-phase root cause debugging — methodology + Python (pdb/debugpy) + Node.js (--inspect). Understand bugs before fixing.
 
+**Relações:**
+- `uses` → `software-development/test-driven-development`
+- `uses` → `software-development/plan`
+- `used_by` → `software-development/test-driven-development`
+
 ### Test-Driven Development (TDD)
 
 - **Nome:** `software-development/test-driven-development`
@@ -840,6 +1189,10 @@ Throwaway experiments to validate an idea before build.
 
 TDD: enforce RED-GREEN-REFACTOR, tests before code.
 
+**Relações:**
+- `uses` → `software-development/systematic-debugging`
+- `used_by` → `software-development/plan`
+- `used_by` → `software-development/systematic-debugging`
 
 ## Uncategorized
 
@@ -852,6 +1205,9 @@ TDD: enforce RED-GREEN-REFACTOR, tests before code.
 
 Exploratory QA of web apps: find bugs, evidence, reports.
 
+**Relações:**
+- `similar` → `github/codebase-inspection`
+
 ### Read Reddit via RSS
 
 - **Nome:** `read-reddit`
@@ -860,3 +1216,6 @@ Exploratory QA of web apps: find bugs, evidence, reports.
 - **Resumo:** How to read Reddit subreddits reliably using RSS feeds — bypassing API rate limits and ...
 
 Read Reddit subreddits reliably via RSS feeds — bypasses API rate limits and bot detection. For research, curation, or news gathering.
+
+**Relações:**
+- `similar` → `research/blogwatcher`

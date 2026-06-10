@@ -59,3 +59,6 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 **AGENTS.md:** Regra adicionada — index.md é território de agente LLM, proibida edição por scripts
 
 **index.md:** Regenerado (83 skills, 12 edges)
+
+## [2026-06-10] update | Relations rebuilt depth-1 via 3 subagentes. 75/83 skills com relações.
+**Análise:** 3 subagentes leram cada skill + suas potenciais relações (profundidade 1), confirmaram bilateralmente. Total: ~223 relações analisadas, 141 arestas no grafo — 75 skills com `**Relações:**` em index.md.

@@ -1,7 +1,7 @@
 ---
 name: text-to-speech
 category: content-production
-description: Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback, self-hosted Fish Speech, and Hermes TTS provider. Full lifecycle from persona to audio.
+description: "Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback, self-hosted Fish Speech, and Hermes TTS provider. Full lifecycle from persona to audio."
 metadata:
   hermes:
     tags: [tts, voice, gemini, fish-speech, audio, prompting, speech]
@@ -12,7 +12,7 @@ metadata:
 
 Umbrella skill. Covers:
 - [Voice design & prompting](#gemini-31-flash-tts) — Gemini TTS prompt structure, voice selection, audio tags
-- [Hermes TTS system](#hermes-tts-command-provider-chain) — multi-provider fallback, config
+- [Hermes TTS system](#hermes-tts-command-provider-chain) — multi-provider fallback, config, wav_temp fix
 - [Self-hosted inference](#fish-speech-s2-pro-gguf-self-hosted) — Fish Speech on ARM64
 - [Voice design patterns](#voice-design-process) — iterative refinement, persona creation
 
@@ -60,15 +60,15 @@ Director tags: `[dryly]` `[wryly]` `[matter-of-fact]` `[whispers]` `[measured]`
 
 | Voice | Style | Best for |
 |-------|-------|----------|
-| **Charon** | Informative | Imponente, denso, grave, solene. **NOTA:** Charon NÃO é entidade separada — é o tom/infusão de personalidade do Hermes (seco, irônico, trickster). A voz é do Hermes, modulada pelo estilo Charon. |
+| **Charon** | Informative | Imponente, denso, grave, solene. **NOTA:** Charon NAO e entidade separada — e o tom/infusao de personalidade do Hermes (seco, ironico, trickster). A voz e do Hermes, modulada pelo estilo Charon. |
 | **Erinome** | Clear | Preciso, limpo, direto |
 | **Iapetus** | Clear | Clean, neutral |
-| **Schedar** | Even | Equilibrado, steady, lacônico |
-| **Achird** | Friendly | Acessível, caloroso |
+| **Schedar** | Even | Equilibrado, steady, laconico |
+| **Achird** | Friendly | Acessivel, caloroso |
 | **Sadaltager** | Knowledgeable | Autoridade intelectual |
-| **Zubenelgenubi** | Casual | Tom descontraído, irônico |
+| **Zubenelgenubi** | Casual | Tom descontraido, ironico |
 | **Gacrux** | Mature | Solene com textura |
-| **Puck** | Upbeat | Animado, energético |
+| **Puck** | Upbeat | Animado, energetico |
 | **Kore** | Firm | Firme, seguro |
 | **Sulafat** | Warm | Aconchegante, humano |
 | **Vindemiatrix** | Gentle | Suave, delicado |
@@ -105,7 +105,8 @@ with wave.open('out.wav', 'wb') as wf:
 
 ## Hermes TTS Command Provider Chain
 
-Single command provider for ALL TTS, configured in `config.yaml`:
+Single command provider for ALL TTS, configured in the main config file
+(`$HERMES_HOME/config.yaml` — here: `/opt/data/config.yaml`, NOT `.hermes/config.yaml`):
 
 ```yaml
 tts:
@@ -118,16 +119,42 @@ tts:
       timeout: 600
 ```
 
-**Nota sobre formato:** O script sempre gera OGG (Opus) internamente — mesmo que o path que a ferramenta passa termine em `.wav`, o conteúdo do arquivo é OGG. Isso porque ffmpeg rejeita codec Opus dentro de container WAV (`Codec opus not supported in WAVE format`). O fluxo é: gera WAV temp do Gemini → converte com ffmpeg para `.ogg` → move para o path final esperado pela ferramenta via `os.replace()`.
+**Fluxo de saida:** O script hermes-tts.py gera `.wav` bruto do Gemini,
+depois converte para OGG (Opus) via ffmpeg. O path final termina em `.ogg`
+(config `output_format: ogg` garante que a ferramenta gere caminho `.ogg`).
+
+**Bug conhecido do wav_temp:** O script (linha ~263) cria o WAV temporario
+com `args.output + ".wav"`. Quando o output termina em `.ogg`, isso gera
+`arquivo.ogg.wav`. A correcao e usar `rsplit(".", 1)[0] + ".wav"` para gerar
+`arquivo.wav`. Sem essa correcao, ffmpeg recebe `.wav` com codec libopus
+e falha com exit 218.
+
+**Workflow de depuracao — reportar antes de corrigir:** Quando investigando
+problemas no TTS (ou qualquer sistema), primeiro reporte os achados ao
+usuario antes de sair corrigindo. Deixe o usuario decidir se e o que deve
+ser mexido.
 
 The script tries three-stage fallback:
 1. **Gemini 3.1 Flash TTS** (Charon voice) → best quality
 2. **Gemini 2.5 Flash Preview TTS** → fallback on quota exhaustion (429)
 3. **Fish Speech S2 Pro q8_0** → local voice clone (last resort)
 
-The voice instruct preamble is baked into the script: Charon voice, Brazilian Portuguese, male, mid-deep pitch, warm but precise tone, subtle irony.
+The voice instruct preamble is baked into the script (see `references/hermes-tts-prompt-history.md` for the full evolution).
+Currently set to:
+```
+Voice: Charon. Brazilian Portuguese, male, mid-deep pitch,
+warm but precise tone, subtle irony.
+Speak naturally with a conversational pace — like a competent colleague.
+```
 
-Detalhes do fluxo de conversão WAV→OGG e o gotcha da extensão ffmpeg em `references/ogg-conversion-pattern.md`.
+⚠️ **This is a known minimal version.** A much more detailed prompt structure
+(with PERFIL/CENA/PERFORMANCE/CONTEXTO/TRANSCRIPT sections) was developed
+during earlier iterations but was lost during context compaction. If the user
+mentions a more detailed prompt, they expect the full structure above — not
+just these 3 lines. The canonical structure is documented in the
+[Gemini 3.1 Flash TTS](#gemini-31-flash-tts) section above.
+
+Detalhes do fluxo de conversao WAV→OGG e o gotcha da extensao ffmpeg em `references/ogg-conversion-pattern.md`.
 
 ## Fish Speech S2 Pro GGUF (self-hosted)
 
@@ -158,33 +185,33 @@ curl -X POST http://localhost:8882/v1/audio/speech \
 
 ## Platform-aware audio delivery
 
-Gerou um áudio com TTS? A entrega precisa ser adaptada por plataforma.
+Gerou um audio com TTS? A entrega precisa ser adaptada por plataforma.
 
 ### Format compatibility
 
 | Platform | MEDIA inline | send_message | Best format |
 |----------|-------------|--------------|-------------|
-| **WhatsApp** | ✅ `.wav` via `MEDIA:` na resposta direta | ❌ send_message não suporta MEDIA | `.wav` (nativo) |
+| **WhatsApp** | ✅ `.wav` via `MEDIA:` na resposta direta | ❌ send_message nao suporta MEDIA | `.wav` (nativo) |
 | **Telegram** | ✅ via `MEDIA:` na resposta | ✅ via `send_message` com MEDIA:path | `.ogg` (opus) — mais leve, toca inline |
 | **Discord** | ✅ | ✅ | `.ogg` ou `.wav` |
 
 ### Conversion workflow
 
-O script `hermes-tts.py` faz a conversão automaticamente (WAV → OGG via ffmpeg). Ao entregar manualmente:
+O script `hermes-tts.py` faz a conversao automaticamente (WAV → OGG via ffmpeg). Ao entregar manualmente:
 
 ```bash
 # WAV → OGG (opus, ~10x menor)
 ffmpeg -i input.wav -c:a libopus output.ogg
 ```
 
-**⚠️ ffmpeg e extensão de saída:** ffmpeg escolhe o muxer baseado na extensão do arquivo de saída. Se o destino terminar em `.wav`, ffmpeg tenta muxer WAV, que não aceita codec Opus (exit 218). Sempre use `.ogg` no destino ou force o formato com `-f ogg`.
+**⚠️ ffmpeg e extensao de saida:** ffmpeg escolhe o muxer baseado na extensao do arquivo de saida. Se o destino terminar em `.wav`, ffmpeg tenta muxer WAV, que nao aceita codec Opus (exit 218). Sempre use `.ogg` no destino ou force o formato com `-f ogg`.
 
 ### Delivery rules
 
-1. **Trigger: usuário enviou áudio** — responder com áudio via `text_to_speech`. Não responder em texto. `MEDIA:/path/to/file` na resposta entrega o áudio nativamente.
+1. **Trigger: usuario enviou audio** — responder com audio via `text_to_speech`. Nao responder em texto. `MEDIA:/path/to/file` na resposta entrega o audio nativamente.
 2. **Se for pra mesma plataforma** onde o pedido veio: inclui `MEDIA:/path/to/file` na resposta direta.
-3. **Telegram:** O output do TTS (OGG interno) toca inline como áudio, mesmo com nome `.wav`. Usar `send_message(target='telegram', message='MEDIA:/path/to/file')`.
-4. **WhatsApp:** MEDIA na resposta funciona com `.wav`. `send_message` NÃO suporta MEDIA.
+3. **Telegram:** O output do TTS (OGG) toca inline como audio. Usar `send_message(target='telegram', message='MEDIA:/path/to/file')`.
+4. **WhatsApp:** MEDIA na resposta funciona com `.wav`. `send_message` NAO suporta MEDIA.
 5. **Se pediu pra enviar em outra plataforma** (ex: "manda no Telegram"): converter e usar `send_message`.
 
 ### Quick reference
@@ -211,6 +238,29 @@ Iterative refinement loop for creating TTS voices with Gemini:
 - Set overall tone via PERFORMANCE section
 - Tags work for emphasis; overuse breaks naturalness
 
+## Workflow: Report before fixing
+
+This user's explicit preference: when investigating any TTS (or system) problem,
+**first report findings, then wait for direction.** Do not jump to fixing.
+
+Sequence:
+1. Gather data — config, logs, file system state
+2. Present findings clearly (what's wrong, where, why)
+3. Let the user decide: "não corrija, só relate"
+4. Only fix when the user says "go"
+
+Document what was found; let the user choose the path.
+
+## TTS log diagnostics
+
+Detailed guide in `references/tts-log-diagnostics.md` — recognize false-positive
+success entries, match file extension vs logged format, verify actual codec.
+
+Quick check:
+```bash
+tail -5 /opt/data/.hermes/scripts/tts_log.jsonl | python3 -m json.tool
+```
+
 ## Diagnostics: TTS tool failure investigation
 
 When `text_to_speech` returns an error, trace the resolution chain:
@@ -227,8 +277,9 @@ When `text_to_speech` returns an error, trace the resolution chain:
 | `timed out` | Command too slow | Bump timeout in config |
 | `produced no output` | Script ran but no output file | Run manually with placeholders |
 | Wrong provider name | Second config at different path | Compare config files |
+| `exit 218` | ffmpeg codec/container mismatch | Check output_format in real config.yaml |
 
-**Log de execução:** Cada chamada ao script registra provider, timestamp, tamanho e status em `/opt/data/.hermes/scripts/tts_log.jsonl`. Consulte para depurar falhas passadas.
+**Log de execucao:** Cada chamada ao script registra provider, timestamp, tamanho e status em `/opt/data/.hermes/scripts/tts_log.jsonl`. Consulte para depurar falhas passadas.
 
 ## Pitfalls
 
@@ -238,12 +289,13 @@ When `text_to_speech` returns an error, trace the resolution chain:
 - **Transient output:** Gemini returns PCM, not WAV — must wrap in WAV header
 - **Fish Speech cold start:** First inference loads model (~1-2 min)
 - **API authorization:** Do NOT call Gemini API without explicit user instruction
-- **ffmpeg + extensão .wav:** ffmpeg escolhe muxer pela extensão do output. Opus em `.wav` falha (`Codec opus not supported in WAVE format`, exit 218). Sempre usar extensão `.ogg` no destino do ffmpeg, ou mover o .ogg gerado para o path final com `os.replace()`.
-- **Script output format:** O script `hermes-tts.py` sempre gera OGG (Opus), mesmo que o path da ferramenta termine em `.wav`. O conteúdo é OGG válido e toca inline no Telegram.
+- **ffmpeg + extensao .wav:** ffmpeg escolhe muxer pela extensao do output. Opus em `.wav` falha (exit 218). Sempre usar `.ogg` no destino.
+- **wav_temp naming:** `args.output + ".wav"` gera `arquivo.ogg.wav` se output e `.ogg`. Usar `rsplit(".", 1)[0] + ".wav"`.
+- **Two config trap:** `load_config()` le de `$HERMES_HOME/config.yaml`. O arquivo em `.hermes/config.yaml` e uma config secundaria que NAO e lida pela tool. Sempre checar o config real.
 
 ## Execution Log
 
-Toda execução do TTS é registrada em `/opt/data/.hermes/scripts/tts_log.jsonl` (JSONL).
+Toda execucao do TTS e registrada em `/opt/data/.hermes/scripts/tts_log.jsonl` (JSONL).
 
 Formato de cada linha:
 
@@ -264,9 +316,9 @@ Campos:
 - `timestamp` — ISO 8601 UTC
 - `provider` — qual provider foi usado (Gemini 3.1 Flash, Gemini 2.5 Flash Preview, Fish Speech S2 Pro, ou none)
 - `text_length_chars` — tamanho do texto de entrada em caracteres
-- `output_bytes` — tamanho do áudio gerado em bytes (0 se falhou)
-- `duration_audio_sec` — duração aproximada do áudio em segundos
+- `output_bytes` — tamanho do audio gerado em bytes (0 se falhou)
+- `duration_audio_sec` — duracao aproximada do audio em segundos
 - `output_file` — caminho do arquivo gerado
-- `format` — formato real do áudio (ogg ou wav)
+- `format` — formato real do audio (ogg ou wav)
 - `success` — true/false
 - `error` — mensagem de erro (null se sucesso)
