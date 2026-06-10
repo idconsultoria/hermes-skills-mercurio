@@ -1,0 +1,237 @@
+---
+name: html-report-hermes
+description: "Render dense research reports, analyses, and data summaries as beautiful standalone HTML using the Hermes CRT Design System (amber/blue inversion, terminal aesthetic, serif + monospace typography, scanlines + vignette overlays). Activates automatically whenever the user needs a visual-rich response — HTML landing pages, dashboards, comparative analysis, benchmarks, documentation, or any report that would benefit from structured visual presentation."
+version: 1.0.0
+author: Gustavo
+tags: [html, design-system, hermes, crt, report, visualization, frontend]
+trigger_phrases: ["gere um html", "visualmente", "relatório html", "dashboard", "landing page", "interface", "report html", "make it look good", "html bonito", "apresentação visual", "estilo hermes", "design system", "crie uma página", "faz um html", "monta um visual", "como seria visualmente", "explicação visual", "guia visual", "página explicativa", "página visual", "crie um html", "monte um html", "entregue como html", "visual facilitado", "explicando de forma visual", "refaça esse html", "interface visual", "compile ranked list", "lista ranqueada", "guia de recursos", "pesquisa fontes", "recursos de aprendizagem", "fontes para aprender"]
+---
+
+# HTML Report — Hermes Design System
+
+## REGRA DE ROTEAMENTO: AGY vs ESCRITA DIRETA
+
+Esta skill cobre DOIS modos de geracao HTML. Escolha baseado no sistema de design:
+
+### 🅰 Hermes CRT (Visual/Showcase) → USE AGY
+
+Para landing pages, showcases, demos interativas, paginas de marketing — qualquer conteudo que precise parecer retro-futurista com overlays CRT, cores invertidas, scanlines.
+
+**NAO gere HTML CRT manualmente.** O usuario ja corrigiu isso:
+- "Agora ficou feio. Lembre de usar o Agy com o contexto correto."
+- "De mais tempo para o agy se for necessario — 300s, nao 120s."
+
+**Pipeline AGY (apenas para modo 🅰 CRT):**
+1. Prepare o prompt com TODOS os dados exatos, estrutura e design
+2. Escreva o prompt como .md em `/opt/data/`
+3. Execute no host: `cat /tmp/prompt.md | timeout 300 agy` (via SSH)
+4. Copie o HTML de volta e ZIP para Telegram
+
+### 🅱 Hermes Official (Analitico/Dados) → ESCREVA DIRETO
+
+Para relatorios de dados, pesquisas, rankings, tabelas comparativas, benchmarks — conteudo onde **legibilidade e hierarquia de informacao sao prioridade**. Use o design system Hermes Official (azul royal sobre branco, Inter + Space Mono, cards clean).
+
+**Pode escrever o HTML diretamente** — sem agy, sem pipeline SSH. O Hermes Official design e simples o suficiente (grid, cards, tabelas, callouts) para ser gerado inline com alta qualidade. Exemplo deste padrao: relatorio ranqueado de recursos MCP (Jun 2026), entregue como HTML + ZIP no Telegram.
+
+**Decisao rapida:**
+| O HTML precisa de... | Modo | Ferramenta |
+|---------------------|------|-----------|
+| Overlays CRT, scanlines, cores invertidas | 🅰 CRT | agy via SSH |
+| Grid limpo, cards, tabelas, hero gradiente azul | 🅱 Official | Escrita direta |
+
+## Quando Ativar
+
+Sempre que o usuário pedir qualquer output visual que se beneficie de formatação HTML estruturada:
+
+- **Relatórios densos** (pesquisa de mercado, análise de dados, benchmarks, comparações)
+- **Landing pages** (product pages, feature showcase, download pages)
+- **Dashboards** (métricas, KPIs, status de sistemas)
+- **Documentação** (style guides, API references, changelogs)
+- **Apresentações visuais** (qualquer resposta que precise comunicar informação hierárquica complexa)
+
+## Sistema de Design Padrão: Hermes Style Guide
+
+**⚠️ REGRA ABSOLUTA: O Hermes Style Guide é o padrão para TODA interface visual HTML.** Não espere o usuário pedir. Não pergunte se deve usar. Aplique automaticamente. O usuário já corrigiu isso repetidamente ("Já te pedi algumas vezes, quero que reforce", "QUE VOCÊ DEVE USAR POR PADRÃO SEMPRE") — esta skill DEVE ativar sem exceção para qualquer HTML que produza, a menos que o usuário explicite outro estilo.
+
+O Hermes Agent tem **dois guias de estilo distintos**. Escolha baseado no TIPO do conteúdo:
+
+### 🅰 Hermes CRT — Visual/Showcase/Marketing
+
+Para landing pages, showcases de produto, páginas de marketing, demos interativas, e qualquer conteúdo que PRECISE parecer "retro-futurista Hermes".
+
+- **Arquivo:** `/opt/data/hermes-agent-style-guide.md`
+- **Estética:** Amber/blue inversion, CRT scanlines, vignette, mix-blend-mode:difference, cores invertidas
+- **Vibe:** Terminal cyber-brutalista, laboratório de pesquisa, manifesto visual
+- **Fontes:** Cormorant Garamond (títulos), Syncopate (seções), VT323 (tags), Space Mono (corpo)
+
+### 🅱 Hermes Official Website — Dados/Analítico/Relatórios
+
+Para relatórios densos, análises de dados, benchmarks, tabelas comparativas, documentação técnica, dashboards — qualquer conteúdo onde **legibilidade e hierarquia de informação são prioridade**.
+
+- **Arquivo:** `/opt/data/hermes-agent-design-style-guide.md` (782 linhas, guia completo)
+- **Estética:** Blue royal (#0000FF) sobre branco, layout clean, grid modular, sem overlays CRT
+- **Vibe:** Site oficial do Hermes Agent — profissional, técnico, informativo
+- **Paleta:** `--blue-primary: #0000FF`, `--blue-bg: #F0F5FF`, `--blue-border: #CCD9FF`, `--white: #FFFFFF`
+- **Fontes:** Inter (corpo), Space Mono (código), Spectral (títulos serifados em hero)
+- **Tabelas:** Header azul royal com texto branco, linhas zebradas sutis, cantos arredondados (8px)
+- **Callouts:** Boxes coloridos com borda-left (green/amber/red/blue) para destaques
+- **Cards:** Borda `1px solid var(--blue-border)`, sem sombras, sem glassmorphism
+- **Nav:** Uppercase, letter-spacing generoso, azul escuro (#1A237E) sobre branco
+
+### Regra de decisão
+
+| Tipo de conteúdo | Sistema |
+|-----------------|---------|
+| Landing page, showcase, demo visual | 🅰 Hermes CRT |
+| Relatório de dados, custos, pesquisa, benchmark | 🅱 Hermes Official |
+| Dashboard, métricas, analytics | 🅱 Hermes Official |
+| Documentação técnica, guia | 🅱 Hermes Official |
+| Página de produto, feature grid | 🅰 Hermes CRT |
+| Tutorial com screenshots | 🅱 Hermes Official (legibilidade) |
+
+Quando em dúvida, pergunte ao usuário. Mas para **relatórios de custo/dados/pesquisa**, o padrão é 🅱 Hermes Official Website.
+
+---
+
+## Estrutura Padrão para Relatórios de Custo/Dados
+
+O usuário explicitou a estrutura preferida (após correção). Sempre use esta ordem:
+
+### 1. HERO SECTION (topo)
+- Gradiente azul escuro (#0000FF → #000088)
+- Título + subtítulo + metadados
+- Valor total em destaque (dourado #E8B830, Space Mono)
+
+### 2. SUMÁRIO EXECUTIVO (1-3 páginas, seção destacada)
+- **Fundo:** azul claro (#F0F5FF), borda 2px azul royal
+- **4 KPI cards** no topo (grid 4 colunas):
+  - Total / Maior gasto / Agente real / Grátis
+- **Gráfico donut SVG** com distribuição percentual
+- **Gráfico de barras horizontal** por agente/fase
+- **Tabela consolidada** com:
+  - Agente, Sessões, Calls, Tokens (cache hit + miss + output), Custo
+- **🔥 Métrica de tokens em destaque** — caixa visual separada mostrando:
+  - Total geral de tokens processados (cache hit + miss + output)
+  - Breakdown por modelo: cache hit, cache miss, output
+  - Economia gerada pelo cache hit (valor em $)
+- **4 Key Insights cards** (verde/azul/âmbar/verde)
+- **TL;DR** em callout azul
+
+### 3. CONTEÚDO DETALHADO (seções seguintes)
+- Metodologia (fontes de dados, precisão)
+- Breakdown do Hermes (tabela por atividade + insights)
+- Breakdown do Pi Agent (tabela por sessão + bar chart por fase)
+- Agentes gratuitos (com impacto indireto)
+- Comparação vX vs vY (tabela com diferenças + lições aprendidas)
+- Anexos técnicos (fórmulas, listagem de arquivos)
+
+---
+
+## Telegram Delivery
+
+**.html files nao sao suportados diretamente no Telegram.** Use um destes:
+
+1. **ZIP** — Python shutil.make_archive('nome', 'zip', '.', 'arquivo.html')
+2. **Renomear para .txt** — funciona, mas mostra o HTML puro (nao indicado)
+3. **Converter para .pdf** — via Chromium headless (veja skill html-to-pdf-chromium)
+
+Preferencia: ZIP com shutil.make_archive().
+
+### Princípios do Sistema (Atualizado — legibilidade em primeiro lugar)
+
+1. **CRT Inversion Layer** — Três overlays fixos obrigatórios no `<body>`:
+   - `crt-inversion-overlay`: `position:fixed; inset:0; background:#ffffff; mix-blend-mode:difference; z-index:9999`
+   - `crt-vignette-overlay`: `position:fixed; inset:0; radial-gradient(amber glow); mix-blend-mode:lighten; z-index:9998`
+   - `crt-scanline-overlay`: `position:fixed; inset:0; linear-gradient(scanlines); background-size:100% 4px; z-index:9997`
+
+2. **Cores Invertidas** — Todas as cores no CSS são codificadas pelo AVESSO porque o overlay de inversão as reverte:
+   - `#000000` (preto CSS) → `#ffffff` (branco renderizado) — **fundo da página**
+   - `#ffff0d` (âmbar CSS) → `#0000f2` (azul royal renderizado) — **texto principal, bordas**
+   - ~~`#ffffff` (branco CSS) → `#000000` (preto renderizado) — fundos de painel/card~~ **EVITAR. Fundos escuros (#ffffff → preto) atrapalham legibilidade. Deixe cards sem background (transparente, herda branco da página) ou use `#171717` (renderiza #e8e8e8) para separações sutis.**~~
+   - `#171717` (cinza escuro CSS) → `#e8e8e8` (cinza claro renderizado) — fundos secundários (use com moderação)
+   - `#00ffff` (cyan CSS) → `#ff0000` (vermelho renderizado) — alertas, erros
+   - `#ff2702` (laranja-avermelhado CSS) → `#00d8fd` (cyan renderizado) — **destaques em strong/negrito**
+
+3. **Tipografia (tamanhos generosos para leitura confortável)**:
+   - `'Cormorant Garamond', serif` — Títulos gigantes (`font-size: clamp(2.5rem, 6vw, 5rem)`, bold, uppercase, `letter-spacing: -0.02em`)
+   - `'Syncopate', sans-serif` — Subtítulos/seções (`font-size: 0.75rem`, uppercase, `letter-spacing: 0.08em`)
+   - `'VT323', monospace` — Tags, badges, números de fase (`font-size: 0.65-0.7rem`, uppercase, `letter-spacing: 0.15em`)
+   - `'Space Mono', monospace` — **Corpo de texto principal** — tamanho mínimo `0.82rem`, `line-height: 1.7-1.8`, opacidade mínima `0.85`. Valores abaixo disso comprometem legibilidade.
+
+4. **Grid e Bordas**:
+   - Cantos retos (`border-radius: 0`) — sem exceções
+   - Grid modular com bordas collapsed entre células (`border-left/border-bottom` no grid, `border-right/border-top` nos itens)
+   - ~~`3px double` para terminais (Componente 4) — **EVITAR. Terminal-showcase removido por problemas de legibilidade.**~~
+   - ~~Chanfro diagonal (Componente 9) — **EVITAR. Reduz espaço útil de leitura.**~~
+   - Prefira `border-top` ou `border-bottom` sutis (`rgba(255,255,13,0.15-0.2)`) para separar blocos no lugar de bordas completas
+
+### Biblioteca de Componentes (Atualizada — prioriza legibilidade)
+
+Sempre que construir um HTML, use estes componentes conforme necessário:
+
+| # | Componente | Seletor/Style | Uso |
+|---|-----------|--------------|-----|
+| 1 | CRT Overlays | `.crt-inversion-overlay`, `.crt-vignette-overlay`, `.crt-scanline-overlay` | Wrapper global obrigatório |
+| 2 | Cursor Piscante | `.terminal-cursor` + `@keyframes terminal-blink` | Final de prompts |
+| 3 | Tech Grid | `.tech-grid` (display:grid, repeat(auto-fit, minmax(210px,1fr)), borders collapsed) | Cards de feature, métricas, grid de dados |
+| 4 | ~~Terminal Showcase~~ | **DEPRECATED — removido por problemas de legibilidade. Não usar.** | ~~Simulação de terminal, logs~~ |
+| — | **Readable Card** (substitui #4 e #9) | `.readable-card` (borda 1px #ffff0d, sem bg escuro, padding 24px, font-size 0.85rem, line-height 1.8) | **Bloco de texto principal. Preferência absoluta para conteúdo corrido.** |
+| 5 | Install Block | `.install-block` (header com título + botão COPY, code block) | Blocos de código, comandos, snippets |
+| 6 | Isometric Button | `.isometric-btn` (filled bg, 4px 4px 0px shadow, hover translate) | CTAs, downloads, ações primárias |
+| 7 | Platform Tabs | `.platform-tabs` (inline-flex, active indicator via ::after 2px) | Seletor de plataforma/SO |
+| 8 | Retro Header | `.retro-header` (top+bottom border, hover glow nos links) | Navbar fixa/sticky |
+| 9 | ~~Retro Card (Chanfrado)~~ | **DEPRECATED — chanfro e fundo escuro atrapalham legibilidade. Usar `.readable-card` no lugar.** | ~~Card com canto chanfrado~~ |
+| 10 | Giant Serif Title | `.giant-serif-title` (Cormorant Garamond 5rem, bold, uppercase) | Hero, título principal da página |
+| 11 | Status Tags | `.status-tag` (1px border, 0.15em tracking, variant `.filled`) | Tags, badges, labels de tecnologia |
+| 12 | Tech Table | `table.tech-table` (2px th border-bottom, dashed td borders) | Benchmarks, specs, dados tabulares |
+| 13 | Scroll Container | `.scroll-container` (height fixa, overflow-y, custom 4px scrollbar) | Logs longos, conteúdo rolável |
+| 14 | Meta List | `.meta-list` (flex column, key-value pairs, bottom border) | Especificações, metadados |
+| 15 | Tech Footer | `.tech-footer` (flex space-between, border-top, 2-3 colunas) | Rodapé com versão, links, licença |
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- Google Fonts: Cormorant Garamond + Syncopate + VT323 + Space Mono -->
+  <style>
+    /* CRT overlays */
+    /* Reset e body bg: #000000 */
+    /* Componentes 1-15 conforme necessidade */
+  </style>
+</head>
+<body>
+  <!-- 3 CRT overlays -->
+  <!-- Retro header (Componente 8) -->
+  <div class="page-wrap">
+    <!-- Hero com título serifado (Componente 10) -->
+    <!-- Conteúdo com componentes 3-15 conforme necessidade -->
+    <!-- Tech footer (Componente 15) -->
+  </div>
+</body>
+</html>
+```
+
+### Regras de Estilo (Checklist de Legibilidade)
+
+- [ ] 3 overlays CRT estão no topo do `<body>`?
+- [ ] Todas as cores estão codificadas pelo avesso (inversão)?
+- [ ] Tipografia usa as 4 famílias nos lugares certos?
+- [ ] `border-radius: 0` em tudo?
+- [ ] **NENHUM fundo escuro** (#ffffff → preto) em cards ou painéis? (preferir transparente)
+- [ ] **NENHUM terminal-showcase** (removido por ilegibilidade)?
+- [ ] **NENHUM chanfro diagonal** (removido por ilegibilidade)?
+- [ ] Texto corpo tem no mínimo `0.82rem` com `line-height: 1.7+`?
+- [ ] Opacidade de texto corrido é `0.85` ou maior?
+- [ ] O layout usa grid com linhas collapsed?
+- [ ] Os componentes mapeiam a biblioteca atualizada?
+- [ ] O footer segue o formato "PRODUTO • LINK ↗ • LICENSE • ANO"?
+
+### Fallback Estético
+
+Se o usuário pedir explicitamente OUTRA estética (ex: "faz no estilo da Vercel", "quero algo minimalista clean", "tema claro corporativo"), USE a estética solicitada em vez do Hermes CRT. O Hermes é o padrão, não a única opção.
+
+### Referências
+
+- Style guide (CRT): `/opt/data/hermes-agent-style-guide.md`
+- Style guide (Official): `/opt/data/hermes-agent-design-style-guide.md`
+- Pesquisa multi-fonte: `references/research-compilation-workflow.md` — fallback chain quando web_search falha, estrutura de HTML ranqueado, fontes prioritárias

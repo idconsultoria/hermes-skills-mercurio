@@ -1,0 +1,590 @@
+---
+name: deep-research
+description: >
+  Multi-agent deep research skill inspired by GPT-Researcher. Decomposes a question
+  into sub-queries, dispatches parallel research agents across web/GitHub/news/academic
+  sources, each with an independent reviewer for source verification, then runs
+  cross-validation and a roundtable discussion to produce a final cited report.
+triggers:
+  - 深度调研
+  - deep research
+  - 全面调研
+  - 多角度调研
+  - research roundtable
+---
+
+# Deep Research Skill
+
+基于 GPT-Researcher 架构，适配 Hermes delegate_task 的多 agent 深度调研流水线。
+
+## Pipeline Overview
+
+```
+用户问题
+   │
+   ▼
+[Phase 0] 问题分析 & 子问题分解 (Hermes 自身)
+   │
+   ▼
+[Phase 1] 并行调研 agents (delegate_task batch, 4 agents)
+   │         ├─ Web 调研 agent
+   │         ├─ GitHub/代码 调研 agent
+   │         ├─ 新闻/时事 调研 agent
+   │         └─ 学术/论文 调研 agent
+   │
+   ▼
+[Phase 2] 并行审核 agents (delegate_task batch, 4 reviewers)
+   │         ├─ Web reviewer     ── 核实来源可信度 & 事实准确性
+   │         ├─ GitHub reviewer  ── 验证仓库活跃度 & 代码质量
+   │         ├─ News reviewer    ── 检查时效性 & 多源交叉
+   │         └─ Academic reviewer── 验证引用 & 方法论
+   │
+   ▼
+[Phase 3] 交叉验证 + 圆桌会议 (delegate_task, 1 orchestrator agent)
+   │         ├─ 找出各源矛盾点
+   │         ├─ 对有争议观点进行辩论
+   │         └─ 形成共识或标注分歧
+   │
+   ▼
+[Phase 4] 报告生成 (Hermes 自身)
+   │         ├─ 综合所有审核后的调研结果
+   │         ├─ 按置信度分级 (HIGH/MEDIUM/LOW/CONTESTED)
+   │         └─ 输出最终报告 (含引用来源)
+```
+
+## Phase 0: 问题分析 & 子问题分解
+
+Hermes 自身完成，不需要 delegate。
+
+1. 分析用户问题，确定调研范围和深度
+2. 生成 4-8 个子问题，覆盖不同维度
+3. 为每个调研 agent 分配相关子问题
+4. 确定调研语言（跟随用户偏好，默认中文报告）
+
+生成子问题时的 prompt 模板：
+
+```
+分析以下问题，生成 4-8 个聚焦的子问题，用于从不同角度调研：
+- 每个子问题应独立可查
+- 覆盖：背景/现状、技术细节、对比/替代方案、趋势/前景
+- 标注每个子问题适合的调研渠道（web/github/news/academic）
+
+问题：{user_question}
+```
+
+## Phase 1: 并行调研 Agents
+
+使用 delegate_task 的 batch 模式，4 个 agent 并行执行：
+
+### Agent 分配
+
+```python
+delegate_task(tasks=[
+    {
+        "goal": "Web 综合调研",
+        "context": f"""你是 Web 调研专家。针对以下问题进行深度 web 搜索调研：
+
+问题：{user_question}
+重点子问题：{web_sub_queries}
+
+要求：
+1. 搜索至少 3 个不同搜索引擎/来源
+2. 每个发现必须附带来源 URL
+3. 提取关键数据点、统计数字、专家观点
+4. 标注信息的时效性（发布日期）
+5. 区分事实陈述 vs 观点/推测
+6. 输出格式：
+   ## 发现 N: [标题]
+   - 来源: [URL]
+   - 日期: [日期]
+   - 类型: 事实/观点/数据
+   - 内容: [详细描述]
+   - 置信度: HIGH/MEDIUM/LOW
+""",
+        "toolsets": ["web", "browser"]
+    },
+    {
+        "goal": "GitHub/代码生态调研",
+        "context": f"""你是 GitHub 和开源生态调研专家。针对以下问题搜索相关代码仓库、技术实现和社区讨论：
+
+问题：{user_question}
+重点子问题：{github_sub_queries}
+
+要求：
+1. 搜索 GitHub 仓库（star 数、活跃度、最近更新）
+2. 查看关键仓库的 README、架构、issues、discussions
+3. 查找相关技术实现和最佳实践
+4. 对比不同开源方案的优劣
+5. 每个发现必须附带仓库 URL 和具体证据
+6. 输出格式：
+   ## 仓库/发现 N: [名称]
+   - URL: [链接]
+   - Stars: [数量] | 最近更新: [日期]
+   - 核心特点: [描述]
+   - 与问题的关联: [分析]
+   - 置信度: HIGH/MEDIUM/LOW
+""",
+        "toolsets": ["web", "browser", "terminal"]
+    },
+    {
+        "goal": "新闻/时事调研",
+        "context": f"""你是新闻和时事调研专家。针对以下问题搜索最新新闻报道、行业动态和市场趋势：
+
+问题：{user_question}
+重点子问题：{news_sub_queries}
+
+要求：
+1. 搜索最近 6 个月内的相关新闻
+2. 覆盖不同地区和语言的新闻源（中文+英文）
+3. 关注行业报告、融资动态、公司公告
+4. 识别趋势和转折点
+5. 每条新闻必须附带来源和发布日期
+6. 输出格式：
+   ## 新闻 N: [标题]
+   - 来源: [媒体名 + URL]
+   - 日期: [发布日期]
+   - 摘要: [核心内容]
+   - 影响分析: [与问题的关联]
+   - 置信度: HIGH/MEDIUM/LOW
+""",
+        "toolsets": ["web", "browser"]
+    },
+    {
+        "goal": "学术/论文调研",
+        "context": f"""你是学术调研专家。针对以下问题搜索相关学术论文、技术报告和权威文献：
+
+问题：{user_question}
+重点子问题：{academic_sub_queries}
+
+要求：
+1. 搜索 arXiv、Google Scholar、Semantic Scholar 等学术平台
+2. 关注高引用论文和最新发表
+3. 提取核心方法论、实验结果、关键结论
+4. 对比不同研究团队的观点
+5. 每篇论文必须附带标题、作者、年份、链接
+6. 输出格式：
+   ## 论文 N: [标题]
+   - 作者: [作者列表]
+   - 年份: [发表年份]
+   - 来源: [期刊/会议 + URL]
+   - 核心发现: [描述]
+   - 方法论: [简述]
+   - 与问题的关联: [分析]
+   - 置信度: HIGH/MEDIUM/LOW
+""",
+        "toolsets": ["web", "browser"]
+    }
+])
+```
+
+## Phase 2: 并行审核 Agents
+
+调研结果返回后，启动 4 个独立 reviewer agent 并行审核：
+
+```python
+delegate_task(tasks=[
+    {
+        "goal": "审核 Web 调研结果",
+        "context": f"""你是信息验证专家。请审核以下 Web 调研结果的准确性和可信度：
+
+原始问题：{user_question}
+调研结果：
+{web_research_results}
+
+审核要求：
+1. 逐条验证来源 URL 是否可访问、内容是否匹配
+2. 交叉检查关键事实（用不同来源验证）
+3. 识别潜在偏见（来源是否有利益关联）
+4. 检查数据时效性（是否过期）
+5. 标注已验证/存疑/已否定的条目
+6. 输出格式：
+   ## 审核条目 N
+   - 原始发现: [引用]
+   - 验证状态: ✅已验证 / ⚠️存疑 / ❌已否定
+   - 验证依据: [说明]
+   - 修正建议: [如有]
+""",
+        "toolsets": ["web", "browser"]
+    },
+    # ... GitHub reviewer, News reviewer, Academic reviewer 同理
+    # GitHub reviewer 额外检查: 仓库是否真实存在、star数是否准确、最近commit活跃度
+    # News reviewer 额外检查: 多个新闻源是否交叉印证、是否有后续跟进报道
+    # Academic reviewer 额外检查: 论文是否真实存在、引用数、是否被撤稿、方法论是否合理
+])
+```
+
+每个 reviewer 的 context 中包含：
+- 原始用户问题（提供审核上下文）
+- 对应 agent 的完整调研结果
+- 审核标准和输出格式要求
+
+## Phase 3: 交叉验证 + 圆桌会议
+
+所有审核完成后，启动一个综合 agent：
+
+```python
+delegate_task(
+    goal="交叉验证与圆桌讨论",
+    context=f"""你是资深调研分析师，负责交叉验证来自不同渠道的调研结果并组织圆桌讨论。
+
+原始问题：{user_question}
+
+--- Web 调研（已审核）---
+{web_results_reviewed}
+
+--- GitHub 调研（已审核）---
+{github_results_reviewed}
+
+--- 新闻调研（已审核）---
+{news_results_reviewed}
+
+--- 学术调研（已审核）---
+{academic_results_reviewed}
+
+任务：
+
+1. 【交叉验证】
+   - 找出跨渠道一致的发现（增强置信度 -> HIGH）
+   - 找出跨渠道矛盾的发现（标记为 CONTESTED）
+   - 找出仅单一渠道提及的发现（标记为 MEDIUM/LOW）
+
+2. 【圆桌会议模拟】
+   模拟四位专家的圆桌讨论：
+   - Web 分析师：关注实际应用和市场反馈
+   - 技术专家：关注代码实现和技术可行性
+   - 新闻分析师：关注趋势和商业影响
+   - 学术研究员：关注理论基础和实验验证
+
+   讨论要点：
+   a. 各方最核心的发现是什么？
+   b. 有哪些观点相互矛盾？为什么？
+   c. 综合来看，最可信的结论是什么？
+   d. 还有哪些信息缺口需要注意？
+
+3. 【输出】
+   ## 交叉验证结果
+   ### HIGH 置信度发现（多源印证）
+   - ...
+   ### MEDIUM 置信度发现（部分印证）
+   - ...
+   ### LOW 置信度发现（单一来源）
+   - ...
+   ### CONTESTED 发现（来源矛盾）
+   - ...
+
+   ## 圆桌讨论纪要
+   [按讨论要点组织]
+
+   ## 信息缺口
+   [尚未充分覆盖的方面]
+
+   ## 综合结论
+   [最终共识]
+""",
+    toolsets=["web", "browser"]  # 允许 agent 在交叉验证时补充搜索
+)
+```
+
+## Phase 4: 报告生成
+
+Hermes 自身完成最终报告整合：
+
+### 报告模板
+
+```markdown
+# 深度调研报告：{topic}
+
+> 生成时间：{timestamp}
+> 调研渠道：Web / GitHub / 新闻 / 学术
+> 总计来源：{source_count} 个
+
+## 📋 执行摘要
+[3-5 句话概括核心发现]
+
+## 🔍 详细发现
+
+### 1. [主题维度 1]
+[综合多源信息，按置信度排列]
+- 🟢 HIGH: ...
+- 🟡 MEDIUM: ...
+- 🔴 CONTESTED: ...
+
+### 2. [主题维度 2]
+...
+
+## 🏛️ 圆桌讨论纪要
+[来自 Phase 3 的讨论精华]
+
+## ⚖️ 置信度总结
+| 发现 | 置信度 | 支持来源数 | 备注 |
+|------|--------|-----------|------|
+| ...  | HIGH   | 3         |      |
+
+## 📚 参考来源
+[所有已验证来源的完整列表，按类型分组]
+
+### Web 来源
+1. [标题](URL) - 日期
+
+### GitHub 仓库
+1. [名称](URL) - ⭐ stars
+
+### 新闻报道
+1. [标题](URL) - 媒体名 - 日期
+
+### 学术论文
+1. [标题](URL) - 作者 - 年份
+
+## ⚠️ 局限性 & 信息缺口
+[本次调研未能覆盖的方面]
+```
+
+## Execution Notes
+
+### 深度级别
+
+根据问题复杂度选择：
+
+| 级别 | 子问题数 | Phase 1 并发 | Phase 2 审核 | Phase 3 |
+|------|---------|-------------|-------------|---------|
+| Quick | 2-3 | 2 agents (web+github) | 跳过 | 简化 |
+| Standard | 4-6 | 4 agents 全开 | 4 reviewers | 完整 |
+| Deep | 6-8 | 4 agents + 递归深挖 | 4 reviewers | 完整+补充搜索 |
+
+默认使用 Standard。用户说"快速调研"用 Quick，"深度调研"用 Deep。
+
+### Hermes 适配要点
+
+1. delegate_task batch supports 3 concurrent → Phase 1 dispatch 3 agents (web+github+news), then academic if needed
+2. Phase 2 reviewers can be skipped when sources are primarily official docs/GitHub (HIGH confidence already)
+3. 所有 context 传递必须自包含（subagent 无当前对话记忆）
+4. 报告默认中文（用户偏好）
+5. Phase 3 的 roundtable agent 用单个 delegate_task 而非 batch
+
+### Phase 2 Skip Heuristic
+
+当 Phase 1 的 subagent 直接访问了一手来源（browser_navigate 到 GitHub 仓库页、官方文档、arXiv 论文页）时，数据已经是一手验证过的，Phase 2 reviewer 的边际价值很低。可以跳过 Phase 2，直接进 Phase 3 交叉验证。判断标准：Phase 1 的 tool_trace 中 browser_navigate 占主导且目标是权威来源。
+
+### 迭代追问模式
+
+用户对第一轮报告不满意是常态（"还有别的方案吗？"、"都不喜欢"）。常见模式：
+1. 用户给出一个具体参考项目 URL，要求以它为锚点重新搜索
+2. 用户否定整个方向，需要换赛道
+
+应对：
+- 第一轮报告后预留对话空间，不要假设调研结束
+- 用户给参考 URL 时，启动一轮 **聚焦调研**（2 agents: 一个深挖参考项目 spec/生态，一个搜索同类竞品），不需要重跑完整 4-agent pipeline
+- 聚焦调研的 context 要包含第一轮被否定的方案列表，避免重复推荐
+
+### Adaptive Depth — When to Skip Phases
+
+Phase 2 (reviewers) can be skipped when:
+- Sources are primarily official docs, GitHub repos, or first-party blog posts (already authoritative)
+- The question is about tooling/products rather than contested claims or statistics
+- Time pressure — reviewer round adds 2-4 minutes with limited value on factual topics
+
+Phase 1 agent selection — drop channels that don't fit:
+- Academic agent: skip for tooling/ops/devops topics (no meaningful papers)
+- News agent: skip for stable/mature topics with no recent developments
+- Minimum: 2 agents (web + github) for Quick depth
+
+3 parallel agents in one delegate_task batch works reliably (not limited to 2+2 as originally noted). Use 3-agent batches as default for Standard depth.
+
+### Local Codebase Analysis (Phase 0.5)
+
+When the research involves "how does project X do it + what are the alternatives", add a Phase 0.5 BEFORE external research:
+1. Hermes itself (not a subagent) analyzes the local codebase using search_files/read_file
+2. Extract architecture patterns, SDK versions, configuration approaches, dependency choices
+3. Feed findings into Phase 1 subagent contexts so they search for relevant alternatives
+4. This avoids subagents wasting time on approaches incompatible with the existing architecture
+
+This phase is especially valuable when comparing sister/sibling projects (e.g. iOS vs macOS app in same repo).
+
+**Phase 0.5 as sole phase**: When the user's "research" question is actually about their own codebase (e.g. "what UI tests exist and what's missing", "find bugs in this flow"), Phase 0.5 alone may be sufficient. Skip the entire external research pipeline. Indicators: the question references specific files/features in the local repo, asks for a plan rather than market/landscape analysis, or asks to file issues based on findings. In these cases, do codebase analysis → synthesize findings → deliver (issue, plan, PR) directly.
+
+### Posting Results to GitHub Issues
+
+When creating issues with large markdown research reports:
+- **Never** use `gh issue create --body "$(cat <<'EOF' ...)"` or heredoc — special characters (`&`, backticks, `$`) cause shell parsing failures in Hermes terminal
+- **Always** write the body to a temp file first, then use `gh issue create --body-file /tmp/report.md`
+- Same applies to `gh issue comment --body-file`
+
+### Bug-to-Fix Pipeline Pattern
+
+When research uncovers existing bugs that block test plans, structure the output as:
+1. Bug issues first (with root cause analysis tracing through the code layers)
+2. Test plan issue (dependent on bug fixes)
+3. Automation/workflow design issue (if requested)
+
+For SwiftUI apps, common bug patterns to trace:
+- **Cache-server inconsistency**: local cache shows stale items, server returns 404 → check if error handler cleans up local state
+- **Event timing/race conditions**: WebSocket event listeners established after the action that triggers events → events lost
+- **Missing accessibility identifiers**: Views use `.accessibilityLabel` (for VoiceOver) but not `.accessibilityIdentifier` (for UI tests) — these are different things
+
+### Reference Files
+
+- `references/agent-memory-landscape-2026.md` — Agent memory open-source landscape (Mem0, Letta, Zep, Cognee, Hermes providers). Useful when user asks about memory/knowledge management for AI agents.
+- `references/research-to-batch-dev-pattern.md` — Proven pattern for research → phased batch development with parallel subagents (19 tasks, 7 phases). Useful when research is followed by implementation.
+- `references/internal-telemetry-investigation.md` — Iterative hypothesis-testing pattern for investigating bugs via internal telemetry databases (Kusto/BigQuery). Includes Kusto REST API template, phase sequence, and pitfalls. Use when research target is an internal database rather than public web sources.
+- `references/kusto-rest-api-pattern.md` — Reusable execute_code helper for Azure Data Explorer REST API queries, cluster-specific details for SapphireNRT, and pitfalls (timeouts, dvhashid, iOS format differences). Use when investigating internal telemetry.
+
+### Research → Project Application (Fitness Check)
+
+When research results recommend a tech stack for an existing project, ALWAYS run Phase 0.5 codebase analysis BEFORE presenting final recommendations. The top research pick may be wrong for the specific project:
+
+**Pattern**: Research says "use X" → Analyze existing codebase → X doesn't fit → Recommend Y instead.
+
+**Example**: Frontend research recommended React + Next.js + shadcn/ui as #1. But the target project (Financial) is a pure SPA with an independent FastAPI/Python backend. Next.js would either:
+- Waste SSR/RSC value (if only used as frontend shell calling FastAPI)
+- Require rewriting the entire Python backend (unreasonable effort)
+
+The correct recommendation was React 19 + Vite + shadcn/ui (the "fourth tier" from the same research).
+
+**Checklist before applying research to a project**:
+1. Does the project have a separate backend (FastAPI/Django/Express)? → SSR frameworks (Next.js/Nuxt) add complexity without value for pure SPAs
+2. Does the project need SEO? Internal tools/dashboards → no SSR needed
+3. What's the current UI library usage scope? (count files) → Small footprint = easier migration
+4. Are there existing patterns (hooks, abstractions) that align with one recommendation over another?
+5. What's already working well? Don't replace what isn't broken.
+
+**Output pattern**: Present the research findings, then explicitly state which recommendation fits and which doesn't, with project-specific reasoning.
+
+### Research-to-Planning Pipeline
+
+When research is followed by a teamwork/planning phase (e.g. "调研X然后用teamwork给出plan"):
+1. Save the final research report as a project file (e.g. `RESEARCH.md`) and git commit it — this becomes durable context for planning agents.
+2. Feed the research conclusions (not raw agent output) into the teamwork task description. Condense to key decisions, constraints, and data model — planning agents don't need full source URLs.
+3. The research report serves as the "Phase 0.5 local analysis" for the planning pipeline, so planners don't re-research already-settled questions.
+4. Commit research before starting teamwork so it's in the repo for subagents to read.
+
+### Internal Data Source Investigation (Phase 0.5 variant)
+
+When the research target is an internal database (Kusto, SQL, internal API) rather than public web sources:
+1. **Skip the standard 4-agent pipeline entirely.** Web/GitHub/News/Academic agents add no value for internal telemetry investigation.
+2. **Phase 0.5 becomes the primary phase**: Hermes directly queries the data source via REST API or SDK.
+3. **Browser-based data explorers are unreliable** for automation: Azure Data Explorer web UI has VPN dialogs, trust dialogs, virtual scrolling. Always prefer REST API from terminal.
+4. **Subagent timeout risk**: Kusto queries on large tables (billions of rows) can take 1-5 minutes each. Subagent default timeout (600s) may not be enough if multiple queries are needed sequentially. Prefer running queries directly in the main session or give subagents very specific, pre-tested queries.
+5. **Start narrow, expand**: Query 1 day first, then expand to 7 or 30 days. Use `event_time > ago(1d)` to avoid scanning full table.
+6. **Azure Data Explorer web UI pitfalls**: Two modal dialogs block interaction — "Adding connection" (click Trust) and "VPN Connection Required" (click Approve and Continue). These are NOT in the accessibility tree — must use `browser_console` with JS: `document.querySelectorAll('button').find(b => b.innerText.trim() === 'Trust')?.click()`. Results grid uses virtual scrolling (only ~7 rows rendered). **Always prefer REST API from terminal over browser automation.**
+
+Pattern: Phase 0 (decompose questions) → Phase 0.5 (direct API queries, iterative) → Phase 4 (report). No external agents needed.
+
+### Iterative Kusto Investigation Pattern
+
+When investigating telemetry data to diagnose a bug, follow this proven progression:
+1. **Schema discovery**: `.show tables`, `Table | getschema`, `Table | take 5`
+2. **Event inventory**: `summarize count() by event_name | order by count_ desc` with keyword filters
+3. **Sample inspection**: `take 3 | project event_time, key_fields, event_data` for each relevant event
+4. **Distribution analysis**: `summarize count() by dimension` (platform, market, version, unitSource)
+5. **Anomaly detection**: Cross-tabulate dimensions to find mismatches (e.g., market vs unit, platform vs mismatch rate)
+6. **Timeline reconstruction**: For specific devices/users, order events by time to understand state transitions
+7. **Root cause confirmation**: Find the code path that produces the telemetry pattern, verify hypothesis
+
+Key insight: each query's results inform what to query next. This is inherently sequential and poorly suited to subagent parallelization.
+
+### Slow Data Sources (Kusto, BigQuery, etc.)
+
+When "research" means querying a slow internal database (30-300s per query):
+- **Do NOT delegate to subagents** — 600s timeout is insufficient when each query takes 30-300s and you need 5-10 queries.
+- **Run queries directly from parent agent** using execute_code or terminal.
+- **Phase 0.5 is the right fit**: treat it as local codebase analysis but against a database. Hermes runs the queries, builds understanding iteratively, and synthesizes findings.
+- **Optimize queries aggressively**: filter by time range first (`where event_time > ago(1d)`), avoid full-table scans, use `summarize` server-side instead of fetching raw rows.
+- **IntRaw vs Int vs Prod tables**: Raw tables have lower latency but queries often timeout returning empty HTTP body. Int tables are more reliable for recent data. Debug/dev builds emit to Int, production to Prod.
+- **Empty response debugging**: Kusto curl can return HTTP 200 but empty body on timeout. Add `-w "\nHTTP_%{http_code}"` to curl to distinguish timeout from auth failure. Use `execute_code` with explicit error handling rather than terminal pipe-to-python.
+- **Device identifier pitfall**: `headers_dvhashid` can be empty string for all events — always verify with `dcount()` before using as group-by key; `headers_installid` is more reliable.
+- **Iterative investigation pattern**: Start with event discovery (`.show tables`, `summarize count() by event_name`), then narrow to specific events, then cross-correlate. Each query informs the next — don't try to write the perfect query upfront.
+- **DeviceID pitfall**: `headers_dvhashid` can be empty for all events — always verify with `dcount(headers_dvhashid)` before using it as device key. Use `headers_installid` as fallback.
+- **Kusto REST API helper pattern** (proven in this session):
+  ```python
+  def kusto(query, db="SapphireNRT", timeout_min=5):
+      token = subprocess.check_output(["az","account","get-access-token","--resource",
+          "https://bingviznrt.eastus.kusto.windows.net","--query","accessToken","-o","tsv"],
+          text=True, stderr=subprocess.DEVNULL).strip()
+      body = json.dumps({"db":db,"csl":query,"properties":{"Options":{"servertimeout":f"00:{timeout_min:02d}:00"}}})
+      r = subprocess.check_output(["curl","-s","--max-time",str(timeout_min*60+30),"-X","POST",
+          "https://bingviznrt.eastus.kusto.windows.net/v1/rest/query",
+          "-H",f"Authorization: Bearer {token}","-H","Content-Type: application/json; charset=utf-8","-d",body],
+          text=True, stderr=subprocess.DEVNULL)
+      d = json.loads(r)
+      return [c['ColumnName'] for c in d['Tables'][0]['Columns']], d['Tables'][0]['Rows']
+  ```
+- **Use management endpoint for .show commands**: POST to `/v1/rest/mgmt` (not `/v1/rest/query`) for `.show tables`, `.show table X schema` etc.
+- **String matching in KQL for cross-platform data**: iOS and Android may serialize the same field differently (e.g., JSON `"key":"1"` vs Swift Dictionary `"key": 1`). Use multiple `contains` patterns in a `case` expression to handle both.
+- **Prefer `execute_code` with a reusable helper function** over raw terminal curl. Define a `kusto_query(kql)` wrapper once and reuse it — avoids repeated token fetch, JSON escaping issues, and pipe-to-interpreter blocks. Save result to file then parse separately if needed.
+- **Iterative narrowing pattern**: start with schema exploration (`.show tables`, `getschema`), then event name discovery (`summarize count() by event_name`), then targeted sampling (`take 5`), then aggregation. Each step informs the next query.
+- **Device identity pitfall**: `headers_dvhashid` may be empty for certain events — always check. Use `headers_installid` as fallback device identifier and verify with `dcount()` before grouping.
+- **Cross-referencing events**: When investigating a data flow (e.g., user sets preference → syncs to server → server sends notification), query each event type separately first, then join by `headers_installid` or `userId` to trace the full path. Don't try to join in a single query — it will timeout.
+- **See** `references/kusto-rest-api-querying.md` for proven Kusto REST API patterns, reusable Python helper, and Sapphire-specific column mappings.
+
+### Telemetry Bug Investigation Methodology
+
+When investigating data inconsistencies across platforms/components:
+
+1. **Don't jump to root cause on platform differences.** If iOS shows 8% mismatch and Android shows 0%, first verify whether the SAME user/device exhibits both match and mismatch states. If yes, the cause is timing/state-dependent, not a systemic platform bug.
+
+2. **Check the "denominator problem."** An 8% mismatch rate might mean 8% of users are affected, or it might mean only 8% of events capture the mismatch while 100% of users share the underlying issue. Always check how many unique users/devices participate.
+
+3. **Follow the full data flow, not just the endpoint.** A bug report says "notification shows °F but app shows °C." Before debugging the client, map the FULL path:
+   - Where does the notification server get the unit? (MSN profile)
+   - Where does the app get the unit? (local preference)
+   - How often do these two data sources sync? (only on manual toggle — 0.1% of users)
+   
+4. **When user pushes back on your root cause, they're usually right.** If your explanation can't account for the PROPORTION of affected users (e.g., "serialization bug" should be 100%, not 8%), the explanation is wrong. Go back to data.
+
+5. **Timeline analysis is the strongest tool.** For any inconsistency, pull a per-device event timeline ordered by time. Patterns like "always one step behind" or "only on switch events" immediately reveal timing vs. persistent bugs.
+- **Iterative hypothesis-testing pattern**: Start broad (list tables/events) → find anomalies (unexpected distributions) → drill into specific cases (per-device timelines) → cross-validate with code. Each query result shapes the next query. See `references/internal-telemetry-investigation.md`.
+- **Cross-source validation**: When investigating client-server inconsistencies, find telemetry events that capture BOTH the local state and the server response in a single record (e.g. a "sync" event that logs the POST body AND the response). This is far more powerful than correlating separate client and server logs.
+- **Subagent fallback**: If subagents fail (timeout, model error), switch to direct execution immediately — don't retry subagents. One failed batch wastes 600s+.
+- **execute_code timeout**: default 300s may not be enough for a script that runs multiple sequential Kusto queries. If a single query takes 200s+, use terminal with explicit `--max-time` on curl instead.
+- **Azure Data Explorer browser UI is unreliable for automation**: VPN dialogs, trust dialogs, virtual scrolling hide results. Always prefer REST API from terminal.
+- **Pre-test queries before delegating**: If you must use subagents for parallel queries, run each query once yourself first to verify it completes within timeout. Give subagents pre-tested, specific queries with known execution times.
+
+### Kusto REST API from Terminal (proven pattern)
+
+When querying Azure Data Explorer from the terminal (instead of browser UI which has VPN dialogs, trust popups, virtual scrolling issues):
+
+```bash
+TOKEN=$(az account get-access-token --resource https://<cluster>.kusto.windows.net --query accessToken -o tsv 2>/dev/null)
+curl -s --max-time 400 -X POST "https://<cluster>.kusto.windows.net/v1/rest/query" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d '{"db":"<database>","csl":"<KQL>","properties":{"Options":{"servertimeout":"00:05:00"}}}'
+```
+
+Key details:
+- `/v1/rest/query` for data queries, `/v1/rest/mgmt` for management commands (`.show tables` etc.)
+- v2 (`/v2/rest/query`) returns JSON frames array, supports progressive mode — use for large results
+- Response: `.Tables[0].Rows` (array of arrays), `.Tables[0].Columns` for schema
+- Default timeout: 4 min. Max: 1 hour via `servertimeout` property.
+- Default truncation: 500K rows / 64MB. Disable with `"notruncation": true`.
+- Token expires in ~1 hour; re-fetch before each query in long sessions.
+- For `execute_code`, wrap in a Python helper function to keep queries clean.
+- Save results to `/tmp/` files and parse separately to avoid pipe-to-interpreter blocks.
+
+### Kusto Investigation Pitfalls
+
+- **dvhashid may be empty** — use `headers_installid` as device identifier instead. Always verify aggregation keys before drawing conclusions.
+- **Sample rate matters**: check `sample` field in telemetry event definitions (e.g. `sample=10` means only 10% of events are logged). Multiply observed counts accordingly.
+- **Start with 1-day window**, expand to 7 or 30 days only after confirming query completes in time.
+- **execute_code timeout is 300s** — for queries taking 200+s, use `terminal` with explicit `--max-time` on curl instead.
+- **Browser-based Kusto explorers** (Azure Data Explorer web UI) are unreliable for automation: VPN dialogs, trust dialogs, virtual scrolling that hides data. Always prefer REST API.
+
+### Pitfalls
+
+- subagent 的 web 搜索可能返回大量内容，context 要控制在合理长度
+- GitHub 搜索注意 rate limit，不要短时间大量请求
+- 学术搜索 arXiv API 有时不稳定，准备 Google Scholar 作为 fallback
+- reviewer agent 验证 URL 时可能遇到付费墙/地区限制，标注而非失败
+- 圆桌会议模拟要避免四个"专家"说同样的话，prompt 中强调差异化视角
+- Google/DuckDuckGo may block subagent browser with bot detection — Bing tends to work better as fallback
+- Phase 2 审核可在来源以官方文档/GitHub 为主时跳过（节省时间和 tokens）
+- Phase 3 圆桌 agent 不需要 web/browser toolset（纯分析），给 ["web"] 仅在需要补充搜索时
+- delegate_task goal 参数不能用 XML 属性语法（`goal">text`），必须用正常 JSON key
+- delegate_task API 不能同时传 `goal` 和 `tasks` 参数。单任务用 `goal`+`context`，批量用 `tasks` 数组。同时传两个会报 "Provide either 'goal' (single task) or 'tasks' (batch)."
+- Subagent model availability can fail at runtime (`model_not_supported` error from Copilot provider). When this happens, **don't retry subagents** — fall back to running the queries/work directly in the parent session. This is especially common with non-default models (e.g. claude-sonnet-4 when only opus is available).
+- `execute_code` has a 300s hard timeout. For multi-query Kusto investigations (each query 30-300s), use `terminal()` with explicit `--max-time` on curl instead. Write results to `/tmp/*.json` and parse in a separate step.
+- When investigating internal databases, the parent session is almost always more reliable than subagents: no timeout pressure, can iterate on queries, can adjust based on intermediate results. Reserve subagents for parallel independent web searches, not sequential database exploration.
+- **Subagent model availability failures**: delegate_task can fail with `model_not_supported` errors when the configured model is temporarily unavailable on the provider. When this happens, don't retry — fall back to running the queries/tasks directly in the parent session. This is especially important for internal data source investigations where each query takes 30-300s and the parent agent can run them sequentially without timeout risk.
+- **Kusto queries in subagents**: Even when the model works, Kusto queries are too slow for subagents (600s timeout, each query 30-300s, need 5-10 queries). Always prefer running Kusto queries directly. Use `scripts/kusto_query.py` as the reusable helper.
+- **Subagent model failures**: Copilot provider may return `model_not_supported` for subagent model selection, failing the entire batch. When this happens, don't retry subagents — fall back to running the work directly in the parent session. This is especially common for Kusto/database investigation where the parent session already has auth context and query helpers set up.
+- **Kusto/database queries in subagents**: Even when subagents launch successfully, each Kusto query takes 30-300s. A subagent with 5 queries will likely hit the 600s timeout. Prefer the `execute_code` helper function pattern (see `references/kusto-rest-api-pattern.md`) in the parent session.
