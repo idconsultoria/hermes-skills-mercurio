@@ -9,8 +9,9 @@ skills/
 ├── AGENTS.md          ← Este arquivo — regras do repositório
 ├── index.md           ← Catálogo orientado a conteúdo (sempre atualizado)
 ├── log.md             ← Diário cronológico append-only de operações
-├── reports/           ← Planos de evolução salvos em markdown
-│   └── evolve-<YYYY-MM-DD-HHMM>.md
+├── reports/           ← Planos de evolução + relatórios pós-evolução
+│   ├── evolve-<YYYY-MM-DD-HHMM>.md        ← plano (pré-execução)
+│   └── evolve-<YYYY-MM-DD>-report.md      ← relatório (pós-execução)
 └── <category>/
     └── <skill-name>/
         ├── SKILL.md
@@ -58,7 +59,7 @@ Cada entrada começa com `## [YYYY-MM-DD]` seguido de um prefixo de operação e
 | Prefixo | Operação |
 |---------|----------|
 | `update` | Criação/edição manual de index.md (first seed, correções) |
-| `evolve` | Ciclo completo de consolidação (plano → execução → offload → commit) |
+| `evolve` | Ciclo completo de consolidação (plano → execução → report → offload → commit) |
 | `offload` | Limpeza de memória — remoção de fatos redundantes com skills |
 
 O formato é parseável com Unix tools:
@@ -95,17 +96,23 @@ Ciclo de consolidação inteligente. Analisa o portfólio e propõe merges, remo
 4. **Stage + commit** (checkpoint pré-plano)
 5. **Estuda** o index.md completo e elabora plano de evolução
 6. **Salva** o plano em `reports/evolve-<YYYY-MM-DD-HHMM>.md`
-7. **Executa** o plano (merges, deletes, consolidação de conteúdo)
-8. **Offload** — limpa da memória persistente informações que já estão documentadas em skills; revisa a memória restante para garantir que só contém fatos não cobertos por skills
-9. **Atualiza** o index.md pós-transformação
-10. **Registra** no log.md com prefixo `evolve`
-11. **Stage + commit** final
+7. **Executa** o plano (merges, deletes, consolidação de conteúdo, limpeza de aprendizados excessivamente específicos)
+8. **Escreve relatório denso** em `reports/evolve-<YYYY-MM-DD>-report.md` com:
+   - Estado inicial vs final (skills, memória, disco)
+   - Tabela de deleções com motivos
+   - Tabela de merges com o que foi absorvido
+   - Offload realizado
+   - Git diff summary
+9. **Offload** — limpa da memória persistente informações que já estão documentadas em skills; revisa a memória restante para garantir que só contém fatos não cobertos por skills
+10. **Atualiza** o index.md pós-transformação
+11. **Registra** no log.md com prefixo `evolve`
+12. **Stage + commit** final
 
 ### offload
 
-Limpeza de memória após um ciclo evolve. Remove entradas da memória persistente que estejam redundantes com skills (ex: configurações de ferramentas, procedimentos, paths de instalação — tudo que deveria viver em skill em vez de memória).
+Limpeza de memória após um ciclo evolve. Remove entradas da memória persistente que estejam redundantes com skills (ex: configurações de ferramentas, procedimentos, paths de instalação — tudo que deveria viver em skill em vez de memória). Também remove aprendizados excessivamente específicos de skills — dados de debugging pontual, mensagens de erro de sessões passadas, informações transientes que não agregam numa próxima execução do workflow.
 
-**Regra:** memória guarda preferências do usuário e fatos estáveis do ambiente. Skills guardam procedimentos, receitas e workflows. Tudo que é procedural e está numa skill pode sair da memória.
+**Regra:** memória guarda preferências do usuário e fatos estáveis do ambiente. Skills guardam procedimentos, receitas e workflows. Tudo que é procedural e está numa skill pode sair da memória. Aprendizados demasiado específicos (ex: "quando o erro X apareceu na sessão Y, o workaround foi Z") devem ser limpos das skills — mantém-se o padrão geral, não o caso específico.
 
 **Passos:**
 1. Lista entradas da memória atual

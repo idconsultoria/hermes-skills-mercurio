@@ -22,3 +22,5 @@ Repositório git iniciado em /opt/data/skills/. AGENTS.md, index.md e log.md cri
 ## [2026-06-10] offload | Memory cleaned: 11→6 entries (94%→47%). Procedural facts moved to skills.
 Removed: agy CLI config (→ agy skill), Pi version/providers (→ pi-agent-coordination), IAF pipeline v1.4 (→ iaf-newsletter-pipeline), Fish Speech (→ text-to-speech), Gemini TTS API (→ text-to-speech), Charon persona (→ text-to-speech)
 Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode Go, Google Workspace
+
+## [2026-06-10] update | AGENTS.md updated: evolve steps now include report writing, offload includes cleaning overly specific learnings, reports dir documented with plan+report pattern
