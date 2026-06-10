@@ -236,7 +236,7 @@ tts:
     hermes-tts:                  # ← same name
       type: command
       command: "python3 /opt/data/.hermes/scripts/hermes-tts.py --input {input_path} --output {output_path}"
-      output_format: wav
+      output_format: ogg
       timeout: 600
 ```
 If the names don't match, Hermes falls back silently to Edge TTS (default).
@@ -253,7 +253,7 @@ tts:
     hermes-tts:
       type: command
       command: "python3 /opt/data/.hermes/scripts/hermes-tts.py --input {input_path} --output {output_path}"
-      output_format: wav
+      output_format: ogg
       timeout: 600
 ```
 
@@ -272,7 +272,7 @@ with open(args.input) as f:
     text = f.read().strip()
 
 # Try cloud first
-for model_id, label in [("gemini-3.1-flash-tts", "Gemini 3.1"),
+for model_id, label in [("gemini-3.1-flash-tts-preview", "Gemini 3.1"),
                          ("gemini-2.5-flash-preview-tts", "Gemini 2.5")]:
     try:
         audio = call_gemini_tts(model_id, text, label)
@@ -310,7 +310,7 @@ with urllib.request.urlopen(req, timeout=1800) as resp:  # 30 min
 **Key env vars for the bridge script:**
 - `GOOGLE_API_KEY` — for Gemini TTS (from `/opt/data/.env` or environment)
 - `FISH_SPEECH_URL` — defaults to `http://fish-speech:8882/v1/audio/speech`
-- The voice instruct preamble should be baked into the script as a constant
+- The voice profile is now `VOICE_PROFILE` (LiveKit canonical format instead of the old `VOICE_INSTRUCT` string). It includes SCENE, PERFORMANCE, CONTEXT sections in Portuguese plus a `#### TRANSCRIPT\n[dryly]` section. See `text-to-speech` umbrella skill for the full structure.
 
 **⚠️ `.env` loading for command provider scripts:** Scripts rodam no Hermes container e o `.env` (`/opt/data/.env`) pode não estar exportado como variável de ambiente real. O script precisa tentar carregá-lo manualmente:
 
@@ -370,7 +370,7 @@ Configure Hermes:
 hermes config set tts.provider <model-name>
 hermes config set tts.providers.<model-name>.type command
 hermes config set tts.providers.<model-name>.command "python3 /opt/data/.hermes/scripts/<model>-tts.py --text-file {input_path} --output {output_path} --voice {voice}"
-hermes config set tts.providers.<model-name>.output_format wav
+hermes config set tts.providers.<model-name>.output_format ogg
 hermes config set tts.providers.<model-name>.timeout 600
 hermes config set tts.providers.<model-name>.voice female
 hermes config set tts.providers.<model-name>.voice_compatible true

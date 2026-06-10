@@ -4,6 +4,10 @@ description: Skill de conteúdo da comunidade IA que Funciona (IAF). Contém con
 version: 1.0.0
 author: Gustavo Mello
 tags: [iaf, comunidade, brand, conteudo, newsletter, social-media]
+metadata:
+  hermes:
+    tags: [iaf, comunidade, brand, conteudo, newsletter, social-media]
+    related_skills: [xurl, iaf-newsletter-pipeline, copywriting]
 ---
 
 # Brand IAF — Conteúdo

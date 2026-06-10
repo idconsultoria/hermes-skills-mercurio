@@ -48,6 +48,7 @@ Track Apple devices/AirTags via FindMy.app on macOS.
 - `similar` → `apple/imessage`
 - `similar` → `apple/macos-computer-use`
 - `similar` → `apple/apple-notes`
+- `similar` → `productivity/maps`
 
 ### iMessage
 
@@ -129,6 +130,7 @@ Hermes cross-platform messaging: platform quirks, JID/ID formats, bridge workaro
 - `used_by` → `apple/macos-computer-use`
 - `used_by` → `autonomous-ai-agents/product-pipeline`
 - `parent` → `autonomous-ai-agents/hermes-agent`
+- `parent` → `messaging-platforms/whatsapp-bridge-baileys`
 
 ### Pi Agent (Local)
 - **Nome:** `autonomous-ai-agents/pi-agent-coordination`
@@ -183,6 +185,7 @@ Umbrella skill for newsletter/briefing/digest pipelines: IAF Manhã Aumentada, D
 - `similar` → `autonomous-ai-agents/product-pipeline`
 - `similar` → `creative/style-guide-consultation`
 - `uses` → `creative/text-to-speech`
+- `uses` → `social-media/brand-iaf-conteudo`
 
 ### Text-to-Speech (TTS)
 
@@ -332,6 +335,7 @@ Load this skill when the user needs marketing copy — landing pages, homepage s
 - `used_by` → `content-production/iaf-newsletter-pipeline`
 - `used_by` → `creative/brand-studio-forge`
 - `used_by` → `autonomous-ai-agents/product-pipeline`
+- `similar` → `social-media/brand-iaf-conteudo`
 
 ### Excalidraw Diagram Skill
 
@@ -475,6 +479,8 @@ Catálogo e consulta de guias de estilo: Hermes Agent (padrão), ID Consultoria,
 
 Iterative Python via live Jupyter kernel (hamelnb).
 
+**Relações:**
+- `similar` → `software-development/spike`
 
 ## Email
 
@@ -487,6 +493,8 @@ Iterative Python via live Jupyter kernel (hamelnb).
 
 Himalaya CLI: IMAP/SMTP email from terminal.
 
+**Relações:**
+- `similar` → `productivity/google-workspace`
 
 ## Github
 
@@ -679,6 +687,8 @@ Send messages, discover group IDs, and manage media via local WhatsApp Baileys b
 
 Local Node.js HTTP bridge on port 3000 for WhatsApp operations via @whiskeysockets/baileys. Covers sending text and media messages, editing sent messages, discovering group IDs from sender-key files, self-chat mode behavior, and common pitfalls including silent delivery failures and emoji issues. Always verify group names before sending — wrong group ID is the most common error.
 
+**Relações:**
+- `similar` → `autonomous-ai-agents/messaging-platforms`
 
 ## Mlops
 
@@ -807,6 +817,7 @@ Google OAuth2 client credentials (downloaded from Google Cloud Console)
 **Relações:**
 - `similar` → `productivity/airtable`
 - `uses` → `productivity/ocr-and-documents`
+- `similar` → `email/himalaya`
 
 ### HTML Report — Hermes Design System
 
@@ -849,7 +860,7 @@ Convert HTML files to high-fidelity PDF using Chromium headless (via Debian .deb
 Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.
 
 **Relações:**
-- No relations found in this batch analysis. Maps is a standalone location intelligence skill with no confirmed reciprocal relations to other skills in scope.
+- `similar` → `apple/findmy`
 
 ### nano-pdf
 
@@ -961,6 +972,7 @@ Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool.
 **Relações:**
 - `similar` → `read-reddit/read-reddit`
 - `used_by` → `research/deep-research`
+- `similar` → `research/tech-trend-discovery`
 
 ### Deep Research Skill
 
@@ -977,6 +989,8 @@ Inspired by GPT-Researcher, this pipeline decomposes complex questions into sub-
 - `uses` → `research/arxiv`
 - `uses` → `research/blogwatcher`
 - `similar` → `research/llm-wiki`
+- `similar` → `research/tech-trend-discovery`
+- `similar` → `research/polymarket`
 
 ### Karpathy's LLM Wiki
 
@@ -1003,6 +1017,9 @@ Query Polymarket: markets, prices, orderbooks, history.
 
 Read-only access to Polymarket prediction market data via three public REST APIs (Gamma, CLOB, Data) — no authentication required. Search markets, fetch real-time prices and orderbooks, retrieve price history, and present probabilities as human-readable percentages. Covers double-encoded JSON field parsing, rate limits, and the events-to-markets data model.
 
+**Relações:**
+- `similar` → `research/deep-research`
+
 ### Research Paper Writing Pipeline
 
 - **Nome:** `research/research-paper-writing`
@@ -1023,6 +1040,10 @@ Write ML papers for NeurIPS/ICML/ICLR: design→submit.
 - **Resumo:** Discover what the tech/AI community is discussing right now — trending topics, hot disc...
 
 Discover what the tech/AI community is discussing right now — trending topics, hot discussions, and breaking conversations. Covers Reddit alternatives and HN Algolia API as primary sources when traditional search tools fail.
+
+**Relações:**
+- `similar` → `research/blogwatcher`
+- `similar` → `research/deep-research`
 
 ### User Interview
 
@@ -1048,6 +1069,11 @@ Discover what the tech/AI community is discussing right now — trending topics,
 
 Skill de conteúdo da comunidade IA que Funciona (IAF). Contém constantes de marca, voz, tom, paleta, tipografia, regras de idioma e templates de conteúdo. Use para gerar qualquer texto da comunidade — newsletter diária, posts, discussões, boas-vindas.
 
+**Relações:**
+- `similar` → `social-media/xurl`
+- `used_by` → `content-production/iaf-newsletter-pipeline`
+- `similar` → `creative/copywriting`
+
 ### xurl — X (Twitter) API via the Official CLI
 
 - **Nome:** `social-media/xurl`
@@ -1057,6 +1083,8 @@ Skill de conteúdo da comunidade IA que Funciona (IAF). Contém constantes de ma
 
 X/Twitter via xurl CLI: post, search, DM, media, v2 API.
 
+**Relações:**
+- `similar` → `social-media/brand-iaf-conteudo`
 
 ## Software Development
 
@@ -1170,6 +1198,7 @@ Throwaway experiments to validate an idea before build.
 **Relações:**
 - `uses` → `software-development/plan`
 - `similar` → `software-development/plan`
+- `similar` → `data-science/jupyter-live-kernel`
 
 ### Systematic Debugging
 

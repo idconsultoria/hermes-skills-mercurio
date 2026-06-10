@@ -1,6 +1,10 @@
 ---
 name: messaging-platforms
 description: Hermes cross-platform messaging: platform quirks, JID/ID formats, bridge workarounds for Telegram, WhatsApp, more.
+metadata:
+  hermes:
+    tags: [messaging, platforms, telegram, whatsapp, signal, matrix, discord, slack, bridge]
+    related_skills: [whatsapp-bridge-baileys]
 ---
 
 # Messaging Platforms

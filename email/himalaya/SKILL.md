@@ -9,6 +9,7 @@ metadata:
   hermes:
     tags: [Email, IMAP, SMTP, CLI, Communication]
     homepage: https://github.com/pimalaya/himalaya
+    related_skills: [google-workspace]
 prerequisites:
   commands: [himalaya]
 ---

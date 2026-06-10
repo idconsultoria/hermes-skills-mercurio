@@ -7,6 +7,10 @@ triggers:
   - 全面调研
   - 多角度调研
   - research roundtable
+metadata:
+  hermes:
+    tags: [research, deep-research, multi-agent, pipeline, web, github, news, academic]
+    related_skills: [tech-trend-discovery, polymarket]
 ---
 
 # Deep Research Skill

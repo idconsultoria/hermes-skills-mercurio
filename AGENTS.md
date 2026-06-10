@@ -110,17 +110,22 @@ Ciclo de consolidação inteligente. Analisa o portfólio e propõe merges, remo
 7. **Executa** o plano (merges, deletes, consolidação de conteúdo). Durante a execução:
    - Limpa aprendizados excessivamente específicos das skills — dados de debugging pontual, mensagens de erro de sessões passadas, workarounds temporários, informações transientes que não agregam numa próxima execução do workflow. Mantém o padrão geral, não o caso específico.
    - **Audita descrições das skills** — verifica se cada SKILL.md tem cabeçalhos de descrição adequados: resumo de uma linha (~80 chars) seguido de parágrafo descritivo completo. Skills com descrições ausentes, truncadas ou genéricas demais devem ser corrigidas para que o conteúdo alimente bem o index.md. O resumo é extraído como `summary` e o parágrafo como `description`. Skills já consolidadas (merges) têm prioridade. Skills não modificadas podem ser corrigidas em lote.
-8. **Escreve relatório denso** em `reports/evolve-<YYYY-MM-DD>-report.md` com:
+8. **Revisa skills órfãs** — skills sem relações no grafo. Para cada uma:
+   - Tenta encontrar conexão semântica com outras skills (lendo ambos os SKILL.md). Se encontrar, adiciona relação.
+   - Se não encontrar conexão, avalia se a skill é importante o suficiente para existir isolada. Skills genuinamente de nicho (API de terceiros, CLI específico, data source exótico) podem ficar órfãs com justificativa.
+   - Se a skill não tem conexão E não é claramente importante, considera merge com skill genérica ou delete.
+9. **Escreve relatório denso** em `reports/evolve-<YYYY-MM-DD>-report.md` com:
    - Estado inicial vs final (skills, memória, disco)
    - Tabela de deleções com motivos
    - Tabela de merges com o que foi absorvido
    - Offload realizado
    - Git diff summary
-9. **Offload** — limpa da memória persistente informações que já estão documentadas em skills; revisa a memória restante para garantir que só contém fatos não cobertos por skills
-10. **Atualiza** o index.md pós-transformação
-11. **Registra** no log.md com prefixo `evolve`
-12. **Gera grafo HTML interativo** — extrai dados do index.md, constrói grafo D3.js com relações (similar/uses/used_by/parent), salva em `skills_graph.html` na raiz do repositório. Nós coloridos por categoria, arestas tracejadas para similar e sólidas com seta para uses. Modal com summary + description ao clicar no nó. Responsivo para mobile.
-13. **Stage + commit** final
+   - **Lista de skills órfãs** e decisão tomada (relacionada / justificada como nicho / deletada)
+10. **Offload** — limpa da memória persistente informações que já estão documentadas em skills; revisa a memória restante para garantir que só contém fatos não cobertos por skills
+11. **Atualiza** o index.md pós-transformação
+12. **Registra** no log.md com prefixo `evolve`
+13. **Gera grafo HTML interativo** — extrai dados do index.md, constrói grafo D3.js com relações (similar/uses/used_by/parent), salva em `skills_graph.html` na raiz do repositório. Nós coloridos por categoria, arestas tracejadas para similar e sólidas com seta para uses. Modal com summary + description ao clicar no nó. Responsivo para mobile.
+14. **Stage + commit** final
 
 ### offload
 

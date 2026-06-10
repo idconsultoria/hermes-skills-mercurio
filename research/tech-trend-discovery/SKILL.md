@@ -7,6 +7,10 @@ trigger:
   - User asks for "o que estão discutindo" (Portuguese: what they're discussing)
   - Need to find hot topics without using web_search (which may return empty)
   - Need to bypass blocked social media (Reddit) via alternative data sources
+metadata:
+  hermes:
+    tags: [trends, tech, ai, reddit, hacker-news, firecrawl, discovery]
+    related_skills: [blogwatcher, deep-research]
 ---
 
 # Tech Trend Discovery

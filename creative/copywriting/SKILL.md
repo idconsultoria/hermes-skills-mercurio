@@ -5,7 +5,7 @@ version: 2.0.0
 author: coreyhaines31/marketingskills
 metadata:
   hermes:
-    related_skills: [humanizer]
+    related_skills: [humanizer, brand-iaf-conteudo]
 ---
 
 # Copywriting

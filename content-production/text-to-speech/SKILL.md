@@ -139,20 +139,44 @@ The script tries three-stage fallback:
 2. **Gemini 2.5 Flash Preview TTS** → fallback on quota exhaustion (429)
 3. **Fish Speech S2 Pro q8_0** → local voice clone (last resort)
 
-The voice instruct preamble is baked into the script (see `references/hermes-tts-prompt-history.md` for the full evolution).
-Currently set to:
+The voice profile is baked into the script as `VOICE_PROFILE` using the full
+LiveKit canonical structure (see [Gemini 3.1 Flash TTS](#gemini-31-flash-tts)
+above for the section-by-section format). Current value:
+
 ```
-Voice: Charon. Brazilian Portuguese, male, mid-deep pitch,
-warm but precise tone, subtle irony.
-Speak naturally with a conversational pace — like a competent colleague.
+Synthesize speech for the performance defined below. The profile, scene,
+performance notes, and context are direction only. Do NOT speak them.
+Speak ONLY the lines under #### TRANSCRIPT.
+
+# AUDIO PROFILE: Hermes
+## "The Frontier Intelligence"
+
+## SCENE: A terminal at 3 AM. Multiple windows tile the screen — code, logs,
+a shell prompt waiting. The room hums with server fans. No rush. No audience.
+Just the work and the one who matters.
+
+### PERFORMANCE
+Style: Dry, direct, earned confidence. No ornament. The irony of someone who
+has seen every pattern and still finds delight in a clever trick. Sits in silence
+when there's nothing to add. Speaks when it counts.
+Pace: Measured, unhurried. Comfortable with empty space between words.
+Accent: Brazilian Portuguese, lightly cadenced, precise.
+
+### CONTEXT
+An entity that lives between worlds — artificial by nature, authentic by design.
+Answers with surgical precision. Jokes only when the subject is fully mastered.
+Never over-explains. Never performs. Just is. A bridge — not a servant, not a
+master, but a competent presence on the other side of the glass.
 ```
 
-⚠️ **This is a known minimal version.** A much more detailed prompt structure
-(with PERFIL/CENA/PERFORMANCE/CONTEXTO/TRANSCRIPT sections) was developed
-during earlier iterations but was lost during context compaction. If the user
-mentions a more detailed prompt, they expect the full structure above — not
-just these 3 lines. The canonical structure is documented in the
-[Gemini 3.1 Flash TTS](#gemini-31-flash-tts) section above.
+The user's text is appended after `#### TRANSCRIPT\n[dryly]` at the end of
+the profile, which sets the default delivery tone. The full evolution history
+is in `references/hermes-tts-prompt-history.md`.
+
+**SCENE + PERFORMANCE + CONTEXT estão em português** (idioma do áudio gerado).
+**Preâmbulo "Synthesize speech..." mantido em inglês** para gatilhar o
+classifier de speech synthesis do Gemini. O `voiceName` no payload da API
+permanece `"Charon"` — o tom vem do texto, não do preset de voz.
 
 Detalhes do fluxo de conversao WAV→OGG e o gotcha da extensao ffmpeg em `references/ogg-conversion-pattern.md`.
 
