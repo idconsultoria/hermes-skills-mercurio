@@ -24,12 +24,12 @@ button:hover { background: #252540; }
 #stats { position: fixed; top: 12px; right: 12px; z-index: 10; font-size: 11px; color: #606080; text-align: right; }
 #modal-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; }
 #modal-backdrop.open { display: flex; }
-#modal { background: #141428; border: 1px solid #303058; border-radius: 14px; padding: 0; max-width: 560px; width: 92vw; max-height: 85dvh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: modalIn 0.2s ease-out; }
-@keyframes modalIn { from { opacity: 0; transform: translateY(16px) scale(0.97); } }
+#modal { background: #141428; border: 1px solid #303058; border-radius: 14px; padding: 0; max-width: 560px; width: 92vw; max-height: 85dvh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: modalIn .2s ease-out; }
+@keyframes modalIn { from { opacity: 0; transform: translateY(16px) scale(.97); } }
 #modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #202038; position: sticky; top: 0; background: #141428; z-index: 1; }
 #modal-close { float: right; background: none; border: none; color: #606090; font-size: 22px; cursor: pointer; line-height: 1; padding: 0 0 4px 8px; }
 #modal-close:hover { color: #fff; }
-.modal-category { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; margin-right: 8px; vertical-align: middle; }
+.modal-category { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; letter-spacing: .5px; margin-right: 8px; vertical-align: middle; }
 .modal-title { font-size: 17px; font-weight: 700; color: #fff; margin: 8px 0 0; }
 #modal-body { padding: 20px 24px 24px; }
 .modal-section { margin-bottom: 18px; }
@@ -38,10 +38,9 @@ button:hover { background: #252540; }
 .modal-desc { font-size: 13px; color: #9090b0; line-height: 1.7; white-space: pre-wrap; }
 .modal-relations { display: flex; flex-direction: column; gap: 5px; }
 .modal-rel { font-size: 11px; padding: 4px 10px; border-radius: 5px; background: #1a1a30; display: inline-flex; align-items: center; gap: 6px; width: fit-content; }
-.modal-rel-type { font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; padding: 1px 6px; border-radius: 4px; }
+.modal-rel-type { font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: .5px; padding: 1px 6px; border-radius: 4px; }
 .rel-similar { background: #2a2a40; color: #8080a0; }
 .rel-uses { background: #1a2a40; color: #6080ff; }
-.rel-parent { background: #2a1a30; color: #b060e0; }
 .rel-used_by { background: #1a3020; color: #50b070; }
 @media (max-width: 480px) {
   #controls { top: 8px; left: 8px; gap: 4px; max-width: 160px; }
@@ -62,8 +61,38 @@ button:hover { background: #252540; }
 <div id="modal-backdrop" onclick="closeModal(event)"><div id="modal" onclick="event.stopPropagation()"><div id="modal-header"><button id="modal-close" onclick="closeModal()">&times;</button><div><span class="modal-category" id="modal-cat-badge"></span><span style="font-size:10px;color:#505070" id="modal-size"></span></div><div class="modal-title" id="modal-title"></div></div><div id="modal-body"><div class="modal-section" id="modal-summary-section"><div class="modal-section-title">Summary</div><div class="modal-summary" id="modal-summary"></div></div><div class="modal-section" id="modal-desc-section"><div class="modal-section-title">Description</div><div class="modal-desc" id="modal-desc"></div></div><div class="modal-section"><div class="modal-section-title">Relations</div><div class="modal-relations" id="modal-relations"></div></div></div></div></div>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-/* DATA injected at build time: const DATA = __DATA_PLACEHOLDER__; */
-/* See references/llm-relations-inference.md for how the data is produced. */
+// Build-time placeholder — inject with: const DATA = <JSON>;
+const DATA = __DATA_PLACEHOLDER__;
+
+(function(){
+const CAT_COLORS={'apple':'#ff6b6b','autonomous-ai-agents':'#845ef7','content-production':'#f06595','creative':'#ffd43b','data-science':'#20c997','dogfood':'#ff922b','email':'#74c0fc','github':'#adb5bd','infrastructure':'#4dabf7','media':'#da77f2','messaging-platforms':'#63e6be','mlops':'#f783ac','note-taking':'#a9e34b','productivity':'#228be6','read-reddit':'#ff8787','research':'#38d9a9','social-media':'#e599f7','software-development':'#339af0','yuanbao':'#ffa94d','uncategorized':'#868e96'};
+const w=window.innerWidth,h=window.innerHeight;
+const svg=d3.select("#graph").append("svg").attr("width",w).attr("height",h).attr("viewBox",[0,0,w,h]);
+const g=svg.append("g");
+const zoom=d3.zoom().scaleExtent([.2,4]).on("zoom",e=>g.attr("transform",e.transform));
+svg.call(zoom);
+svg.append("defs").append("marker").attr("id","arrow").attr("viewBox","0 -5 10 10").attr("refX",24).attr("refY",0).attr("markerWidth",6).attr("markerHeight",6).attr("orient","auto").append("path").attr("d","M0,-5L10,0L0,5").attr("fill","#6080ff");
+const nodes=DATA.nodes.map(d=>({...d}));
+const links=DATA.edges.map(d=>({...d}));
+const sizeScale=d3.scaleSqrt().domain([0,d3.max(nodes,d=>d.size)]).range([4,22]);
+const sim=d3.forceSimulation(nodes).force("link",d3.forceLink(links).id(d=>d.id).distance(90)).force("charge",d3.forceManyBody().strength(-180)).force("center",d3.forceCenter(w/2,h/2)).force("collision",d3.forceCollide().radius(d=>sizeScale(d.size)+4));
+const link=g.append("g").selectAll("g").data(links).join("g");
+link.filter(d=>d.type==="similar").append("line").attr("stroke","#8080a0").attr("stroke-width",1).attr("stroke-dasharray","4,4").attr("opacity",.5);
+link.filter(d=>d.type==="uses").append("line").attr("stroke","#6080ff").attr("stroke-width",1.5).attr("marker-end","url(#arrow)").attr("opacity",.6);
+const node=g.append("g").selectAll("g").data(nodes).join("g").attr("cursor","pointer").call(d3.drag().on("start",(e,d)=>{if(!e.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y}).on("drag",(e,d)=>{d.fx=e.x;d.fy=e.y}).on("end",(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null}));
+node.append("circle").attr("r",d=>sizeScale(d.size)).attr("fill",d=>CAT_COLORS[d.category]||"#868e96").attr("stroke","#0a0a14").attr("stroke-width",1.5);
+node.append("text").text(d=>d.label).attr("x",14).attr("y",3).attr("font-size","9px").attr("fill","#9090c0").attr("opacity",.7);
+node.on("mouseenter",function(e,d){d3.select(this).select("circle").transition().duration(200).attr("stroke","#fff").attr("stroke-width",2.5);d3.select(this).select("text").transition().duration(200).attr("opacity",1).attr("font-size","11px").attr("fill","#fff");link.selectAll("line").attr("opacity",l=>(l.source.id===d.id||l.target.id===d.id)?1:.1);node.selectAll("circle").attr("opacity",n=>{if(n.id===d.id)return 1;return links.some(l=>(l.source.id===d.id&&l.target.id===n.id)||(l.target.id===d.id&&l.source.id===n.id))?.9:.15})}).on("mouseleave",function(){d3.select(this).select("circle").transition().duration(200).attr("stroke","#0a0a14").attr("stroke-width",1.5);d3.select(this).select("text").transition().duration(200).attr("opacity",.7).attr("font-size","9px").attr("fill","#9090c0");link.selectAll("line").attr("opacity",d=>d.type==="similar"?.5:.6);node.selectAll("circle").attr("opacity",1)});
+node.on("click",function(e,d){openModal(d)});
+function openModal(d){const c=CAT_COLORS[d.category]||"#868e96";document.getElementById("modal-cat-badge").textContent=d.category;document.getElementById("modal-cat-badge").style.background=c+"30";document.getElementById("modal-cat-badge").style.color=c;document.getElementById("modal-size").textContent=(d.size/1024).toFixed(1)+" KB";document.getElementById("modal-title").textContent=d.label;const s=d.summary||"";document.getElementById("modal-summary").textContent=s;document.getElementById("modal-summary-section").style.display=s?"block":"none";const desc=d.description||"";document.getElementById("modal-desc").textContent=desc;document.getElementById("modal-desc-section").style.display=desc?"block":"none";const rels=DATA.edges.filter(e=>e.source.id===d.id||e.target.id===d.id);document.getElementById("modal-relations").innerHTML=rels.map(e=>{const is=e.source.id===d.id,other=is?e.target.label:e.source.label,type=is?e.type:(e.type==='uses'?'used_by':'similar'),cls='rel-'+type;return'<div class="modal-rel"><span class="modal-rel-type '+cls+'">'+type+'</span> '+other+'</div>'}).join('')||'<div style="font-size:11px;color:#505070">No relations</div>';document.getElementById("modal-backdrop").classList.add("open")}
+function closeModal(e){if(e&&e.target!==document.getElementById("modal-backdrop"))return;document.getElementById("modal-backdrop").classList.remove("open")}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+sim.on("tick",()=>{link.filter(d=>d.type==="similar").select("line").attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);link.filter(d=>d.type==="uses").select("line").attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);node.attr("transform",d=>"translate("+d.x+","+d.y+")")});
+function filterNodes(){const q=d3.select("#search").property("value").toLowerCase();if(!q){node.selectAll("circle").attr("opacity",1);node.selectAll("text").attr("opacity",.7);link.selectAll("line").attr("opacity",d=>d.type==="similar"?.5:.6);return}node.selectAll("circle").attr("opacity",d=>(d.label.toLowerCase().includes(q)||d.category.toLowerCase().includes(q))?1:.08);node.selectAll("text").attr("opacity",d=>(d.label.toLowerCase().includes(q)||d.category.toLowerCase().includes(q))?.9:0);link.selectAll("line").attr("opacity",d=>{const s=d.source.label.toLowerCase().includes(q)||d.source.category.toLowerCase().includes(q),t=d.target.label.toLowerCase().includes(q)||d.target.category.toLowerCase().includes(q);return(s||t)?(d.type==="similar"?.5:.6):.03})}
+function resetZoom(){svg.transition().duration(500).call(zoom.transform,d3.zoomIdentity)}
+d3.select("#stats").html(DATA.nodes.length+" skills · "+DATA.edges.length+" connections");
+window.addEventListener('resize',()=>{const W=window.innerWidth,H=window.innerHeight;svg.attr("width",W).attr("height",H).attr("viewBox",[0,0,W,H]);sim.force("center",d3.forceCenter(W/2,H/2)).alpha(.3).restart()});
+})();
 </script>
 </body>
 </html>

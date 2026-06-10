@@ -39,3 +39,10 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 - design-md → hermes-agent-skill-authoring (DESIGN.md Token Specs section)
 **AGENTS.md:** Evolve step 7 now audits skill descriptions
 **index.md:** Regenerated (86 skills)
+
+## [2026-06-10] evolve | Cycle #3: merged 3 coding agents → autonomous-ai-agents. 86→84 skills.
+**Merge:** claude-code + codex + opencode → autonomous-ai-agents (identical orchestration patterns, decision guide + per-agent reference)
+**Not merged:** 6 pairs analyzed and rejected per AGENTS.md criterion (distinct workflows, different abstraction levels, or fundamentally different toolchains)
+**AGENTS.md:** Added merge criterion — skills stay separate only if workflows are genuinely distinct
+**index.md:** Regenerated (84 skills)
+**graph:** Regenerated (92 edges)

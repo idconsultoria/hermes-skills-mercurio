@@ -76,8 +76,9 @@ Para cada operação:
   - Error messages específicas de um bug que já foi resolvido
   - Workarounds temporários que não são padrão reutilizável
   - Timestamps de eventos únicos, nomes de arquivos temporários
-  - Caminhos absolutos que só existem neste ambiente
-  Manter: padrões gerais, workflows reutilizáveis, comandos estáveis, regras de formato.
+  Manter: padrões gerais, workflows reutilizáveis, comandos estáveis.
+- **Auditoria de descrições:** Verificar se cada skill afetada tem frontmatter `description` adequado — resumo de 1 linha (~80 chars) seguido de parágrafo descritivo completo. Skills com descrições ausentes, truncadas ou genéricas demais devem ser corrigidas para alimentar bem o index.md. Skills consolidadas (merges) têm prioridade.
+- **Limpeza de disco:** `rm -rf` dos diretórios órfãos
 - **Limpeza de disco:** `rm -rf` dos diretórios órfãos (referências, templates, scripts das skills deletadas)
 
 ### 8. Offload — limpa memória de fatos procedurais
@@ -105,7 +106,24 @@ Entrada de 1 linha detalhando o que foi feito:
 ## [YYYY-MM-DD] evolve | <resumo: skills N→M, merges, deletes, offload>
 ```
 
-### 12. Stage + commit final
+### 12. Gera grafo HTML interativo
+Ao final de cada ciclo evolve, gerar o grafo D3.js para visualização das relações:
+
+```bash
+cd /opt/data/skills
+python3 scripts/generate_graph.py
+```
+
+O script extrai dados do index.md (com fallback para LLM-inferred JSON se o index não tiver relações), constrói JSON com nodes/edges, e injeta no template `skills_graph_template.html` → `skills_graph.html`.
+
+Features do grafo:
+- Nodes coloridos por categoria (14 cores), tamanho proporcional ao arquivo
+- Similar: linha tracejada cinza | Uses: linha sólida azul com seta
+- Hover: destaca nó + conexões | Click: modal com summary, description, relations
+- Filtro por texto, zoom/pan, drag, mobile-responsive, resize handler
+- Deduplicação de arestas bidirecionais (parent/child, uses/used_by)
+
+### 13. Stage + commit final
 ```bash
 cd /opt/data/skills
 git add -A
@@ -158,29 +176,33 @@ ls reports/
 
 Após regenerar o index.md com relações semanticamente inferidas, gerar um grafo interativo HTML:
 
-1. **Extrair dados** do index.md → JSON com nodes (id, label, title, size, category, summary, description) e edges (source, target, type)
-2. **Deduplicar arestas:** parent/child e uses/used_by viram uma única aresta direcionada
-3. **Gerar HTML** com D3.js force-directed graph:
-   - Nodes coloridos por categoria, tamanho proporcional ao arquivo
-   - Similar: linha tracejada cinza
-   - Uses/used_by: linha sólida azul com seta
-   - Hover: destaca nó + conexões
-   - Click: modal com summary, description, relations
-   - Filtro por texto, zoom/pan, drag, mobile-responsive
-4. **Template:** injetar JSON no placeholder `__DATA_PLACEHOLDER__` do template em `templates/graph.html`
-
-Comando:
 ```bash
-python3 scripts/build_graph.py  # parse index.md → graph_data.json
-python3 scripts/inject_graph.py  # merge template + data → skills_graph.html
+cd /opt/data/skills
+python3 scripts/generate_graph.py         # HTML + JSON
+python3 scripts/generate_graph.py --json  # JSON only
 ```
 
-Arquivos de output: `/opt/data/skills_graph.html` (standalone, ~55KB)
+O script lê o index.md para relações; se não encontrar (fallback), usa `/opt/data/skills_relations_merged.json` (LLM-inferred).
+
+Arquivos:
+- `scripts/generate_graph.py` — script standalone
+- `skills_graph_template.html` — template D3.js com placeholder `__DATA_PLACEHOLDER__`
+- `skills_graph.html` — output final (~55KB)
+
+Features: nodes por categoria, arestas tracejadas (similar) e sólidas (uses), modal com summary+description, filtro, zoom, mobile.
 
 ## Pitfalls
 
-⚠️ **Relations regex vs LLM:** A primeira passada de geração de relações (scan automatizado por regex no conteúdo) produz relações fracas — menciona skills que nem sempre são semanticamente relacionadas. Sempre que possível, usar o padrão de subagentes paralelos (`references/llm-relations-inference.md`) para inferência semântica de relações. A diferença é visível: 207 relações semanticamente corretas em 76 skills vs ~138 heurísticas imprecisas.
+⚠️ **Relations regex vs LLM:** A primeira passada de geração de relações (scan automatizado por regex) produz relações fracas. Sempre usar o padrão de subagentes paralelos (`references/llm-relations-inference.md`) para inferência semântica. Resultado: 207 relações semanticamente corretas vs ~138 heurísticas imprecisas.
 
-⚠️ **Log entries devem ser resumos de 1 linha detalhando a operação.** Não apenas "updated index.md" — incluir números, merges, deletes, impacto. O log é parseável com `grep "^## \[" log.md | tail -5` e deve recontar a história.
+⚠️ **index.md pode perder relações na regeneração.** O script de regeneração do index.md pode não incluir relações se não for explicitamente instruído. O grafo e a análise do evolve dependem delas. Solução: manter `/opt/data/skills_relations_merged.json` como fallback. O `generate_graph.py` já implementa o fallback automático — se o index.md tiver 0 relações, carrega do JSON.
+
+⚠️ **Log entries devem ser resumos de UMA LINHA.** Formato: `## [YYYY-MM-DD] prefixo | resumo detalhado`. O resumo deve incluir números, ações, impacto. Exemplo correto: `## [2026-06-10] evolve | Merged 11 skills into 4, deleted 10. 113→92.` Exemplo fraco: `## [2026-06-10] evolve | Updated skills.`
+
+⚠️ **Offload ≠ limpeza de skills.** Offload remove fatos procedurais da memória persistente. Limpeza de aprendizado excessivamente específico DENTRO das skills acontece no passo 7 (execução). Não confundir.
+
+⚠️ **Descrições de skills são auditadas no passo 7**, não depois. Skills consolidadas (merges) têm prioridade na auditoria de description. Skills não modificadas podem ser corrigidas em lote se tiverem descrições pobres.
+
+⚠️ **Offload é distinto da limpeza de skills.** Offload só cuida da memória persistente — remove de lá o que já está documentado em skills. A limpeza de aprendizados excessivamente específicos DENTRO das skills (debug transcripts, error messages pontuais, workarounds temporários) acontece no passo 7 (execução do plano), não no offload.
 
 

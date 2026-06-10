@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 86 skills*
+*Total: 84 skills*
 
 ---
 
@@ -48,27 +48,21 @@ Send and receive iMessages/SMS via the imsg CLI on macOS.
 - **Nome:** `apple/macos-computer-use`
 - **Arquivo:** `apple/macos-computer-use/SKILL.md`
 - **Tamanho:** 7,309 chars
+- **Resumo:** You have a `computer_use` tool that drives the Mac in the **background**
+
+You have a `computer_use` tool that drives the Mac in the **background**. Your actions do NOT move the user's cursor, steal keyboard focus, or switch Spaces. The user can keep typing in their editor while you click around in
 
 
 ## Autonomous Ai Agents
 
-### Claude Code — Hermes Orchestration Guide
+### Autonomous AI Coding Agents
 
-- **Nome:** `autonomous-ai-agents/claude-code`
-- **Arquivo:** `autonomous-ai-agents/claude-code/SKILL.md`
-- **Tamanho:** 34,288 chars
-- **Resumo:** Delegate coding to Claude Code CLI (features, PRs)
+- **Nome:** `autonomous-ai-agents/autonomous-ai-agents`
+- **Arquivo:** `autonomous-ai-agents/autonomous-ai-agents/SKILL.md`
+- **Tamanho:** 3,200 chars
+- **Resumo:** Delegate coding tasks to autonomous AI coding agent CLIs (Claude Code, Codex, OpenCode)...
 
-Delegate coding to Claude Code CLI (features, PRs).
-
-### Codex CLI
-
-- **Nome:** `autonomous-ai-agents/codex`
-- **Arquivo:** `autonomous-ai-agents/codex/SKILL.md`
-- **Tamanho:** 5,386 chars
-- **Resumo:** Delegate coding to OpenAI Codex CLI (features, PRs)
-
-Delegate coding to OpenAI Codex CLI (features, PRs).
+Delegate coding tasks to autonomous AI coding agent CLIs (Claude Code, Codex, OpenCode) via Hermes terminal/process tools. Covers one-shot tasks, interactive sessions, PR reviews, parallel worktrees, and monitoring.
 
 ### Hermes Agent
 
@@ -88,15 +82,6 @@ Configure, extend, or contribute to Hermes Agent.
 
 Hermes cross-platform message sending — platform-specific quirks, JID/ID format requirements, bridge API workarounds, and channel directory resolution. Covers Telegram, WhatsApp, and other messaging adapters.
 
-### OpenCode CLI
-
-- **Nome:** `autonomous-ai-agents/opencode`
-- **Arquivo:** `autonomous-ai-agents/opencode/SKILL.md`
-- **Tamanho:** 7,259 chars
-- **Resumo:** Delegate coding to OpenCode CLI (features, PR review)
-
-Delegate coding to OpenCode CLI (features, PR review).
-
 ### Pi Agent (Local)
 
 - **Nome:** `autonomous-ai-agents/pi-agent-coordination`
@@ -111,6 +96,9 @@ Pi Coder Agent local no Hermes. Hierarquia: agy > Pi best > Pi cost. Invoacao di
 - **Nome:** `autonomous-ai-agents/product-pipeline`
 - **Arquivo:** `autonomous-ai-agents/product-pipeline/SKILL.md`
 - **Tamanho:** 80,167 chars
+- **Resumo:** ┌───────────────────────────────────────────────────┐ │                     Hermes     ...
+
+┌───────────────────────────────────────────────────┐ │                     Hermes                         │ │  Orquestrador • valida • agenda • pesquisa • integra│
 
 
 ## Content Production
@@ -129,6 +117,9 @@ Umbrella skill for all newsletter/briefing/digest pipelines — IAF Manhã Aumen
 - **Nome:** `content-production/text-to-speech`
 - **Arquivo:** `content-production/text-to-speech/SKILL.md`
 - **Tamanho:** 7,413 chars
+- **Resumo:** Umbrella skill
+
+Umbrella skill. Covers: - [Voice design & prompting](#gemini-31-flash-tts) — Gemini TTS prompt structure, voice selection, audio tags - [Hermes TTS system](#hermes-tts-command-provider-chain) — multi-provider fallback, config
 
 
 ## Creative
@@ -405,6 +396,9 @@ Deploy static sites and frontend apps to Vercel — from zero to production. Cov
 - **Nome:** `media/hyperframes-video-production`
 - **Arquivo:** `media/hyperframes-video-production/SKILL.md`
 - **Tamanho:** 11,345 chars
+- **Resumo:** node --version          # needs 22+ ffmpeg -version         # needs ffmpeg npx hyperfra...
+
+node --version          # needs 22+ ffmpeg -version         # needs ffmpeg npx hyperframes --version  # should print version
 
 ### YouTube Content Tool
 
@@ -480,6 +474,9 @@ vLLM: high-throughput LLM serving, OpenAI API, quantization.
 - **Nome:** `mlops/pi-session-audit`
 - **Arquivo:** `mlops/pi-session-audit/SKILL.md`
 - **Tamanho:** 13,878 chars
+- **Resumo:** ~/
+
+~/.pi/agent/sessions/--<path-normalizado>--/<timestamp>_<uuid>.jsonl Onde `<path-normalizado>` é o diretório de trabalho com `/` substituído por `-`. Ex: `--opt-data-code-workstation-taskflow--`
 
 
 ## Note Taking
@@ -582,12 +579,18 @@ Create, read, edit .pptx decks, slides, notes, templates.
 - **Nome:** `productivity/relatorio-de-custos`
 - **Arquivo:** `productivity/relatorio-de-custos/SKILL.md`
 - **Tamanho:** 9,688 chars
+- **Resumo:** Usuário pede relatório de custos do projeto X, breakdown de gastos, quanto custou o MVP
+
+Usuário pede relatório de custos do projeto X, breakdown de gastos, quanto custou o MVP. sqlite3 /opt/data/state.db " SELECT id, title, source, model,
 
 ### TaskFlow MCP — Ferramentas e Workflows
 
 - **Nome:** `productivity/taskflow-mcp`
 - **Arquivo:** `productivity/taskflow-mcp/SKILL.md`
 - **Tamanho:** 4,485 chars
+- **Resumo:** TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Pr...
+
+TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Protocol). Conecta-se via SSE (StreamableHTTP POST não funciona — SSE deve ser explícito). Transport: SSE (StreamableHTTP POST padrão do Hermes não funciona)
 
 
 ## Research
@@ -615,6 +618,9 @@ Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool.
 - **Nome:** `research/deep-research`
 - **Arquivo:** `research/deep-research/SKILL.md`
 - **Tamanho:** 33,335 chars
+- **Resumo:** 基于 GPT-Researcher 架构，适配 Hermes delegate_task 的多 agent 深度调研流水线
+
+基于 GPT-Researcher 架构，适配 Hermes delegate_task 的多 agent 深度调研流水线。 用户问题 │
 
 ### Karpathy's LLM Wiki
 
@@ -657,6 +663,9 @@ Discover what the tech/AI community is discussing right now — trending topics,
 - **Nome:** `research/user-interview`
 - **Arquivo:** `research/user-interview/SKILL.md`
 - **Tamanho:** 9,161 chars
+- **Resumo:** - During the Research phase (Fase 2) of the product pipeline - Understanding user needs...
+
+- During the Research phase (Fase 2) of the product pipeline - Understanding user needs, pain points, and behaviors - Before defining personas or user stories
 
 
 ## Social Media
@@ -696,12 +705,18 @@ Google Antigravity CLI (agy) — instalação, autenticação OAuth via tmux, e 
 - **Nome:** `software-development/backlog-and-sprint`
 - **Arquivo:** `software-development/backlog-and-sprint/SKILL.md`
 - **Tamanho:** 78,483 chars
+- **Resumo:** Usuário dá feedback │ ▼
+
+Usuário dá feedback │ ▼
 
 ### Code Tasks
 
 - **Nome:** `software-development/code-tasks`
 - **Arquivo:** `software-development/code-tasks/SKILL.md`
 - **Tamanho:** 8,258 chars
+- **Resumo:** - After engineering docs (SAD, TechSpecs, ERD, API contracts) are approved - Before wri...
+
+- After engineering docs (SAD, TechSpecs, ERD, API contracts) are approved - Before writing any implementation code - During the MVP build phase (Fase 4 — Engineering)
 
 ### Authoring Hermes-Agent Skills (in-repo)
 
@@ -717,6 +732,9 @@ Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structu
 - **Nome:** `software-development/ideation-drilling`
 - **Arquivo:** `software-development/ideation-drilling/SKILL.md`
 - **Tamanho:** 14,550 chars
+- **Resumo:** - O usuário diz: "Tenho uma ideia para um produto/feature" - O usuário pede: "Me ajude ...
+
+- O usuário diz: "Tenho uma ideia para um produto/feature" - O usuário pede: "Me ajude a refinar essa ideia" - Início do pipeline de produto (Fase 1)
 
 ### Plan Mode
 
@@ -732,13 +750,16 @@ Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bi
 - **Nome:** `software-development/skill-curation`
 - **Arquivo:** `software-development/skill-curation/SKILL.md`
 - **Tamanho:** 10,756 chars
+- **Resumo:** Hermes Agent has a rich ecosystem of **70+ bundled skills** and **hundreds of community...
+
+Hermes Agent has a rich ecosystem of **70+ bundled skills** and **hundreds of community skills** across GitHub, HermesHub (`hermeshub.xyz`), Hermes Atlas (`hermesatlas.com`), and the `skills.sh` marketplace. The challenge is not finding skills — it's finding the **right** skill and evaluating whether it's production-grade. This skill covers the full curation workflow: User request → Web search for skills → Extract details from repos
 
 ### Skills Repository Curator
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 9,262 chars
-- **Resumo:** Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidação MECE, index
+- **Tamanho:** 11,208 chars
+- **Resumo:** Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidação MECE, ind
 
 Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidação MECE, index.md/log.md/reports, offload de memória, e manutenção de AGENTS.md. Executa o processo completo de análise, merge, delete, relatório e commit.
 
