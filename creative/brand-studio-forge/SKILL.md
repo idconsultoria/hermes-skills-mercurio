@@ -136,6 +136,7 @@ All commands use `forge_<subcommand>` format (underscore-delimited) for Telegram
 | `forge_polish` | Refine | Final quality pass on brand collateral | [references/grid-and-layout.md](references/grid-and-layout.md) |
 | `forge_content` | Generate | Generate brand-voice social/marketing content | [references/tone-and-copy.md](references/tone-and-copy.md) |
 | `forge_schedule` | Generate | Set up NL cron for brand content | [references/process.md](references/process.md) |
+| `forge_analyze` | Analyze | Browser-based visual identity analysis of existing brands → style guide | [merged from brand-aesthetic-analysis] |
 
 ### Routing rules
 
@@ -178,6 +179,35 @@ Common flavor text categories that need refinement:
 - **Metáfora central** (1-sentence philosophy)
 - **Descrição do símbolo/mascote**
 - **Anti-referências list**
+
+## User Preferences (gustavomello9600)
+
+This user applies to the style guide output format:
+- **Language**: Brazilian Portuguese — write the entire guide in PT-BR
+- **Format**: Comprehensive, deep-dive structure with 10-15 sections
+- **Style**: Tables, ASCII diagrams, hex codes, practical reference data
+- **Delivery**: Always a downloadable file via MEDIA: path
+- **Detail level**: Exhaustive — every component disassembled
+
+## forge_analyze — Browser-Based Brand Analysis
+
+Systematically inspect a product/brand's visual identity using browser tools and vision analysis, then produce a style guide file.
+
+### Workflow
+
+1. **Scout** — `browser_navigate` to landing, feature, docs, and brand hub pages
+2. **See** — `browser_vision` on each page with structured questions (colors, typography, layout, components, decorative elements, interactive states, overall philosophy)
+3. **Dive** — Click interactive elements, toggle dark mode, scroll to capture full layout
+4. **Organize** — Structure findings: Philosophy → Color → Typography → Layout → Navigation → Components → Icons → Interactions → Voice → Design Principles
+5. **Produce** — Write polished markdown file at `/opt/data/<brand>-design-style-guide.md`, deliver via MEDIA:
+
+### Pitfalls
+- Vision model may be unreliable on colors/fonts — cross-reference with source
+- Interactive elements may be JS-dependent — try different click targets
+- Font identification is approximate — note "appears to be"
+- Different surfaces (marketing vs docs) may use different design systems
+
+---
 
 ## Pitfalls
 

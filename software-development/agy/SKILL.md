@@ -1,6 +1,6 @@
 ---
 name: agy
-description: Google Antigravity CLI (agy) — instalação, autenticação OAuth via tmux, e workflows de design (image generation, prototipagem, subagentes paralelos).
+description: Google Antigravity CLI (agy) — instalação, autenticação OAuth via tmux, e workflows de design (image generation, prototipagem, subagentes paralelos, HTML reports).
 category: software-development
 ---
 
@@ -12,9 +12,16 @@ category: software-development
 >
 > Ver pi-agent-coordination para a hierarquia completa (agy > Pi best > Pi cost).
 
+**PRIMARY design tool** — agy (Gemini Flash 3.5 via --print mode) é o DEFAULT para qualquer output visual. Use FIRST, não como fallback.
+
 ## Trigger
-User asks to use agy for design tasks (UI mockups, prototipagem, design review, UX audit, pesquisa),
-ou quando a tarefa se encaixa no perfil "consultor externo": complexo, estrategico, requer file I/O.
+
+- User asks for any visual design output — HTML pages, brand presentations, UI mockups, SVGs, prototypes
+- User says "make an HTML", "create a visual", "apresente em HTML"
+- Tarefa complexa/estratégica que requer file I/O ou design/UX
+- User asks to use agy for design tasks
+
+For user Gustavo Mello: agy is the primary design tool. Não use HTML manual quando agy está disponível.
 
 ## Install
 
@@ -30,146 +37,196 @@ curl -fsSL -o /tmp/agy-install.sh https://antigravity.google/cli/install.sh
 bash /tmp/agy-install.sh
 ```
 
-Installed to `~/.local/bin/agy` (version seen: 1.0.6, Go binary ~158MB).
+Installed to `~/.local/bin/agy` (version: 1.0.6, Go binary ~158MB).
 
-Add to PATH manually:
+Add to PATH:
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
 ## Authentication (Critical — OAuth Requires Interactive TTY)
 
-agy uses Google OAuth with PKCE. In remote/SSH environments (no browser), the flow is:
-
-1. agy prints a Google OAuth URL
-2. User visits URL in browser, signs in
-3. Browser shows an alphanumeric authorization code
-4. User pastes the code back into agy's TUI
-
-**The problem:** agy uses bubbletea (TUI framework) that requires a real TTY. Running via `ssh <host> agy` or piping stdin doesn't work — it either fails with "error opening TTY" or the 30s timeout expires.
-
-### Solution: tmux session on the host
+agy uses Google OAuth with PKCE. In remote/SSH environments (no browser), use tmux:
 
 ```bash
 # 1. Install tmux if missing
 ssh oracle-host 'sudo apt-get install -y tmux'
 
-# 2. Create a tmux session with agy running
+# 2. Create a tmux session
 ssh oracle-host 'tmux new-session -d -s agy-auth \
   "env HOME=/home/ubuntu TERM=xterm-256color /home/ubuntu/.local/bin/agy"'
 
-# 3. Wait for the TUI to render, then select Google OAuth
+# 3. Wait, then select Google OAuth
 sleep 3
 ssh oracle-host 'tmux send-keys -t agy-auth "1" Enter'
 
-# 4. Extract the auth URL from the tmux pane
+# 4. Extract auth URL
 ssh oracle-host 'tmux capture-pane -t agy-auth -p -S -30'
 
-# 5. Send the URL to the user — they visit it, authenticate, get a code
-# 6. Send the code back to agy in tmux
+# 5. User visits URL, authenticates, gets a code
+# 6. Send code back
 ssh oracle-host 'tmux send-keys -t agy-auth "<THE_CODE>" Enter'
 
-# 7. Verify auth succeeded
+# 7. Verify
 ssh oracle-host 'tmux capture-pane -t agy-auth -p -S -10'
 ```
 
-**Important:** Each agy invocation generates a fresh PKCE `code_challenge`. If the URL is lost and agy restarts, the previous auth code is invalidated.
+**Important:** Each agy invocation generates a fresh PKCE `code_challenge`.
 
 ### Detecting auth state
 ```bash
 ssh oracle-host 'echo "n" | timeout 12 env HOME=/home/ubuntu /home/ubuntu/.local/bin/agy 2>&1 | head -10'
-# If "Authentication required" → not authenticated yet
-# If session starts → authenticated
 ```
 
 ## Design Workflows
 
-### Image Generation (Built-in)
-agy has native `GenerateImage()` — no external tools needed. Use for:
-- UI mockups
-- App icons / branding assets
-- Placeholder images
-- Visual concepts
+### 1. Image & Visual Generation
 
-Prompt pattern: *"Generate an image of [description]"*
+Generate logos, banners, brand kits, illustrations using Gemini Flash 3.5's built-in image generation.
 
-### Autonomous Prototyping (/goal)
-Hands-free mode: agy plans, codes, tests, and delivers without human input.
 ```bash
-agy /goal "Build a single-page landing page for [product] with hero, features, and CTA"
+ssh oracle-host 'export PATH=$PATH:/home/ubuntu/.local/bin && \
+  timeout 300 agy --dangerously-skip-permissions --print \
+  "Generate a [logo/banner/brand-kit/image] for [subject]. \
+   Style: [description]. Colors: [exact hexes]."'
 ```
 
-Generates:
-- `implementation_plan.md` — full spec
-- Code output
-- `walkthrough.md` — post-completion docs
+**Image retrieval:** agy saves to `~/.gemini/antigravity-cli/brain/<uuid>/<name>.png`.
+```bash
+ssh oracle-host 'find ~/.gemini/antigravity-cli/brain/ -name "*.png" -mmin -5 2>/dev/null | head -3'
+ssh oracle-host 'sudo cp ~/.gemini/antigravity-cli/brain/<uuid>/<file>.png /home/ubuntu/selfhost/hermes/data/'
+```
 
-### Requirements Gathering (/grill-me)
-Interactive TUI interview before coding — agy asks targeted questions with curated options.
+### 2. HTML Generation (brand presentations, landing pages)
+
+Use agy's `--print` mode with Gemini Flash 3.5 for standalone HTML.
+
+**CRITICAL: `--print` syntax.** `--print` takes a STRING argument. Piping/redirecting stdin does NOT work:
+```bash
+# ✅ CORRECT:
+agy --print "your prompt here"
+agy --print "$(cat /tmp/prompt.txt)"
+
+# ❌ WRONG:
+cat prompt.txt | agy --print
+agy --print < prompt.txt
+```
+
+**Two modes — prefer Mode B when a file already exists:**
+
+**Mode A — Generate from scratch:**
+```bash
+cat > /tmp/prompt.md << 'PROMPT'
+[detailed prompt with ALL data, colors, specs inline]
+PROMPT
+scp -F ~/.ssh/config /tmp/prompt.md oracle-host:/tmp/prompt.txt
+ssh oracle-host 'export PATH=$PATH:/home/ubuntu/.local/bin && timeout 300 agy --print "$(cat /tmp/prompt.txt)"'
+```
+
+**Mode B — Edit existing file (preferred when user provides one):**
+```bash
+scp -F ~/.ssh/config /path/to/original.html oracle-host:/home/ubuntu/file.html
+# Write focused prompt describing exact edits
+ssh oracle-host 'export PATH=$PATH:/home/ubuntu/.local/bin && timeout 600 agy --print "$(cat /tmp/prompt.txt)"'
+ssh oracle-host 'sudo cp /home/ubuntu/file.html /home/ubuntu/selfhost/hermes/data/'
+```
+
+### 3. Autonomous Prototyping (/goal)
+```bash
+agy /goal "Build a single-page landing page for [product]"
+```
+Generates: `implementation_plan.md`, code output, `walkthrough.md`.
+
+### 4. Requirements Gathering (/grill-me)
 ```bash
 agy /grill-me "Design a dashboard UI for [purpose]"
 ```
 
-Good for ambiguous design briefs with many decision points.
-
-### Subagents (Parallel Design Work)
-Spawn parallel agents for research + implementation:
-```bash
-# Spawn research subagent for design research
-# Meanwhile, main agent works on implementation
-```
-
+### 5. Subagents (Parallel Design Work)
 Three subagent types: `research` (read-only), `self` (full clone), custom.
 
-### Skills System
-agy has 56+ built-in skills (Chrome DevTools, Modern Web, Firebase, etc.):
-```bash
-# List available skills
-/skills
+### 6. Image Generation & File Retrieval
+agy has native `GenerateImage()` — no external tools needed.
 
-# Use a skill
-"Use the modern-web-guidance skill for CSS container queries best practices"
+When agy generates an image, it saves to:
+```
+~/.gemini/antigravity-cli/brain/<uuid>/<descriptive-name>.png
 ```
 
-### Workflow Skill Creator
-Completed design workflows can be distilled into reusable `SKILL.md` files:
+Fallback delivery when bind mount has permission issues:
 ```bash
-# After completing a design workflow, save it as a skill
-"Save this workflow as a skill called 'landing-page-scaffold'"
+ssh oracle-host 'sudo cat ~/.gemini/antigravity-cli/brain/<uuid>/<file>.png | base64' 2>/dev/null | \
+  base64 -d > /opt/data/<filename>.png
 ```
+
+## Hermes Style Guide (for agy prompts)
+
+Default to this design system for visual outputs:
+
+```css
+--primary: #0000FF;
+--blue-bg: #F0F5FF;
+--blue-border: #CCD9FF;
+--gold-accent: #E8B830;
+--green-accent: #059669;
+--text-dark: #1C1C1E;
+--text-muted: #666680;
+```
+
+- **Headings:** 'Spectral', Georgia, serif
+- **Numbers/Code:** 'Space Mono', monospace
+- **Body:** 'Inter', sans-serif
+- **Report structure:** Hero (gradient blue, gold total), Executive Summary (blue bg, negative margin), Sections (white, blue borders), Footer
+
+## Key Commands Reference
+
+| Command | Purpose |
+|---------|---------|
+| `agy` | Launch interactive TUI session |
+| `agy --print "prompt"` | One-shot execution |
+| `agy --print "$(cat prompt.txt)"` | One-shot from file |
+| `agy /goal "..."` | Autonomous hands-free build |
+| `agy /grill-me` | Interactive requirements interview |
+| `agy doctor` | Verify setup and auth |
+| `agy -p` | Print mode (non-interactive) |
+| `agy --dangerously-skip-permissions` | Skip approval prompts (file writes) |
 
 ## Pitfalls
 
-⚠️ **TUI requires real TTY.** Cannot pipe commands or redirect stdin for interactive use. Always use tmux/screen on the remote host.
+⚠️ **`--print` syntax non-obvious.** `--print` takes a STRING argument. Pipe/redirect do NOT work.
 
-⚠️ **30s auth timeout.** agy waits 30s for the user to authenticate. If using the tmux approach, the session stays alive indefinitely — no timeout issue.
+⚠️ **TUI requires real TTY.** Cannot pipe commands for interactive use. Always use tmux on host.
 
-⚠️ **PKCE one-time use.** Auth code from one session cannot be reused in another. Always generate a fresh URL.
+⚠️ **30s auth timeout.** agy waits 30s for user to authenticate. tmux session stays alive indefinitely.
 
-⚠️ **Output token limit em arquivos grandes.** agy (Gemini Flash 3.5) tem limite de tokens de saída. Ao reconstruir arquivos grandes (ex: prototype.html > 75KB), a geração pode ser truncada com "The model's generation exceeded the maximum output token limit." agy se recupera compactando e reescrevendo — mas o resultado pode perder funcionalidades. Para evitar: quebrar a tarefa em partes menores, ou pedir versão compacta explicitamente.
+⚠️ **PKCE one-time use.** Auth code invalidated if agy restarts.
 
-⚠️ **Path confusion — sempre usar path absoluto explícito.** agy pode procurar arquivos em diretórios errados (ex: `/home/ubuntu/selfhost/taskflow/` em vez de `/home/ubuntu/selfhost/shared/code/workstation/taskflow/`). Como o agy usa o modelo para decidir onde ler, ele pode seguir links simbólicos ou caminhos antigos. Sempre fornecer o path absoluto completo (desde `/home/ubuntu/selfhost/...`) nos prompts para evitar confusão.
+⚠️ **Output token limit** em arquivos grandes. agy pode truncar se >75KB. Quebrar em partes.
 
-⚠️ **$HOME must be set.** agy crashes with `$HOME is not defined` if the env var is missing. Always pass `HOME=/home/ubuntu` or whatever is appropriate.
+⚠️ **$HOME must be set.** agy crashes without it.
 
-⚠️ **First-run only in HOST keyring.** OAuth tokens are cached in the OS keyring (`secret-tool` / `dbus`) **on the host** after first auth. The Hermes/Pi containers have no dbus, so agy prompts for auth every time when run inside the container. **Always run agy on the host via SSH**, not inside any container:
+⚠️ **Keyring only on host.** OAuth tokens cached on host keyring, NOT inside containers. Always run agy on host via SSH.
 
-```bash
-# ✅ Run on host
-ssh oracle-host 'cd /home/ubuntu/selfhost/shared/code/PROJETO && /home/ubuntu/.local/bin/agy -p "prompt"'
+⚠️ **Timeout:** Para HTML multi-section, use `timeout 300`. Para editar arquivos HTML grandes (600KB+), use `timeout 600`.
 
-# ❌ Does NOT work (container has no keyring)
-agy -p "prompt"
-```
+⚠️ **Prefira editar existente a regenerar:** Editar preserva ajustes manuais.
 
-⚠️ **File paths from host perspective** — Inside the container, files are at `/opt/data/code/workstation/...`. On the host, they're at `/home/ubuntu/selfhost/shared/code/workstation/...`. When running agy via SSH, always use the host path.
+⚠️ **No emojis em outputs visuais.** Substitua por SVGs inline (stroke, viewBox="0 0 24 24").
+
+⚠️ **agy CAN read files from host filesystem** via its own tools. Put files on host first (SCP).
+
+⚠️ **`DOMContentLoaded` timing** em slides HTML interativos. Usar padrão `readyState === 'loading'` para init.
+
+⚠️ **Base64 images inline** inflam arquivos HTML. Usar uma única variável JS `const LOGO_URI = "data:..."`.
+
+⚠️ **Path confusion.** Sempre usar caminho absoluto completo nos prompts.
+
+⚠️ **First-run color scheme picker.** Cached after first use.
+
+⚠️ **Quota exhaustion.** agy compartilha quota do Google Cloud. Fallback para HTML manual com os mesmos tokens visuais.
 
 ## Verification
 ```bash
-# Check binary
-ssh oracle-host '/home/ubuntu/.local/bin/agy --version'
-# Expected: 1.0.6
-
-# Check PATH setup
-ssh oracle-host 'export PATH="$HOME/.local/bin:$PATH" && which agy'
+agy --version        # → 1.0.5+
+agy doctor           # → "All checks passed" (requires auth)
 ```
