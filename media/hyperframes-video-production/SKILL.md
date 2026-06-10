@@ -1,10 +1,6 @@
 ---
 name: hyperframes-video-production
-description: >-
-  Produce deterministic MP4 videos using HyperFrames (HTML→video engine).
-  Generates HTML compositions with GSAP animations, renders locally via
-  npx hyperframes. Hermes Style Guide is the default visual aesthetic
-  for explainer/demo videos.
+description: "Produce deterministic MP4 videos using HyperFrames (HTML→video engine). Generates HTML compositions with GSAP animations, renders locally via npx hyperframes. Hermes Style Guide is the default visual aesthetic for explainer/demo videos."
 category: media
 ---
 

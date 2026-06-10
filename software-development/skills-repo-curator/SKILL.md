@@ -1,247 +1,252 @@
 ---
 name: skills-repo-curator
-description: "Gerencia o repositório Git de skills do Hermes com ciclo evolve de consolidação MECE.\n\nLoad this skill when the skills repo needs maintenance — evolve cycles (analysis, merge, delete, report, commit), index.md/log.md/reports updates, memory offload, orphan review, and AGENTS.md upkeep. Executes the full consolidation lifecycle: analyze portfolio, propose merges, delete redundant skills, review orphans, write reports, offload learned facts to skills, and commit changes."
+description: "Gerencia o skills repo em /opt/data/skills/ com controle de versão Git: Ciclo de Consolidação (Update→Evolve→Offload), análise MECE, merges, revisão de órfãos, inferência depth-1 de relações, auditoria de conformidade de descrições, index.md/log.md/reports, geração de grafo D3 interativo e offload de memória.\\\\\\\\n\\\\\\\\nLoad this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, AGENTS.md updates, or any skills repository management task. Executes the full consolidation lifecycle: analyze portfolio, propose merges, delete redundant skills, review orphans, write reports, offload learned facts to skills, generate graph, and commit."
+category: software-development
 ---
 
 # Skills Repository Curator
 
 > Gerencia o skills repo em `/opt/data/skills/` com controle de versão Git.
-> Ciclo principal: `evolve` — análise → plano → execução → orphan review → report → offload → commit.
+> Macro: **Ciclo de Consolidação** — `Update → log → commit → Evolve → log → Offload → commit`.
+> Sub-etapa: **evolve** (9 passos) — estudo → plano → execução → orphan review → report → grafo → commit.
 
-## Trigger
-- User diz "gerencie suas skills", "limpe as skills", "rode evolve", "consolide skills"
-- User pede para revisar, fundir, deletar ou organizar skills
-- Ao final de uma sessão com múltiplas correções de workflow que merecem ser capturadas
+## Visão Geral — Ciclo de Consolidação vs Evolve
+
+**Não são a mesma coisa.** O **Ciclo de Consolidação** é o processo macro que coordena as 3 etapas na ordem fixa: **Update → Evolve → Offload**. Cada etapa tem seu próprio prefixo no log.md. O **evolve** é apenas uma das 3 etapas — a de consolidação inteligente.
+
+```
+┌───────────────────────────────────────────────────────┐
+│                 Ciclo de Consolidação                  │
+│                                                       │
+│   Update ──→ Log ──→ Commit ──→ Evolve ──→ Log ──→ Offload ──→ Commit
+│   (6 passos)           (9 passos)            (4 passos)
+│                                                       │
+│   As 3 etapas sempre rodam nesta ordem.               │
+└───────────────────────────────────────────────────────┘
+```
+
+O ciclo é executado periodicamente (diariamente via cron às 02:00). Ele inicia os updates — não o contrário.
 
 ## Estrutura do Repositório
 
 ```
 skills/
-├── AGENTS.md           ← Regras, operações, prefixos de log
-├── index.md            ← Catálogo orientado a conteúdo de todas as skills
+├── AGENTS.md           ← Regras, operações, prefixos de log, scripts
+├── index.md            ← Catálogo orientado a conteúdo (evolui commit a commit)
 ├── log.md              ← Diário cronológico append-only
 ├── reports/            ← Planos (pré) e relatórios (pós) de cada ciclo evolve
-│   ├── evolve-<YYYY-MM-DD-HHMM>.md       ← plano
-│   └── evolve-<YYYY-MM-DD>-report.md     ← relatório denso pós-execução
-├── .gitignore          ← Cache files excluded
-├── <category>/
-│   └── <skill-name>/
-│       ├── SKILL.md
-│       └── references/
-├── templates/          ← (opcional) boilerplate
-└── scripts/            ← (opcional) validadores
+├── scripts/            ← Scripts de apoio (generate_graph.py, etc.)
+├── skills_graph.html   ← Grafo D3 interativo (regenerado a cada evolve)
+├── graph_data.json     ← Dados estruturados do grafo
+└── <category>/
+    └── <skill-name>/
+        ├── SKILL.md
+        └── references/
 ```
 
-## ⚠️ Regra Absoluta: index.md é Território de LLM
+## Trigger
 
-O arquivo `index.md` **não pode ser editado por scripts** — nem Python, nem sed, nem awk, nem regeneração automática. Toda edição no index.md deve passar por ferramentas de agente LLM (`read_file`, `write_file`, `patch`), garantindo que cada decisão editorial passe por julgamento humano-assistido.
+- Usuário diz "gerencie suas skills", "limpe as skills", "rode evolve", "consolide skills"
+- Usuário pede para revisar, fundir, deletar ou organizar skills
+- Ao final de uma sessão com múltiplas correções de workflow
+- Execução automática via cron diário
+
+## Regra Absoluta: index.md é Território de Agente LLM
+
+**O index.md NUNCA pode ser editado por scripts** — nem Python, sed, awk, regeneração automática. Toda edição no index.md deve passar por ferramentas de agente LLM (`read_file`, `write_file`, `patch`), garantindo que cada decisão editorial (merge, ajuste de descrição, relação) passe por julgamento humano-assistido.
 
 **Scripts são permitidos para tarefas de apoio** — análise de conexões, extração de metadados dos SKILL.md, geração do grafo HTML, relatórios. O output desses scripts informa o agente, que então edita o index.md manualmente.
 
-**Violação detectada:** Se uma sessão anterior fabricou a edição do index.md via script, reverter imediatamente e refazer manualmente com patch.
+O index.md **evolui commit a commit** — nunca é regenerado do zero. O agente usa `git diff` entre o último commit e o estado atual para detectar mudanças, depois aplica patches cirúrgicos. Cada commit adiciona uma camada sem destruir o histórico.
 
-## ⚠️ Pattern: Batch-Report-Then-Apply (Evita File Conflict)
+---
 
-Quando múltiplos subagentes precisam modificar o index.md (ex: adicionar relações para centenas de skills), **NUNCA** mande todos escreverem no index.md diretamente — eles vão conflitar e corromper o arquivo.
+## Etapa 1: Update (6 passos)
 
-**Padrão correto:**
+Sincroniza o index.md com o estado atual das skills.
 
-1. Cada subagente produz um **relatório de saída** (ex: `relations-batch1.md`) com as modificações a fazer
-2. Os relatórios são salvos via `write_file` em `/opt/data/skills/`
-3. Um único subagente (ou o agente principal) lê os relatórios e aplica **todos os patches sequencialmente** no index.md
+### Passos
+
+1. **Verifica mudanças** — `git status` + `git diff` entre o último commit e o estado atual. Identifica skills adicionadas, removidas, modificadas ou com metadados alterados. Este diff É o ponto de partida.
+2. Escaneia todas as skills no repositório
+3. **Atualiza o index.md** com as mudanças detectadas via patches cirúrgicos (adiciona, edita, remove entradas)
+4. **Audita conformidade de descrições** — varre TODAS as SKILL.md, não apenas as modificadas:
+   - **Sumário de uma linha (≤85 chars, SEM `...`):** descrição concisa e auto-contida. Quem lê entende na hora se deve carregar a skill.
+   - **Parágrafo de resumo:** explica gatilhos de ativação ("Load this skill when...") e expande a descrição com capacidades específicas, ferramentas utilizadas e o que produz.
+   - Lista **todas as skills fora do formato** com o problema específico, edita a SKILL.md original, depois atualiza o index.md.
+   - **Sem exceção** — faz para todas as skills fora do formato.
+5. Registra no log.md com prefixo `update` incluindo o resumo de tudo que foi alterado
+6. **Stage + commit**
+
+### Formato exato esperado da description
+
+```yaml
+description: "One-liner summary here (≤85 chars, no ...).
+
+Load this skill when [activation trigger]. [Expanded capabilities,
+tools used, what it produces, key workflows covered.]"
+```
+
+**Exemplo conforme:**
+```yaml
+description: "Geocode addresses, find POIs, calculate routes, and lookup timezones via OpenStreetMap and OSRM.
+
+Load this skill when you need location-based data — converting addresses to coordinates, searching for points of interest, getting driving or walking directions with distance and ETA, or looking up timezone information. Uses free APIs (Nominatim, Overpass, OSRM) with no API key required."
+```
+
+---
+
+## Etapa 2: Evolve (9 passos)
+
+**Esta é uma etapa do ciclo de consolidação.** Executa DEPOIS do update e ANTES do offload.
+
+Analisa o portfólio e propõe merges, remoções e spin-offs para manter as skills **MECE** (Mutually Exclusive, Collectively Exhaustive).
+
+### Critério de Merge
+
+Duas skills conectadas (similar/uses) só devem permanecer separadas se descreverem **fluxos de trabalho realmente distintos** — que não podem ou não faz sentido incorporar um ao outro. A conexão no grafo é **evidência, não sentença** — o julgamento final é sobre o workflow descrito.
+
+### Passos
+
+1. **Estuda** o index.md completo e elabora plano de evolução
+2. **Salva** o plano em `reports/evolve-<YYYY-MM-DD-HHMM>.md`
+3. **Executa** o plano (merges, deletes, consolidação de conteúdo):
+   - Limpa aprendizados excessivamente específicos das skills (debugging, workarounds temporários, timestamps únicos)
+   - **Audita descrições** das skills afetadas
+   - **PII em skills:** verificar números de telefone reais, usernames, JIDs/LIDs de WhatsApp, IPs públicos, grupos reais, marcas do usuário. Skills são artefatos compartilháveis — dados pessoais devem ser substituídos por `[REDACTED]` ou placeholders.
+   - **Limpeza de disco:** `rm -rf` de diretórios órfãos
+4. **Revisa skills órfãs** — skills sem relações no grafo:
+   - Tenta encontrar conexão semântica com outras skills (lendo ambos os SKILL.md — **profundidade 1**). Se encontrar, adiciona relação bilateral (frontmatter + index.md).
+   - Se não encontrar conexão, avalia se a skill é importante o suficiente para existir isolada. Skills genuinamente de nicho podem ficar órfãs com justificativa.
+   - Se não tem conexão E não é claramente importante, considera merge ou delete.
+   - **Target: 0 órfãos.**
+5. **Escreve relatório denso** em `reports/evolve-<YYYY-MM-DD>-report.md`
+6. **Atualiza** o index.md pós-transformação
+7. **Registra** no log.md com prefixo `evolve`
+8. **Gera grafo HTML interativo** — `python3 scripts/generate_graph.py`
+9. **Stage + commit** final
+
+### Inferência Depth-1 de Relações (Padrão Obrigatório)
+
+**Não confiar em scan automatizado de frontmatter.** A primeira passada rasa produz ~12 arestas fracas. Para relações semânticas de qualidade:
+
+1. Dispare **3 subagentes paralelos** via `delegate_task(tasks=[...])`
+2. Cada subagente analisa ~28 skills
+3. **Cada subagente lê a skill principal E cada skill candidata a relação (profundidade 1)** — lê o SKILL.md de ambos os lados, confirma a conexão semântica antes de declará-la
+4. **Cada subagente produz um RELATÓRIO de saída** (ex: `relations-batch1.md`) — NUNCA edita o index.md diretamente (evita conflito de escrita concorrente)
+5. Um único agente central lê os relatórios e aplica **todos os patches sequencialmente** no index.md
+
+Resultado esperado: ~140+ arestas em 75+ skills com precisão validada nos dois sentidos.
+
+**NÃO** parar no primeiro merge óbvio. Se um merge parece evidente (ex: 3 coding agents), isso não é desculpa para encerrar a análise. O ciclo evolve deve analisar **todas as skills**.
+
+### Formato `|-` Quebra o Grafo
+
+O script `generate_graph.py` usa o regex `r"- `(\w+)` → `(.+)`"` para parsear relações. Se uma relação começar com `|- ` (pipe-dash) em vez de `- ` (só dash), o regex não captura.
+
+**Verificar SEMPRE antes de gerar o grafo:**
+```bash
+grep "|- `" index.md
+```
+
+Se existir, corrigir com:
+```bash
+# Use patch tool com replace_all=true
+patch(path='/opt/data/skills/index.md', old_string='|- `', new_string='- `', replace_all=True)
+```
+
+---
+
+## Etapa 3: Offload (4 passos)
+
+**Esta é uma etapa do ciclo de consolidação.** Executa DEPOIS do evolve.
+
+Remove entradas da memória persistente que estejam redundantes com skills.
+
+### Regra
+
+Memória guarda **preferências do usuário e fatos estáveis do ambiente**. Skills guardam **procedimentos, receitas e workflows**. Tudo que é procedural e está numa skill pode sair da memória.
+
+### Passos
+
+1. Lista entradas da memória atual via `memory(action='list')`
+2. Para cada entrada, verifica se existe skill cobrindo o mesmo assunto
+3. Se sim, remove da memória com `memory(action='remove', old_text=...)`
+4. Registra no log.md com prefixo `offload`
+
+---
+
+## Padrão: Batch-Report-Then-Apply (Evita File Conflict)
+
+Sempre que múltiplos subagentes precisarem modificar o index.md:
+
+1. Cada subagente produz um **relatório de saída** (ex: `relations-batch1.md`) com as modificações
+2. Relatórios são salvos via `write_file` em `/opt/data/skills/`
+3. **Um único** agente principal lê os relatórios e aplica **todos os patches sequencialmente** no index.md
 
 Isso garante atomicidade e evita corrupção do arquivo por escrita concorrente.
 
-## Ciclo Evolve (14 passos)
-
-**⚠️ Batch-Report-Then-Apply:** Quando múltiplos subagentes precisam modificar o index.md (ex: adicionar relações para dezenas de skills), **NUNCA** mande todos escreverem no index.md diretamente — eles vão conflitar. Cada subagente produz um **relatório de saída** (ex: `relations-batch1.md`) com as modificações a fazer. Um único agente principal então lê os relatórios e aplica **todos os patches sequencialmente** no index.md. Isso garante atomicidade e evita corrupção do arquivo por escrita concorrente.
-
-### 1. Lista mudanças desde último ciclo
-```bash
-git diff --stat HEAD~1 HEAD || git log --oneline -1
-```
-Compare estado atual com o último commit do Git para detectar skills adicionadas, removidas ou com metadados alterados. A index.md é regenerada do zero e a diff é comparada com o último commit para extrair resumo de mudanças.
-
-### 2. Atualiza index.md com mudanças
-Regenera o catálogo completo escaneando todos os `SKILL.md` no disco. Inclui: nome, título, tamanho, resumo (~80 chars), descrição completa, categoria, e relações.
-
-**Para relações semanticamente inferidas (não regex):** usar o padrão de subagentes com análise **depth-1** — cada subagente lê a skill principal **e** cada skill candidata a relação (lendo o SKILL.md de ambos os lados), confirmando a conexão semântica antes de declará-la. 3 subagentes analisam ~28 skills cada em paralelo, cada um produzindo um **relatório de saída** (`relations-batchN.md`) em vez de editar o index.md diretamente. Um agente central então consolida todos os patches no index.md. Isso evita conflitos de escrita concorrente e garante precisão bilateral. Resultado: ~140+ arestas em 75+ skills com precisão validada nos dois sentidos.
-
-**⚠️ Não parar no primeiro merge óbvio.** Se uma skill parece alvo óbvio de merge (ex: coding agents), isso não é desculpa para encerrar a análise. O ciclo evolve deve analisar **todas** as skills, não apenas as que têm alvos evidentes. O usuário pode chamar a atenção se isso acontecer.
-
-**Formato exato do index.md:** cada skill segue o template documentado em `references/index-md-spec.md` — bullet metadata + description paragraph + relations list.
-
-### 3. Registra no log.md
-Entrada única com prefixo `## [YYYY-MM-DD] update | ...`
-
-### 4. Stage + commit (checkpoint pré-plano)
-```bash
-git add -A && git commit -m "update: pre-evolve checkpoint"
-```
-
-### 5. Estuda index.md e elabora plano MECE
-Analisa todo o portfólio buscando:
-- **Cluster de redundância:** skills que cobrem o mesmo território (ex: 5 newsletters)
-- **Skills mortas:** ferramentas sem GPU, CLI que não existe mais, utilidades que nunca foram usadas
-- **Sobreposição de trigger:** skills que disparam no mesmo comando do usuário
-- **Alinhamento com memória:** facts procedurais na memória que deveriam estar em skills
-
-**Critério de merge:** Duas skills conectadas (similar/uses) só devem permanecer separadas se descreverem fluxos de trabalho realmente distintos — que não podem ou não faz sentido incorporar um ao outro. Se ambas descrevem o mesmo domínio com padrões de orquestração idênticos, devem ser fundidas. Se operam em níveis de abstração diferentes (receita técnica vs workflow estratégico) ou com toolchains fundamentalmente distintas, devem permanecer separadas. A conexão no grafo (`similar`, `uses`) é evidência, não sentença — o julgamento final é sobre o workflow descrito.
-
-**Ferramenta:** Usar `delegate_task` com 3 subagentes paralelos para ler skills em lotes e determinar merge viability. Cada subagente lê ~28 skills, analisa semanticamente, retorna JSON com recomendações.
-
-Regra MECE: cada skill com responsabilidade única. Se duas skills compartilham o mesmo domínio com padrões idênticos, é candidato a merge.
-
-### 6. Salva plano em reports/evolve-<YYYY-MM-DD-HHMM>.md
-Documenta: alvos de delete, alvos de merge, impacto estimado (skills perdidas vs mantidas).
-
-### 7. Executa o plano
-Para cada operação:
-- **Delete:** `skill_manage(action='delete', name=..., absorbed_into=...)` — sempre registrar o absorbed_into para rastreabilidade
-- **Merge:** ler skill alvo + skill fonte → construir novo conteúdo mesclado → `skill_manage(action='edit')` no alvo → delete da fonte com absorbed_into
-- **Limpeza de aprendizado específico:** Durante merges, remover das skills:
-  - Debug transcripts de sessões passadas
-  - Error messages específicas de um bug que já foi resolvido
-  - Workarounds temporários que não são padrão reutilizável
-  - Timestamps de eventos únicos, nomes de arquivos temporários
-  Manter: padrões gerais, workflows reutilizáveis, comandos estáveis.
-- **Auditoria de descrições:** Verificar se cada skill afetada tem frontmatter `description` adequado — resumo de 1 linha (~80 chars) seguido de parágrafo descritivo completo. Skills com descrições ausentes, truncadas ou genéricas demais devem ser corrigidas para alimentar bem o index.md. Skills consolidadas (merges) têm prioridade.
-- **Limpeza de disco:** `rm -rf` dos diretórios órfãos (referências, templates, scripts das skills deletadas)
-
-**⚠️ PII em skills — auditar no passo 7.**
-
-### 8. Revisa skills órfãs
-Skills sem relações no grafo. Para cada uma:
-- Tenta encontrar conexão semântica com outras skills (lendo ambos os SKILL.md — profundidade 1). Se encontrar, adiciona relação bilateral no frontmatter e no index.md.
-- Se não encontrar conexão, avalia se a skill é importante o suficiente para existir isolada. Skills genuinamente de nicho (API de terceiros, CLI específico, data source exótico) podem ficar órfãs com justificativa.
-- Se a skill não tem conexão E não é claramente importante, considera merge com skill genérica ou delete.
-- **Target:** 0 órfãos. Toda skill deve ter pelo menos uma relação.
-
-**⚠️ Formato `|-` quebra o grafo.** O script `generate_graph.py` usa regex `r"- \`(\w+)\` → \`(.+)\`"` para parsear relações. Se uma relação começar com `|- ` (pipe-dash) em vez de `- ` (só dash), o regex não captura. Verificar antes de gerar o grafo: `grep "|- \`" index.md`. Se existir, corrigir com `patch(replace_all=True, old_string='|- \`', new_string='- \`')`.
-
-### 9. Offload — limpa memória de fatos procedurais
-Regra: **memória** = preferências do usuário + fatos estáveis do ambiente. **Skills** = procedimentos. Remover da memória persistente entradas que já estão documentadas em skills — configurações de ferramentas, versões, paths de instalação, schedules de cron, detalhes de API. Manter: preferências de estilo, IDs de grupos/contas, regras de permissão, convenções de projeto.
-
-### 10. Escreve relatório denso pós-evolução
-Arquivo: `reports/evolve-<YYYY-MM-DD>-report.md`
-Conteúdo:
-- Estado inicial vs final (skills, memória, chars)
-- Tabela de deletions com motivo
-- Tabela de merges com conteúdo absorvido
-- Mudanças no AGENTS.md / index.md / log.md
-- Resultado do offload (o que saiu, o que ficou)
-- Git diff summary
-
-### 11. Atualiza index.md pós-transformação
-Regenera o catálogo completo com as skills pós-merge/delete.
-
-### 12. Registra no log.md com prefixo `evolve`
-Entrada de 1 linha detalhando o que foi feito:
-```
-## [YYYY-MM-DD] evolve | <resumo: skills N→M, merges, deletes, offload>
-```
-
-### 13. Gera grafo HTML interativo
-Ao final de cada ciclo evolve, gerar o grafo D3.js para visualização das relações:
-
-```bash
-cd /opt/data/skills
-python3 scripts/generate_graph.py
-```
-
-O script extrai dados do index.md (com fallback para LLM-inferred JSON se o index não tiver relações), constrói JSON com nodes/edges, e injeta no template `skills_graph_template.html` → `skills_graph.html`.
-
-Features do grafo:
-- Nodes coloridos por categoria (14 cores), tamanho proporcional ao arquivo
-- Similar: linha tracejada cinza | Uses: linha sólida azul com seta
-- Hover: destaca nó + conexões | Click: modal com summary, description, relations
-- Filtro por texto, zoom/pan, drag, mobile-responsive, resize handler
-- Deduplicação de arestas bidirecionais (parent/child, uses/used_by)
-
-### 14. Stage + commit final
-```bash
-cd /opt/data/skills
-git add -A
-git commit -m "evolve: <resumo de uma linha>"
-```
+---
 
 ## Log Entries — Formato
 
-Toda entrada no log.md deve ser concisa mas detalhada — 1-3 linhas no máximo, começando com o formato parseável:
-
 ```markdown
-## [YYYY-MM-DD] <prefixo> | <resumo de 1 linha detalhando o que foi feito na operação>
-```
-
-O resumo de 1 linha deve conter detalhes específicos o suficiente para que `grep "^## \[" log.md | tail -5` reconte a história completa. Exemplos reais:
-
-```
-## [2026-06-10] evolve | Merged 11 skills into 4, deleted 10 skills. 113→92. Offload pending.
-## [2026-06-10] offload | Memory cleaned: 11→6 entries (94%→47%). Procedural facts moved to skills.
-## [2026-06-10] update | AGENTS.md updated: evolve steps now include report writing
+## [YYYY-MM-DD] update | <resumo detalhado>
+## [YYYY-MM-DD] evolve | <resumo: skills N→M, merges, deletes, órfãos>
+## [YYYY-MM-DD] offload | <entradas removidas>
 ```
 
 Prefixos:
-| Prefixo | Quando |
-|---------|--------|
-| `update` | Sincronização de index.md, mudanças manuais |
-| `evolve` | Ciclo completo de consolidação (plano → execução → report → offload → commit) |
+
+| Prefixo | Etapa do ciclo |
+|---------|---------------|
+| `update` | Sincronização de index.md — git diff, escaneia, patches, audita descrições, log, commit |
+| `evolve` | Consolidação inteligente — análise, merges, órfãos, relações, grafo, commit |
 | `offload` | Limpeza de memória — remoção de fatos procedurais redundantes com skills |
 
-A entrada deve ser detalhada o suficiente para que um `tail -5` no log reconte a história, mas concisa — 1-3 linhas no máximo.
+---
 
-## Relatórios Pós-Evolve
+## Scripts de Apoio
 
-Relatórios densos são mandatórios após cada ciclo evolve. Eles devem conter:
-- Métricas comparativas (antes/depois) em tabela
-- Tabela de deletions com motivo individual
-- Tabela de merges com conteúdo específico absorvido
-- Impacto no index.md, AGENTS.md, log.md
-- Resultado do offload de memória
-- Git log do ciclo
-
-## Verification
-```bash
-cd /opt/data/skills && git log --oneline -5
-wc -l index.md log.md
-ls reports/
-```
-
-## Grafo Interativo (D3.js)
-
-Após regenerar o index.md com relações semanticamente inferidas, gerar um grafo interativo HTML:
+### `scripts/generate_graph.py` — Grafo Interativo D3.js
 
 ```bash
 cd /opt/data/skills
-python3 scripts/generate_graph.py         # HTML + JSON
-python3 scripts/generate_graph.py --json  # JSON only
+python3 scripts/generate_graph.py              # gera skills_graph.html + graph_data.json
+python3 scripts/generate_graph.py --json       # só graph_data.json
 ```
 
-O script lê o index.md para relações; se não encontrar (fallback), usa `/opt/data/skills_relations_merged.json` (LLM-inferred).
+Gera um force-directed graph com 83+ nós coloridos por categoria, modal com summary + description ao clicar, filtro por nome. Lê relações do index.md (formato `` `tipo` → `path` ``), varre todos os SKILL.md para metadados, injeta no template `skills_graph_template.html`.
 
-Arquivos:
-- `scripts/generate_graph.py` — script standalone
-- `skills_graph_template.html` — template D3.js com placeholder `__DATA_PLACEHOLDER__`
-- `skills_graph.html` — output final (~55KB)
+Dependências: Python 3 stdlib. Nenhum pacote externo.
 
-Features: nodes por categoria, arestas tracejadas (similar) e sólidas (uses), modal com summary+description, filtro, zoom, mobile.
+---
+
+## Verification
+
+```bash
+cd /opt/data/skills
+git log --oneline -5
+python3 scripts/generate_graph.py
+grep "|- \`" index.md  # deve retornar vazio
+grep "^### " index.md | wc -l  # total de skills
+grep -c "Relações" index.md  # skills com relações
+```
 
 ## Pitfalls
 
-⚠️ **Relations regex vs LLM:** A primeira passada de geração de relações (scan automatizado por regex) produz relações fracas. Sempre usar o padrão de subagentes paralelos (`references/llm-relations-inference.md`) para inferência semântica. Resultado: 207 relações semanticamente corretas vs ~138 heurísticas imprecisas.
+⚠️ **Depth-1 obrigatória para relações.** Scan automatizado (regex de frontmatter) produz ~12 arestas. Leitura bilateral (profundidade 1) produz ~140+. Sempre usar subagentes com leitura depth-1.
 
-⚠️ **index.md pode perder relações na regeneração.** O script de regeneração do index.md pode não incluir relações se não for explicitamente instruído. O grafo e a análise do evolve dependem delas. Solução: manter `/opt/data/skills_relations_merged.json` como fallback. O `generate_graph.py` já implementa o fallback automático — se o index.md tiver 0 relações, carrega do JSON.
+⚠️ **Formato `|- ` quebra o grafo.** Verificar SEMPRE antes de gerar o grafo.
 
-⚠️ **Log entries devem ser resumos de UMA LINHA.** Formato: `## [YYYY-MM-DD] prefixo | resumo detalhado`. O resumo deve incluir números, ações, impacto. Exemplo correto: `## [2026-06-10] evolve | Merged 11 skills into 4, deleted 10. 113→92.` Exemplo fraco: `## [2026-06-10] evolve | Updated skills.`
+⚠️ **Consolidation cycle ≠ evolve.** O macro-ciclo (Update→Evolve→Offload) **não** é a mesma coisa que evolve. Evolve é uma etapa de 9 passos dentro do macro-ciclo.
 
-⚠️ **Offload ≠ limpeza de skills.** Offload remove fatos procedurais da memória persistente. Limpeza de aprendizado excessivamente específico DENTRO das skills acontece no passo 7 (execução). Não confundir.
+⚠️ **Descrição conforme requer escopo total — não incremental.** A auditoria de descrições varre **todas** as SKILL.md, sem exceção.
 
-⚠️ **Descrições de skills são auditadas no passo 7**, não depois. Skills consolidadas (merges) têm prioridade na auditoria de description. Skills não modificadas podem ser corrigidas em lote se tiverem descrições pobres.
+⚠️ **PII em skills — auditar no passo 3 (execução do evolve).** Números reais, usernames, JIDs, IPs públicos, marcas do usuário devem ser substituídos.
 
-⚠️ **Formato `|-` quebra o grafo.** O script `generate_graph.py` espera `- \`type\` → \`path\`` — se um subagente escrever `|- \`type\` → \`path\`` (pipe-dash), a aresta não é capturada. Verificar SEMPRE antes de gerar o grafo: `grep "|- \`" index.md`. Se existir, corrigir com `patch(replace_all=True, old_string='|- \`', new_string='- \`')`.
+⚠️ **Batch-Report-Then-Apply.** Subagentes NUNCA editam o index.md diretamente — produzem relatórios. Um agente central aplica todos os patches.
 
-⚠️ **Não parar no primeiro merge óbvio.** Quando um merge parece evidente (ex: 3 coding agents com mesmo padrão de orquestração), o agente tende a declarar vitória e parar. Isso é erro — o ciclo evolve deve analisar **todas as skills**. O usuário explicitamente pediu "skill a skill" e detectou o shortcut. Mesmo que o merge seja válido, a análise completa continua sendo necessária.
+⚠️ **Não parar no primeiro merge óbvio.** Analisar todas as skills, não apenas os alvos evidentes.
 
-- **Limpeza de disco:** `rm -rf` dos diretórios órfãos (referências, templates, scripts das skills deletadas)
-
-**⚠️ PII em skills — auditar no passo 7.** Durante a auditoria de descrições e limpeza de detalhes efêmeros, verificar também: números de telefone reais, usernames (ex: `gustavomello9600`), JIDs/LIDs de WhatsApp, IPs públicos, nomes de grupos reais ("IA que Funciona"), e marcas/empresas do usuário ("ID Consultoria"). Skills são artefatos compartilháveis — dados pessoais devem ser substituídos por `[REDACTED]` ou placeholders genéricos.
+⚠️ **index.md nunca é regenerado do zero.** Apenas patches cirúrgicos via ferramentas LLM.

@@ -653,9 +653,9 @@ Deploy static sites and frontend apps to Vercel — from zero to production. Cov
 - **Nome:** `media/hyperframes-video-production`
 - **Arquivo:** `media/hyperframes-video-production/SKILL.md`
 - **Tamanho:** 11,345 chars
-- **Resumo:** node --version          # needs 22+ ffmpeg -version         # needs ffmpeg npx hyperfra...
+- **Resumo:** Produce deterministic MP4 videos using HyperFrames (HTML→video engine).
 
-node --version          # needs 22+ ffmpeg -version         # needs ffmpeg npx hyperframes --version  # should print version
+Produce deterministic MP4 videos using HyperFrames (HTML→video engine). Generates HTML compositions with GSAP animations, renders locally via npx hyperframes. Hermes Style Guide is the default visual aesthetic for explainer/demo videos.
 
 **Relações:**
 - `similar` → `media/youtube-content`
