@@ -1,6 +1,6 @@
 ---
 name: whatsapp-bridge-baileys
-description: Operações no WhatsApp bridge baileys — enviar mensagens para grupos, descobrir IDs de grupos, consultar metadados, gerenciar envio de mídia. Bridge HTTP local na porta 3000, socket baileys via @whiskeysockets/baileys.
+description: "Send messages, discover group IDs, and manage media via local WhatsApp Baileys bridge.\n\nLocal Node.js HTTP bridge on port 3000 for WhatsApp operations via @whiskeysockets/baileys. Covers sending text and media messages, editing sent messages, discovering group IDs from sender-key files, self-chat mode behavior, and common pitfalls including silent delivery failures and emoji issues. Always verify group names before sending — wrong group ID is the most common error."
 ---
 
 # WhatsApp Bridge (Baileys)
@@ -95,10 +95,7 @@ Em self-chat mode:
 
 ## Contatos Salvos
 
-| Nome | Número (JID) | Grupo/LID |
-|------|-------------|-----------|
-| Tácio Brito | `557991441720@s.whatsapp.net` | `183137455853610@lid` |
-| ID [Núcleo] (grupo) | `120363170662612284@g.us` | — |
+Group IDs are opaque — always verify name before sending. Contact JIDs follow the format `number@s.whatsapp.net` and group JIDs follow `group_id@g.us`. Use `GET /chat/:id` to resolve names.
 
 ## Pitfalls
 
@@ -110,4 +107,4 @@ Em self-chat mode:
 
 ⚠️ **Mensagens com emoji podem falhar silenciosamente** em certos clients WhatsApp. Preferir texto sem emoji ou usar apenas caracteres ASCII.
 
-⚠️ **Cron job com `send_message` + `deliver` errado causa duplicação.** Quando um cron job usa `send_message()` para entregar no grupo E o cron está configurado com `deliver: "whatsapp:grupo"`, a resposta final do agente (incluindo confirmação "Mensagem enviada com sucesso") também vai pro grupo — gerando duplicata. **Correção:** no cron, usar `deliver: "origin"` (volta pro chat do usuário), e a mensagem pro grupo enviada exclusivamente via `send_message()`. A resposta final do agente deve ser uma confirmação enxuta ("✅ Lembrete enviado.") sem IDs técnicos ou o conteúdo da mensagem.
+⚠️ **Cron job com `send_message` + `deliver` errado causa duplicação.** Quando um cron job usa `send_message()` para entregar no grupo E o cron está configurado com `deliver: "whatsapp:grupo"`, a resposta final do agente (incluindo confirmação) também vai pro grupo — gerando duplicata. **Correção:** no cron, usar `deliver: "origin"` (volta pro chat do usuário), e a mensagem pro grupo enviada exclusivamente via `send_message()`. A resposta final do agente deve ser uma confirmação enxuta ("✅ Lembrete enviado.") sem IDs técnicos ou o conteúdo da mensagem.

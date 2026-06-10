@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 84 skills*
+*Total: 83 skills*
 
 ---
 
@@ -25,6 +25,9 @@ Manage Apple Notes via memo CLI: create, search, edit.
 
 Apple Reminders via remindctl: add, list, complete.
 
+**Relações:**
+- `similar` → `apple/apple-notes`
+
 ### Find My (Apple)
 
 - **Nome:** `apple/findmy`
@@ -33,6 +36,9 @@ Apple Reminders via remindctl: add, list, complete.
 - **Resumo:** Track Apple devices/AirTags via FindMy
 
 Track Apple devices/AirTags via FindMy.app on macOS.
+
+**Relações:**
+- `uses` → `apple/macos-computer-use`
 
 ### iMessage
 
@@ -50,7 +56,7 @@ Send and receive iMessages/SMS via the imsg CLI on macOS.
 - **Tamanho:** 7,309 chars
 - **Resumo:** You have a `computer_use` tool that drives the Mac in the **background**
 
-You have a `computer_use` tool that drives the Mac in the **background**. Your actions do NOT move the user's cursor, steal keyboard focus, or switch Spaces. The user can keep typing in their editor while you click around in
+Drive macOS desktop in background — screenshots, mouse, keyboard, scroll, drag — without stealing cursor, focus, or Space. Works with any model. Load when computer_use tool is available.
 
 
 ## Autonomous Ai Agents
@@ -62,7 +68,7 @@ You have a `computer_use` tool that drives the Mac in the **background**. Your a
 - **Tamanho:** 3,200 chars
 - **Resumo:** Delegate coding tasks to autonomous AI coding agent CLIs (Claude Code, Codex, OpenCode)...
 
-Delegate coding tasks to autonomous AI coding agent CLIs (Claude Code, Codex, OpenCode) via Hermes terminal/process tools. Covers one-shot tasks, interactive sessions, PR reviews, parallel worktrees, and monitoring.
+Delegate tasks to autonomous AI coding agent CLIs via Hermes. One-shot, PR review, and session orchestration patterns.
 
 ### Hermes Agent
 
@@ -80,16 +86,18 @@ Configure, extend, or contribute to Hermes Agent.
 - **Tamanho:** 11,222 chars
 - **Resumo:** Hermes cross-platform message sending — platform-specific quirks, JID/ID format require...
 
-Hermes cross-platform message sending — platform-specific quirks, JID/ID format requirements, bridge API workarounds, and channel directory resolution. Covers Telegram, WhatsApp, and other messaging adapters.
+Hermes cross-platform messaging: platform quirks, JID/ID formats, bridge workarounds for Telegram, WhatsApp, more.
 
 ### Pi Agent (Local)
 
 - **Nome:** `autonomous-ai-agents/pi-agent-coordination`
 - **Arquivo:** `autonomous-ai-agents/pi-agent-coordination/SKILL.md`
 - **Tamanho:** 26,294 chars
-- **Resumo:** Pi Coder Agent local no Hermes
+- **Resumo:** Invoke Pi Agent locally from Hermes: provider/model hierarchy, session recovery, stall detection, fallback patterns.
 
-Pi Coder Agent local no Hermes. Hierarquia: agy > Pi best > Pi cost. Invoacao direta sem Docker/SSH.
+Invoke Pi Agent locally from Hermes: provider/model hierarchy, session recovery, stall detection, fallback patterns.
+
+Comprehensive reference for running Pi Coder Agent (v0.78.1) as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code tasks), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring. Includes GoUsageLimitError handling, pre-launch session reuse checks, and model drift awareness for Pi best.
 
 ### Product Development Pipeline
 
@@ -98,7 +106,7 @@ Pi Coder Agent local no Hermes. Hierarquia: agy > Pi best > Pi cost. Invoacao di
 - **Tamanho:** 80,167 chars
 - **Resumo:** ┌───────────────────────────────────────────────────┐ │                     Hermes     ...
 
-┌───────────────────────────────────────────────────┐ │                     Hermes                         │ │  Orquestrador • valida • agenda • pesquisa • integra│
+Multi-agent product pipeline from raw idea to MVP with iterative sprints. Orchestrated by Hermes, executed by Pi Agent + Antigravity.
 
 
 ## Content Production
@@ -110,7 +118,7 @@ Pi Coder Agent local no Hermes. Hierarquia: agy > Pi best > Pi cost. Invoacao di
 - **Tamanho:** 8,803 chars
 - **Resumo:** Umbrella skill for all newsletter/briefing/digest pipelines — IAF Manhã Aumentada, Dail...
 
-Umbrella skill for all newsletter/briefing/digest pipelines — IAF Manhã Aumentada, Daily AI Digest, editorial curation, cron scheduling, briefing patterns. Covers multi-source collection, ranking/scoring, HTML→PDF, dedup, WhatsApp companion, and delivery.
+Umbrella skill for newsletter/briefing/digest pipelines: IAF Manhã Aumentada, Daily AI Digest, editorial curation, cron scheduling. Covers multi-source collection, ranking, HTML→PDF, delivery.
 
 ### Text-to-Speech (TTS)
 
@@ -119,7 +127,7 @@ Umbrella skill for all newsletter/briefing/digest pipelines — IAF Manhã Aumen
 - **Tamanho:** 7,413 chars
 - **Resumo:** Umbrella skill
 
-Umbrella skill. Covers: - [Voice design & prompting](#gemini-31-flash-tts) — Gemini TTS prompt structure, voice selection, audio tags - [Hermes TTS system](#hermes-tts-command-provider-chain) — multi-provider fallback, config
+Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback, self-hosted Fish Speech, and Hermes TTS provider. Full lifecycle from persona to audio.
 
 
 ## Creative
@@ -141,6 +149,9 @@ Dark-themed SVG architecture/cloud/infra diagrams as HTML.
 - **Resumo:** ASCII art: pyfiglet, cowsay, boxes, image-to-ascii
 
 ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.
+
+**Relações:**
+- `similar` → `creative/ascii-video`
 
 ### ASCII Video Production Pipeline
 
@@ -169,6 +180,11 @@ Infographics: 21 layouts x 21 styles (信息图, 可视化).
 
 Use when the user wants to create, refine, or evolve a brand identity. Covers brand interviews, identity kit generation (logo, color, type, voice, guidelines), brand-specific content skills, and ongoing content via cron. Not for UI design or non-brand creative tasks.
 
+**Relações:**
+- `uses` → `creative/claude-design`
+- `uses` → `creative/style-guide-consultation`
+- `uses` → `creative/popular-web-designs`
+
 ### Claude Design for CLI/API Agents
 
 - **Nome:** `creative/claude-design`
@@ -185,7 +201,7 @@ Design one-off HTML artifacts (landing, deck, prototype). Includes Sketch Mode f
 - **Tamanho:** 24,287 chars
 - **Resumo:** Generate images, video, and audio with ComfyUI — install, launch, manage nodes/models, ...
 
-Generate images, video, and audio with ComfyUI — install, launch, manage nodes/models, run workflows with parameter injection. Uses the official comfy-cli for lifecycle and direct REST/WebSocket API for execution.
+Generate images, video, and audio with ComfyUI. Install, manage nodes/models, run workflows via comfy-cli and direct REST/WebSocket API.
 
 ### Copywriting
 
@@ -194,7 +210,12 @@ Generate images, video, and audio with ComfyUI — install, launch, manage nodes
 - **Tamanho:** 7,429 chars
 - **Resumo:** Expert conversion copywriting — write, rewrite, or improve marketing copy for any page
 
-Expert conversion copywriting — write, rewrite, or improve marketing copy for any page. Use when the user says 'write copy for,' 'improve this copy,' 'headline help,' 'CTA copy,' 'value proposition,' 'tagline,' 'hero section copy,' 'above the fold,' 'this copy is weak,' 'make this more compelling.' For email copy see emails skill. For editing copy see copy-editing.
+Expert conversion copywriting: write, rewrite, or improve marketing copy — headlines, CTAs, value props, page sections.
+
+Load this skill when the user needs marketing copy — landing pages, homepage sections, pricing copy, CTAs, taglines, or value propositions. Provides a complete framework for gathering context, applying copywriting principles (clarity over cleverness, benefits over features, specificity over vagueness), and producing organized output with annotations and alternatives. Covers page structure frameworks, voice and tone guidance, CTA copy guidelines, and page-specific strategies for homepages, landing pages, pricing pages, feature pages, and about pages. For thorough line-by-line editing after drafting, pair with the copy-editing skill.
+
+**Relações:**
+- `similar` → `creative/humanizer`
 
 ### Excalidraw Diagram Skill
 
@@ -213,6 +234,9 @@ Hand-drawn Excalidraw JSON diagrams (arch, flow, seq).
 - **Resumo:** Humanize text: strip AI-isms and add real voice
 
 Humanize text: strip AI-isms and add real voice.
+
+**Relações:**
+- `similar` → `creative/copywriting`
 
 ### Manim Video Production Pipeline
 
@@ -248,7 +272,7 @@ p5.js sketches: gen art, shaders, interactive, 3D.
 - **Tamanho:** 14,168 chars
 - **Resumo:** Use when building creative browser demos with @chenglou/pretext — DOM-free text layout ...
 
-Use when building creative browser demos with @chenglou/pretext — DOM-free text layout for ASCII art, typographic flow around obstacles, text-as-geometry games, kinetic typography, and text-powered generative art. Produces single-file HTML demos by default.
+Creative browser demos with @chenglou/pretext: DOM-free text layout for ASCII art, kinetic typography, text-as-geometry games, and generative art. Single-file HTML output.
 
 ### Songwriting & AI Music Generation
 
@@ -302,7 +326,7 @@ Himalaya CLI: IMAP/SMTP email from terminal.
 - **Tamanho:** 9,747 chars
 - **Resumo:** Multi-layered codebase diagnostics: structural mapping, module analysis, dependency aud...
 
-Multi-layered codebase diagnostics: structural mapping, module analysis, dependency audit, git history, quantitative metrics, and critical health reports.
+Multi-layered codebase diagnostics: structural mapping, dependency audit, git history, metrics, and health reports.
 
 ### GitHub Authentication Setup
 
@@ -340,6 +364,10 @@ Create, triage, label, assign GitHub issues via gh or REST.
 
 GitHub PR lifecycle: branch, commit, open, CI, merge.
 
+**Relações:**
+- `uses` → `infrastructure/deployment-pipeline`
+- `uses` → `infrastructure/oracle-host-access`
+
 ### GitHub Repository Management
 
 - **Nome:** `github/github-repo-management`
@@ -348,6 +376,9 @@ GitHub PR lifecycle: branch, commit, open, CI, merge.
 - **Resumo:** Clone/create/fork repos; manage remotes, releases
 
 Clone/create/fork repos; manage remotes, releases.
+
+**Relações:**
+- `uses` → `github/codebase-inspection`
 
 
 ## Infrastructure
@@ -359,7 +390,7 @@ Clone/create/fork repos; manage remotes, releases.
 - **Tamanho:** 30,160 chars
 - **Resumo:** Self-host AI voice/TTS models (OmniVoice, Qwen3-TTS, Fish Speech S2 Pro GGUF) on Oracle...
 
-Self-host AI voice/TTS models (OmniVoice, Qwen3-TTS, Fish Speech S2 Pro GGUF) on Oracle ARM64 server with Docker. Covers Python inference wrappers (Pattern A) and C++ native inference via subprocess (Pattern B, with s2.cpp). Includes OpenAI-compatible endpoint design, Hermes TTS command provider integration, GGUF quantized model deployment, ARM64 PyTorch pitfalls, voice steering strategies, and GPU acceleration research.
+Self-host TTS models (OmniVoice, Qwen3-TTS, Fish Speech) on Oracle ARM64 with Docker. Python and C++ inference patterns, OpenAI-compatible endpoints, Hermes TTS provider integration.
 
 ### Deployment Pipeline — Docker + GitHub Actions + SSH Deploy
 
@@ -378,6 +409,10 @@ CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr.io → SSH deploy 
 - **Resumo:** SSH access from a Hermes Docker container to its Oracle Linux host
 
 SSH access from a Hermes Docker container to its Oracle Linux host. Covers key setup, SSH config quirks, Docker host discovery, and host diagnostics.
+
+**Relações:**
+- `uses` → `infrastructure/deployment-pipeline`
+- `uses` → `infrastructure/ai-voice-selfhost`
 
 ### Vercel Deploy — Skill
 
@@ -417,9 +452,11 @@ YouTube transcripts to summaries, threads, blogs.
 - **Nome:** `messaging-platforms/whatsapp-bridge-baileys`
 - **Arquivo:** `messaging-platforms/whatsapp-bridge-baileys/SKILL.md`
 - **Tamanho:** 5,281 chars
-- **Resumo:** Operações no WhatsApp bridge baileys — enviar mensagens para grupos, descobrir IDs de g...
+- **Resumo:** Send messages, discover group IDs, and manage media via local WhatsApp Baileys bridge.
 
-Operações no WhatsApp bridge baileys — enviar mensagens para grupos, descobrir IDs de grupos, consultar metadados, gerenciar envio de mídia. Bridge HTTP local na porta 3000, socket baileys via @whiskeysockets/baileys.
+Send messages, discover group IDs, and manage media via local WhatsApp Baileys bridge.
+
+Local Node.js HTTP bridge on port 3000 for WhatsApp operations via @whiskeysockets/baileys. Covers sending text and media messages, editing sent messages, discovering group IDs from sender-key files, self-chat mode behavior, and common pitfalls including silent delivery failures and emoji issues. Always verify group names before sending — wrong group ID is the most common error.
 
 
 ## Mlops
@@ -502,6 +539,8 @@ Read, search, create, and edit notes in the Obsidian vault.
 
 Airtable REST API via curl. Records CRUD, filters, upserts.
 
+**Relações:** notion, google-workspace
+
 ### Google Workspace
 
 - **Nome:** `productivity/google-workspace`
@@ -511,6 +550,8 @@ Airtable REST API via curl. Records CRUD, filters, upserts.
 
 Google OAuth2 client credentials (downloaded from Google Cloud Console)
 
+**Relações:** himalaya, airtable, ocr-and-documents
+
 ### HTML Report — Hermes Design System
 
 - **Nome:** `productivity/html-report-hermes`
@@ -518,7 +559,9 @@ Google OAuth2 client credentials (downloaded from Google Cloud Console)
 - **Tamanho:** 15,051 chars
 - **Resumo:** Render dense research reports, analyses, and data summaries as beautiful standalone HTM...
 
-Render dense research reports, analyses, and data summaries as beautiful standalone HTML using the Hermes CRT Design System (amber/blue inversion, terminal aesthetic, serif + monospace typography, scanlines + vignette overlays). Activates automatically whenever the user needs a visual-rich response — HTML landing pages, dashboards, comparative analysis, benchmarks, documentation, or any report that would benefit from structured visual presentation.
+Render research reports as dark-themed HTML with SVG charts and Tufte-inspired typography.
+
+Two design systems in one skill: Hermes CRT (amber/blue inversion, scanlines, terminal aesthetic) for visual showcases and landing pages, and Hermes Official (blue royal on white, Inter + Space Mono, clean cards) for data reports, benchmarks, and dashboards. Covers CRT overlay mechanics, inverted color coding, component library, report structure templates, Telegram delivery via ZIP, and the agy pipeline for complex CRT pages. Activates automatically when the user needs structured visual output.
 
 ### HTML → PDF com Chromium Headless
 
@@ -529,6 +572,8 @@ Render dense research reports, analyses, and data summaries as beautiful standal
 
 Convert HTML files to high-fidelity PDF using Chromium headless (via Debian .deb extraction, no root or Playwright required). Use when weasyprint or other tools lose CSS features like gradients, webkit-background-clip, grid, and glow effects.
 
+**Relações:** html-report-hermes, iaf-newsletter-pipeline
+
 ### Maps Skill
 
 - **Nome:** `productivity/maps`
@@ -537,6 +582,8 @@ Convert HTML files to high-fidelity PDF using Chromium headless (via Debian .deb
 - **Resumo:** Geocode, POIs, routes, timezones via OpenStreetMap/OSRM
 
 Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.
+
+**Relações:** taskflow-mcp, findmy
 
 ### nano-pdf
 
@@ -547,6 +594,8 @@ Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.
 
 Edit PDF text/typos/titles via nano-pdf CLI (NL prompts).
 
+**Relações:** ocr-and-documents, html-to-pdf-chromium
+
 ### Notion
 
 - **Nome:** `productivity/notion`
@@ -555,6 +604,8 @@ Edit PDF text/typos/titles via nano-pdf CLI (NL prompts).
 - **Resumo:** Notion API + ntn CLI: pages, databases, markdown, Workers
 
 Notion API + ntn CLI: pages, databases, markdown, Workers.
+
+**Relações:** airtable, taskflow-mcp
 
 ### PDF & Document Extraction
 
@@ -565,6 +616,8 @@ Notion API + ntn CLI: pages, databases, markdown, Workers.
 
 Extract text from PDFs/scans (pymupdf, marker-pdf).
 
+**Relações:** powerpoint, nano-pdf
+
 ### Powerpoint Skill
 
 - **Nome:** `productivity/powerpoint`
@@ -573,6 +626,8 @@ Extract text from PDFs/scans (pymupdf, marker-pdf).
 - **Resumo:** Create, read, edit
 
 Create, read, edit .pptx decks, slides, notes, templates.
+
+**Relações:** ocr-and-documents
 
 ### Relatório de Custos — Skill de Geração
 
@@ -620,7 +675,9 @@ Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool.
 - **Tamanho:** 33,335 chars
 - **Resumo:** 基于 GPT-Researcher 架构，适配 Hermes delegate_task 的多 agent 深度调研流水线
 
-基于 GPT-Researcher 架构，适配 Hermes delegate_task 的多 agent 深度调研流水线。 用户问题 │
+Multi-agent deep research pipeline: decompose topics, dispatch parallel agents, review, cross-validate, synthesize.
+
+Inspired by GPT-Researcher, this pipeline decomposes complex questions into sub-queries, dispatches parallel research agents across web, GitHub, news, and academic sources, runs independent reviewers for source verification, then conducts cross-validation and a roundtable discussion. Produces a final cited report with confidence-graded findings (HIGH/MEDIUM/LOW/CONTESTED). Supports three depth levels (Quick, Standard, Deep), adaptive phase skipping, local codebase analysis as Phase 0.5, and a bug-to-fix pipeline pattern.
 
 ### Karpathy's LLM Wiki
 
@@ -639,6 +696,8 @@ Karpathy's LLM Wiki: build/query interlinked markdown KB.
 - **Resumo:** Query Polymarket: markets, prices, orderbooks, history
 
 Query Polymarket: markets, prices, orderbooks, history.
+
+Read-only access to Polymarket prediction market data via three public REST APIs (Gamma, CLOB, Data) — no authentication required. Search markets, fetch real-time prices and orderbooks, retrieve price history, and present probabilities as human-readable percentages. Covers double-encoded JSON field parsing, rate limits, and the events-to-markets data model.
 
 ### Research Paper Writing Pipeline
 
@@ -708,15 +767,6 @@ Google Antigravity CLI (agy) — instalação, autenticação OAuth via tmux, e 
 - **Resumo:** Usuário dá feedback │ ▼
 
 Usuário dá feedback │ ▼
-
-### Code Tasks
-
-- **Nome:** `software-development/code-tasks`
-- **Arquivo:** `software-development/code-tasks/SKILL.md`
-- **Tamanho:** 8,258 chars
-- **Resumo:** - After engineering docs (SAD, TechSpecs, ERD, API contracts) are approved - Before wri...
-
-- After engineering docs (SAD, TechSpecs, ERD, API contracts) are approved - Before writing any implementation code - During the MVP build phase (Fase 4 — Engineering)
 
 ### Authoring Hermes-Agent Skills (in-repo)
 
@@ -809,4 +859,4 @@ Exploratory QA of web apps: find bugs, evidence, reports.
 - **Tamanho:** 7,130 chars
 - **Resumo:** How to read Reddit subreddits reliably using RSS feeds — bypassing API rate limits and ...
 
-How to read Reddit subreddits reliably using RSS feeds — bypassing API rate limits and bot detection. Use this skill whenever you need to fetch content from Reddit for research, curation, or news gathering.
+Read Reddit subreddits reliably via RSS feeds — bypasses API rate limits and bot detection. For research, curation, or news gathering.

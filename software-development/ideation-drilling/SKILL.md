@@ -360,4 +360,4 @@ ssh oracle-host 'pi-shell "cd /workspace/code/PROJETO && \
 
 ⚠️ **Shared volume: Hermes READ-ONLY:** `/opt/data/code/` é owned por uid 1001, Hermes roda como uid diferente. Hermes **não pode criar nem escrever** arquivos/pastas no shared volume. Todo `mkdir`, `touch`, `git init`, `mv` precisa ser delegado ao Pi via `ssh oracle-host 'pi-shell "comando"'`. Ambos os agentes leem sem problema.
 
-⚠️ **Rota SSH correta:** Não usar IP público `129.146.163.107:2222` (timeout). A rota correta é via Docker gateway: `ssh oracle-host "pi-agent 'pi ...'"` ou `ssh oracle-host 'pi-shell "bash cmd"'`.
+⚠️ **Rota SSH correta:** Não usar IP público direto (timeout). A rota correta é via Docker gateway: `ssh oracle-host "pi-agent 'pi ...'"` ou `ssh oracle-host 'pi-shell "bash cmd"'`.

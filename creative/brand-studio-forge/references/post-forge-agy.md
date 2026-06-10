@@ -72,11 +72,10 @@ ssh oracle-host 'sudo cp ~/.gemini/antigravity-cli/brain/<uuid>/<file>.png \
 - Especifique o estilo emocional (amigável, sério, lúdico)
 - Inclua cores EXATAS em hex — agy respeita paletas fornecidas
 
-## Prompt que funcionou (Capivara Mecânica para IAF)
+## Prompt que funcionou (Mascot Logo Example)
 
 ```
-Generate a logo image for a community called "IA que Funciona"
-(the name means "AI that works" in Portuguese).
+Generate a logo image for a community.
 
 The symbol is a MECHANICAL CAPYBARA in side profile, walking calmly to the left.
 Style: mix of friendly cartoon and subtle technical/engineering details,

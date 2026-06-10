@@ -1,6 +1,6 @@
 ---
 name: pi-agent-coordination
-description: "Pi Coder Agent local no Hermes. Hierarquia: agy > Pi best > Pi cost. Invoacao direta sem Docker/SSH."
+description: "Invoke Pi Agent locally from Hermes: provider/model hierarchy, session recovery, stall detection, fallback patterns.\n\nComprehensive reference for running Pi Coder Agent (v0.78.1) as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code tasks), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring. Includes GoUsageLimitError handling, pre-launch session reuse checks, and model drift awareness for Pi best."
 category: autonomous-ai-agents
 ---
 
@@ -44,7 +44,7 @@ Config:   ~/.pi/agent/  (= /opt/data/home/.pi/agent/)
 ├── auth.json      — 4 providers
 ├── settings.json  — v0.78.1
 └── skills/        — 21 skills (PM + UX + UI + Eng)
-Dotfiles: gh:gustavomello9600/pi-dotfiles
+Dotfiles: gh:[username]/pi-dotfiles
 ```
 
 ## Providers e Modelos
@@ -177,7 +177,7 @@ pi -p "prompt" --provider deepseek --model deepseek-v4-flash
 
 ⚠️ **NUNCA omitir `--provider` e `--model` ao invocar Pi.** O default do `pi` é `google` (built-in), mas não há provider "google" no auth.json. Pi cai em fallback para o primeiro provider disponível com key (`deepseek`) e o modelo padrão do deepseek é `deepseek-v4-pro` (não `v4-flash`). Consequência: toda sessão roda no tier mais caro sem você perceber. **Sempre explicitamente passar `--provider opencode --model opencode/deepseek-v4-flash-free` (gratuito) ou `--provider deepseek --model deepseek-v4-flash` (barato) ao lançar Pi Cost.** Verificar via `model_change` event no session `.jsonl` se o provider/model esperado foi usado.
 
-⚠️ **Wrapper `pi-cost` disponível** em `/opt/data/pi-global/bin/pi-cost` que já fixa `--provider opencode --model opencode/deepseek-v4-flash-free`. Use `pi-cost` no lugar de `pi` quando quiser garantir o tier gratuito.
+⚠️ **Wrapper `pi-cost` disponível** em `[pi-bin-dir]/pi-cost` que já fixa `--provider opencode --model opencode/deepseek-v4-flash-free`. Use `pi-cost` no lugar de `pi` quando quiser garantir o tier gratuito.
 
 ⚠️ **NÃO prefixar com `opencode-go/`** quando usando fallback.
 `opencode-go/deepseek-v4-pro` tenta o provider Go (sem cota).
@@ -275,7 +275,7 @@ tmux capture-pane -t pi-sessao -p -S -10  # ver progresso
 ### Sessões interativas (Termux)
 ```bash
 # Instalar Pi (qualquer máquina)
-bash <(curl -fsSL https://raw.githubusercontent.com/gustavomello9600/pi-dotfiles/main/scripts/bootstrap.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/[username]/pi-dotfiles/main/scripts/bootstrap.sh)
 
 # Rodar
 cd ~/projetos/taskflow && pi
@@ -455,11 +455,11 @@ DeepSeek **V4 Flash é mais confiável** que V4 Pro para code tasks. V4 Pro stal
 
 ## Manutenção de Dotfiles
 
-Configuração versionada em `gh:gustavomello9600/pi-dotfiles`:
+Configuração versionada em `gh:[username]/pi-dotfiles`:
 
 ```bash
 # Máquina nova: instalar Pi + restaurar tudo
-bash <(curl -fsSL https://raw.githubusercontent.com/gustavomello9600/pi-dotfiles/main/scripts/bootstrap.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/[username]/pi-dotfiles/main/scripts/bootstrap.sh)
 
 # Sincronizar skills (qualquer máquina)
 cd ~/.pi-dotfiles && bash scripts/sync.sh pull   # repo → local

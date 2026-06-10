@@ -6,6 +6,7 @@ description: >-
   com base nos preços dos modelos, e produz HTML com design Hermes Style Guide
   (azul royal, Spectral + Space Mono, dourado) via Antigravity (agy).
 category: productivity
+related_skills: [html-report-hermes, product-pipeline]
 ---
 
 # Relatório de Custos — Skill de Geração

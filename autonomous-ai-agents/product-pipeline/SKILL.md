@@ -1,9 +1,6 @@
 ---
 name: product-pipeline
-description: >-
-  Multi-agent product development pipeline — da ideia bruta ao MVP entregue
-  com sprints iterativos. Orquestrado por Hermes, executado por Pi Agent
-  (ideação/PM/design/engenharia) + Antigravity (autoridade visual/revisor).
+description: Multi-agent product pipeline from raw idea to MVP with iterative sprints. Orchestrated by Hermes, executed by Pi Agent + Antigravity.
 category: autonomous-ai-agents
 ---
 

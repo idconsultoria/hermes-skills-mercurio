@@ -30,9 +30,9 @@ C) "[option]" — why this works
 **ESCOLHIDO:** A — motivo da escolha
 ```
 
-## IAF Example (from production)
+## Brand Example (from production)
 
-This is the actual refinement that was applied for the "IA que Funciona" community brand:
+This is the actual refinement that was applied for a community brand:
 
 | Categoria | Original | Refinado |
 |-----------|----------|----------|

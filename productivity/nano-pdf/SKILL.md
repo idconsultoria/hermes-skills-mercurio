@@ -9,6 +9,7 @@ metadata:
   hermes:
     tags: [PDF, Documents, Editing, NLP, Productivity]
     homepage: https://pypi.org/project/nano-pdf/
+    related_skills: [ocr-and-documents, html-to-pdf-chromium]
 ---
 
 # nano-pdf

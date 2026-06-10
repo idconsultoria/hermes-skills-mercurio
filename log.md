@@ -40,9 +40,22 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 **AGENTS.md:** Evolve step 7 now audits skill descriptions
 **index.md:** Regenerated (86 skills)
 
-## [2026-06-10] evolve | Cycle #3: merged 3 coding agents → autonomous-ai-agents. 86→84 skills.
-**Merge:** claude-code + codex + opencode → autonomous-ai-agents (identical orchestration patterns, decision guide + per-agent reference)
-**Not merged:** 6 pairs analyzed and rejected per AGENTS.md criterion (distinct workflows, different abstraction levels, or fundamentally different toolchains)
-**AGENTS.md:** Added merge criterion — skills stay separate only if workflows are genuinely distinct
-**index.md:** Regenerated (84 skills)
-**graph:** Regenerated (92 edges)
+## [2026-06-10] evolve | Cycle #4: skill-by-skill deep audit, PII removal, 1 merge, 900+ ephemeral lines cleaned. 84→83 skills.
+
+**Análise:** 3 subagentes paralelos leram todos os 84 SKILL.md avaliando descrições, efêmeros, merges e relações.
+
+**Merge:** code-tasks → backlog-and-sprint (task format moved to references/code-tasks-format.md)
+
+**PII removal:** 6 skills limpas — whatsapp-bridge-baileys (contatos reais), brand-studio-forge (username), style-guide-consultation (marcas do usuário), messaging-platforms (JIDs), pi-agent-coordination (dotfiles URL), ideation-drilling (IP exposto)
+
+**Limpeza de efêmeros:** ~900 linhas removidas. deep-research (135 linhas Kusto → references/), ai-voice-selfhost (80 linhas benchmarks → references/), github-pr-workflow (446 linhas CI/CD duplicadas), oracle-host-access (178 linhas PR Preview), pi-session-audit (64 linhas)
+
+**Descrições:** 21 skills corrigidas — 6 críticas (copywriting 400+→120, pi-agent-coordination PT→EN, polymarket sem parágrafo, html-report-hermes 500+→80, whatsapp-bridge PT→EN, deep-research multi→80), 12 encurtadas, 3 com relações erradas corrigidas
+
+**Relações:** 22 novas adicionadas (apple-reminders, findmy, airtable, google-workspace, html-to-pdf-chromium, maps, nano-pdf, notion, ocr-and-documents, powerpoint, relatorio-de-custos, taskflow-mcp, github-pr-workflow, oracle-host-access, github-repo-management, brand-studio-forge, ascii-art, humanizer, copywriting)
+
+**De-duplicação:** github-pr-workflow e oracle-host-access agora referenciam deployment-pipeline para CI/CD
+
+**AGENTS.md:** Regra adicionada — index.md é território de agente LLM, proibida edição por scripts
+
+**index.md:** Regenerado (83 skills, 12 edges)

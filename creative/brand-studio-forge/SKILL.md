@@ -5,6 +5,9 @@ version: 1.0.0
 user-invocable: true
 argument-hint: "[interview · forge · name · evolve · author | critique · audit | polish | content · schedule] [target]"
 license: MIT
+metadata:
+  hermes:
+    related_skills: [claude-design, style-guide-consultation, popular-web-designs]
 allowed-tools:
   - Bash(python3 forge/scripts/*.py *)
   - Bash(bash forge/scripts/setup.sh)
@@ -180,14 +183,14 @@ Common flavor text categories that need refinement:
 - **Descrição do símbolo/mascote**
 - **Anti-referências list**
 
-## User Preferences (gustavomello9600)
+## User Preferences
 
-This user applies to the style guide output format:
-- **Language**: Brazilian Portuguese — write the entire guide in PT-BR
-- **Format**: Comprehensive, deep-dive structure with 10-15 sections
-- **Style**: Tables, ASCII diagrams, hex codes, practical reference data
-- **Delivery**: Always a downloadable file via MEDIA: path
-- **Detail level**: Exhaustive — every component disassembled
+Style guide output format should match user preferences (language, detail level, delivery format). Adjust per session — ask the user or infer from context. Common dimensions to clarify:
+- **Language**: Which language should the guide be written in?
+- **Format**: Comprehensive deep-dive vs. quick reference?
+- **Style**: Tables, ASCII diagrams, hex codes, practical reference data?
+- **Delivery**: Downloadable file via MEDIA: path vs. inline?
+- **Detail level**: Exhaustive component breakdown vs. high-level overview?
 
 ## forge_analyze — Browser-Based Brand Analysis
 

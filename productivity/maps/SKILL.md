@@ -11,6 +11,7 @@ metadata:
     category: productivity
     requires_toolsets: [terminal]
     supersedes: [find-nearby]
+    related_skills: [taskflow-mcp, findmy]
 ---
 
 # Maps Skill

@@ -1,13 +1,13 @@
 # Style Guide Extraction & Application Patterns
 
-## From HTML style guides (ID Consultoria, IAF)
+## From HTML style guides (generic)
 
 HTML style guides store design tokens in CSS custom properties in the `<style>` block.
 Read with:
 
 ```python
 from hermes_tools import read_file
-content = read_file('/opt/data/referencias/id-consultoria/id-style-guide.html', limit=100)
+content = read_file('/opt/data/referencias/[brand]/[brand]-style-guide.html', limit=100)
 # Search for ":root {" in content — that's where the design tokens live
 ```
 
@@ -16,7 +16,7 @@ content = read_file('/opt/data/referencias/id-consultoria/id-style-guide.html', 
 After reading the first 100 lines of the HTML, the `:root { ... }` block contains
 all design tokens. Copy-paste them into your prompt/command directly.
 
-For dark-mode brands (ID, IAF), if the user asks for **light mode**, adapt:
+For dark-mode brands, if the user asks for **light mode**, adapt:
 
 | Token | Dark | Light |
 |-------|------|-------|
@@ -50,7 +50,7 @@ The token table format is:
 
 ## Light mode adaptation rules
 
-For ID Consultoria specifically, when user asks for light mode:
+For the consulting brand specifically, when user asks for light mode:
 
 - Flip backgrounds: #050A0F → #F7F9FB, #1C1C1E → #FFFFFF
 - Keep deep-teal #003B46 as main accent (works on both)

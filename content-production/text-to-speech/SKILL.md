@@ -1,11 +1,7 @@
 ---
 name: text-to-speech
 category: content-production
-description: >-
-  Umbrella skill for all TTS operations — voice design, Gemini prompt engineering,
-  multi-provider fallback chain, self-hosted Fish Speech, voice cloning, and
-  Hermes TTS command provider. Covers the full lifecycle from voice persona
-  design to audio delivery.
+description: Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback, self-hosted Fish Speech, and Hermes TTS provider. Full lifecycle from persona to audio.
 metadata:
   hermes:
     tags: [tts, voice, gemini, fish-speech, audio, prompting, speech]
@@ -118,9 +114,11 @@ tts:
     hermes-tts:
       type: command
       command: "python3 /opt/data/.hermes/scripts/hermes-tts.py --input {input_path} --output {output_path}"
-      output_format: wav
+      output_format: ogg
       timeout: 600
 ```
+
+**Nota sobre formato:** O script sempre gera OGG (Opus) internamente — mesmo que o path que a ferramenta passa termine em `.wav`, o conteúdo do arquivo é OGG. Isso porque ffmpeg rejeita codec Opus dentro de container WAV (`Codec opus not supported in WAVE format`). O fluxo é: gera WAV temp do Gemini → converte com ffmpeg para `.ogg` → move para o path final esperado pela ferramenta via `os.replace()`.
 
 The script tries three-stage fallback:
 1. **Gemini 3.1 Flash TTS** (Charon voice) → best quality
@@ -128,6 +126,8 @@ The script tries three-stage fallback:
 3. **Fish Speech S2 Pro q8_0** → local voice clone (last resort)
 
 The voice instruct preamble is baked into the script: Charon voice, Brazilian Portuguese, male, mid-deep pitch, warm but precise tone, subtle irony.
+
+Detalhes do fluxo de conversão WAV→OGG e o gotcha da extensão ffmpeg em `references/ogg-conversion-pattern.md`.
 
 ## Fish Speech S2 Pro GGUF (self-hosted)
 
@@ -155,6 +155,46 @@ curl -X POST http://localhost:8882/v1/audio/speech \
 | q5_k_m | 3.8 GB | ~26x | Fastest |
 
 **Voice cloning:** Place reference WAV files (3-15s, 16-bit mono) in `models/`.
+
+## Platform-aware audio delivery
+
+Gerou um áudio com TTS? A entrega precisa ser adaptada por plataforma.
+
+### Format compatibility
+
+| Platform | MEDIA inline | send_message | Best format |
+|----------|-------------|--------------|-------------|
+| **WhatsApp** | ✅ `.wav` via `MEDIA:` na resposta direta | ❌ send_message não suporta MEDIA | `.wav` (nativo) |
+| **Telegram** | ✅ via `MEDIA:` na resposta | ✅ via `send_message` com MEDIA:path | `.ogg` (opus) — mais leve, toca inline |
+| **Discord** | ✅ | ✅ | `.ogg` ou `.wav` |
+
+### Conversion workflow
+
+O script `hermes-tts.py` faz a conversão automaticamente (WAV → OGG via ffmpeg). Ao entregar manualmente:
+
+```bash
+# WAV → OGG (opus, ~10x menor)
+ffmpeg -i input.wav -c:a libopus output.ogg
+```
+
+**⚠️ ffmpeg e extensão de saída:** ffmpeg escolhe o muxer baseado na extensão do arquivo de saída. Se o destino terminar em `.wav`, ffmpeg tenta muxer WAV, que não aceita codec Opus (exit 218). Sempre use `.ogg` no destino ou force o formato com `-f ogg`.
+
+### Delivery rules
+
+1. **Trigger: usuário enviou áudio** — responder com áudio via `text_to_speech`. Não responder em texto. `MEDIA:/path/to/file` na resposta entrega o áudio nativamente.
+2. **Se for pra mesma plataforma** onde o pedido veio: inclui `MEDIA:/path/to/file` na resposta direta.
+3. **Telegram:** O output do TTS (OGG interno) toca inline como áudio, mesmo com nome `.wav`. Usar `send_message(target='telegram', message='MEDIA:/path/to/file')`.
+4. **WhatsApp:** MEDIA na resposta funciona com `.wav`. `send_message` NÃO suporta MEDIA.
+5. **Se pediu pra enviar em outra plataforma** (ex: "manda no Telegram"): converter e usar `send_message`.
+
+### Quick reference
+
+```python
+# Converter e entregar no Telegram
+import subprocess
+subprocess.run(['ffmpeg', '-i', 'input.wav', '-c:a', 'libopus', 'output.ogg'])
+# Depois send_message(target='telegram', message='MEDIA:output.ogg')
+```
 
 ## Voice Design Process
 
@@ -188,6 +228,8 @@ When `text_to_speech` returns an error, trace the resolution chain:
 | `produced no output` | Script ran but no output file | Run manually with placeholders |
 | Wrong provider name | Second config at different path | Compare config files |
 
+**Log de execução:** Cada chamada ao script registra provider, timestamp, tamanho e status em `/opt/data/.hermes/scripts/tts_log.jsonl`. Consulte para depurar falhas passadas.
+
 ## Pitfalls
 
 - **Over-tagging:** Max 1-2 tags per transcript. Set tone via PERFORMANCE
@@ -196,3 +238,35 @@ When `text_to_speech` returns an error, trace the resolution chain:
 - **Transient output:** Gemini returns PCM, not WAV — must wrap in WAV header
 - **Fish Speech cold start:** First inference loads model (~1-2 min)
 - **API authorization:** Do NOT call Gemini API without explicit user instruction
+- **ffmpeg + extensão .wav:** ffmpeg escolhe muxer pela extensão do output. Opus em `.wav` falha (`Codec opus not supported in WAVE format`, exit 218). Sempre usar extensão `.ogg` no destino do ffmpeg, ou mover o .ogg gerado para o path final com `os.replace()`.
+- **Script output format:** O script `hermes-tts.py` sempre gera OGG (Opus), mesmo que o path da ferramenta termine em `.wav`. O conteúdo é OGG válido e toca inline no Telegram.
+
+## Execution Log
+
+Toda execução do TTS é registrada em `/opt/data/.hermes/scripts/tts_log.jsonl` (JSONL).
+
+Formato de cada linha:
+
+```json
+{
+  "timestamp": "2026-06-10T06:45:04+00:00",
+  "provider": "Gemini 3.1 Flash",
+  "text_length_chars": 47,
+  "output_bytes": 50124,
+  "duration_audio_sec": 1.57,
+  "output_file": "/opt/data/audio_cache/tts_20260610_064504.wav",
+  "success": true,
+  "error": null
+}
+```
+
+Campos:
+- `timestamp` — ISO 8601 UTC
+- `provider` — qual provider foi usado (Gemini 3.1 Flash, Gemini 2.5 Flash Preview, Fish Speech S2 Pro, ou none)
+- `text_length_chars` — tamanho do texto de entrada em caracteres
+- `output_bytes` — tamanho do áudio gerado em bytes (0 se falhou)
+- `duration_audio_sec` — duração aproximada do áudio em segundos
+- `output_file` — caminho do arquivo gerado
+- `format` — formato real do áudio (ogg ou wav)
+- `success` — true/false
+- `error` — mensagem de erro (null se sucesso)

@@ -1,6 +1,6 @@
 ---
 name: messaging-platforms
-description: Hermes cross-platform message sending — platform-specific quirks, JID/ID format requirements, bridge API workarounds, and channel directory resolution. Covers Telegram, WhatsApp, and other messaging adapters.
+description: Hermes cross-platform messaging: platform quirks, JID/ID formats, bridge workarounds for Telegram, WhatsApp, more.
 ---
 
 # Messaging Platforms
@@ -104,7 +104,7 @@ app.get('/groups', async (req, res) => {
 });
 ```
 
-2. **Restart the bridge**: `kill $(cat /opt/data/whatsapp/session/bridge.pid)` — gateway auto-restarts ~30s.
+2. **Restart the bridge**: `kill $(cat [whatsapp-session-dir]/bridge.pid)` — gateway auto-restarts ~30s.
 3. **Query**: `curl -s http://127.0.0.1:3000/groups`
 
 ### Sending to Groups
@@ -114,7 +114,7 @@ Once you have the group JID, bypass `send_message` and hit the bridge directly:
 ```bash
 curl -s -X POST http://127.0.0.1:3000/send \
   -H "Content-Type: application/json" \
-  -d '{"chatId":"120363419131378682@g.us","message":"Your message here"}'
+  -d '{"chatId":"120363XXXXX@g.us","message":"Your message here"}'
 ```
 
 On success: `{"success":true,"messageId":"..."}`
@@ -137,7 +137,7 @@ In self-chat mode the bridge **ignores ALL group messages** — both your own (`
 | Entity | JID Format | Example |
 |---|---|---|
 | Individual contact | `number@s.whatsapp.net` | `5511999999999@s.whatsapp.net` |
-| Group | `group_id@g.us` | `120363419131378682@g.us` |
+| Group | `group_id@g.us` | `120363XXXXX@g.us` |
 
 Note: `send_message` cannot resolve group JIDs through the channel directory. Group delivery must go through the bridge API directly.
 
@@ -171,7 +171,7 @@ app.get('/groups', async (req, res) => {
 
 3. **Query groups**:
 ```bash
-curl -s http://127.0.0.1:3000/groups | jq '.groups[] | select(.subject | test("IA que Funciona"; "i"))'
+curl -s http://127.0.0.1:3000/groups | jq '.groups[] | select(.subject | test("GROUP NAME"; "i"))'
 ```
 
 ### Sending to Groups
@@ -181,7 +181,7 @@ Once you have the group JID, bypass `send_message` and hit the bridge directly:
 ```bash
 curl -s -X POST http://127.0.0.1:3000/send \
   -H "Content-Type: application/json" \
-  -d '{"chatId":"120363419131378682@g.us","message":"Your message"}'
+  -d '{"chatId":"120363XXXXX@g.us","message":"Your message"}'
 ```
 
 The bridge returns `{"success":true,"messageId":"..."}` on success.
@@ -229,7 +229,7 @@ The bridge has a `/send-media` endpoint for native file delivery (image, video, 
 curl -s -X POST http://127.0.0.1:3000/send-media \
   -H "Content-Type: application/json" \
   -d '{
-    "chatId":"120363419131378682@g.us",
+    "chatId":"120363XXXXX@g.us",
     "filePath":"/opt/data/report.html",
     "caption":"Optional caption text",
     "mediaType":"document",
@@ -254,13 +254,13 @@ If the `GET /groups` endpoint hasn't been added to bridge.js yet, group IDs can 
 
 ```bash
 # List all groups the bot is participating in
-ls /opt/data/whatsapp/session/ | grep "sender-key-" | sed 's/.*sender-key-//' | sed 's/--.*//' | sort -u
+ls [whatsapp-session-dir]/ | grep "sender-key-" | sed 's/.*sender-key-//' | sed 's/--.*//' | sort -u
 
 # Find the most recently active group (likely where user just messaged)
-ls -lt /opt/data/whatsapp/session/sender-key-*.json | head -5
+ls -lt [whatsapp-session-dir]/sender-key-*.json | head -5
 
 # Check bridge log for the most frequently active group
-grep -oP '"chatId":"[^"]+' /opt/data/whatsapp/bridge.log | sort | uniq -c | sort -rn | head -10
+grep -oP '"chatId":"[^"]+' [whatsapp-bridge-log] | sort | uniq -c | sort -rn | head -10
 ```
 
 The bridge logs don't contain group names (only JIDs in self-chat mode), so the most recently modified sender-key file is the best heuristic for identifying the active group.
@@ -268,7 +268,7 @@ The bridge logs don't contain group names (only JIDs in self-chat mode), so the 
 ### Bridging Restart Pattern
 
 After editing `bridge.js`:
-1. Kill the process: `kill $(cat /opt/data/whatsapp/session/bridge.pid)`
+1. Kill the process: `kill $(cat [whatsapp-session-dir]/bridge.pid)`
 2. Wait for the gateway's reconnection watcher (~30s, check with `curl http://localhost:3000/health`)
 3. The bridge starts with the modified code, session auth persists from saved creds
 
@@ -276,5 +276,5 @@ After editing `bridge.js`:
 
 - **"Cannot destructure property 'user' of 'jidDecode(...)'"** — JID is malformed. Use `number@s.whatsapp.net`, not E.164.
 - **"Could not resolve '...' on whatsapp"** — Contact not in channel directory. Use direct bridge API.
-- **Bridge log** at `/opt/data/whatsapp/bridge.log` for connection status and errors.
+- **Bridge log** at `[bridge-log-path]` for connection status and errors.
 - **Check status**: `curl -s http://127.0.0.1:3000/health`

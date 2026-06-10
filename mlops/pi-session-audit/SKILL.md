@@ -116,9 +116,8 @@ if __name__ == "__main__":
 
 ## ⚠️ Tool_Use Analysis — Pi JSONL NUNCA tem tool_use, mas TEM bash com cat
 
-**TODAS as sessões do Pi (35+ auditadas) mostram 0 tool_use calls** — mesmo as
-produtivas que escreveram código, criaram arquivos, custaram $0.62 e tiveram
-679 entradas. O Pi não expõe tool_use no formato Hermes porque delega a
+**TODAS as sessões do Pi auditadas mostram 0 tool_use calls** — mesmo as
+produtivas que escreveram código. O Pi não expõe tool_use no formato Hermes porque delega a
 execução para um subprocesso interno que não é logado no JSONL.
 
 ### 🔑 Pi escreve via `bash` + `cat >`, não via `write_file`
@@ -157,43 +156,12 @@ for p in sorted(write_paths)[:20]:
 **Não use tool_use count para medir produtividade de sessões Pi.** Use
 `bash` + `cat >` count ou git diff como métrica.
 
-**TODAS as sessões do Pi (35+ auditadas) mostram 0 tool_use calls** — mesmo as
-produtivas que escreveram código, criaram arquivos, custaram $0.62 e tiveram
-679 entradas. O Pi não expõe tool_use no formato Hermes porque delega a
+**TODAS as sessões do Pi auditadas mostram 0 tool_use calls** — mesmo as
+produtivas que escreveram código. O Pi não expõe tool_use no formato Hermes porque delega a
 execução para um subprocesso interno que não é logado no JSONL.
 
 **Não use tool_use count para medir produtividade de sessões Pi.** A métrica
 só funciona para Claude Code, não para Pi.
-
-### Como verificar se Pi realmente fez trabalho
-
-Em vez de contar tool_use:
-
-```bash
-# Método 1 — git diff (mais confiável)
-cd /opt/data/code/workstation/PROJETO
-git diff --stat HEAD
-git diff --name-status HEAD
-
-# Método 2 — Verificar arquivos esperados
-ls -la product/sprint_N/engineering/Sprint-N-code-tasks.md 2>/dev/null
-ls -la backend/taskflow/services/gcal_service.py 2>/dev/null
-
-# Método 3 — Contar entradas na sessão vs custo
-python3 -c "
-import json
-p = 'SESSION.jsonl'
-entries = [json.loads(l) for l in open(p) if l.strip()]
-print(f'Total entries: {len(entries)}')
-c_total = 0
-for e in entries:
-    if e.get('type')=='message' and e.get('message',{}).get('role')=='assistant':
-        c = e['message'].get('usage',{}).get('cost',{}).get('total',0)
-        c_total += c
-print(f'Total cost: \${c_total:.4f}')
-"
-# Entries >200 e custo >$0.10 = quase certo que fez trabalho real
-```
 
 ### Como encontrar o session file correto
 
@@ -278,30 +246,6 @@ for i in range(max(0,len(entries)-5), len(entries)):
 | Arquivos modificados (git diff) | sim | não |
 | Última entrada | toolResult com código lido | assistant sem conteúdo |
 
-## Pós-Auditoria: Verificação de Drift
-
-Após extrair métricas, **verificar se Pi alterou arquivos que não deveria**.
-Pi best (MiniMax M3) tem tendência a refatorar APIs, renomear arquivos e deletar
-arquivos de teste como efeito colateral.
-
-```bash
-# 1. Listar arquivos esperados que podem ter sido deletados (git)
-cd /opt/data/code/workstation/PROJETO
-git diff --name-status HEAD 2>/dev/null
-
-# 2. Verificar arquivos renomeados (ex: mcp_tokens.py → mcp.py)
-echo "=== Routes ==="
-ls backend/taskflow/api/routes/mcp*.py 2>/dev/null
-echo "=== Tests MCP ==="
-ls tests/unit/test_mcp*.py tests/integration/test_mcp*.py 2>/dev/null
-
-# 3. Verificar assinatura do service (drift de API)
-grep -n "^    async def " backend/taskflow/services/mcp*.py
-```
-
-Se arquivos sumiram ou foram renomeados, restaurar do git e re-aplicar
-correção seletiva (não aceitar a reescrita completa do Pi).
-
 ## Progress Classification — O Que Pi Está Fazendo Agora
 
 Para determinar se Pi está progredindo ou travado, classifique o conteúdo
@@ -365,14 +309,6 @@ def classify_progress(session_path: str, tail: int = 5):
 # Uso
 # classify_progress('sessao.jsonl')
 ```
-
-## Referências
-
-| Arquivo | Conteúdo |
-|---------|----------|
-| `references/sprint1-codetasks-audit.md` | Auditoria da sessão Sprint 1 (code tasks, 47 tasks) |
-| `references/sprint1-fix-post-agy.md` | Auditoria da sessão pós-agy (drift detectado) |
-| `references/sprint1-pr-audit.md` | Auditoria da sessão sprint1-pr: 3 mortes, 0 ferramentas, lições |
 
 ## One-liner Rápido
 

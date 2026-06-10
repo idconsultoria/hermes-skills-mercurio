@@ -1,6 +1,6 @@
 ---
 name: codebase-inspection
-description: "Multi-layered codebase diagnostics: structural mapping, module analysis, dependency audit, git history, quantitative metrics, and critical health reports."
+description: "Multi-layered codebase diagnostics: structural mapping, dependency audit, git history, metrics, and health reports."
 version: 2.0.0
 author: Hermes Agent
 license: MIT

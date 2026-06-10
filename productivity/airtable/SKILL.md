@@ -12,6 +12,7 @@ metadata:
   hermes:
     tags: [Airtable, Productivity, Database, API]
     homepage: https://airtable.com/developers/web/api/introduction
+    related_skills: [notion, google-workspace]
 ---
 
 # Airtable — Bases, Tables & Records

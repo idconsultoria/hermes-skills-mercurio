@@ -1,6 +1,6 @@
 ---
 name: ai-voice-selfhost
-description: "Self-host AI voice/TTS models (OmniVoice, Qwen3-TTS, Fish Speech S2 Pro GGUF) on Oracle ARM64 server with Docker. Covers Python inference wrappers (Pattern A) and C++ native inference via subprocess (Pattern B, with s2.cpp). Includes OpenAI-compatible endpoint design, Hermes TTS command provider integration, GGUF quantized model deployment, ARM64 PyTorch pitfalls, voice steering strategies, and GPU acceleration research."
+description: "Self-host TTS models (OmniVoice, Qwen3-TTS, Fish Speech) on Oracle ARM64 with Docker. Python and C++ inference patterns, OpenAI-compatible endpoints, Hermes TTS provider integration."
 version: 1.2.0
 author: Hermes agent (learned from session)
 category: infrastructure
@@ -385,23 +385,7 @@ ssh -L <port>:localhost:<port> ubuntu@<server-ip>
 
 ## Models Tested on Oracle ARM64 (4 CPU, 24GB RAM, 0 GPU)
 
-| Model | RAM | RTF (ARM64 CPU) | 10s audio | Steering | Port |
-|-------|-----|-----------------|-----------|----------|------|
-| Gemini 3.1 Flash TTS (cloud API) | — | ~1x (cloud) | ~10s | ✅ 200+ tags + prompt | cloud |
-| OmniVoice (k2-fsa) — DEPRECATED on ARM64 | ~7.3GB | ~111 | ~18 min | ❌ só presets | 8880 |
-| Qwen3-TTS 1.7B VoiceDesign | ~8-10GB | 14-28 (measured) | 2.5-4.5 min | ✅ VoiceDesign instruct | 8881 |
-| Fish Speech S2 Pro q8_0 (5B) | ~4.6GB | ~38 (mid-text) | ~6 min | ✅ ref áudio + inline tags | 8882 |
-| Fish Speech S2 Pro q6_k (5B) | ~3.7GB | ~33 (mid-text) | ~5.5 min | ✅ ref áudio + inline tags | 8882 |
-| Fish Speech S2 Pro q5_k_m (5B) | ~3.2GB | ~26 (mid-text) | ~4.3 min | ✅ ref áudio + inline tags | 8882 |
-
-**Qwen3-TTS measured performance (Jun/2026, server cold → warm):**
-- 0.64s audio → 10.5s (RTF 16.4, warm)
-- 1.0s audio → 15.3s (RTF 15.3, warm)
-- 4.96s audio → 138s (RTF 27.8, first req after restart)
-- 6.9s audio → 103s (RTF 15.0, warm)
-- 14.2s audio → 208s (RTF 14.6, warm)
-
-First request after container restart is always slower (model warmup). Subsequent requests stabilize at RTF 14-16.
+See `references/benchmarks.md` for detailed benchmark tables (RTF values, Qwen3-TTS measurements, GGUF quantization results, voice cloning metrics).
 
 ## Known Pitfalls
 
@@ -447,20 +431,13 @@ ssh oracle-host 'cd ~/selfhost/fish-speech && docker compose build s2-server && 
 
 ⚠️ **Fish Speech S2 Pro (5B) — GGUF quantizado é VIÁVEL em CPU, mas lento.** O modelo full float32 é inviável (~20GB RAM, RTF proibitivo). Porém GGUF quantization muda o cenário. O engine C++ nativo `s2.cpp` elimina overhead Python, mas a inferência segue pesada para 5B params em 4 CPUs.
 
-   **GGUF tested (Jun/2026, Oracle ARM64 4-core, "Olá, me chamo Hermes. Sou inteligência de fronteira."):**
-   | Quant | File | RAM | RTF | Áudio gerado | Notas |
-   |-------|------|-----|-----|-------------|-------|
-   | `q8_0` | 5.3GB | ~4.6GB | ~38x | 3.34s / 126s | **Padrão em produção** |
-   | `q6_k` | 4.3GB | ~3.7GB | ~33x | 3.85s / 128s | Mais leve, ~13% mais rápido |
-   | `q5_k_m` | 3.8GB | ~3.2GB | ~26x | 4.60s / 118s | Mais rápido, ~32% menos RAM |
-   
-   Sample rate: 44100 Hz, 32-bit float mono. s2.cpp binário: ~1.4MB, compilado nativamente.
+   **GGUF benchmarks**: See `references/benchmarks.md` for RTF, RAM, and audio duration per quantization level (q8_0, q6_k, q5_k_m).
    
    **Multi-quant API:** refatore o server.py para usar MODEL_REGISTRY + _resolve_model(). O template `templates/fish-speech-server.py` já inclui essa arquitetura. Adicione novos quants sem rebuildar o container — modelos são montados como read-only volumes.
 
    **Model download:** GGUF models (3-5GB) baixam do HuggingFace. Preferir `wget -c` (resume support) sobre `curl` para arquivos grandes. O download speed varia muito (~2MB/s a ~80MB/s) dependendo da carga do CDN. Se lento, matar e reiniciar pode pegar um mirror mais rápido.
    
-   **Preferência de quant:** Este usuário usa **q8_0 como padrão em produção** (removeu q5_k_m e q6_k por decisão própria). As outras quants permanecem como opção para testes mas não são mantidas. A arquitetura multi-quant no server.py permite alternar via parâmetro `model` sem rebuild.
+   **Quant selection:** Multi-quant architecture in server.py allows switching via `model` parameter without rebuild. See `references/benchmarks.md` for performance comparison across quantization levels.
 
    **Use `s2.cpp` (https://github.com/rodrigomatta/s2.cpp) — NÃO o Docker oficial Python.** O inference em Python com PyTorch seria muito mais lento e consumiria mais RAM. O engine C++ é a única via viável para CPU.
 
@@ -520,14 +497,7 @@ ssh oracle-host 'cd ~/selfhost/fish-speech && docker compose build s2-server && 
      --text "Texto" -o /tmp/out.wav
    ```
 
-   **Métricas (q8_0, ref 15s, Oracle ARM64 4-core):**
-   | Fase | Tempo | Notas |
-   |------|-------|-------|
-   | Init + codec load | ~56s | Fixo por invocação |
-   | Reference encode | ~27-39s | Só na primeira vez ou sem `--save-voice` |
-   | Generate (1.5s áudio) | ~68s | Prefill + loop autoregressivo |
-   | **Total (~1.5s áudio)** | **~73-85s** | RTF ~48-57x |
-   | RAM | ~6.8GB max | Modelo 4.6GB + buffers |
+   **Métricas (q8_0, ref 15s, Oracle ARM64 4-core):** See `references/benchmarks.md` for init/encode/generate timing breakdown and RTF values.
 
 ⚠️ **Qwen3-TTS voice description for Portuguese — must specify accent:** The default voice produces a pronounced Chinese accent in Portuguese. Always include `"sotaque português brasileiro neutro"` or similar in the voice description. Example that works:
 ```json
@@ -596,7 +566,8 @@ See `references/gpu-options.md` for a comparison of:
 - `references/gemini-3-1-tts-prompting.md` — Gemini 3.1 Flash TTS prompting guide: voice selection, audio tags, LiveKit canonical prompt structure, Python API, multi-speaker, and reference generation for voice cloning
 
 - `references/qwen3-tts-voicedesign-prompting.md` — Qwen3-TTS VoiceDesign instruct format (structured key-value from official blog), accepted dimensions, and common errors
-- `references/fish-speech-s2-pro-research.md` — Fish Speech S2 Pro (5B) research: architecture, GGUF quantization, s2.cpp engine, measured RTF benchmarks on ARM64 CPU, and comparison with Qwen3-TTS
+- `references/fish-speech-s2-pro-research.md` — Fish Speech S2 Pro (5B) research: architecture, GGUF quantization, s2.cpp engine, and comparison with Qwen3-TTS
+- `references/benchmarks.md` — Performance benchmarks for all TTS models on Oracle ARM64: RTF tables, Qwen3-TTS measurements, GGUF quantization results, voice cloning metrics
 - `references/gpu-options.md` — GPU acceleration options for TTS inference (HF ZeroGPU, GCP, RunPod)
 - `references/qwen3-tts-deployment.md` — Qwen3-TTS 1.7B deployment details on Oracle ARM64 (Dockerfile, compose, performance data, known issues)
 

@@ -1,6 +1,6 @@
 ---
 name: read-reddit
-description: "How to read Reddit subreddits reliably using RSS feeds — bypassing API rate limits and bot detection. Use this skill whenever you need to fetch content from Reddit for research, curation, or news gathering."
+description: "Read Reddit subreddits reliably via RSS feeds — bypasses API rate limits and bot detection. For research, curation, or news gathering."
 version: 1.1.0
 author: Created for IAF pipeline
 platforms: [linux, macos]

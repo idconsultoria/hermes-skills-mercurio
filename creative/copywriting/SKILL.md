@@ -1,8 +1,11 @@
 ---
 name: copywriting
-description: "Expert conversion copywriting — write, rewrite, or improve marketing copy for any page. Use when the user says 'write copy for,' 'improve this copy,' 'headline help,' 'CTA copy,' 'value proposition,' 'tagline,' 'hero section copy,' 'above the fold,' 'this copy is weak,' 'make this more compelling.' For email copy see emails skill. For editing copy see copy-editing."
+description: "Expert conversion copywriting: write, rewrite, or improve marketing copy — headlines, CTAs, value props, page sections.\n\nLoad this skill when the user needs marketing copy — landing pages, homepage sections, pricing copy, CTAs, taglines, or value propositions. Provides a complete framework for gathering context, applying copywriting principles (clarity over cleverness, benefits over features, specificity over vagueness), and producing organized output with annotations and alternatives. Covers page structure frameworks, voice and tone guidance, CTA copy guidelines, and page-specific strategies for homepages, landing pages, pricing pages, feature pages, and about pages. For thorough line-by-line editing after drafting, pair with the copy-editing skill."
 version: 2.0.0
 author: coreyhaines31/marketingskills
+metadata:
+  hermes:
+    related_skills: [humanizer]
 ---
 
 # Copywriting

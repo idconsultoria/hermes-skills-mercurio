@@ -1,6 +1,6 @@
 ---
 name: iaf-newsletter-pipeline
-description: Umbrella skill for all newsletter/briefing/digest pipelines — IAF Manhã Aumentada, Daily AI Digest, editorial curation, cron scheduling, briefing patterns. Covers multi-source collection, ranking/scoring, HTML→PDF, dedup, WhatsApp companion, and delivery.
+description: Umbrella skill for newsletter/briefing/digest pipelines: IAF Manhã Aumentada, Daily AI Digest, editorial curation, cron scheduling. Covers multi-source collection, ranking, HTML→PDF, delivery.
 trigger: User asks to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline. Also when designing cron-based content aggregation patterns.
 ---
 

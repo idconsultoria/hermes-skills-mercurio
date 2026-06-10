@@ -1,6 +1,6 @@
 ---
 name: autonomous-ai-agents
-description: Delegate coding tasks to autonomous AI coding agent CLIs (Claude Code, Codex, OpenCode) via Hermes terminal/process tools. Covers one-shot tasks, interactive sessions, PR reviews, parallel worktrees, and monitoring.
+description: Delegate tasks to autonomous AI coding agent CLIs via Hermes. One-shot, PR review, and session orchestration patterns.
 category: autonomous-ai-agents
 ---
 
