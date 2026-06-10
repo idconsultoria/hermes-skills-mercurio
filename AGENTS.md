@@ -99,7 +99,9 @@ Ciclo de consolidação inteligente. Analisa o portfólio e propõe merges, remo
 4. **Stage + commit** (checkpoint pré-plano)
 5. **Estuda** o index.md completo e elabora plano de evolução
 6. **Salva** o plano em `reports/evolve-<YYYY-MM-DD-HHMM>.md`
-7. **Executa** o plano (merges, deletes, consolidação de conteúdo). Durante a execução, limpa aprendizados excessivamente específicos das skills — dados de debugging pontual, mensagens de erro de sessões passadas, workarounds temporários, informações transientes que não agregam numa próxima execução do workflow. Mantém o padrão geral, não o caso específico.
+7. **Executa** o plano (merges, deletes, consolidação de conteúdo). Durante a execução:
+   - Limpa aprendizados excessivamente específicos das skills — dados de debugging pontual, mensagens de erro de sessões passadas, workarounds temporários, informações transientes que não agregam numa próxima execução do workflow. Mantém o padrão geral, não o caso específico.
+   - **Audita descrições das skills** — verifica se cada SKILL.md tem cabeçalhos de descrição adequados: resumo de uma linha (~80 chars) seguido de parágrafo descritivo completo. Skills com descrições ausentes, truncadas ou genéricas demais devem ser corrigidas para que o conteúdo alimente bem o index.md. O resumo é extraído como `summary` e o parágrafo como `description`. Skills já consolidadas (merges) têm prioridade. Skills não modificadas podem ser corrigidas em lote.
 8. **Escreve relatório denso** em `reports/evolve-<YYYY-MM-DD>-report.md` com:
    - Estado inicial vs final (skills, memória, disco)
    - Tabela de deleções com motivos
