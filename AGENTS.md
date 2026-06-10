@@ -15,9 +15,9 @@ skills/
 ├── AGENTS.md          ← Este arquivo — regras do repositório
 ├── index.md           ← Catálogo orientado a conteúdo (sempre atualizado)
 ├── log.md             ← Diário cronológico append-only de operações
-├── reports/           ← Planos de evolução + relatórios pós-evolução
-│   ├── evolve-<YYYY-MM-DD-HHMM>.md        ← plano (pré-execução)
-│   └── evolve-<YYYY-MM-DD>-report.md      ← relatório (pós-execução)
+├── reports/           ← Planos e relatórios gerados pela etapa evolve
+│   ├── evolve-<YYYY-MM-DD-HHMM>.md        ← plano (pré-execução do evolve)
+│   └── evolve-<YYYY-MM-DD>-report.md      ← relatório (pós-execução do evolve)
 └── <category>/
     └── <skill-name>/
         ├── SKILL.md
@@ -43,13 +43,13 @@ Cada skill é registrada com:
 | **category** | Categoria de diretório |
 | **relations** | Outras skills relacionadas (parent, child, similar, uses, used_by) |
 
-**Quando atualizar:** a cada operação `update` ou `evolve`. O index.md é a fonte da verdade para planejamento de consolidação.
+**Quando atualizar:** a cada `update` ou `evolve` dentro do ciclo de consolidação. O index.md é a fonte da verdade para o ciclo de consolidação.
 
 ---
 
 ## log.md — Diário Cronológico
 
-**Função:** Append-only. Cada operação no repositório vira uma entrada.
+**Função:** Append-only. Cada operação do ciclo de consolidação vira uma entrada.
 
 **Formato padronizado:**
 
@@ -58,25 +58,86 @@ Cada skill é registrada com:
 ## [YYYY-MM-DD] evolve | Descrição concisa
 ```
 
-Cada entrada começa com `## [YYYY-MM-DD]` seguido de um prefixo de operação e uma descrição.
+Cada entrada começa com `## [YYYY-MM-DD]` seguido do prefixo da etapa e uma descrição.
 
-**Prefixos padronizados:**
+**Prefixos padronizados (etapas do ciclo de consolidação):**
 
-| Prefixo | Operação |
-|---------|----------|
+| Prefixo | Etapa |
+|---------|-------|
 | `update` | Sincronização do index.md com o estado atual das skills |
-| `evolve` | Etapa de consolidação inteligente — merges, deletes, órfãos, relações, grafo |
+| `evolve` | Consolidação inteligente — merges, deletes, órfãos, relações, grafo |
 | `offload` | Limpeza de memória — remoção de fatos redundantes com skills |
 
 O formato é parseável com Unix tools:
 ```bash
-grep "^## \[" log.md | tail -5   # últimas 5 entradas
-grep "evolve" log.md               # só etapas evolve
+grep "^## \[" log.md | tail -5   # últimas 5 entradas do ciclo
+grep "evolve" log.md              # só etapas evolve
 ```
 
 ---
 
-## Operações
+## Ciclo de Consolidação (macro)
+
+**Não é uma etapa. É o processo que orquestra as etapas.** O ciclo de consolidação é executado periodicamente (a cada N evolves ou sob demanda). Ele inicia os `update` e coordena a sequência completa:
+
+### Sequência do ciclo
+
+```
+1. Update          → detecta mudanças, audita descrições, sincroniza index.md
+2. Log             → registra o update no log.md
+3. Commit          → checkpoint intermediário
+4. Evolve          → análise profunda: merges, órfãos, relações, grafo
+5. Log             → registra o evolve no log.md
+6. Offload         → limpa memória redundante com skills
+7. Commit          → checkpoint final
+```
+
+### Exemplo de execução
+
+```bash
+# --- Etapa: Update ---
+# (executa os 6 passos da seção ## update abaixo)
+
+# --- Log do update ---
+echo "## [$(date +%F)] update | ..." >> log.md
+git commit -m "update: ..."
+
+# --- Etapa: Evolve ---
+# (executa os 13 passos da seção ## evolve abaixo)
+
+# --- Log do evolve ---
+echo "## [$(date +%F)] evolve | ..." >> log.md
+git commit -m "evolve: ..."
+
+# --- Etapa: Offload ---
+# (executa os 4 passos da seção ## offload abaixo)
+
+# --- Log do offload ---
+echo "## [$(date +%F)] offload | ..." >> log.md
+git commit -m "offload: ..."
+```
+
+### Diagrama
+
+```
+┌───────────────────────────────────────────────────────┐
+│                 Ciclo de Consolidação                  │
+│                                                       │
+│   Update ──→ Log ──→ Commit ──→ Evolve ──→ Log ──→ Offload ──→ Commit
+│   (6 passos)           (13 passos)           (4 passos)
+│                                                       │
+│   As 3 etapas sempre rodam nesta ordem,               │
+│   formando um ciclo completo. Cada etapa               │
+│   tem seu próprio prefixo no log.md.                   │
+└───────────────────────────────────────────────────────┘
+```
+
+---
+
+## Etapas do Ciclo
+
+Cada seção abaixo descreve uma das etapas que compõem o ciclo de consolidação.
+Elas sempre executam na ordem: **update → evolve → offload**.
 
 ### update
 
@@ -93,20 +154,24 @@ Sincronização do index.md com o estado atual das skills. Executado quando:
 3. Atualiza o index.md com as mudanças detectadas (adiciona, edita, remove entradas via patches cirúrgicos)
 4. **Audita conformidade de descrições** — varre todas as SKILL.md e verifica se cada uma está no formato esperado:
    - **Sumário de uma linha (~80 chars):** descrição concisa do que a skill faz, sem truncamentos (sem `...`). Deve ser auto-contido: quem lê entende na hora se deve carregar a skill ou não.
-   - **Parágrafo de resumo:** explica os gatilhos de ativação (\"Load this skill when...\") e expande a descrição com capacidades específicas, ferramentas que utiliza e o que produz. Não é o corpo inteiro da skill — é um resumo informativo que alimenta o index.md.
+   - **Parágrafo de resumo:** explica os gatilhos de ativação ("Load this skill when...") e expande a descrição com capacidades específicas, ferramentas que utiliza e o que produz. Não é o corpo inteiro da skill — é um resumo informativo que alimenta o index.md.
    - Lista **todas as skills fora do formato** com o problema específico, edita a SKILL.md original para corrigir, depois atualiza o index.md com as descrições corrigidas.
    - Faz isso para **todas as skills fora do formato**, sem exceção.
 5. Registra no log.md com prefixo `update` incluindo o resumo de tudo que foi alterado
 6. Stage + commit
 
+---
+
 ### evolve
 
-Etapa de consolidação inteligente do ciclo de consolidação. Analisa o portfólio e propõe merges, remoções e spin-offs para manter as skills **MECE** (Mutually Exclusive, Collectively Exhaustive).
+**Esta é uma etapa do ciclo de consolidação.** Ela executa DEPOIS do update e ANTES do offload.
+
+A etapa evolve analisa o portfólio e propõe merges, remoções e spin-offs para manter as skills **MECE** (Mutually Exclusive, Collectively Exhaustive).
 
 **Critério de merge:** Duas skills conectadas (similar/uses) só devem permanecer separadas se descreverem fluxos de trabalho realmente distintos — que não podem ou não faz sentido incorporar um ao outro. Se ambas descrevem o mesmo domínio com padrões de orquestração idênticos, devem ser fundidas. Se operam em níveis de abstração diferentes (receita técnica vs workflow estratégico) ou com toolchains fundamentalmente distintas, devem permanecer separadas. A conexão no grafo (`similar`, `uses`) é evidência, não sentença — o julgamento final é sobre o workflow descrito.
 
 **Passos:**
-1. **Lista** mudanças de skills desde o último ciclo
+1. **Lista** mudanças de skills desde o último evolve
 2. **Atualiza** o index.md com as mudanças
 3. **Registra** no log.md
 4. **Stage + commit** (checkpoint pré-plano)
@@ -130,9 +195,13 @@ Etapa de consolidação inteligente do ciclo de consolidação. Analisa o portf�
 12. **Gera grafo HTML interativo** — extrai dados do index.md, constrói grafo D3.js com relações (similar/uses/used_by/parent), salva em `skills_graph.html` na raiz do repositório. Nós coloridos por categoria, arestas tracejadas para similar e sólidas com seta para uses. Modal com summary + description ao clicar no nó. Responsivo para mobile.
 13. **Stage + commit** final
 
+---
+
 ### offload
 
-Limpeza de memória após a etapa evolve do ciclo de consolidação. Remove entradas da memória persistente que estejam redundantes com skills (ex: configurações de ferramentas, procedimentos, paths de instalação — tudo que deveria viver em skill em vez de memória).
+**Esta é uma etapa do ciclo de consolidação.** Ela executa DEPOIS do evolve.
+
+Remove entradas da memória persistente que estejam redundantes com skills (ex: configurações de ferramentas, procedimentos, paths de instalação — tudo que deveria viver em skill em vez de memória).
 
 **Regra:** memória guarda preferências do usuário e fatos estáveis do ambiente. Skills guardam procedimentos, receitas e workflows. Tudo que é procedural e está numa skill pode sair da memória.
 
@@ -144,59 +213,11 @@ Limpeza de memória após a etapa evolve do ciclo de consolidação. Remove entr
 
 ---
 
-## Ciclo de Consolidação
-
-**Não é a mesma coisa que `evolve`.** O ciclo de consolidação é o processo macro que orquestra as operações. É executado periodicamente (a cada N evolves ou sob demanda) e é ele quem inicia os `update` normalmente.
-
-### Etapas do ciclo
-
-```
-1. Update          → varre mudanças, audita descrições, sincroniza index.md
-2. Log do update   → registra no log.md com prefixo `update`
-3. Stage + commit  → checkpoint intermediário
-4. Evolve          → análise profunda, merges, órfãos, relações, grafo
-5. Log do evolve   → registra no log.md com prefixo `evolve`
-6. Offload         → limpa memória redundante com skills
-7. Stage + commit  → checkpoint final
-```
-
-### Diagrama
-
-```
-┌─────────────────────────────────────────────────────┐
-│              Ciclo de Consolidação                   │
-│                                                      │
-│   Update → log → commit → Evolve → log → Offload → commit
-│   ───────          ──────          ───────
-│   (6 passos)       (13 passos)     (4 passos)
-│                                                      │
-│   Executado periodicamente — inicia os updates       │
-└─────────────────────────────────────────────────────┘
-```
-
-### Exemplo de execução
-
-```bash
-# Update (passos 1-6 do update)
-# Log do update
-echo "## [$(date +%F)] update | ..." >> log.md
-git commit -m "update: ..."
-
-# Evolve (passos 1-13 do evolve)
-# Log do evolve  
-echo "## [$(date +%F)] evolve | ..." >> log.md
-git commit -m "evolve: ..."
-
-# Offload (passos 1-4 do offload)
-# Log do offload
-echo "## [$(date +%F)] offload | ..." >> log.md
-git commit -m "offload: ..."
-```
-
----
-
 ## Convenções de Commit
 
-- `update: <descrição>` — para atualizações de índice
-- `evolve: <descrição>` — para ciclos de consolidação
-- `init: <descrição>` — para commits iniciais
+| Prefixo | Uso |
+|---------|-----|
+| `update: <descrição>` | Para a etapa update do ciclo de consolidação |
+| `evolve: <descrição>` | Para a etapa evolve do ciclo de consolidação |
+| `offload: <descrição>` | Para a etapa offload do ciclo de consolidação |
+| `init: <descrição>` | Para commits iniciais |
