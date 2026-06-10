@@ -64,14 +64,14 @@ Cada entrada começa com `## [YYYY-MM-DD]` seguido de um prefixo de operação e
 
 | Prefixo | Operação |
 |---------|----------|
-| `update` | Criação/edição manual de index.md (first seed, correções) |
-| `evolve` | Ciclo completo de consolidação (plano → execução → report → offload → commit) |
+| `update` | Sincronização do index.md com o estado atual das skills |
+| `evolve` | Etapa de consolidação inteligente — merges, deletes, órfãos, relações, grafo |
 | `offload` | Limpeza de memória — remoção de fatos redundantes com skills |
 
 O formato é parseável com Unix tools:
 ```bash
 grep "^## \[" log.md | tail -5   # últimas 5 entradas
-grep "evolve" log.md               # só ciclos de consolidação
+grep "evolve" log.md               # só etapas evolve
 ```
 
 ---
@@ -101,7 +101,7 @@ Sincronização do index.md com o estado atual das skills. Executado quando:
 
 ### evolve
 
-Ciclo de consolidação inteligente. Analisa o portfólio e propõe merges, remoções e spin-offs para manter as skills **MECE** (Mutually Exclusive, Collectively Exhaustive).
+Etapa de consolidação inteligente do ciclo de consolidação. Analisa o portfólio e propõe merges, remoções e spin-offs para manter as skills **MECE** (Mutually Exclusive, Collectively Exhaustive).
 
 **Critério de merge:** Duas skills conectadas (similar/uses) só devem permanecer separadas se descreverem fluxos de trabalho realmente distintos — que não podem ou não faz sentido incorporar um ao outro. Se ambas descrevem o mesmo domínio com padrões de orquestração idênticos, devem ser fundidas. Se operam em níveis de abstração diferentes (receita técnica vs workflow estratégico) ou com toolchains fundamentalmente distintas, devem permanecer separadas. A conexão no grafo (`similar`, `uses`) é evidência, não sentença — o julgamento final é sobre o workflow descrito.
 
@@ -123,18 +123,16 @@ Ciclo de consolidação inteligente. Analisa o portfólio e propõe merges, remo
    - Estado inicial vs final (skills, memória, disco)
    - Tabela de deleções com motivos
    - Tabela de merges com o que foi absorvido
-   - Offload realizado
    - Git diff summary
    - **Lista de skills órfãs** e decisão tomada (relacionada / justificada como nicho / deletada)
-10. **Offload** — limpa da memória persistente informações que já estão documentadas em skills; revisa a memória restante para garantir que só contém fatos não cobertos por skills
-11. **Atualiza** o index.md pós-transformação
-12. **Registra** no log.md com prefixo `evolve`
-13. **Gera grafo HTML interativo** — extrai dados do index.md, constrói grafo D3.js com relações (similar/uses/used_by/parent), salva em `skills_graph.html` na raiz do repositório. Nós coloridos por categoria, arestas tracejadas para similar e sólidas com seta para uses. Modal com summary + description ao clicar no nó. Responsivo para mobile.
-14. **Stage + commit** final
+10. **Atualiza** o index.md pós-transformação
+11. **Registra** no log.md com prefixo `evolve`
+12. **Gera grafo HTML interativo** — extrai dados do index.md, constrói grafo D3.js com relações (similar/uses/used_by/parent), salva em `skills_graph.html` na raiz do repositório. Nós coloridos por categoria, arestas tracejadas para similar e sólidas com seta para uses. Modal com summary + description ao clicar no nó. Responsivo para mobile.
+13. **Stage + commit** final
 
 ### offload
 
-Limpeza de memória após um ciclo evolve. Remove entradas da memória persistente que estejam redundantes com skills (ex: configurações de ferramentas, procedimentos, paths de instalação — tudo que deveria viver em skill em vez de memória).
+Limpeza de memória após a etapa evolve do ciclo de consolidação. Remove entradas da memória persistente que estejam redundantes com skills (ex: configurações de ferramentas, procedimentos, paths de instalação — tudo que deveria viver em skill em vez de memória).
 
 **Regra:** memória guarda preferências do usuário e fatos estáveis do ambiente. Skills guardam procedimentos, receitas e workflows. Tudo que é procedural e está numa skill pode sair da memória.
 
@@ -170,7 +168,7 @@ Limpeza de memória após um ciclo evolve. Remove entradas da memória persisten
 │                                                      │
 │   Update → log → commit → Evolve → log → Offload → commit
 │   ───────          ──────          ───────
-│   (5 passos)       (14 passos)     (4 passos)
+│   (6 passos)       (13 passos)     (4 passos)
 │                                                      │
 │   Executado periodicamente — inicia os updates       │
 └─────────────────────────────────────────────────────┘
@@ -184,7 +182,7 @@ Limpeza de memória após um ciclo evolve. Remove entradas da memória persisten
 echo "## [$(date +%F)] update | ..." >> log.md
 git commit -m "update: ..."
 
-# Evolve (passos 1-14 do evolve)
+# Evolve (passos 1-13 do evolve)
 # Log do evolve  
 echo "## [$(date +%F)] evolve | ..." >> log.md
 git commit -m "evolve: ..."
