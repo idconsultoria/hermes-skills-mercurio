@@ -32,6 +32,26 @@ skills/
 └── scripts/            ← (opcional) validadores
 ```
 
+## ⚠️ Regra Absoluta: index.md é Território de LLM
+
+O arquivo `index.md` **não pode ser editado por scripts** — nem Python, nem sed, nem awk, nem regeneração automática. Toda edição no index.md deve passar por ferramentas de agente LLM (`read_file`, `write_file`, `patch`), garantindo que cada decisão editorial passe por julgamento humano-assistido.
+
+**Scripts são permitidos para tarefas de apoio** — análise de conexões, extração de metadados dos SKILL.md, geração do grafo HTML, relatórios. O output desses scripts informa o agente, que então edita o index.md manualmente.
+
+**Violação detectada:** Se uma sessão anterior fabricou a edição do index.md via script, reverter imediatamente e refazer manualmente com patch.
+
+## ⚠️ Pattern: Batch-Report-Then-Apply (Evita File Conflict)
+
+Quando múltiplos subagentes precisam modificar o index.md (ex: adicionar relações para centenas de skills), **NUNCA** mande todos escreverem no index.md diretamente — eles vão conflitar e corromper o arquivo.
+
+**Padrão correto:**
+
+1. Cada subagente produz um **relatório de saída** (ex: `relations-batch1.md`) com as modificações a fazer
+2. Os relatórios são salvos via `write_file` em `/opt/data/skills/`
+3. Um único subagente (ou o agente principal) lê os relatórios e aplica **todos os patches sequencialmente** no index.md
+
+Isso garante atomicidade e evita corrupção do arquivo por escrita concorrente.
+
 ## Ciclo Evolve (12 passos)
 
 ### 1. Lista mudanças desde último ciclo
@@ -43,7 +63,9 @@ Compare estado atual com o último commit do Git para detectar skills adicionada
 ### 2. Atualiza index.md com mudanças
 Regenera o catálogo completo escaneando todos os `SKILL.md` no disco. Inclui: nome, título, tamanho, resumo (~80 chars), descrição completa, categoria, e relações.
 
-**Para relações semanticamente inferidas (não regex):** usar o padrão de subagentes paralelos documentado em `references/llm-relations-inference.md`. 3 subagentes leem ~31 skills cada e retornam JSON com relações do tipo `similar`, `uses`, `used_by`, `parent`. O merge gera ~200 relações em 70+ skills com precisão muito superior à heurística automatizada.
+**Para relações semanticamente inferidas (não regex):** usar o padrão de subagentes com análise **depth-1** — cada subagente lê a skill principal **e** cada skill candidata a relação (lendo o SKILL.md de ambos os lados), confirmando a conexão semântica antes de declará-la. 3 subagentes analisam ~28 skills cada em paralelo, cada um produzindo um **relatório de saída** (`relations-batchN.md`) em vez de editar o index.md diretamente. Um agente central então consolida todos os patches no index.md. Isso evita conflitos de escrita concorrente e garante precisão bilateral. Resultado: ~140+ arestas em 75+ skills com precisão validada nos dois sentidos.
+
+**⚠️ Não parar no primeiro merge óbvio.** Se uma skill parece alvo óbvio de merge (ex: coding agents), isso não é desculpa para encerrar a análise. O ciclo evolve deve analisar **todas** as skills, não apenas as que têm alvos evidentes. O usuário pode chamar a atenção se isso acontecer.
 
 **Formato exato do index.md:** cada skill segue o template documentado em `references/index-md-spec.md` — bullet metadata + description paragraph + relations list.
 
@@ -205,6 +227,8 @@ Features: nodes por categoria, arestas tracejadas (similar) e sólidas (uses), m
 ⚠️ **Offload ≠ limpeza de skills.** Offload remove fatos procedurais da memória persistente. Limpeza de aprendizado excessivamente específico DENTRO das skills acontece no passo 7 (execução). Não confundir.
 
 ⚠️ **Descrições de skills são auditadas no passo 7**, não depois. Skills consolidadas (merges) têm prioridade na auditoria de description. Skills não modificadas podem ser corrigidas em lote se tiverem descrições pobres.
+
+⚠️ **Não parar no primeiro merge óbvio.** Quando um merge parece evidente (ex: 3 coding agents com mesmo padrão de orquestração), o agente tende a declarar vitória e parar. Isso é erro — o ciclo evolve deve analisar **todas as skills**. O usuário explicitamente pediu "skill a skill" e detectou o shortcut. Mesmo que o merge seja válido, a análise completa continua sendo necessária.
 
 ⚠️ **Fabricação em compaction — verificar SEMPRE.** O resumo de contexto entre sessões pode reportar trabalho como concluído quando não foi. Nunca confiar cegamente: após qualquer operação de evolve, verificar o estado real do disco (`git log --oneline -3`, `ls` nos diretórios esperados, `grep` nos arquivos modificados) antes de declarar "já feito". Se o usuário disser que não recebeu arquivos, acredite nele — o compaction pode ter fabricado a entrega.
 

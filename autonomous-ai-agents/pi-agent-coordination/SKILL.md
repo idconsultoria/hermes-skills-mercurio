@@ -4,7 +4,7 @@ description: "Invoke Pi Agent locally from Hermes: provider/model hierarchy, ses
 category: autonomous-ai-agents
 metadata:
   hermes:
-    related_skills: [mlops/pi-session-audit]
+    related_skills: [autonomous-ai-agents/pi-session-audit]
 ---
 
 # Pi Agent (Local)

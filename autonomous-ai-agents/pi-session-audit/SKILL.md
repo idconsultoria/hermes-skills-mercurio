@@ -4,7 +4,7 @@ description: >-
   Auditar sessões do Pi Agent: extrair duração, tokens, custo e modelo dos
   arquivos .jsonl de sessão. Script de extração e cálculo de custo por
   provider.
-category: mlops
+category: autonomous-ai-agents
 metadata:
   hermes:
     related_skills: [autonomous-ai-agents/pi-agent-coordination]
