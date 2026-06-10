@@ -1,6 +1,6 @@
 ---
 name: notion
-description: "Notion API + ntn CLI: pages, databases, markdown, Workers."
+description: "Notion API plus ntn CLI — pages, databases, markdown import, and Cloudflare Workers integration.\n\nLoad this skill when you need to interact with Notion programmatically. Covers creating and updating pages, querying databases, importing and exporting markdown content, and deploying Notion-integrated Cloudflare Workers for automation."
 version: 2.0.0
 author: community
 license: MIT

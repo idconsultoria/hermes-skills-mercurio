@@ -1,6 +1,6 @@
 ---
 name: p5js
-description: "p5.js sketches: gen art, shaders, interactive, 3D."
+description: "p5.js sketches — generative art, shaders, interactive animations, and 3D graphics.\n\nLoad this skill for creative coding with p5.js. Covers creating generative art pieces, writing GLSL shaders for visual effects, building interactive animations and games, and rendering 3D scenes using WebGL. Produces standalone HTML files with embedded p5.js sketches."
 version: 1.0.0
 platforms: [linux, macos, windows]
 metadata:

@@ -1,6 +1,6 @@
 ---
 name: github-repo-management
-description: "Clone/create/fork repos; manage remotes, releases."
+description: "Clone, create, and fork repos — manage remotes, releases, and repository settings.\n\nLoad this skill for GitHub repository management operations. Covers cloning existing repos, creating new repositories, forking projects, managing remote URLs, creating and publishing releases, and configuring repository settings via gh CLI and GitHub API."
 version: 1.1.0
 author: Hermes Agent
 license: MIT

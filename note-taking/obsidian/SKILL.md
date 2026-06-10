@@ -1,6 +1,6 @@
 ---
 name: obsidian
-description: Read, search, create, and edit notes in the Obsidian vault.
+description: "Read, search, create, and edit notes in the Obsidian vault from the command line.\n\nLoad this skill for filesystem-first Obsidian vault work. Covers reading notes, searching note files by content or title, creating new notes with wikilinks, appending content to existing notes, and managing the vault structure through file operations."
 platforms: [linux, macos, windows]
 ---
 

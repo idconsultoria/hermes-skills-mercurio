@@ -1,6 +1,6 @@
 ---
 name: jupyter-live-kernel
-description: "Iterative Python via live Jupyter kernel (hamelnb)."
+description: "Iterative Python development via live Jupyter kernel using hamelnb.\n\nLoad this skill when you need to explore data, prototype algorithms, or run iterative Python workflows with immediate feedback. Covers connecting to a live Jupyter kernel, executing cells, inspecting variables, and visualizing results for data science and exploratory programming."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

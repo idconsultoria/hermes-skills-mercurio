@@ -1,6 +1,6 @@
 ---
 name: ocr-and-documents
-description: "Extract text from PDFs/scans (pymupdf, marker-pdf)."
+description: "Extract text from PDFs and scanned documents using pymupdf and marker-pdf.\n\nLoad this skill when you need to extract text content from PDF files or scanned documents. Covers using pymupdf for direct text extraction, marker-pdf for OCR-based extraction from scans, handling multi-page documents, and preserving layout structure where possible."
 version: 2.3.0
 author: Hermes Agent
 license: MIT

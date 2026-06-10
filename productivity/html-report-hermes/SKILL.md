@@ -1,6 +1,6 @@
 ---
 name: html-report-hermes
-description: "Render research reports as dark-themed HTML with SVG charts and Tufte-inspired typography.\n\nTwo design systems in one skill: Hermes CRT (amber/blue inversion, scanlines, terminal aesthetic) for visual showcases and landing pages, and Hermes Official (blue royal on white, Inter + Space Mono, clean cards) for data reports, benchmarks, and dashboards. Covers CRT overlay mechanics, inverted color coding, component library, report structure templates, Telegram delivery via ZIP, and the agy pipeline for complex CRT pages. Activates automatically when the user needs structured visual output."
+description: "Render research reports as dark-themed HTML with SVG charts and Tufte-inspired typography.\n\nLoad this skill when the user needs structured visual output — data reports, benchmarks, dashboards, or landing pages. Activates automatically for visual requests. Two design systems: Hermes CRT (amber/blue inversion, scanlines, terminal aesthetic) for visual showcases, and Hermes Official (blue royal on white, Inter + Space Mono) for data reports. Covers CRT overlay mechanics, component library, report templates, Telegram delivery via ZIP, and agy pipeline for complex CRT pages."
 version: 1.0.0
 author: Gustavo
 tags: [html, design-system, hermes, crt, report, visualization, frontend]

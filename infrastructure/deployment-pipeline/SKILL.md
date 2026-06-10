@@ -1,6 +1,6 @@
 ---
 name: deployment-pipeline
-description: "CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr.io → SSH deploy to bare metal. Covers workflow design, registry auth, tag strategy, deploy key setup, migration management, and common pitfalls."
+description: "CI/CD pipeline for Docker-based apps — GitHub Actions, ghcr.io registry, and SSH deploy to bare metal.\n\nLoad this skill to set up or troubleshoot a full CI/CD pipeline for containerized applications. Covers GitHub Actions workflow design, ghcr.io registry authentication, Docker tag strategy, SSH deploy key setup, database migration management, and common deployment pitfalls. Spans the full lifecycle from PR merge through testing, build, registry push, and SSH deploy."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

@@ -1,6 +1,6 @@
 ---
 name: imessage
-description: Send and receive iMessages/SMS via the imsg CLI on macOS.
+description: "Send and receive iMessages and SMS via the imsg CLI on macOS.\n\nLoad this skill for Apple iMessage automation from the terminal. Covers sending iMessages to individual contacts and group chats, reading received messages, checking delivery status, and managing conversations through the imsg CLI tool on macOS."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

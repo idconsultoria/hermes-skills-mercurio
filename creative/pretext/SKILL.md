@@ -1,6 +1,6 @@
 ---
 name: pretext
-description: "Creative browser demos with @chenglou/pretext: DOM-free text layout for ASCII art, kinetic typography, text-as-geometry games, and generative art. Single-file HTML output."
+description: "Creative browser demos with @chenglou/pretext for DOM-free text layout, ASCII art, and kinetic typography.\n\nLoad this skill when the user asks for creative browser demos using the Pretext library — text flowing around moving shapes, ASCII-art effects with real prose, kinetic typography, text-as-geometry games, and generative art. Produces single-file HTML output at 60fps using canvas-based text measurement without DOM reflow."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

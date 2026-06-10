@@ -1,6 +1,6 @@
 ---
 name: findmy
-description: "Track Apple devices/AirTags via FindMy.app on macOS."
+description: "Track Apple devices and AirTags via the FindMy app on macOS.\n\nLoad this skill when you need to locate lost devices, check AirTag positions, or monitor location of Apple devices. Uses the FindMy.app infrastructure on macOS to query device locations and display them on a map."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

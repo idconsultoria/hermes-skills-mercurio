@@ -1,6 +1,6 @@
 ---
 name: maps
-description: "Geocode, POIs, routes, timezones via OpenStreetMap/OSRM."
+description: "Geocode addresses, find POIs, calculate routes, and lookup timezones via OpenStreetMap and OSRM.\n\nLoad this skill when you need location-based data — converting addresses to coordinates, searching for points of interest, getting driving or walking directions with distance and ETA, or looking up timezone information. Uses free APIs (Nominatim, Overpass, OSRM) with no API key required."
 version: 1.2.0
 author: Mibayy
 license: MIT

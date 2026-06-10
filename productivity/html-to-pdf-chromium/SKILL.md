@@ -1,6 +1,6 @@
 ---
 name: html-to-pdf-chromium
-description: Convert HTML files to high-fidelity PDF using Chromium headless (via Debian .deb extraction, no root or Playwright required). Use when weasyprint or other tools lose CSS features like gradients, webkit-background-clip, grid, and glow effects.
+description: "Convert HTML to high-fidelity PDF using Chromium headless without root or Playwright.\n\nLoad this skill when weasyprint or other tools lose CSS features like gradients, webkit-background-clip, grid, or glow effects. Uses Chromium headless extracted from Debian .deb packages for browser-quality PDF rendering without root access, Playwright, or Puppeteer. Covers setup, rendering options, and CSS feature preservation for complex layouts."
 trigger: User asks to generate PDF from HTML with browser-quality rendering, or when weasyprint output lacks CSS features like -webkit-background-clip or gradients.
 related_skills: [html-report-hermes, iaf-newsletter-pipeline]
 ---

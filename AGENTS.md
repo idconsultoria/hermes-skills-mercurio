@@ -92,7 +92,12 @@ Sincronização do index.md com o estado atual das skills. Executado quando:
 2. Regera o index.md completo (adiciona, edita, remove entradas)
 3. Compara diff com o último commit do Git para extrair resumo de mudanças
 4. Registra no log.md com prefixo `update` incluindo o resumo
-5. Stage + commit
+5. **Audita conformidade de descrições** — varre todas as SKILL.md e verifica se cada uma está no formato esperado:
+   - **Sumário de uma linha (~80 chars):** descrição concisa do que a skill faz, sem truncamentos (sem `...`). Deve ser auto-contido: quem lê entende na hora se deve carregar a skill ou não.
+   - **Parágrafo de resumo:** explica os gatilhos de ativação (\"Load this skill when...\") e expande a descrição com capacidades específicas, ferramentas que utiliza e o que produz. Não é o corpo inteiro da skill — é um resumo informativo que alimenta o index.md.
+   - Lista **todas as skills fora do formato** com o problema específico, edita a SKILL.md original para corrigir, depois atualiza o index.md com as descrições corrigidas.
+   - Faz isso para **todas as skills fora do formato**, sem exceção.
+6. Stage + commit
 
 ### evolve
 
@@ -141,23 +146,53 @@ Limpeza de memória após um ciclo evolve. Remove entradas da memória persisten
 
 ---
 
-## Ciclo Completo (exemplo)
+## Ciclo de Consolidação
+
+**Não é a mesma coisa que `evolve`.** O ciclo de consolidação é o processo macro que orquestra as operações. É executado periodicamente (a cada N evolves ou sob demanda) e é ele quem inicia os `update` normalmente.
+
+### Etapas do ciclo
+
+```
+1. Update          → varre mudanças, audita descrições, sincroniza index.md
+2. Log do update   → registra no log.md com prefixo `update`
+3. Stage + commit  → checkpoint intermediário
+4. Evolve          → análise profunda, merges, órfãos, relações, grafo
+5. Log do evolve   → registra no log.md com prefixo `evolve`
+6. Offload         → limpa memória redundante com skills
+7. Stage + commit  → checkpoint final
+```
+
+### Diagrama
+
+```
+┌─────────────────────────────────────────────────────┐
+│              Ciclo de Consolidação                   │
+│                                                      │
+│   Update → log → commit → Evolve → log → Offload → commit
+│   ───────          ──────          ───────
+│   (5 passos)       (14 passos)     (4 passos)
+│                                                      │
+│   Executado periodicamente — inicia os updates       │
+└─────────────────────────────────────────────────────┘
+```
+
+### Exemplo de execução
 
 ```bash
-# update
-python3 scripts/regenerate_index.py
-git add index.md
-git commit -m "update: sync index.md with current skills"
+# Update (passos 1-6 do update)
+# Log do update
+echo "## [$(date +%F)] update | ..." >> log.md
+git commit -m "update: ..."
 
-# evolve
-python3 scripts/regenerate_index.py
-git add -A
-git commit -m "pre-evolve checkpoint"
-# elabora reports/evolve-2026-06-10-1200.md
-# executa plano
-python3 scripts/regenerate_index.py
-git add -A
-git commit -m "evolve: merged N skills, removed M, spun off K"
+# Evolve (passos 1-14 do evolve)
+# Log do evolve  
+echo "## [$(date +%F)] evolve | ..." >> log.md
+git commit -m "evolve: ..."
+
+# Offload (passos 1-4 do offload)
+# Log do offload
+echo "## [$(date +%F)] offload | ..." >> log.md
+git commit -m "offload: ..."
 ```
 
 ---

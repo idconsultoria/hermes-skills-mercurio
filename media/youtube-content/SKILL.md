@@ -1,6 +1,6 @@
 ---
 name: youtube-content
-description: "YouTube transcripts to summaries, threads, blogs."
+description: "Convert YouTube transcripts into summaries, Twitter threads, and blog posts.\n\nLoad this skill when you need to repurpose YouTube video content. Covers fetching transcripts via YouTube API or yt-dlp, generating concise summaries, creating Twitter/X thread versions, and producing full blog post articles from video content."
 platforms: [linux, macos, windows]
 ---
 

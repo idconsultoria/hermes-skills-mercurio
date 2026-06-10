@@ -1,6 +1,6 @@
 ---
 name: agy
-description: Google Antigravity CLI (agy) — instalação, autenticação OAuth via tmux, e workflows de design (image generation, prototipagem, subagentes paralelos, HTML reports).
+description: "Google Antigravity CLI (agy) — installation, OAuth auth, and design workflows for HTML reports and prototyping.\n\nLoad this skill for strategic design tasks — visual HTML output, brand presentations, UI mockups, SVGs, and prototypes. Covers agy installation, OAuth authentication via tmux, and design workflows including image generation, prototyping, parallel subagents, and HTML report generation. Part of the three-tier agent hierarchy (agy > Pi best > Pi cost) where agy serves as external specialist consultant."
 category: software-development
 ---
 

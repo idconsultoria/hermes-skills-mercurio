@@ -1,6 +1,6 @@
 ---
 name: llama-cpp
-description: llama.cpp local GGUF inference + HF Hub model discovery.
+description: "Local GGUF inference with llama.cpp and model discovery via Hugging Face Hub.\n\nLoad this skill when running LLMs locally with quantized GGUF models. Covers installing and configuring llama.cpp with Python bindings, downloading GGUF models from Hugging Face Hub, running inference with various sampling parameters, and optimizing for local hardware constraints."
 version: 2.1.2
 author: Orchestra Research
 license: MIT

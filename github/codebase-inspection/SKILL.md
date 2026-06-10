@@ -1,6 +1,6 @@
 ---
 name: codebase-inspection
-description: "Multi-layered codebase diagnostics: structural mapping, dependency audit, git history, metrics, and health reports."
+description: "Multi-layered codebase diagnostics — structural mapping, dependency audit, git history, metrics, and health reports.\n\nLoad this skill for comprehensive repository analysis. Produces multi-layer diagnostics from surface structure through deep architecture using pygount for LOC metrics, git history analysis, and dependency auditing. Outputs structured reports with severity ratings and actionable recommendations for refactoring and health assessment."
 version: 2.0.0
 author: Hermes Agent
 license: MIT

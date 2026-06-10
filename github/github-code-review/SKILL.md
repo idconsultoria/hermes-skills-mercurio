@@ -1,6 +1,6 @@
 ---
 name: github-code-review
-description: "Review PRs: diffs, inline comments via gh or REST."
+description: "Review GitHub pull requests — diffs, inline comments via gh CLI or REST API.\n\nLoad this skill for code review workflows. Covers fetching PR diffs, analyzing changes, adding inline comments on specific lines, approving or requesting changes, and managing the review lifecycle through gh CLI or the GitHub REST API."
 version: 1.1.0
 author: Hermes Agent
 license: MIT

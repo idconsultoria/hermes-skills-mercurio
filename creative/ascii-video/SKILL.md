@@ -1,6 +1,6 @@
 ---
 name: ascii-video
-description: "ASCII video: convert video/audio to colored ASCII MP4/GIF."
+description: "Convert video and audio into colored ASCII art MP4 or GIF animations.\n\nLoad this skill for creating ASCII video effects. Covers converting video files to colored ASCII frame-by-frame animations, processing audio input for audio-reactive visuals, and generating MP4 or GIF output files with customizable character sets and color palettes."
 platforms: [linux, macos, windows]
 ---
 

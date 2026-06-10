@@ -1,6 +1,6 @@
 ---
 name: xurl
-description: "X/Twitter via xurl CLI: post, search, DM, media, v2 API."
+description: "X/Twitter via xurl CLI — post, search, DM, media upload, and v2 API access.\n\nLoad this skill to interact with X/Twitter programmatically through the xurl command-line tool. Covers posting tweets, searching content, sending direct messages, uploading media, and using the Twitter v2 API. Useful for social media automation and content publishing."
 version: 1.1.1
 author: xdevplatform + openclaw + Hermes Agent
 license: MIT

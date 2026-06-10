@@ -1,6 +1,6 @@
 ---
 name: baoyu-infographic
-description: "Infographics: 21 layouts x 21 styles (信息图, 可视化)."
+description: "Create infographics with 21 layout templates and 21 visual styles for data storytelling.\n\nLoad this skill when you need visually compelling infographics for data presentation. Covers choosing from 21 layout templates, applying 21 visual styles, customizing colors and typography, and generating infographic outputs suitable for social media, presentations, or reports."
 version: 1.56.1
 author: 宝玉 (JimLiu)
 license: MIT

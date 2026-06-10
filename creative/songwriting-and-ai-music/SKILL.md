@@ -1,6 +1,6 @@
 ---
 name: songwriting-and-ai-music
-description: "Songwriting craft and Suno AI music prompts."
+description: "Songwriting craft and Suno AI music prompt engineering for AI-generated songs.\n\nLoad this skill when writing original songs or generating music with AI. Covers songwriting structure (verses, choruses, bridges), lyric writing techniques, crafting effective prompts for Suno AI music generation, creating parodies, and refining AI music outputs."
 tags: [songwriting, music, suno, parody, lyrics, creative]
 platforms: [linux, macos, windows]
 triggers:

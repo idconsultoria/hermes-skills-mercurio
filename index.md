@@ -12,9 +12,9 @@
 - **Nome:** `apple/apple-notes`
 - **Arquivo:** `apple/apple-notes/SKILL.md`
 - **Tamanho:** 2,169 chars
-- **Resumo:** Manage Apple Notes via memo CLI: create, search, edit
+- **Resumo:** Manage Apple Notes via the memo CLI — create, search, and edit notes from the terminal.
 
-Manage Apple Notes via memo CLI: create, search, edit.
+Manage Apple Notes via the memo CLI — create, search, and edit notes from the terminal. Load this skill to interact with Apple Notes programmatically on macOS. Covers creating new notes with formatted content, searching through existing notes by keyword, editing note content, and organizing notes into folders.
 
 **Relações:**
 - `similar` → `apple/apple-reminders`
@@ -26,9 +26,9 @@ Manage Apple Notes via memo CLI: create, search, edit.
 - **Nome:** `apple/apple-reminders`
 - **Arquivo:** `apple/apple-reminders/SKILL.md`
 - **Tamanho:** 3,606 chars
-- **Resumo:** Apple Reminders via remindctl: add, list, complete
+- **Resumo:** Apple Reminders via remindctl — add, list, and complete tasks from the command line.
 
-Apple Reminders via remindctl: add, list, complete.
+Apple Reminders via remindctl — add, list, and complete tasks from the command line. Load this skill to manage Apple Reminders programmatically from macOS terminal. Covers adding new reminders with due dates and notes, listing pending and completed reminders, marking tasks as complete, and searching through existing reminders.
 
 **Relações:**
 - `similar` → `apple/apple-notes`
@@ -40,9 +40,9 @@ Apple Reminders via remindctl: add, list, complete.
 - **Nome:** `apple/findmy`
 - **Arquivo:** `apple/findmy/SKILL.md`
 - **Tamanho:** 3,709 chars
-- **Resumo:** Track Apple devices/AirTags via FindMy
+- **Resumo:** Track Apple devices and AirTags via the FindMy app on macOS.
 
-Track Apple devices/AirTags via FindMy.app on macOS.
+Track Apple devices and AirTags via the FindMy app on macOS. Load this skill when you need to locate lost devices, check AirTag positions, or monitor location of Apple devices. Uses the FindMy.app infrastructure on macOS to query device locations and display them on a map.
 
 **Relações:**
 - `similar` → `apple/imessage`
@@ -55,9 +55,9 @@ Track Apple devices/AirTags via FindMy.app on macOS.
 - **Nome:** `apple/imessage`
 - **Arquivo:** `apple/imessage/SKILL.md`
 - **Tamanho:** 2,442 chars
-- **Resumo:** Send and receive iMessages/SMS via the imsg CLI on macOS
+- **Resumo:** Send and receive iMessages and SMS via the imsg CLI on macOS.
 
-Send and receive iMessages/SMS via the imsg CLI on macOS.
+Send and receive iMessages and SMS via the imsg CLI on macOS. Load this skill for Apple iMessage automation from the terminal. Covers sending iMessages to individual contacts and group chats, reading received messages, checking delivery status, and managing conversations through the imsg CLI tool on macOS.
 
 **Relações:**
 - `similar` → `autonomous-ai-agents/messaging-platforms`
@@ -69,9 +69,9 @@ Send and receive iMessages/SMS via the imsg CLI on macOS.
 - **Nome:** `apple/macos-computer-use`
 - **Arquivo:** `apple/macos-computer-use/SKILL.md`
 - **Tamanho:** 7,309 chars
-- **Resumo:** You have a `computer_use` tool that drives the Mac in the **background**
+- **Resumo:** Drive macOS desktop in background — screenshots, mouse, keyboard, scroll, drag — without stealing cursor focus.
 
-Drive macOS desktop in background — screenshots, mouse, keyboard, scroll, drag — without stealing cursor, focus, or Space. Works with any model. Load when computer_use tool is available.
+Drive macOS desktop in background — screenshots, mouse, keyboard, scroll, drag — without stealing cursor focus. Load this skill when the computer_use tool is available and you need to automate macOS GUI interactions. Works with any tool-capable model. Covers background desktop automation (screenshots, mouse clicks and drag, keyboard input, scrolling) without stealing cursor focus or switching Spaces. Includes canonical workflows for app launching, web browsing, and file management.
 
 **Relações:**
 - `uses` → `autonomous-ai-agents/messaging-platforms`
@@ -102,9 +102,9 @@ Delegate tasks to autonomous AI coding agent CLIs via Hermes. One-shot, PR revie
 - **Nome:** `autonomous-ai-agents/hermes-agent`
 - **Arquivo:** `autonomous-ai-agents/hermes-agent/SKILL.md`
 - **Tamanho:** 46,692 chars
-- **Resumo:** Configure, extend, or contribute to Hermes Agent
+- **Resumo:** Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, and multi-agent orchestration.
 
-Configure, extend, or contribute to Hermes Agent.
+Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, and multi-agent orchestration. Load this skill when working with Hermes Agent itself. Covers initial setup and configuration, managing profiles, creating and installing skills, multi-agent spawning patterns, CLI usage, gateway configuration, and contributing to the Hermes codebase.
 
 **Relações:**
 - `parent` → `autonomous-ai-agents/messaging-platforms`
@@ -121,7 +121,7 @@ Configure, extend, or contribute to Hermes Agent.
 - **Nome:** `autonomous-ai-agents/messaging-platforms`
 - **Arquivo:** `autonomous-ai-agents/messaging-platforms/SKILL.md`
 - **Tamanho:** 11,222 chars
-- **Resumo:** Hermes cross-platform message sending — platform-specific quirks, JID/ID format require...
+- **Resumo:** Reference for Hermes cross-platform messaging — platform quirks, ID formats, and bridge workarounds.
 
 Hermes cross-platform messaging: platform quirks, JID/ID formats, bridge workarounds for Telegram, WhatsApp, more.
 
@@ -136,11 +136,11 @@ Hermes cross-platform messaging: platform quirks, JID/ID formats, bridge workaro
 - **Nome:** `autonomous-ai-agents/pi-agent-coordination`
 - **Arquivo:** `autonomous-ai-agents/pi-agent-coordination/SKILL.md`
 - **Tamanho:** 26,843 chars
-- **Resumo:** Invoke Pi Agent locally from Hermes: provider/model hierarchy, session recovery, stall detection, fallback patterns.
+- **Resumo:** Invoke Pi Agent locally from Hermes with provider/model hierarchy, session recovery, and stall detection.
 
 Invoke Pi Agent locally from Hermes: provider/model hierarchy, session recovery, stall detection, fallback patterns.
 
-Comprehensive reference for running Pi Coder Agent (v0.78.1) as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code tasks), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring. Includes GoUsageLimitError handling, pre-launch session reuse checks, and model drift awareness for Pi best.
+Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code tasks), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring. Includes GoUsageLimitError handling and pre-launch session reuse checks.
 
 **Relações:**
 - `uses` → `autonomous-ai-agents/pi-session-audit`
@@ -175,7 +175,7 @@ Multi-agent product pipeline from raw idea to MVP with iterative sprints. Orches
 - **Nome:** `content-production/iaf-newsletter-pipeline`
 - **Arquivo:** `content-production/iaf-newsletter-pipeline/SKILL.md`
 - **Tamanho:** 8,803 chars
-- **Resumo:** Umbrella skill for all newsletter/briefing/digest pipelines — IAF Manhã Aumentada, Dail...
+- **Resumo:** Umbrella skill for newsletter, briefing, and digest pipelines with cron scheduling and multi-source curation.
 
 Umbrella skill for newsletter/briefing/digest pipelines: IAF Manhã Aumentada, Daily AI Digest, editorial curation, cron scheduling. Covers multi-source collection, ranking, HTML→PDF, delivery.
 
@@ -192,7 +192,7 @@ Umbrella skill for newsletter/briefing/digest pipelines: IAF Manhã Aumentada, D
 - **Nome:** `content-production/text-to-speech`
 - **Arquivo:** `content-production/text-to-speech/SKILL.md`
 - **Tamanho:** 7,413 chars
-- **Resumo:** Umbrella skill
+- **Resumo:** Umbrella skill for TTS covering voice design, multi-provider fallback, and full lifecycle from persona to audio.
 
 Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback, self-hosted Fish Speech, and Hermes TTS provider. Full lifecycle from persona to audio.
 
@@ -211,9 +211,9 @@ Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback,
 - **Nome:** `creative/architecture-diagram`
 - **Arquivo:** `creative/architecture-diagram/SKILL.md`
 - **Tamanho:** 5,830 chars
-- **Resumo:** Dark-themed SVG architecture/cloud/infra diagrams as HTML
+- **Resumo:** Dark-themed SVG architecture, cloud, and infrastructure diagrams as standalone HTML.
 
-Dark-themed SVG architecture/cloud/infra diagrams as HTML.
+Dark-themed SVG architecture, cloud, and infrastructure diagrams as standalone HTML. Load this skill when you need to create architecture diagrams for presentations or documentation. Covers drawing cloud infrastructure topologies, system architecture diagrams, network flows, and component relationships using SVG rendered as dark-themed HTML pages.
 
 **Relações:**
 - `similar` → `creative/excalidraw`
@@ -227,7 +227,7 @@ Dark-themed SVG architecture/cloud/infra diagrams as HTML.
 - **Nome:** `creative/ascii-art`
 - **Arquivo:** `creative/ascii-art/SKILL.md`
 - **Tamanho:** 10,556 chars
-- **Resumo:** ASCII art: pyfiglet, cowsay, boxes, image-to-ascii
+- **Resumo:** ASCII art generation — pyfiglet, cowsay, boxes, and image-to-ascii conversion.
 
 ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.
 
@@ -242,7 +242,7 @@ ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.
 - **Nome:** `creative/ascii-video`
 - **Arquivo:** `creative/ascii-video/SKILL.md`
 - **Tamanho:** 14,864 chars
-- **Resumo:** ASCII video: convert video/audio to colored ASCII MP4/GIF
+- **Resumo:** Convert video and audio into colored ASCII art MP4 or GIF animations.
 
 ASCII video: convert video/audio to colored ASCII MP4/GIF.
 
@@ -258,7 +258,7 @@ ASCII video: convert video/audio to colored ASCII MP4/GIF.
 - **Nome:** `creative/baoyu-infographic`
 - **Arquivo:** `creative/baoyu-infographic/SKILL.md`
 - **Tamanho:** 10,434 chars
-- **Resumo:** Infographics: 21 layouts x 21 styles (信息图, 可视化)
+- **Resumo:** Create infographics with 21 layout templates and 21 visual styles for data storytelling.
 
 Infographics: 21 layouts x 21 styles (信息图, 可视化).
 
@@ -324,11 +324,11 @@ Generate images, video, and audio with ComfyUI. Install, manage nodes/models, ru
 - **Nome:** `creative/copywriting`
 - **Arquivo:** `creative/copywriting/SKILL.md`
 - **Tamanho:** 7,429 chars
-- **Resumo:** Expert conversion copywriting — write, rewrite, or improve marketing copy for any page
+- **Resumo:** Expert conversion copywriting to write, rewrite, or improve marketing copy.
 
 Expert conversion copywriting: write, rewrite, or improve marketing copy — headlines, CTAs, value props, page sections.
 
-Load this skill when the user needs marketing copy — landing pages, homepage sections, pricing copy, CTAs, taglines, or value propositions. Provides a complete framework for gathering context, applying copywriting principles (clarity over cleverness, benefits over features, specificity over vagueness), and producing organized output with annotations and alternatives. Covers page structure frameworks, voice and tone guidance, CTA copy guidelines, and page-specific strategies for homepages, landing pages, pricing pages, feature pages, and about pages. For thorough line-by-line editing after drafting, pair with the copy-editing skill.
+Load this skill when the user needs marketing copy — landing pages, homepage sections, pricing copy, CTAs, taglines, or value propositions. Provides a complete framework for gathering context, applying copywriting principles (clarity over cleverness, benefits over features, specificity over vagueness), and producing organized output with annotations and alternatives. Covers page structure frameworks, voice and tone guidance, CTA copy guidelines, and page-specific strategies for homepages, landing pages, pricing pages, feature pages, and about pages. Pair with the humanizer skill for thorough line-by-line editing after drafting.
 
 **Relações:**
 - `similar` → `creative/humanizer`
@@ -342,7 +342,7 @@ Load this skill when the user needs marketing copy — landing pages, homepage s
 - **Nome:** `creative/excalidraw`
 - **Arquivo:** `creative/excalidraw/SKILL.md`
 - **Tamanho:** 7,300 chars
-- **Resumo:** Hand-drawn Excalidraw JSON diagrams (arch, flow, seq)
+- **Resumo:** Hand-drawn Excalidraw JSON diagrams — architecture, flowcharts, and sequence diagrams.
 
 Hand-drawn Excalidraw JSON diagrams (arch, flow, seq).
 
@@ -359,7 +359,7 @@ Hand-drawn Excalidraw JSON diagrams (arch, flow, seq).
 - **Nome:** `creative/humanizer`
 - **Arquivo:** `creative/humanizer/SKILL.md`
 - **Tamanho:** 30,025 chars
-- **Resumo:** Humanize text: strip AI-isms and add real voice
+- **Resumo:** Humanize text by stripping AI-isms and adding authentic voice and personality.
 
 Humanize text: strip AI-isms and add real voice.
 
@@ -375,7 +375,7 @@ Humanize text: strip AI-isms and add real voice.
 - **Nome:** `creative/manim-video`
 - **Arquivo:** `creative/manim-video/SKILL.md`
 - **Tamanho:** 12,023 chars
-- **Resumo:** Manim CE animations: 3Blue1Brown math/algo videos
+- **Resumo:** Manim CE animations — 3Blue1Brown-style math and algorithm explainer videos.
 
 Manim CE animations: 3Blue1Brown math/algo videos.
 
@@ -391,7 +391,7 @@ Manim CE animations: 3Blue1Brown math/algo videos.
 - **Nome:** `creative/p5js`
 - **Arquivo:** `creative/p5js/SKILL.md`
 - **Tamanho:** 27,494 chars
-- **Resumo:** p5
+- **Resumo:** p5.js sketches — generative art, shaders, interactive animations, and 3D graphics.
 
 p5.js sketches: gen art, shaders, interactive, 3D.
 
@@ -409,7 +409,7 @@ p5.js sketches: gen art, shaders, interactive, 3D.
 - **Nome:** `creative/popular-web-designs`
 - **Arquivo:** `creative/popular-web-designs/SKILL.md`
 - **Tamanho:** 9,722 chars
-- **Resumo:** 54 real design systems (Stripe, Linear, Vercel) as HTML/CSS
+- **Resumo:** 54 real-world design systems from Stripe, Linear, Vercel and more — rendered as HTML and CSS.
 
 54 real design systems (Stripe, Linear, Vercel) as HTML/CSS.
 
@@ -424,7 +424,7 @@ p5.js sketches: gen art, shaders, interactive, 3D.
 - **Nome:** `creative/pretext`
 - **Arquivo:** `creative/pretext/SKILL.md`
 - **Tamanho:** 14,168 chars
-- **Resumo:** Use when building creative browser demos with @chenglou/pretext — DOM-free text layout ...
+- **Resumo:** Creative browser demos with @chenglou/pretext for DOM-free text layout, ASCII art, and kinetic typography.
 
 Creative browser demos with @chenglou/pretext: DOM-free text layout for ASCII art, kinetic typography, text-as-geometry games, and generative art. Single-file HTML output.
 
@@ -442,7 +442,7 @@ Creative browser demos with @chenglou/pretext: DOM-free text layout for ASCII ar
 - **Nome:** `creative/songwriting-and-ai-music`
 - **Arquivo:** `creative/songwriting-and-ai-music/SKILL.md`
 - **Tamanho:** 10,206 chars
-- **Resumo:** Songwriting craft and Suno AI music prompts
+- **Resumo:** Songwriting craft and Suno AI music prompt engineering for AI-generated songs.
 
 Songwriting craft and Suno AI music prompts.
 
@@ -475,7 +475,7 @@ Catálogo e consulta de guias de estilo: Hermes Agent (padrão), ID Consultoria,
 - **Nome:** `data-science/jupyter-live-kernel`
 - **Arquivo:** `data-science/jupyter-live-kernel/SKILL.md`
 - **Tamanho:** 5,285 chars
-- **Resumo:** Iterative Python via live Jupyter kernel (hamelnb)
+- **Resumo:** Iterative Python development via live Jupyter kernel using hamelnb.
 
 Iterative Python via live Jupyter kernel (hamelnb).
 
@@ -489,7 +489,7 @@ Iterative Python via live Jupyter kernel (hamelnb).
 - **Nome:** `email/himalaya`
 - **Arquivo:** `email/himalaya/SKILL.md`
 - **Tamanho:** 7,164 chars
-- **Resumo:** Himalaya CLI: IMAP/SMTP email from terminal
+- **Resumo:** Himalaya CLI — IMAP/SMTP email management directly from the terminal.
 
 Himalaya CLI: IMAP/SMTP email from terminal.
 
@@ -503,7 +503,7 @@ Himalaya CLI: IMAP/SMTP email from terminal.
 - **Nome:** `github/codebase-inspection`
 - **Arquivo:** `github/codebase-inspection/SKILL.md`
 - **Tamanho:** 9,747 chars
-- **Resumo:** Multi-layered codebase diagnostics: structural mapping, module analysis, dependency aud...
+- **Resumo:** Multi-layered codebase diagnostics — structural mapping, dependency audit, git history, metrics, and health reports.
 
 Multi-layered codebase diagnostics: structural mapping, dependency audit, git history, metrics, and health reports.
 
@@ -517,7 +517,7 @@ Multi-layered codebase diagnostics: structural mapping, dependency audit, git hi
 - **Nome:** `github/github-auth`
 - **Arquivo:** `github/github-auth/SKILL.md`
 - **Tamanho:** 10,190 chars
-- **Resumo:** GitHub auth setup: HTTPS tokens, SSH keys, gh CLI login
+- **Resumo:** GitHub authentication setup — HTTPS tokens, SSH keys, and gh CLI login.
 
 GitHub auth setup: HTTPS tokens, SSH keys, gh CLI login.
 
@@ -533,7 +533,7 @@ GitHub auth setup: HTTPS tokens, SSH keys, gh CLI login.
 - **Nome:** `github/github-code-review`
 - **Arquivo:** `github/github-code-review/SKILL.md`
 - **Tamanho:** 13,565 chars
-- **Resumo:** Review PRs: diffs, inline comments via gh or REST
+- **Resumo:** Review GitHub pull requests — diffs, inline comments via gh CLI or REST API.
 
 Review PRs: diffs, inline comments via gh or REST.
 
@@ -547,7 +547,7 @@ Review PRs: diffs, inline comments via gh or REST.
 - **Nome:** `github/github-issues`
 - **Arquivo:** `github/github-issues/SKILL.md`
 - **Tamanho:** 9,265 chars
-- **Resumo:** Create, triage, label, assign GitHub issues via gh or REST
+- **Resumo:** Create, triage, label, and assign GitHub issues via gh CLI or REST API.
 
 Create, triage, label, assign GitHub issues via gh or REST.
 
@@ -561,7 +561,7 @@ Create, triage, label, assign GitHub issues via gh or REST.
 - **Nome:** `github/github-pr-workflow`
 - **Arquivo:** `github/github-pr-workflow/SKILL.md`
 - **Tamanho:** 26,249 chars
-- **Resumo:** GitHub PR lifecycle: branch, commit, open, CI, merge
+- **Resumo:** GitHub PR lifecycle — branch, commit, open PR, CI checks, and merge.
 
 GitHub PR lifecycle: branch, commit, open, CI, merge.
 
@@ -577,7 +577,7 @@ GitHub PR lifecycle: branch, commit, open, CI, merge.
 - **Nome:** `github/github-repo-management`
 - **Arquivo:** `github/github-repo-management/SKILL.md`
 - **Tamanho:** 16,758 chars
-- **Resumo:** Clone/create/fork repos; manage remotes, releases
+- **Resumo:** Clone, create, and fork repos — manage remotes, releases, and repository settings.
 
 Clone/create/fork repos; manage remotes, releases.
 
@@ -609,7 +609,7 @@ Self-host TTS models (OmniVoice, Qwen3-TTS, Fish Speech) on Oracle ARM64 with Do
 - **Nome:** `infrastructure/deployment-pipeline`
 - **Arquivo:** `infrastructure/deployment-pipeline/SKILL.md`
 - **Tamanho:** 45,584 chars
-- **Resumo:** CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr
+- **Resumo:** CI/CD pipeline for Docker-based apps — GitHub Actions, ghcr.io registry, and SSH deploy to bare metal.
 
 CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr.io → SSH deploy to bare metal. Covers workflow design, registry auth, tag strategy, deploy key setup, migration management, and common pitfalls.
 
@@ -665,7 +665,7 @@ node --version          # needs 22+ ffmpeg -version         # needs ffmpeg npx h
 - **Nome:** `media/youtube-content`
 - **Arquivo:** `media/youtube-content/SKILL.md`
 - **Tamanho:** 3,218 chars
-- **Resumo:** YouTube transcripts to summaries, threads, blogs
+- **Resumo:** Convert YouTube transcripts into summaries, Twitter threads, and blog posts.
 
 YouTube transcripts to summaries, threads, blogs.
 
@@ -681,11 +681,11 @@ YouTube transcripts to summaries, threads, blogs.
 - **Nome:** `messaging-platforms/whatsapp-bridge-baileys`
 - **Arquivo:** `messaging-platforms/whatsapp-bridge-baileys/SKILL.md`
 - **Tamanho:** 5,281 chars
-- **Resumo:** Send messages, discover group IDs, and manage media via local WhatsApp Baileys bridge.
+- **Resumo:** Send messages, discover group IDs, and manage media via a local WhatsApp Baileys bridge.
 
 Send messages, discover group IDs, and manage media via local WhatsApp Baileys bridge.
 
-Local Node.js HTTP bridge on port 3000 for WhatsApp operations via @whiskeysockets/baileys. Covers sending text and media messages, editing sent messages, discovering group IDs from sender-key files, self-chat mode behavior, and common pitfalls including silent delivery failures and emoji issues. Always verify group names before sending — wrong group ID is the most common error.
+Load this skill when you need to interact with WhatsApp programmatically. Covers the local Node.js HTTP bridge on port 3000 using @whiskeysockets/baileys — sending text and media messages, editing sent messages, discovering group IDs from sender-key files, self-chat mode behavior, and common pitfalls including silent delivery failures and emoji issues. Always verify group names before sending to avoid wrong-group-ID errors.
 
 **Relações:**
 - `similar` → `autonomous-ai-agents/messaging-platforms`
@@ -697,7 +697,7 @@ Local Node.js HTTP bridge on port 3000 for WhatsApp operations via @whiskeysocke
 - **Nome:** `mlops/evaluation/lm-evaluation-harness`
 - **Arquivo:** `mlops/evaluation/lm-evaluation-harness/SKILL.md`
 - **Tamanho:** 12,020 chars
-- **Resumo:** lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc
+- **Resumo:** Benchmark LLMs using lm-eval-harness — MMLU, GSM8K, and other standard evaluations.
 
 lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.).
 
@@ -767,9 +767,9 @@ vLLM: high-throughput LLM serving, OpenAI API, quantization.
 - **Nome:** `autonomous-ai-agents/pi-session-audit`
 - **Arquivo:** `autonomous-ai-agents/pi-session-audit/SKILL.md`
 - **Tamanho:** 13,878 chars
-- **Resumo:** ~/
+- **Resumo:** Audita sessões do Pi Agent extraindo duração, tokens, custo e modelo dos arquivos .jsonl.
 
-~/.pi/agent/sessions/--<path-normalizado>--/<timestamp>_<uuid>.jsonl Onde `<path-normalizado>` é o diretório de trabalho com `/` substituído por `-`. Ex: `--opt-data-code-workstation-taskflow--`
+Audita sessões do Pi Agent extraindo duração, tokens, custo e modelo dos arquivos .jsonl. Load this skill to analyze Pi Agent session logs and calculate costs per provider. Extracts real usage metrics from session JSONL files, computes costs based on model pricing, and produces audit reports for tracking agent usage and spending.
 
 **Relações:**
 - `used_by` → `autonomous-ai-agents/pi-agent-coordination`

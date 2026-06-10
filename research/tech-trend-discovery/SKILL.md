@@ -1,6 +1,6 @@
 ---
 name: tech-trend-discovery
-description: Discover what the tech/AI community is discussing right now — trending topics, hot discussions, and breaking conversations. Covers Reddit alternatives and HN Algolia API as primary sources when traditional search tools fail.
+description: "Discover what the tech and AI community is discussing right now — trending topics and breaking conversations.\n\nLoad this skill when the user wants to check trending discussions in tech/AI, browse subreddits or Hacker News, or find hot topics without traditional web search. Covers Reddit alternatives and HN Algolia API as primary sources when direct access is blocked or traditional search tools return empty results."
 trigger:
   - User asks "what's trending in AI/tech"
   - User wants to check subreddits, HN, or community discussions

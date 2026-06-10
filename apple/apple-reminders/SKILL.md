@@ -1,6 +1,6 @@
 ---
 name: apple-reminders
-description: "Apple Reminders via remindctl: add, list, complete."
+description: "Apple Reminders via remindctl — add, list, and complete tasks from the command line.\n\nLoad this skill to manage Apple Reminders programmatically from macOS terminal. Covers adding new reminders with due dates and notes, listing pending and completed reminders, marking tasks as complete, and searching through existing reminders."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

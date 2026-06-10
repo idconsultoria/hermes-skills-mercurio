@@ -1,6 +1,6 @@
 ---
 name: excalidraw
-description: "Hand-drawn Excalidraw JSON diagrams (arch, flow, seq)."
+description: "Hand-drawn Excalidraw JSON diagrams — architecture, flowcharts, and sequence diagrams.\n\nLoad this skill when you need hand-drawn style diagrams. Covers creating architecture diagrams, flowcharts, sequence diagrams, and wireframes using the Excalidraw format. Produces JSON files that render in the Excalidraw editor with a hand-drawn aesthetic."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

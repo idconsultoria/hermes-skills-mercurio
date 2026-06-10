@@ -1,6 +1,6 @@
 ---
 name: messaging-platforms
-description: Hermes cross-platform messaging: platform quirks, JID/ID formats, bridge workarounds for Telegram, WhatsApp, more.
+description: "Reference for Hermes cross-platform messaging — platform quirks, ID formats, and bridge workarounds.\n\nLoad this skill when troubleshooting message delivery across platforms. Covers Telegram MEDIA file delivery rules, WhatsApp JID/group ID formats, bridge processes for WhatsApp and Telegram, known file-type limitations, and platform-specific workarounds for reliable cross-platform messaging."
 metadata:
   hermes:
     tags: [messaging, platforms, telegram, whatsapp, signal, matrix, discord, slack, bridge]

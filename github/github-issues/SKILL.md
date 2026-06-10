@@ -1,6 +1,6 @@
 ---
 name: github-issues
-description: "Create, triage, label, assign GitHub issues via gh or REST."
+description: "Create, triage, label, and assign GitHub issues via gh CLI or REST API.\n\nLoad this skill for GitHub issue management. Covers creating new issues with labels and assignees, triaging incoming issues, organizing with labels and milestones, searching and filtering issues, and updating issue status through gh CLI or the GitHub REST API."
 version: 1.1.0
 author: Hermes Agent
 license: MIT

@@ -1,6 +1,6 @@
 ---
 name: powerpoint
-description: "Create, read, edit .pptx decks, slides, notes, templates."
+description: "Create, read, and edit PowerPoint .pptx decks — slides, notes, and templates.\n\nLoad this skill when you need to work with PowerPoint files programmatically. Covers creating new presentations from templates, adding and editing slides, modifying speaker notes, updating text content, and handling slide layouts and masters."
 license: Proprietary. LICENSE.txt has complete terms
 platforms: [linux, macos, windows]
 metadata:

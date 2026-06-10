@@ -1,6 +1,6 @@
 ---
 name: himalaya
-description: "Himalaya CLI: IMAP/SMTP email from terminal."
+description: "Himalaya CLI — IMAP/SMTP email management directly from the terminal.\n\nLoad this skill to send, receive, and manage email via the Himalaya command-line tool. Covers IMAP and SMTP configuration, listing and reading messages, sending replies, managing folders, and handling attachments without a GUI email client."
 version: 1.1.0
 author: community
 license: MIT

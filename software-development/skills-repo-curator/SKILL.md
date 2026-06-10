@@ -1,12 +1,12 @@
 ---
 name: skills-repo-curator
-description: Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidação MECE, index.md/log.md/reports, offload de memória, e manutenção de AGENTS.md. Executa o processo completo de análise, merge, delete, relatório e commit.
+description: "Gerencia o repositório Git de skills do Hermes com ciclo evolve de consolidação MECE.\n\nLoad this skill when the skills repo needs maintenance — evolve cycles (analysis, merge, delete, report, commit), index.md/log.md/reports updates, memory offload, orphan review, and AGENTS.md upkeep. Executes the full consolidation lifecycle: analyze portfolio, propose merges, delete redundant skills, review orphans, write reports, offload learned facts to skills, and commit changes."
 ---
 
 # Skills Repository Curator
 
 > Gerencia o skills repo em `/opt/data/skills/` com controle de versão Git.
-> Ciclo principal: `evolve` — análise → plano → execução → report → offload → commit.
+> Ciclo principal: `evolve` — análise → plano → execução → orphan review → report → offload → commit.
 
 ## Trigger
 - User diz "gerencie suas skills", "limpe as skills", "rode evolve", "consolide skills"
@@ -52,7 +52,9 @@ Quando múltiplos subagentes precisam modificar o index.md (ex: adicionar relaç
 
 Isso garante atomicidade e evita corrupção do arquivo por escrita concorrente.
 
-## Ciclo Evolve (12 passos)
+## Ciclo Evolve (14 passos)
+
+**⚠️ Batch-Report-Then-Apply:** Quando múltiplos subagentes precisam modificar o index.md (ex: adicionar relações para dezenas de skills), **NUNCA** mande todos escreverem no index.md diretamente — eles vão conflitar. Cada subagente produz um **relatório de saída** (ex: `relations-batch1.md`) com as modificações a fazer. Um único agente principal então lê os relatórios e aplica **todos os patches sequencialmente** no index.md. Isso garante atomicidade e evita corrupção do arquivo por escrita concorrente.
 
 ### 1. Lista mudanças desde último ciclo
 ```bash
@@ -106,13 +108,21 @@ Para cada operação:
 - **Auditoria de descrições:** Verificar se cada skill afetada tem frontmatter `description` adequado — resumo de 1 linha (~80 chars) seguido de parágrafo descritivo completo. Skills com descrições ausentes, truncadas ou genéricas demais devem ser corrigidas para alimentar bem o index.md. Skills consolidadas (merges) têm prioridade.
 - **Limpeza de disco:** `rm -rf` dos diretórios órfãos (referências, templates, scripts das skills deletadas)
 
-### 8. Offload — limpa memória de fatos procedurais
-Regra: **memória** = preferências do usuário + fatos estáveis do ambiente. **Skills** = procedimentos.
-Remover da memória persistente entradas que já estão documentadas em skills — configurações de ferramentas, versões, paths de instalação, schedules de cron, detalhes de API.
-Manter: preferências de estilo, IDs de grupos/contas, regras de permissão, convenções de projeto.
-Isso NÃO inclui limpeza de conteúdo de skills — aprendizado excessivamente específico é removido no passo 7 (execução do plano), não no offload.
+**⚠️ PII em skills — auditar no passo 7.**
 
-### 9. Escreve relatório denso pós-evolução
+### 8. Revisa skills órfãs
+Skills sem relações no grafo. Para cada uma:
+- Tenta encontrar conexão semântica com outras skills (lendo ambos os SKILL.md — profundidade 1). Se encontrar, adiciona relação bilateral no frontmatter e no index.md.
+- Se não encontrar conexão, avalia se a skill é importante o suficiente para existir isolada. Skills genuinamente de nicho (API de terceiros, CLI específico, data source exótico) podem ficar órfãs com justificativa.
+- Se a skill não tem conexão E não é claramente importante, considera merge com skill genérica ou delete.
+- **Target:** 0 órfãos. Toda skill deve ter pelo menos uma relação.
+
+**⚠️ Formato `|-` quebra o grafo.** O script `generate_graph.py` usa regex `r"- \`(\w+)\` → \`(.+)\`"` para parsear relações. Se uma relação começar com `|- ` (pipe-dash) em vez de `- ` (só dash), o regex não captura. Verificar antes de gerar o grafo: `grep "|- \`" index.md`. Se existir, corrigir com `patch(replace_all=True, old_string='|- \`', new_string='- \`')`.
+
+### 9. Offload — limpa memória de fatos procedurais
+Regra: **memória** = preferências do usuário + fatos estáveis do ambiente. **Skills** = procedimentos. Remover da memória persistente entradas que já estão documentadas em skills — configurações de ferramentas, versões, paths de instalação, schedules de cron, detalhes de API. Manter: preferências de estilo, IDs de grupos/contas, regras de permissão, convenções de projeto.
+
+### 10. Escreve relatório denso pós-evolução
 Arquivo: `reports/evolve-<YYYY-MM-DD>-report.md`
 Conteúdo:
 - Estado inicial vs final (skills, memória, chars)
@@ -122,16 +132,16 @@ Conteúdo:
 - Resultado do offload (o que saiu, o que ficou)
 - Git diff summary
 
-### 10. Atualiza index.md pós-transformação
+### 11. Atualiza index.md pós-transformação
 Regenera o catálogo completo com as skills pós-merge/delete.
 
-### 11. Registra no log.md com prefixo `evolve`
+### 12. Registra no log.md com prefixo `evolve`
 Entrada de 1 linha detalhando o que foi feito:
 ```
 ## [YYYY-MM-DD] evolve | <resumo: skills N→M, merges, deletes, offload>
 ```
 
-### 12. Gera grafo HTML interativo
+### 13. Gera grafo HTML interativo
 Ao final de cada ciclo evolve, gerar o grafo D3.js para visualização das relações:
 
 ```bash
@@ -148,7 +158,7 @@ Features do grafo:
 - Filtro por texto, zoom/pan, drag, mobile-responsive, resize handler
 - Deduplicação de arestas bidirecionais (parent/child, uses/used_by)
 
-### 13. Stage + commit final
+### 14. Stage + commit final
 ```bash
 cd /opt/data/skills
 git add -A
@@ -228,10 +238,10 @@ Features: nodes por categoria, arestas tracejadas (similar) e sólidas (uses), m
 
 ⚠️ **Descrições de skills são auditadas no passo 7**, não depois. Skills consolidadas (merges) têm prioridade na auditoria de description. Skills não modificadas podem ser corrigidas em lote se tiverem descrições pobres.
 
+⚠️ **Formato `|-` quebra o grafo.** O script `generate_graph.py` espera `- \`type\` → \`path\`` — se um subagente escrever `|- \`type\` → \`path\`` (pipe-dash), a aresta não é capturada. Verificar SEMPRE antes de gerar o grafo: `grep "|- \`" index.md`. Se existir, corrigir com `patch(replace_all=True, old_string='|- \`', new_string='- \`')`.
+
 ⚠️ **Não parar no primeiro merge óbvio.** Quando um merge parece evidente (ex: 3 coding agents com mesmo padrão de orquestração), o agente tende a declarar vitória e parar. Isso é erro — o ciclo evolve deve analisar **todas as skills**. O usuário explicitamente pediu "skill a skill" e detectou o shortcut. Mesmo que o merge seja válido, a análise completa continua sendo necessária.
 
-⚠️ **Fabricação em compaction — verificar SEMPRE.** O resumo de contexto entre sessões pode reportar trabalho como concluído quando não foi. Nunca confiar cegamente: após qualquer operação de evolve, verificar o estado real do disco (`git log --oneline -3`, `ls` nos diretórios esperados, `grep` nos arquivos modificados) antes de declarar "já feito". Se o usuário disser que não recebeu arquivos, acredite nele — o compaction pode ter fabricado a entrega.
+- **Limpeza de disco:** `rm -rf` dos diretórios órfãos (referências, templates, scripts das skills deletadas)
 
-⚠️ **PII em skills — auditar no passo 7.** Durante a auditoria de descrições e limpeza de detalhes efêmeros, verificar também: números de telefone reais, usernames (ex: `gustavomello9600`), JIDs/LIDs de WhatsApp, IPs públicos, nomes de grupos reais ("IA que Funciona"), e marcas/empresas do usuário ("ID Consultoria"). Skills são artefatos compartilháveis — dados pessoais devem ser substituídos por `[REDACTED]` ou placeholders genéricos.
-
-
+**⚠️ PII em skills — auditar no passo 7.** Durante a auditoria de descrições e limpeza de detalhes efêmeros, verificar também: números de telefone reais, usernames (ex: `gustavomello9600`), JIDs/LIDs de WhatsApp, IPs públicos, nomes de grupos reais ("IA que Funciona"), e marcas/empresas do usuário ("ID Consultoria"). Skills são artefatos compartilháveis — dados pessoais devem ser substituídos por `[REDACTED]` ou placeholders genéricos.

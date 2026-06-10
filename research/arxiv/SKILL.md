@@ -1,6 +1,6 @@
 ---
 name: arxiv
-description: "Search arXiv papers by keyword, author, category, or ID."
+description: "Search arXiv papers by keyword, author, category, or paper ID.\n\nLoad this skill when you need to find academic papers on arXiv. Covers searching by keyword, author name, subject category, or specific paper ID, fetching paper metadata and abstracts, and retrieving download links for PDF sources."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

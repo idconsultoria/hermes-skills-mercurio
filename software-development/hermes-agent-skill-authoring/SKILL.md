@@ -1,6 +1,6 @@
 ---
 name: hermes-agent-skill-authoring
-description: "Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structure. Merged with design-md skill."
+description: "Author in-repo SKILL.md and DESIGN.md token specs — frontmatter, validator, structure.\n\nLoad this skill when creating or editing skills that ship with the Hermes Agent repository. Covers SKILL.md frontmatter requirements, DESIGN.md token specifications, frontmatter validation, directory structure conventions, and workflow for committing in-repo skills. Does NOT cover user-local skills (use skill_manage for those)."
 version: 1.0.0
 author: Hermes Agent
 license: MIT
@@ -54,6 +54,41 @@ metadata:
 ```
 
 `version` / `author` / `license` / `metadata` are NOT enforced by the validator, but every peer has them — omit and your skill sticks out.
+
+## Shape da Biblioteca — Class-Level Skills
+
+A biblioteca de skills deve tender a **skills de classe** (nível de conceito/domínio), não **skills de instância** (uma sessão, um bug, um PR). Cada skill deve cobrir uma classe de tarefa reutilizável, não o artefato de uma única execução.
+
+**✅ Nomes corretos (classe):** `deployment-pipeline`, `systematic-debugging`, `text-to-speech`, `github-pr-workflow`, `brand-studio-forge`
+
+**❌ Nomes errados (instância):** `fix-auth-bug-42`, `audit-pi-sprint1`, `debug-firecrawl-issue`, `deploy-taskflow-preview` — são artefatos de sessão, não skills.
+
+**Target shape para cada skill:**
+- SKILL.md rico, com descrição, triggers, corpo acionável, pitfalls, seções bem definidas
+- `references/` para detalhe específico de sessão — benchmarks, debugging transcripts, errata de provider, dados de pesquisa condensados
+- `templates/` para boilerplate (starter configs, scaffolding)
+- `scripts/` para validadores determinísticos, fixtures, probes reexecutáveis
+
+### O que NÃO capturar em skills
+
+Alguns sinais parecem relevantes mas são armadilhas persistentes:
+
+- **Falhas de ambiente:** binário não encontrado, erro de fresh install, path mismatch pós-migração, `command not found`, credencial não configurada. O usuário corrige na hora — não é regra durável.
+- **Alegações negativas sobre ferramentas** ("browser tools não funcionam", "X está quebrado", "execute_code não suporta Y"). Viram restrições que o agente cita contra si mesmo meses após o bug real ter sido corrigido.
+- **Erros transientes que resolveram na mesma sessão.** Se retentar funcionou, a lição é o padrão de retry, não o erro original.
+- **Narrativas de tarefa única.** "Resuma o mercado de hoje" ou "analise este PR" não é classe de trabalho que mereça skill.
+
+### Onde capturar cada tipo de informação
+
+| Tipo | Destino | Exemplo |
+|------|---------|---------|
+| Preferência de estilo/forma | Corpo do SKILL.md | "Usuário prefere respostas em pt-BR, tabelas sem pipe" |
+| Preferência de workflow | Pitfall no SKILL.md | "NUNCA pular para terminal quando tool falha" |
+| Erro transiente resolvido | Nada | Rolou, passou — não registrar |
+| Fix de setup | SKILL.md de troubleshoot | "Instalar com `apt install X` antes de rodar Y" |
+| Benchmark/Dados de sessão | `references/` | Tabelas de RTF, outputs de auditoria |
+| Boilerplate reutilizável | `templates/` | Dockerfile starter, config padrão |
+| Comando determinístico | `scripts/` | Validador de grafo, gerador de relatório |
 
 ## Size Limits
 

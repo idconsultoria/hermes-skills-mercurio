@@ -1,6 +1,6 @@
 ---
 name: architecture-diagram
-description: "Dark-themed SVG architecture/cloud/infra diagrams as HTML."
+description: "Dark-themed SVG architecture, cloud, and infrastructure diagrams as standalone HTML.\n\nLoad this skill when you need to create architecture diagrams for presentations or documentation. Covers drawing cloud infrastructure topologies, system architecture diagrams, network flows, and component relationships using SVG rendered as dark-themed HTML pages."
 version: 1.0.0
 author: Cocoon AI (hello@cocoon-ai.com), ported by Hermes Agent
 license: MIT

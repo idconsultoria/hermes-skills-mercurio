@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: "4-phase root cause debugging — methodology + Python (pdb/debugpy) + Node.js (--inspect). Understand bugs before fixing."
+description: "4-phase root cause debugging methodology with Python (pdb/debugpy) and Node.js (--inspect) tooling.\n\nLoad this skill when you need to systematically find root causes before fixing bugs. Covers the four-phase debugging methodology — reproduce, isolate, identify root cause, verify fix — with language-specific tooling for Python (pdb, debugpy) and Node.js (--inspect, Chrome DevTools). Includes concrete debugging patterns and emphasizes understanding bugs before attempting fixes."
 version: 1.1.0
 author: Hermes Agent (adapted from obra/superpowers)
 license: MIT

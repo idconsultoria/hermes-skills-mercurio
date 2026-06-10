@@ -1,6 +1,6 @@
 ---
 name: huggingface-hub
-description: "HuggingFace hf CLI: search/download/upload models, datasets."
+description: "Hugging Face Hub via hf CLI — search, download, and upload models and datasets.\n\nLoad this skill to interact with the Hugging Face Hub programmatically. Covers searching for models and datasets, downloading model weights and tokenizers, uploading custom models and datasets, managing repositories, and using the hf CLI for hub operations."
 version: 1.0.0
 author: Hugging Face
 license: MIT

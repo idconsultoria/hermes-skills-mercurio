@@ -1,8 +1,6 @@
 ---
 name: taskflow-mcp
-description: >-
-  Interact with the TaskFlow MCP server via Hermes Agent — SSE transport setup, full tool catalog,
-  2-step confirmation flow, context UUID requirements, NLP quick-add workflows, GTD pipeline.
+description: "Interact with the TaskFlow MCP server via Hermes Agent for GTD task management with SSE transport and 2-step confirmation.\n\nLoad this skill when managing tasks through the TaskFlow MCP system. Covers SSE transport setup, full tool catalog (list/get/create/update/delete tasks and next actions), 2-step confirmation flow for writes, context UUID requirements, NLP quick-add workflows, and GTD pipeline integration."
 related_skills: [notion, apple-reminders]
 ---
 

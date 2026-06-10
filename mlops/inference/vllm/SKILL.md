@@ -1,6 +1,6 @@
 ---
 name: serving-llms-vllm
-description: "vLLM: high-throughput LLM serving, OpenAI API, quantization."
+description: "Serve LLMs with vLLM — high-throughput inference, OpenAI-compatible API, and quantization support.\n\nLoad this skill when deploying LLMs for production serving. Covers vLLM installation and configuration, serving models with OpenAI-compatible API endpoints, quantization for memory efficiency, batch inference for throughput, and monitoring serving performance."
 version: 1.0.0
 author: Orchestra Research
 license: MIT

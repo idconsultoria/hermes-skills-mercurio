@@ -1,6 +1,6 @@
 ---
 name: evaluating-llms-harness
-description: "lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.)."
+description: "Benchmark LLMs using lm-eval-harness — MMLU, GSM8K, and other standard evaluations.\n\nLoad this skill for standardized LLM evaluation. Covers installing and configuring lm-eval-harness, running benchmarks (MMLU, GSM8K, HellaSwag, ARC, etc.), comparing model performance across tasks, and generating evaluation reports with structured results."
 version: 1.0.0
 author: Orchestra Research
 license: MIT

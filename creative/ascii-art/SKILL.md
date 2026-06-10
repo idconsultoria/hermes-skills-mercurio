@@ -1,6 +1,6 @@
 ---
 name: ascii-art
-description: "ASCII art: pyfiglet, cowsay, boxes, image-to-ascii."
+description: "ASCII art generation — pyfiglet, cowsay, boxes, and image-to-ascii conversion.\n\nLoad this skill when you need to create ASCII art for terminal banners, text decorations, or image representations. Covers using pyfiglet for text-to-ASCII fonts, cowsay for speech bubbles, boxes for framed text, and image-to-ascii conversion for turning pictures into ASCII art."
 version: 4.0.0
 author: 0xbyt4, Hermes Agent
 license: MIT
