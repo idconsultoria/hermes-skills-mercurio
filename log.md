@@ -30,3 +30,12 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 
 ## [2026-06-10] update | index.md relations replaced with LLM-inferred semantic analysis. 207 edges, 76/93 skills
 3 parallel subagents read every SKILL.md, determined relations by understanding content (not regex). Types: similar, uses, used_by, parent. 45KB total. Replaced automated-heuristic relations from previous version.
+
+## [2026-06-10] evolve | Cycle #2: merged 6→3, deleted 3. 93→86 skills. Description audit passed.
+**Deletes:** teams-meeting-pipeline, yuanbao, touchdesigner-mcp
+**Merges:**
+- sketch → claude-design (Sketch Mode section)
+- python-debugpy+node-inspect-debugger → systematic-debugging (Python + Node.js sections)
+- design-md → hermes-agent-skill-authoring (DESIGN.md Token Specs section)
+**AGENTS.md:** Evolve step 7 now audits skill descriptions
+**index.md:** Regenerated (86 skills)

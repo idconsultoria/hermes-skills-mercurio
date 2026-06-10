@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: "4-phase root cause debugging: understand bugs before fixing."
+description: "4-phase root cause debugging — methodology + Python (pdb/debugpy) + Node.js (--inspect). Understand bugs before fixing."
 version: 1.1.0
 author: Hermes Agent (adapted from obra/superpowers)
 license: MIT
@@ -375,3 +375,31 @@ From debugging sessions:
 - New bugs introduced: Near zero vs common
 
 **No shortcuts. No guessing. Systematic always wins.**
+
+## Python Debugging *(merged from python-debugpy)*
+
+Tools: `pdb` (REPL) + `debugpy` (DAP remote debugging).
+
+### pdb quick usage
+```python
+import pdb; pdb.set_trace()  # breakpoint
+# n=next, s=step into, c=continue, p var=print, l=list, q=quit
+```
+
+### debugpy remote attach
+```bash
+pip install debugpy
+python -m debugpy --listen 5678 --wait-for-client script.py
+```
+Attach from VS Code or any DAP client on port 5678.
+
+## Node.js Debugging *(merged from node-inspect-debugger)*
+
+Tool: `--inspect` + Chrome DevTools Protocol.
+
+```bash
+node --inspect script.js           # default port 9229
+node --inspect-brk script.js       # break on first line
+```
+
+Connect via Chrome DevTools: `chrome://inspect` → "Open dedicated DevTools for Node". Or use `node inspect script.js` for CLI debugger.

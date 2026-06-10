@@ -64,7 +64,7 @@ Director tags: `[dryly]` `[wryly]` `[matter-of-fact]` `[whispers]` `[measured]`
 
 | Voice | Style | Best for |
 |-------|-------|----------|
-| **Charon** | Informative | Imponente, denso, grave, solene |
+| **Charon** | Informative | Imponente, denso, grave, solene. **NOTA:** Charon NÃO é entidade separada — é o tom/infusão de personalidade do Hermes (seco, irônico, trickster). A voz é do Hermes, modulada pelo estilo Charon. |
 | **Erinome** | Clear | Preciso, limpo, direto |
 | **Iapetus** | Clear | Clean, neutral |
 | **Schedar** | Even | Equilibrado, steady, lacônico |

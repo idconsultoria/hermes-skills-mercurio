@@ -1,6 +1,6 @@
 ---
 name: hermes-agent-skill-authoring
-description: "Author in-repo SKILL.md: frontmatter, validator, structure."
+description: "Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structure. Merged with design-md skill."
 version: 1.0.0
 author: Hermes Agent
 license: MIT
@@ -163,3 +163,24 @@ Pick the closest existing category. Don't invent new top-level categories casual
 - [ ] Structure: `# Title` → `## Overview` → `## When to Use` → body → `## Common Pitfalls` → `## Verification Checklist`
 - [ ] `related_skills` references resolve in-repo (or are explicitly OK to be user-local)
 - [ ] `git add skills/<category>/<name>/ && git commit` completed on the intended branch
+
+## DESIGN.md Token Specs *(merged from design-md)*
+
+Google's DESIGN.md format for authoring, validating, and exporting design-token specification files. Use when the output is a formal, machine-readable token spec rather than a rendered artifact.
+
+### Quick reference
+```bash
+# Validate a DESIGN.md file
+npx @google/design-md validate path/to/DESIGN.md
+
+# Export to Tailwind config
+npx @google/design-md export --format tailwind path/to/DESIGN.md
+
+# Export to DTCG (Design Tokens Community Group)
+npx @google/design-md export --format dtcg path/to/DESIGN.md
+```
+
+### When to use DESIGN.md vs SKILL.md
+- **DESIGN.md** → formal token specs (colors, typography, spacing — consumed by agents/tools)
+- **SKILL.md** → workflow procedures and tool instructions (consumed by AI agents)
+- Both live in repos, both have frontmatter, both are markdown-based specs.

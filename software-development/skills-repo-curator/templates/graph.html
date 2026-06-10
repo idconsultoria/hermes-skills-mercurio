@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Hermes Skills Graph</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0a0a14; color: #e0e0e0;
+  overflow: hidden; height: 100dvh; width: 100vw; touch-action: none;
+}
+#graph { width: 100%; height: 100%; }
+#controls { position: fixed; top: 12px; left: 12px; z-index: 10; display: flex; flex-direction: column; gap: 6px; max-width: 220px; }
+input, button { background: #1a1a2e; color: #c0c0e0; border: 1px solid #303050; border-radius: 6px; padding: 8px 12px; font-size: 13px; font-family: inherit; }
+input::placeholder { color: #505070; }
+button { cursor: pointer; }
+button:hover { background: #252540; }
+#legend { position: fixed; bottom: 12px; left: 12px; z-index: 10; font-size: 11px; background: #1a1a2ee0; padding: 10px 14px; border-radius: 8px; border: 1px solid #303050; display: flex; flex-wrap: wrap; gap: 10px; max-width: calc(100vw - 24px); }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dashed { border-top: 2px dashed #8080a0; width: 18px; }
+.legend-solid { background: #6080ff; width: 18px; height: 2px; }
+#stats { position: fixed; top: 12px; right: 12px; z-index: 10; font-size: 11px; color: #606080; text-align: right; }
+#modal-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; }
+#modal-backdrop.open { display: flex; }
+#modal { background: #141428; border: 1px solid #303058; border-radius: 14px; padding: 0; max-width: 560px; width: 92vw; max-height: 85dvh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: modalIn 0.2s ease-out; }
+@keyframes modalIn { from { opacity: 0; transform: translateY(16px) scale(0.97); } }
+#modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #202038; position: sticky; top: 0; background: #141428; z-index: 1; }
+#modal-close { float: right; background: none; border: none; color: #606090; font-size: 22px; cursor: pointer; line-height: 1; padding: 0 0 4px 8px; }
+#modal-close:hover { color: #fff; }
+.modal-category { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; margin-right: 8px; vertical-align: middle; }
+.modal-title { font-size: 17px; font-weight: 700; color: #fff; margin: 8px 0 0; }
+#modal-body { padding: 20px 24px 24px; }
+.modal-section { margin-bottom: 18px; }
+.modal-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #505080; margin-bottom: 8px; font-weight: 600; }
+.modal-summary { font-size: 13px; color: #b0b0d0; line-height: 1.6; padding: 10px 14px; background: #1a1a32; border-radius: 8px; border-left: 3px solid #404080; }
+.modal-desc { font-size: 13px; color: #9090b0; line-height: 1.7; white-space: pre-wrap; }
+.modal-relations { display: flex; flex-direction: column; gap: 5px; }
+.modal-rel { font-size: 11px; padding: 4px 10px; border-radius: 5px; background: #1a1a30; display: inline-flex; align-items: center; gap: 6px; width: fit-content; }
+.modal-rel-type { font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; padding: 1px 6px; border-radius: 4px; }
+.rel-similar { background: #2a2a40; color: #8080a0; }
+.rel-uses { background: #1a2a40; color: #6080ff; }
+.rel-parent { background: #2a1a30; color: #b060e0; }
+.rel-used_by { background: #1a3020; color: #50b070; }
+@media (max-width: 480px) {
+  #controls { top: 8px; left: 8px; gap: 4px; max-width: 160px; }
+  input, button { padding: 6px 10px; font-size: 12px; }
+  #legend { padding: 6px 10px; gap: 6px; font-size: 10px; }
+  #modal { max-width: 100vw; border-radius: 12px 12px 0 0; max-height: 90dvh; }
+  #modal-header { padding: 16px 18px 12px; }
+  #modal-body { padding: 16px 18px 20px; }
+  .modal-title { font-size: 15px; }
+}
+</style>
+</head>
+<body>
+<div id="graph"></div>
+<div id="controls"><input type="text" id="search" placeholder="Filter skills..." oninput="filterNodes()"><button onclick="resetZoom()">Reset View</button></div>
+<div id="stats"></div>
+<div id="legend"><div class="legend-item"><div class="legend-solid"></div><span>uses / used by</span></div><div class="legend-item"><div class="legend-dashed"></div><span>similar</span></div></div>
+<div id="modal-backdrop" onclick="closeModal(event)"><div id="modal" onclick="event.stopPropagation()"><div id="modal-header"><button id="modal-close" onclick="closeModal()">&times;</button><div><span class="modal-category" id="modal-cat-badge"></span><span style="font-size:10px;color:#505070" id="modal-size"></span></div><div class="modal-title" id="modal-title"></div></div><div id="modal-body"><div class="modal-section" id="modal-summary-section"><div class="modal-section-title">Summary</div><div class="modal-summary" id="modal-summary"></div></div><div class="modal-section" id="modal-desc-section"><div class="modal-section-title">Description</div><div class="modal-desc" id="modal-desc"></div></div><div class="modal-section"><div class="modal-section-title">Relations</div><div class="modal-relations" id="modal-relations"></div></div></div></div></div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+/* DATA injected at build time: const DATA = __DATA_PLACEHOLDER__; */
+/* See references/llm-relations-inference.md for how the data is produced. */
+</script>
+</body>
+</html>

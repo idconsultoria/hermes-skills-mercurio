@@ -1,6 +1,6 @@
 ---
 name: claude-design
-description: Design one-off HTML artifacts (landing, deck, prototype).
+description: Design one-off HTML artifacts (landing, deck, prototype). Includes Sketch Mode for throwaway variant comparison.
 version: 1.0.0
 author: BadTechBandit
 license: MIT
@@ -589,3 +589,27 @@ You are running in CLI/API mode, not hosted Claude Design. Ignore references to 
 - Do not under-ask for high-fidelity work with no brand context.
 - Do not produce generic SaaS layouts and call them designed.
 - Do not claim browser verification unless it actually happened.
+
+## Sketch Mode — Quick Throwaway Variants *(merged from sketch skill)*
+
+When the user wants to **compare design directions before committing**, use Sketch Mode: lightweight, throwaway HTML mockups. The point is 2-3 interactive variants, not polished artifacts.
+
+### Trigger
+"sketch this screen", "show me what X could look like", "compare layout A vs B", "2-3 takes on this UI", "mockup before building".
+
+### Process: intake → variants → head-to-head
+
+1. **Intake** (3 questions, one at a time): feel (adjectives/vibe), references (apps/sites), core action (what user does on this screen)
+2. **Variants** (2-3, different design stances — density, emphasis, aesthetic, layout, grounding)
+3. **Head-to-head** — comparison table with dimensions, opinionated recommendation
+
+### Each variant is a self-contained HTML
+- Inline `<style>`, system fonts or 1 Google Font, Tailwind via CDN ok
+- Realistic content (no lorem ipsum)
+- Interactive: clickable, hovers, at least 1 state transition
+- Verify visually with `browser_navigate` + `browser_vision`
+
+### Output
+`sketches/NNN-stance-name/index.html` + `README.md` per variant. Disposable — promote to real code, don't curate.
+
+*(Adapted from GSD project's /gsd-sketch workflow, MIT)*
