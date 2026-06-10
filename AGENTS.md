@@ -221,3 +221,43 @@ Remove entradas da memória persistente que estejam redundantes com skills (ex: 
 | `evolve: <descrição>` | Para a etapa evolve do ciclo de consolidação |
 | `offload: <descrição>` | Para a etapa offload do ciclo de consolidação |
 | `init: <descrição>` | Para commits iniciais |
+
+---
+
+## Scripts de Apoio
+
+Scripts vivem em `scripts/` na raiz do repositório. São permitidos exclusivamente para tarefas de apoio que **informam** o agente sem escrever no index.md (conforme a regra absoluta).
+
+### `scripts/generate_graph.py` — Grafo Interativo D3.js
+
+Gera o arquivo `skills_graph.html` com um grafo de força (force-directed graph) interativo a partir dos dados do index.md.
+
+```bash
+cd /opt/data/skills
+python3 scripts/generate_graph.py              # gera skills_graph.html + graph_data.json
+python3 scripts/generate_graph.py --json       # só graph_data.json (sem HTML)
+```
+
+**O que faz:**
+1. Lê o index.md e extrai as relações de cada skill (blocos `**Relações:**` com formato ``- `tipo` → `path` ``)
+2. Se o index.md não tiver relações parseáveis, usa fallback para JSON prévio em `/opt/data/skills_relations_merged.json`
+3. Varre todos os SKILL.md do repositório extraindo: nome, título, tamanho, categoria, sumário e descrição
+4. Constrói a estrutura de nós e arestas, deduplicando relações bidirecionais
+5. Injeta os dados no template `skills_graph_template.html` (substitui `__DATA__` pelos dados JSON)
+6. Salva `skills_graph.html` (~60KB, auto-contido, sem dependências externas)
+
+**Saída:**
+- `skills_graph.html` — visualização interativa com D3.js (83+ nós, coloridos por categoria, modal ao clicar, filtro por nome)
+- `graph_data.json` — dados estruturados para consumo por outros scripts
+
+**Dependências:** Python 3 stdlib (os, re, json, sys, argparse). Nenhum pacote externo.
+
+**Template:** `skills_graph_template.html` na raiz — contém todo o código HTML/CSS/JS do D3.js. O script só substitui o placeholder de dados.
+
+### Adicionar novos scripts
+
+Scripts em Python (.py) ou shell (.sh) vão em `scripts/`. Todo script deve:
+- Ser chamado via `python3 scripts/<nome>.py` ou `bash scripts/<nome>.sh`
+- Ter docstring ou comentário de uso no topo
+- Não escrever no index.md ou SKILL.md — apenas ler e produzir relatórios/arquivos auxiliares
+- Ser incluído em ````bash```` na seção apropriada acima se for usado pelo ciclo de consolidação
