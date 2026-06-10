@@ -2,6 +2,12 @@
 
 Este repositório gerencia o catálogo de skills do Hermes Agent via Git.
 
+## ⚠️ Regra absoluta: index.md é território de agente LLM
+
+**É proibido editar `index.md` com scripts** — seja regeneração automática via Python, sed, awk, scripts de shell, ou qualquer outra automação programática que escreva diretamente no arquivo. O `index.md` deve ser mantido **exclusivamente por ferramentas de agente LLM** (`read_file`, `write_file`, `patch`), garantindo que cada decisão editorial (merge de skills, ajuste de descrições, criação de relações) passe por julgamento humano-assistido.
+
+**Scripts são permitidos para tarefas de apoio** — análise de conexões, extração de metadados, estatísticas, geração do grafo HTML, e qualquer processamento que informe o agente sem escrever no `index.md`. O output desses scripts alimenta o raciocínio do agente, que então edita o `index.md` manualmente com as ferramentas apropriadas.
+
 ## Estrutura
 
 ```
