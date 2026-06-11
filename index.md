@@ -50,6 +50,7 @@ Track Apple devices and AirTags via the FindMy app on macOS. Load this skill whe
 - `similar` → `apple/apple-notes`
 - `similar` → `productivity/maps`
 
+- `uses` → `autonomous-ai-agents/hermes-agent`
 ### iMessage
 
 - **Nome:** `apple/imessage`
@@ -64,6 +65,7 @@ Send and receive iMessages and SMS via the imsg CLI on macOS. Load this skill fo
 - `similar` → `apple/apple-notes`
 - `similar` → `apple/apple-reminders`
 
+- `uses` → `apple/macos-computer-use`
 ### macOS Computer Use (universal, any-model)
 
 - **Nome:** `apple/macos-computer-use`
@@ -79,6 +81,9 @@ Drive macOS desktop in background — screenshots, mouse, keyboard, scroll, drag
 - `similar` → `creative/excalidraw`
 - `similar` → `creative/claude-design`
 
+- `similar` → `autonomous-ai-agents/hermes-agent`
+- `used_by` → `apple/findmy`
+- `used_by` → `apple/imessage`
 
 ## Autonomous Ai Agents
 
@@ -97,6 +102,8 @@ Delegate tasks to autonomous AI coding agent CLIs via Hermes. One-shot, PR revie
 - `parent` → `autonomous-ai-agents/product-pipeline`
 - `similar` → `autonomous-ai-agents/messaging-platforms`
 
+- `similar` → `autonomous-ai-agents/product-pipeline`
+- `uses` → `autonomous-ai-agents/hermes-agent`
 ### Hermes Agent
 
 - **Nome:** `autonomous-ai-agents/hermes-agent`
@@ -116,6 +123,8 @@ Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, an
 - `similar` → `creative/brand-studio-forge`
 - `similar` → `creative/humanizer`
 
+- `parent` → `apple/macos-computer-use`
+- `uses` → `autonomous-ai-agents/autonomous-ai-agents`
 ### Messaging Platforms
 
 - **Nome:** `autonomous-ai-agents/messaging-platforms`
@@ -132,6 +141,9 @@ Load this skill when troubleshooting message delivery across platforms. Covers T
 - `parent` → `autonomous-ai-agents/hermes-agent`
 - `parent` → `messaging-platforms/whatsapp-bridge-baileys`
 
+- `used_by` → `apple/imessage`
+- `used_by` → `content-production/iaf-newsletter-pipeline`
+- `used_by` → `content-production/text-to-speech`
 ### Pi Agent (Local)
 - **Nome:** `autonomous-ai-agents/pi-agent-coordination`
 - **Arquivo:** `autonomous-ai-agents/pi-agent-coordination/SKILL.md`
@@ -150,6 +162,7 @@ Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — n
 - `used_by` → `autonomous-ai-agents/product-pipeline`
 - `parent` → `autonomous-ai-agents/hermes-agent`
 
+- `uses` → `autonomous-ai-agents/hermes-agent`
 ### Product Development Pipeline
 
 - **Nome:** `autonomous-ai-agents/product-pipeline`
@@ -169,6 +182,8 @@ Load this skill when building a product from scratch through the full pipeline �
 - `uses` → `creative/copywriting`
 - `uses` → `creative/humanizer`
 
+- `uses` → `content-production/text-to-speech`
+- `uses` → `creative/brand-studio-forge`
 
 ## Content Production
 
@@ -189,6 +204,8 @@ Load this skill to set up, modify, run, or troubleshoot any daily newsletter, br
 - `uses` → `creative/text-to-speech`
 - `uses` → `social-media/brand-iaf-conteudo`
 
+- `uses` → `autonomous-ai-agents/hermes-agent`
+- `uses` → `content-production/text-to-speech`
 ### Text-to-Speech (TTS)
 
 - **Nome:** `content-production/text-to-speech`
@@ -205,6 +222,10 @@ Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback,
 - `similar` → `creative/manim-video`
 - `uses` → `creative/humanizer`
 
+- `used_by` → `content-production/iaf-newsletter-pipeline`
+- `used_by` → `creative/ascii-video`
+- `used_by` → `creative/manim-video`
+- `uses` → `autonomous-ai-agents/messaging-platforms`
 
 ## Creative
 
@@ -224,6 +245,8 @@ Dark-themed SVG architecture, cloud, and infrastructure diagrams as standalone H
 - `similar` → `creative/baoyu-infographic`
 - `similar` → `creative/pretext`
 
+- `similar` → `creative/popular-web-designs`
+- `used_by` → `creative/manim-video`
 ### ASCII Art Skill
 
 - **Nome:** `creative/ascii-art`
@@ -239,6 +262,8 @@ ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.
 - `similar` → `creative/p5js`
 - `similar` → `creative/manim-video`
 
+- `used_by` → `creative/ascii-video`
+- `used_by` → `creative/pretext`
 ### ASCII Video Production Pipeline
 
 - **Nome:** `creative/ascii-video`
@@ -255,6 +280,8 @@ ASCII video: convert video/audio to colored ASCII MP4/GIF.
 - `uses` → `creative/text-to-speech`
 - `similar` → `creative/pretext`
 
+- `similar` → `creative/ascii-art`
+- `uses` → `content-production/text-to-speech`
 ### Infographic Generator
 
 - **Nome:** `creative/baoyu-infographic`
@@ -271,6 +298,9 @@ Infographics: 21 layouts x 21 styles (信息图, 可视化).
 - `similar` → `creative/claude-design`
 - `similar` → `creative/comfyui`
 
+- `similar` → `creative/p5js`
+- `similar` → `creative/popular-web-designs (Infographic templates (21 layouts × 21 styles) share the concept of pre-built design systems with the 54-web-design catalog)`
+- `uses` → `creative/brand-studio-forge (Brand visual identity (colors, typography, voice) constrains infographic style choices)`
 ### brand-studio-forge
 
 - **Nome:** `creative/brand-studio-forge`
@@ -289,6 +319,8 @@ Use when the user wants to create, refine, or evolve a brand identity. Covers br
 - `similar` → `creative/baoyu-infographic`
 - `uses` → `creative/copywriting`
 
+- `used_by` → `autonomous-ai-agents/product-pipeline`
+- `uses` → `creative/humanizer`
 ### Claude Design for CLI/API Agents
 
 - **Nome:** `creative/claude-design`
@@ -321,6 +353,7 @@ Generate images, video, and audio with ComfyUI. Install, manage nodes/models, ru
 - `similar` → `creative/ascii-video`
 - `similar` → `creative/p5js`
 
+- `similar` → `creative/brand-studio-forge`
 ### Copywriting
 
 - **Nome:** `creative/copywriting`
@@ -339,6 +372,7 @@ Load this skill when the user needs marketing copy — landing pages, homepage s
 - `used_by` → `autonomous-ai-agents/product-pipeline`
 - `similar` → `social-media/brand-iaf-conteudo`
 
+- `similar` → `creative/songwriting-and-ai-music`
 ### Excalidraw Diagram Skill
 
 - **Nome:** `creative/excalidraw`
@@ -388,6 +422,8 @@ Manim CE animations: 3Blue1Brown math/algo videos.
 - `similar` → `creative/ascii-art`
 - `similar` → `creative/pretext`
 
+- `similar` → `creative/architecture-diagram`
+- `uses` → `content-production/text-to-speech`
 ### p5.js Production Pipeline
 
 - **Nome:** `creative/p5js`
@@ -406,6 +442,7 @@ p5.js sketches: gen art, shaders, interactive, 3D.
 - `similar` → `creative/brand-studio-forge`
 - `similar` → `creative/comfyui`
 
+- `similar` → `creative/baoyu-infographic`
 ### Popular Web Designs
 
 - **Nome:** `creative/popular-web-designs`
@@ -421,6 +458,9 @@ p5.js sketches: gen art, shaders, interactive, 3D.
 - `similar` → `creative/style-guide-consultation`
 - `similar` → `creative/claude-design`
 
+- `similar` → `creative/architecture-diagram`
+- `similar` → `creative/baoyu-infographic`
+- `used_by` → `creative/claude-design`
 ### Pretext Creative Demos
 
 - **Nome:** `creative/pretext`
@@ -454,6 +494,9 @@ Songwriting craft and Suno AI music prompts.
 - `similar` → `creative/humanizer`
 - `similar` → `creative/brand-studio-forge`
 
+- `similar` → `content-production/iaf-newsletter-pipeline`
+- `similar` → `creative/ascii-video`
+- `uses` → `content-production/text-to-speech`
 ### Style Guide Consultation
 
 - **Nome:** `creative/style-guide-consultation`
@@ -485,6 +528,8 @@ Iterative Python via live Jupyter kernel (hamelnb).
 
 **Relações:**
 - `similar` → `software-development/spike`
+- `similar` → `mlops/evaluation/weights-and-biases`
+- `similar` → `mlops/huggingface-hub`
 
 ## Email
 
@@ -500,6 +545,8 @@ Himalaya CLI: IMAP/SMTP email from terminal.
 **Relações:**
 - `similar` → `productivity/google-workspace`
 
+- `similar` → `messaging-platforms/whatsapp-bridge-baileys`
+- `similar` → `productivity/html-report-hermes`
 ## Github
 
 ### Codebase Inspection & Architecture Diagnostic
@@ -516,6 +563,7 @@ Multi-layered codebase diagnostics: structural mapping, dependency audit, git hi
 - `uses` → `github/github-repo-management`
 - `similar` → `dogfood/dogfood`
 
+- `similar` → `software-development/systematic-debugging`
 ### GitHub Authentication Setup
 
 - **Nome:** `github/github-auth`
@@ -546,6 +594,7 @@ Review PRs: diffs, inline comments via gh or REST.
 - `used_by` → `github/github-pr-workflow`
 - `similar` → `github/codebase-inspection`
 
+- `similar` → `software-development/systematic-debugging`
 ### GitHub Issues Management
 
 - **Nome:** `github/github-issues`
@@ -608,6 +657,8 @@ Self-host TTS models (OmniVoice, Qwen3-TTS, Fish Speech) on Oracle ARM64 with Do
 - `uses` → `mlops/huggingface-hub`
 - `similar` → `mlops/inference/llama-cpp`
 
+- `similar` → `infrastructure/deployment-pipeline`
+- `uses` → `mlops/inference/vllm`
 ### Deployment Pipeline — Docker + GitHub Actions + SSH Deploy
 
 - **Nome:** `infrastructure/deployment-pipeline`
@@ -623,6 +674,7 @@ CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr.io → SSH deploy 
 - `used_by` → `github/github-pr-workflow`
 - `similar` → `infrastructure/vercel-deploy`
 
+- `similar` → `infrastructure/ai-voice-selfhost`
 ### Oracle VM — SSH Access from Hermes Container
 
 - **Nome:** `infrastructure/oracle-host-access`
@@ -649,6 +701,9 @@ Deploy static sites and frontend apps to Vercel — from zero to production. Cov
 **Relações:**
 - `similar` → `infrastructure/deployment-pipeline`
 
+- `similar` → `github/github-pr-workflow`
+- `uses` → `github/github-repo-management` (reason: Vercel projects link to GitHub repositories; repo management (clone, push, create) is the upstream step before Vercel deployment.)`
+- `uses` → `productivity/html-report-hermes`
 
 ## Media
 
@@ -663,7 +718,12 @@ Produce deterministic MP4 videos using HyperFrames (HTML→video engine). Genera
 
 **Relações:**
 - `similar` → `media/youtube-content`
+- `uses` → `creative/brand-studio-forge`
+- `uses` → `creative/style-guide-consultation`
+- `similar` → `creative/manim-video`
+- `similar` → `creative/comfyui`
 
+- `uses` → `infrastructure/oracle-host-access`
 ### YouTube Content Tool
 
 - **Nome:** `media/youtube-content`
@@ -677,6 +737,8 @@ YouTube transcripts to summaries, threads, blogs.
 - `similar` → `media/hyperframes-video-production`
 - `uses` → `research/llm-wiki`
 
+- `similar` → `content-production/iaf-newsletter-pipeline` (reason: Both pipelines transform source content (YouTube videos or multi-source curation) into structured written outputs (summaries, newsletters, threads) for distribution.)`
+- `uses` → `creative/copywriting`
 
 ## Messaging Platforms
 
@@ -693,7 +755,11 @@ Load this skill when you need to interact with WhatsApp programmatically. Covers
 
 **Relações:**
 - `similar` → `autonomous-ai-agents/messaging-platforms`
+- `similar` → `email/himalaya`
+- `similar` → `productivity/html-report-hermes`
 
+- `similar` → `apple/imessage`
+- `used_by` → `content-production/iaf-newsletter-pipeline`
 ## Mlops
 
 ### lm-evaluation-harness - LLM Benchmarking
@@ -710,6 +776,7 @@ lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.).
 - `uses` → `mlops/huggingface-hub`
 - `similar` → `mlops/evaluation/weights-and-biases`
 
+- `similar` → `mlops/inference/llama-cpp`
 ### Weights & Biases: ML Experiment Tracking & MLOps
 
 - **Nome:** `mlops/evaluation/weights-and-biases`
@@ -723,6 +790,8 @@ W&B: log ML experiments, sweeps, model registry, dashboards.
 - `uses` → `mlops/huggingface-hub`
 - `similar` → `mlops/evaluation/lm-evaluation-harness`
 
+- `similar` → `data-science/jupyter-live-kernel`
+- `uses` → `mlops/inference/vllm`
 ### Hugging Face CLI (`hf`) Reference Guide
 
 - **Nome:** `mlops/huggingface-hub`
@@ -752,6 +821,7 @@ Local GGUF inference with llama.cpp and model discovery via Hugging Face Hub.
 - `similar` → `mlops/inference/vllm`
 - `similar` → `infrastructure/ai-voice-selfhost`
 
+- `similar` → `mlops/evaluation/lm-evaluation-harness`
 ### vLLM - High-Performance LLM Serving
 
 - **Nome:** `mlops/inference/vllm`
@@ -766,6 +836,7 @@ vLLM: high-throughput LLM serving, OpenAI API, quantization.
 - `used_by` → `mlops/evaluation/lm-evaluation-harness`
 - `similar` → `mlops/inference/llama-cpp`
 
+- `similar` → `infrastructure/ai-voice-selfhost`
 ### Pi Agent Session Audit
 
 - **Nome:** `autonomous-ai-agents/pi-session-audit`
@@ -777,6 +848,8 @@ Audita sessões do Pi Agent extraindo duração, tokens, custo e modelo dos arqu
 
 **Relações:**
 - `used_by` → `autonomous-ai-agents/pi-agent-coordination`
+- `used_by` → `autonomous-ai-agents/product-pipeline`
+- `similar` → `autonomous-ai-agents/autonomous-ai-agents`
 
 
 ## Note Taking
@@ -793,6 +866,8 @@ Read, search, create, and edit notes in the Obsidian vault.
 **Relações:**
 - `used_by` → `research/llm-wiki`
 
+- `similar` → `apple/apple-notes`
+- `similar` → `productivity/notion`
 
 ## Productivity
 
@@ -809,6 +884,7 @@ Airtable REST API via curl. Records CRUD, filters, upserts.
 - `similar` → `productivity/notion`
 - `similar` → `productivity/google-workspace`
 
+- `similar` → `productivity/html-report-hermes`
 ### Google Workspace
 
 - **Nome:** `productivity/google-workspace`
@@ -840,6 +916,8 @@ Two design systems in one skill: Hermes CRT (amber/blue inversion, scanlines, te
 - `used_by` → `productivity/relatorio-de-custos`
 - `used_by` → `productivity/html-to-pdf-chromium`
 
+- `similar` → `email/himalaya`
+- `similar` → `infrastructure/vercel-deploy`
 ### HTML → PDF com Chromium Headless
 
 - **Nome:** `productivity/html-to-pdf-chromium`
@@ -854,6 +932,9 @@ Convert HTML files to high-fidelity PDF using Chromium headless (via Debian .deb
 - `used_by` → `productivity/html-report-hermes`
 - `used_by` → `productivity/nano-pdf`
 
+- `similar` → `productivity/nano-pdf`
+- `similar` → `productivity/powerpoint`
+- `uses` → `productivity/ocr-and-documents`
 ### Maps Skill
 
 - **Nome:** `productivity/maps`
@@ -866,6 +947,8 @@ Geocode, POIs, routes, timezones via OpenStreetMap/OSRM.
 **Relações:**
 - `similar` → `apple/findmy`
 
+- `similar` → `research/deep-research`
+- `uses` → `read-reddit`
 ### nano-pdf
 
 - **Nome:** `productivity/nano-pdf`
@@ -880,6 +963,8 @@ Edit PDF text/typos/titles via nano-pdf CLI (NL prompts).
 - `uses` → `productivity/html-to-pdf-chromium`
 - `similar` → `productivity/ocr-and-documents`
 
+- `similar` → `productivity/html-to-pdf-chromium`
+- `similar` → `productivity/powerpoint`
 ### Notion
 
 - **Nome:** `productivity/notion`
@@ -893,6 +978,9 @@ Notion API + ntn CLI: pages, databases, markdown, Workers.
 - `similar` → `productivity/airtable`
 - `similar` → `productivity/taskflow-mcp`
 
+- `similar` → `note-taking/obsidian`
+- `similar` → `research/llm-wiki`
+- `uses` → `productivity/taskflow-mcp`
 ### PDF & Document Extraction
 
 - **Nome:** `productivity/ocr-and-documents`
@@ -910,6 +998,8 @@ Extract text from PDFs/scans (pymupdf, marker-pdf).
 - `similar` → `productivity/nano-pdf`
 - `used_by` → `productivity/powerpoint`
 
+- `uses` → `research/arxiv`
+- `uses` → `research/research-paper-writing`
 ### Powerpoint Skill
 
 - **Nome:** `productivity/powerpoint`
@@ -923,6 +1013,10 @@ Create, read, edit .pptx decks, slides, notes, templates.
 - `uses` → `productivity/ocr-and-documents`
 - `used_by` → `productivity/ocr-and-documents`
 
+- `similar` → `productivity/html-to-pdf-chromium`
+- `similar` → `productivity/nano-pdf`
+- `uses` → `creative/copywriting`
+- `uses` → `software-development/agy`
 ### Relatório de Custos — Skill de Geração
 
 - **Nome:** `productivity/relatorio-de-custos`
@@ -938,6 +1032,9 @@ Load this skill when the user asks for cost reports, spending breakdowns, or pro
 - `uses` → `software-development/agy`
 - `uses` → `productivity/html-report-hermes`
 
+- `similar` → `productivity/html-report-hermes`
+- `similar` → `software-development/backlog-and-sprint`
+- `uses` → `autonomous-ai-agents/product-pipeline`
 ### TaskFlow MCP — Ferramentas e Workflows
 
 - **Nome:** `productivity/taskflow-mcp`
@@ -949,7 +1046,10 @@ TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Co
 
 **Relações:**
 - `similar` → `productivity/notion`
+- `similar` → `software-development/backlog-and-sprint`
 
+- `similar` → `note-taking/obsidian`
+- `uses` → `productivity/notion`
 
 ## Research
 
@@ -966,6 +1066,9 @@ Search arXiv papers by keyword, author, category, or ID.
 - `used_by` → `research/deep-research`
 - `similar` → `research/llm-wiki`
 
+- `used_by` → `research/research-paper-writing`
+- `uses` → `productivity/ocr-and-documents`
+- `uses` → `research/llm-wiki`
 ### Blogwatcher
 
 - **Nome:** `research/blogwatcher`
@@ -980,6 +1083,8 @@ Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool.
 - `used_by` → `research/deep-research`
 - `similar` → `research/tech-trend-discovery`
 
+- `similar` → `read-reddit`
+- `uses` → `research/deep-research`
 ### Deep Research Skill
 
 - **Nome:** `research/deep-research`
@@ -998,6 +1103,10 @@ Inspired by GPT-Researcher, this pipeline decomposes complex questions into sub-
 - `similar` → `research/tech-trend-discovery`
 - `similar` → `research/polymarket`
 
+- `similar` → `research/research-paper-writing`
+- `similar` → `software-development/spike`
+- `uses` → `research/tech-trend-discovery`
+- `uses` → `research/user-interview`
 ### Karpathy's LLM Wiki
 
 - **Nome:** `research/llm-wiki`
@@ -1012,6 +1121,9 @@ Karpathy's LLM Wiki: build/query interlinked markdown KB.
 - `similar` → `research/deep-research`
 - `uses` → `note-taking/obsidian`
 
+- `similar` → `note-taking/obsidian`
+- `similar` → `productivity/notion`
+- `uses` → `productivity/ocr-and-documents`
 ### Polymarket — Prediction Market Data
 
 - **Nome:** `research/polymarket`
@@ -1025,6 +1137,7 @@ Read-only access to Polymarket prediction market data via three public REST APIs
 
 **Relações:**
 - `similar` → `research/deep-research`
+- `similar` → `research/tech-trend-discovery`
 
 ### Research Paper Writing Pipeline
 
@@ -1038,6 +1151,11 @@ Write ML papers for NeurIPS/ICML/ICLR: design→submit.
 **Relações:**
 - `uses` → `software-development/plan`
 
+- `similar` → `software-development/plan`
+- `uses` → `productivity/ocr-and-documents`
+- `uses` → `research/arxiv`
+- `uses` → `research/deep-research`
+- `uses` → `research/user-interview`
 ### Tech Trend Discovery
 
 - **Nome:** `research/tech-trend-discovery`
@@ -1051,6 +1169,10 @@ Discover what the tech/AI community is discussing right now — trending topics,
 - `similar` → `research/blogwatcher`
 - `similar` → `research/deep-research`
 
+- `similar` → `social-media/xurl`
+- `used_by` → `research/deep-research`
+- `uses` → `read-reddit`
+- `uses` → `research/blogwatcher`
 ### User Interview
 
 - **Nome:** `research/user-interview`
@@ -1066,6 +1188,9 @@ Load this skill during the Research phase (Fase 2) of the product pipeline to un
 - `used_by` → `software-development/ideation-drilling`
 - `used_by` → `software-development/backlog-and-sprint`
 
+- `similar` → `software-development/ideation-drilling`
+- `used_by` → `research/deep-research`
+- `used_by` → `research/research-paper-writing`
 ## Social Media
 
 ### Brand IAF — Conteúdo
@@ -1082,6 +1207,10 @@ Skill de conteúdo da comunidade IA que Funciona (IAF). Contém constantes de ma
 - `used_by` → `content-production/iaf-newsletter-pipeline`
 - `similar` → `creative/copywriting`
 
+- `similar` → `productivity/powerpoint`
+- `uses` → `research/tech-trend-discovery`
+- `uses` → `social-media/xurl`
+- `uses` → `software-development/agy`
 ### xurl — X (Twitter) API via the Official CLI
 
 - **Nome:** `social-media/xurl`
@@ -1094,6 +1223,10 @@ X/Twitter via xurl CLI: post, search, DM, media, v2 API.
 **Relações:**
 - `similar` → `social-media/brand-iaf-conteudo`
 
+- `similar` → `read-reddit`
+- `similar` → `research/tech-trend-discovery`
+- `uses` → `research/polymarket`
+- `uses` → `social-media/brand-iaf-conteudo`
 ## Software Development
 
 ### agy — Antigravity CLI (Consultor Externo)
@@ -1109,6 +1242,8 @@ Load this skill for strategic design tasks — visual HTML output, brand present
 - `used_by` → `software-development/backlog-and-sprint`
 - `used_by` → `productivity/relatorio-de-custos`
 
+- `uses` → `productivity/powerpoint`
+- `uses` → `social-media/brand-iaf-conteudo`
 ### Backlog & Sprint
 
 - **Nome:** `software-development/backlog-and-sprint`
@@ -1125,6 +1260,10 @@ Load this skill during the execution phase (Fase 5) of the product pipeline. Cov
 - `uses` → `research/user-interview`
 - `used_by` → `software-development/ideation-drilling`
 
+- `similar` → `productivity/relatorio-de-custos`
+- `similar` → `productivity/taskflow-mcp`
+- `uses` → `software-development/ideation-drilling`
+- `uses` → `software-development/plan`
 ### Authoring Hermes-Agent Skills (in-repo)
 
 - **Nome:** `software-development/hermes-agent-skill-authoring`
@@ -1139,6 +1278,7 @@ Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structu
 - `used_by` → `software-development/skill-curation`
 - `used_by` → `software-development/skills-repo-curator`
 
+- `similar` → `software-development/skill-curation`
 ### Ideation Drilling (Hermes — Orchestrator)
 
 - **Nome:** `software-development/ideation-drilling`
@@ -1152,6 +1292,9 @@ Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structu
 - `uses` → `research/user-interview`
 - `parent` → `software-development/backlog-and-sprint`
 
+- `similar` → `software-development/spike`
+- `used_by` → `software-development/backlog-and-sprint`
+- `uses` → `software-development/plan`
 ### Plan Mode
 
 - **Nome:** `software-development/plan`
@@ -1170,6 +1313,7 @@ Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bi
 - `used_by` → `software-development/backlog-and-sprint`
 - `similar` → `software-development/spike`
 
+- `uses` → `software-development/systematic-debugging`
 ### Skill Curation — Discover, Evaluate & Install Hermes Skills
 
 - **Nome:** `software-development/skill-curation`
@@ -1185,6 +1329,8 @@ Load this skill when you need to find, evaluate, and install community skills fo
 - `uses` → `software-development/hermes-agent-skill-authoring`
 - `similar` → `software-development/skills-repo-curator`
 
+- `uses` → `read-reddit`
+- `uses` → `research/tech-trend-discovery`
 ### Skills Repository Curator
 
 - **Nome:** `software-development/skills-repo-curator`
@@ -1198,6 +1344,8 @@ Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidaç�
 - `uses` → `software-development/hermes-agent-skill-authoring`
 - `similar` → `software-development/skill-curation`
 
+- `uses` → `productivity/relatorio-de-custos`
+- `uses` → `software-development/plan`
 ### Spike
 
 - **Nome:** `software-development/spike`
@@ -1212,6 +1360,10 @@ Throwaway experiments to validate an idea before build.
 - `similar` → `software-development/plan`
 - `similar` → `data-science/jupyter-live-kernel`
 
+- `similar` → `research/deep-research`
+- `similar` → `software-development/systematic-debugging`
+- `uses` → `software-development/ideation-drilling`
+- `uses` → `software-development/test-driven-development`
 ### Systematic Debugging
 
 - **Nome:** `software-development/systematic-debugging`
@@ -1226,6 +1378,8 @@ Throwaway experiments to validate an idea before build.
 - `uses` → `software-development/plan`
 - `used_by` → `software-development/test-driven-development`
 
+- `similar` → `software-development/spike`
+- `uses` → `software-development/spike`
 ### Test-Driven Development (TDD)
 
 - **Nome:** `software-development/test-driven-development`
@@ -1240,6 +1394,9 @@ TDD: enforce RED-GREEN-REFACTOR, tests before code.
 - `used_by` → `software-development/plan`
 - `used_by` → `software-development/systematic-debugging`
 
+- `similar` → `software-development/systematic-debugging`
+- `uses` → `software-development/plan`
+- `uses` → `software-development/spike`
 ## Uncategorized
 
 ### Dogfood: Systematic Web Application QA Testing
@@ -1253,6 +1410,9 @@ Exploratory QA of web apps: find bugs, evidence, reports.
 
 **Relações:**
 - `similar` → `github/codebase-inspection`
+- `uses` → `github/github-issues`
+- `similar` → `github/github-pr-workflow`
+- `similar` → `software-development/systematic-debugging`
 
 ### Read Reddit via RSS
 
@@ -1265,3 +1425,5 @@ Read Reddit subreddits reliably via RSS feeds — bypasses API rate limits and b
 
 **Relações:**
 - `similar` → `research/blogwatcher`
+- `similar` → `research/tech-trend-discovery`
+- `similar` → `social-media/xurl`

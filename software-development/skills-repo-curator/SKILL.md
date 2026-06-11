@@ -261,8 +261,10 @@ grep -c "Relações" index.md  # skills com relações
 
 ⚠️ **Ciclo pode morrer no meio e deixar working directory sujo.** O cron job tem timeout — se o ciclo não completa, SKILL.md ficam modificados mas sem commit, index.md desatualizado, log.md sem entrada. **Recuperação:**
 
-   1. **Diagnóstico** — `cronjob(action='list')` → ver `last_status: error`. Depois `git status` no workdir pra ver o que ficou sujo.
-   2. **Avaliação** — `git diff --stat` mostra quais skills foram tocadas. `git diff <file>` pra ver se as mudanças são válidas ou corrompidas. Leia o diff — se parece produto de alucinação (ex: conteúdo duplicado, blocos truncados), discard.
+   1. **Diagnóstico** — `cronjob(action='list')` → ver `last_status: error`. O campo `last_error` no `jobs.json` (`/opt/data/cron/jobs.json`) tem a mensagem de erro completa. O output do cron está em `/opt/data/cron/output/<job_id>/<timestamp>.md` — contém o prompt completo + a seção `## Error` com o trace.
+   2. **Avaliação** — `git status` + `git diff --stat` mostra quais skills foram tocadas. `git diff <file>` pra ver se as mudanças são válidas ou corrompidas.
    3. **Se válido** — complete o ciclo manualmente: `git add -A`, escreva entrada no `log.md`, atualize `index.md`, `git commit -m "update: ..."`, `git push`.
    4. **Se corrompido** — `git restore .` pra limpar o working directory. O próximo cron (02:00) recomeça do zero.
-   5. **Causa raiz comum** — o agente estourou cota de ferramentas durante a auditoria de descrições (passo 4 do update: varre TODAS as SKILL.md, cada uma requer `read_file` + possível `patch`). Ciclo com muitas skills precisa de paralelismo ou o job cron precisa de timeout maior.
+   5. **Causas raiz comuns:**
+      - **Cota de ferramentas estourada** na auditoria de descrições (passo 4 do update: varre TODAS as SKILL.md). Ciclo com muitas skills precisa de paralelismo ou timeout maior.
+      - **Provider fallback com quota free tier esgotada.** O cron pinou `model: null, provider: null` no momento da criação → usa o provider ativo na época. Se o provider principal falha (429 rate limit), cai no `fallback_providers` do config.yaml. Gemini free tier tem limite de 250k input tokens — ao varrer 83+ SKILL.md o ciclo estoura a cota e recebe HTTP 429. **Diagnóstico:** `last_error` contém `HTTP 429` + `quota exceeded` + nome do modelo Gemini. **Prevenção:** (a) setar `model` e `provider` explicitamente no cron job via `cronjob(action='update', job_id=..., model={"model": "...", "provider": "..."})` para bypassar o fallback; (b) adicionar `context_length: 250000` ao fallback Gemini no config.yaml para conter a janela dentro do limite free tier.

@@ -68,4 +68,9 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 **YAML folded → quoted:** backlog-and-sprint, ideation-drilling, relatorio-de-custos, user-interview, skill-curation — `>-`/`>` descriptions converted to `"..."` format with explicit `\n\n` separation.
 **Descriptions fixed (added trigger + paragraph):** autonomous-ai-agents, product-pipeline, comfyui, style-guide-consultation, ai-voice-selfhost, oracle-host-access, vercel-deploy, hyperframes-video-production, read-reddit, polymarket, brand-iaf-conteudo, test-driven-development — all now have `Load this skill when` activation trigger and proper summary+paragraph format.
 **Index.md critical Resumo fixes:** product-pipeline, backlog-and-sprint, llama-cpp, skill-curation, style-guide-consultation, user-interview, relatorio-de-custos, taskflow-mcp, hermes-agent-skill-authoring — truncation and wrong summaries replaced.
-**Untracked reference files added:** 7 new reference files across iaf-newsletter-pipeline, brand-studio-forge, hyperframes-video-production.
+|**Untracked reference files added:** 7 new reference files across iaf-newsletter-pipeline, brand-studio-forge, hyperframes-video-production.
+
+## [2026-06-11] evolve | Depth-1 relations inferred via 3 subagentes. 66/83 skills received new relations (~180 edges). 0 merges, 0 deletes — skills MECE. 100% skills now have relations.
+**Análise:** 3 subagentes paralelos leram 83 skills (profundidade 1 bilateral), confirmaram conexões semânticas. Relações adicionadas a 66 skills — similar, uses, used_by, parent.
+**Clusters novos:** creative/* (ascii ↔ p5js ↔ manim ↔ pretext ↔ TTS), research/* (deep-research ↔ user-interview ↔ paper-writing ↔ arxiv), productivity/* (html-to-pdf ↔ nano-pdf ↔ pptx ↔ OCR), cross-category (maps↔reddit, vercel↔reports).
+**index.md:** 66 entries patched com novas relações. Grafo regenerado.
