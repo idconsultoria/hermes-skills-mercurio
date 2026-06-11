@@ -74,3 +74,5 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 **Análise:** 3 subagentes paralelos leram 83 skills (profundidade 1 bilateral), confirmaram conexões semânticas. Relações adicionadas a 66 skills — similar, uses, used_by, parent.
 **Clusters novos:** creative/* (ascii ↔ p5js ↔ manim ↔ pretext ↔ TTS), research/* (deep-research ↔ user-interview ↔ paper-writing ↔ arxiv), productivity/* (html-to-pdf ↔ nano-pdf ↔ pptx ↔ OCR), cross-category (maps↔reddit, vercel↔reports).
 **index.md:** 66 entries patched com novas relações. Grafo regenerado.
+
+## [2026-06-11] offload | No redundant memory found — all 6 entries are user preferences/environment facts, not procedural. Skipped.
