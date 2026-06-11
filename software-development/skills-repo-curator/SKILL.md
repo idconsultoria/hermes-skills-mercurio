@@ -137,7 +137,7 @@ Duas skills conectadas (similar/uses) só devem permanecer separadas se descreve
 2. Cada subagente analisa ~28 skills
 3. **Cada subagente lê a skill principal E cada skill candidata a relação (profundidade 1)** — lê o SKILL.md de ambos os lados, confirma a conexão semântica antes de declará-la
 4. **Cada subagente produz um RELATÓRIO de saída** (ex: `relations-batch1.md`) — NUNCA edita o index.md diretamente (evita conflito de escrita concorrente)
-5. Um único agente central lê os relatórios e aplica **todos os patches sequencialmente** no index.md
+5. Um único agente central lê os relatórios e aplica **todos os patches sequencialmente** no index.md. Com 180+ arestas, use transformação em lote via Python (veja `references/batch-apply-relations.md`) — parseia os relatórios e gera o index.md atualizado em uma operação.
 
 Resultado esperado: ~140+ arestas em 75+ skills com precisão validada nos dois sentidos.
 
@@ -190,6 +190,8 @@ Sempre que múltiplos subagentes precisarem modificar o index.md:
 3. **Um único** agente principal lê os relatórios e aplica **todos os patches sequencialmente** no index.md
 
 Isso garante atomicidade e evita corrupção do arquivo por escrita concorrente.
+
+Para aplicar grandes volumes de relações (180+ arestas), veja `references/batch-apply-relations.md` — abordagem de transformação em lote que parseia relatórios e gera o index.md atualizado.
 
 ---
 
@@ -268,3 +270,4 @@ grep -c "Relações" index.md  # skills com relações
    5. **Causas raiz comuns:**
       - **Cota de ferramentas estourada** na auditoria de descrições (passo 4 do update: varre TODAS as SKILL.md). Ciclo com muitas skills precisa de paralelismo ou timeout maior.
       - **Provider fallback com quota free tier esgotada.** O cron pinou `model: null, provider: null` no momento da criação → usa o provider ativo na época. Se o provider principal falha (429 rate limit), cai no `fallback_providers` do config.yaml. Gemini free tier tem limite de 250k input tokens — ao varrer 83+ SKILL.md o ciclo estoura a cota e recebe HTTP 429. **Diagnóstico:** `last_error` contém `HTTP 429` + `quota exceeded` + nome do modelo Gemini. **Prevenção:** (a) setar `model` e `provider` explicitamente no cron job via `cronjob(action='update', job_id=..., model={"model": "...", "provider": "..."})` para bypassar o fallback; (b) adicionar `context_length: 250000` ao fallback Gemini no config.yaml para conter a janela dentro do limite free tier.
+      - **Re-run deixou estado parcial.** `cronjob(action='run')` pode completar o Update mas falhar no Evolve, deixando batch reports e _analyze.py no working dir. Após recuperação manual, esses artefatos podem ser commitados sem dano ou descartados com `git restore`.
