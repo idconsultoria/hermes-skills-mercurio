@@ -1,0 +1,298 @@
+{
+  "jobs": [
+    {
+      "id": "b874e9037245",
+      "name": "IAF \u2014 Coleta de Fontes",
+      "prompt": "# IAF \u2014 Coleta de Fontes (04:00 GMT-3 / 07:00 UTC)\n\nSua miss\u00e3o \u00e9 varrer as fontes de informa\u00e7\u00e3o sobre IA e salvar os resultados para o CRON #3 (S\u00edntese + PDF) consumir.\n\n## Fontes obrigat\u00f3rias (todas!)\n\nUse web_search, web_extract e scripts locais para coletar.\n\n### 1. Reddit (via RSS)\nUse o script `/opt/data/scripts/reddit_rss_parser.py` para parsear os feeds RSS dos subreddits abaixo. O script aceita uma URL de feed RSS como argumento e retorna markdown estruturado.\n\nSubreddits (buscar HOT + TOP da semana):\n- `/r/artificial/` \u2014 Discuss\u00e3o geral sobre IA\n- `/r/MachineLearning/` \u2014 Research, papers, implementa\u00e7\u00f5es\n- `/r/OpenAI/` \u2014 Tudo relacionado \u00e0 OpenAI\n- `/r/LocalLLaMA/` \u2014 Modelos locais, open-source\n- `/r/singularity/` \u2014 Implica\u00e7\u00f5es sociais/filos\u00f3ficas\n- `/r/ClaudeAI/` \u2014 Claude/Anthropic ecosystem\n- `/r/StableDiffusion/` \u2014 Gera\u00e7\u00e3o de imagem, v\u00eddeo, \u00e1udio\n\n### 2. Hacker News\n- Frontpage: https://news.ycombinator.com/\n- Newest (AI-related): busque por \"AI\", \"GPT\", \"Claude\", \"LLM\", \"neural\" nos t\u00edtulos\n\n### 3. Not\u00edcias Gerais\nWeb_search para not\u00edcias de IA das \u00faltimas 24h. Priorize:\n- TechCrunch AI section\n- WIRED AI\n- Reuters Technology\n- The Verge AI\n- ArsTechnica AI\n\n### 4. Social / Discuss\u00f5es\n- Web_search para os termos amplos de discuss\u00e3o de IA.\n- F\u00f3runs e artigos de opini\u00e3o.\n\n## Crit\u00e9rio de qualidade\nCada entrada DEVE ter: t\u00edtulo, descri\u00e7\u00e3o curta (1-3 linhas), e **link clic\u00e1vel** para a fonte original. Sem link = entrada descartada.\n\n## Formato de sa\u00edda\nSalve em `/opt/data/cron/output/b874e9037245/` com nome `iaf_coleta_$(date +%Y-%m-%d_%H-%M-%S).md`\n\nUse o formato:\n```markdown\n# Coleta de Fontes \u2014 IAF \u00b7 DD/MM/AAAA HH:MM\n\n## Reddit\n### [T\u00edtulo do post](url)\nDescri\u00e7\u00e3o curta. Fonte: r/subreddit\n\n## Hacker News\n### [T\u00edtulo](url)\nDescri\u00e7\u00e3o curta. Pontua\u00e7\u00e3o: N pts\n\n## Not\u00edcias\n### [T\u00edtulo](url)\nDescri\u00e7\u00e3o curta. Fonte: Nome da publica\u00e7\u00e3o\n\n## Social\n### [T\u00edtulo](url)\nDescri\u00e7\u00e3o curta. Fonte: contexto\n```\n\nMantenha o arquivo limpo e sem duplicatas.",
+      "skills": [
+        "hermes-agent"
+      ],
+      "skill": "hermes-agent",
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 7 * * *",
+        "display": "0 7 * * *"
+      },
+      "schedule_display": "0 7 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 7
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-05T10:18:11.317514+00:00",
+      "next_run_at": "2026-06-12T07:00:00+00:00",
+      "last_run_at": "2026-06-11T07:14:55.259679+00:00",
+      "last_status": "ok",
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "local",
+      "origin": {
+        "platform": "telegram",
+        "chat_id": "6171996969",
+        "chat_name": "Gustavo",
+        "thread_id": null
+      },
+      "enabled_toolsets": [
+        "terminal",
+        "web",
+        "file"
+      ],
+      "workdir": null,
+      "profile": null
+    },
+    {
+      "id": "e418042f0c99",
+      "name": "IAF \u2014 S\u00edntese + PDF",
+      "prompt": "# IAF \u2014 S\u00edntese + PDF (07:40 BRT)\n\nSua miss\u00e3o: sintetizar o conte\u00fado coletado pelos CRONs #1 (fontes, 04:00) e #2 (newsletters, 07:30), escrever a newsletter IAF \"Manh\u00e3 Aumentada\", gerar o HTML e o PDF, e entregar no Telegram.\n\n## Skills carregadas\nAs skills `newsletter-curation`, `copywriting`, `humanizer`, `html-to-pdf-chromium` e `iaf-newsletter` est\u00e3o carregadas. Siga suas instru\u00e7\u00f5es para estrutura editorial, tom, zero anglicismos.\n\n## \u26a0\ufe0f REGRA ABSOLUTA: DEDUPLICA\u00c7\u00c3O \u00c9 OBRIGAT\u00d3RIA \u2014 N\u00c3O PULE\n\n**VOC\u00ca \u00c9 OBRIGADO A FAZER DEDUPLICA\u00c7\u00c3O. ISTO N\u00c3O \u00c9 OPCIONAL. N\u00c3O \u00c9 UMA SUGEST\u00c3O. SE VOC\u00ca PULAR A DEDUP, A NEWSLETTER TER\u00c1 NOT\u00cdCIAS REPETIDAS E O USU\u00c1RIO FICAR\u00c1 INSATISFEITO \u2014 ISSO J\u00c1 ACONTECEU DUAS VEZES.**\n\n### Como fazer a dedup:\n\n1. **Leia o hist\u00f3rico** \u2014 antes de escrever qualquer coisa, leia o HTML da edi\u00e7\u00e3o de ontem (ou da \u00faltima edi\u00e7\u00e3o publicada) em `/opt/data/cron/history/`. Extraia a lista de t\u00edtulos e links de todas as not\u00edcias que j\u00e1 sa\u00edram.\n\n2. **Compare** \u2014 para cada not\u00edcia que voc\u00ea est\u00e1 considerando incluir na edi\u00e7\u00e3o de hoje, verifique se o t\u00edtulo ou o link j\u00e1 apareceu no hist\u00f3rico. Se apareceu, **REMOVA** \u2014 n\u00e3o republique a mesma not\u00edcia.\n\n3. **Mesmo conte\u00fado de fontes diferentes** \u2014 se a mesma not\u00edcia apareceu em duas fontes diferentes (ex: The Rundown e Superhuman), use apenas uma ocorr\u00eancia. Mantenha a vers\u00e3o com mais informa\u00e7\u00e3o.\n\n4. **Valide** \u2014 antes de finalizar, leia sua lista final de not\u00edcias e confirme visualmente que nenhuma se repete.\n\n**\u26a0\ufe0f N\u00c3O confie na sua mem\u00f3ria. Leia os arquivos do hist\u00f3rico no disco.**\n**\u26a0\ufe0f Se houver 2+ not\u00edcias sobre o mesmo tema/empresa com \u00e2ngulos diferentes, mantenha apenas a mais relevante.**\n**\u26a0\ufe0f Isto \u00e9 um requisito obrigat\u00f3rio do pipeline. Falhar na dedup = newsletter com defeito.**\n\n---\n\n## \u26a0\ufe0f REGRA ABSOLUTA: PDF DEVE SER GERADO COM CHROMIUM HEADLESS \u2014 NUNCA USE WEASYPRINT OU OUTRAS FERRAMENTAS\n\n**O PDF da newsletter DEVE ser renderizado com Chromium Headless, igual \u00e0 edi\u00e7\u00e3o especial Fable/Mythos.** WeasyPrint e outras bibliotecas Python perdem CSS features (gradientes, webkit-background-clip, grid, glow effects) e produzem PDF de baixa qualidade (~100KB em vez de ~500KB+).\n\n### Comando OBRIGAT\u00d3RIO para gerar o PDF:\n\n```bash\nCHROMIUM=/tmp/chromium-extracted/usr/lib/chromium/chromium\nLD_LIBRARY_PATH=/tmp/chromium-extracted/usr/lib/chromium \\\n  timeout 120 $CHROMIUM \\\n  --headless --no-sandbox --disable-gpu \\\n  --disable-software-rasterizer \\\n  --no-pdf-header-footer \\\n  --deterministic-mode \\\n  --print-to-pdf=\"$PDF\" \"file://$HTML\"\n```\n\n### Verifica\u00e7\u00e3o:\n- O PDF deve ter no m\u00ednimo **300KB** \u2014 se for menor que isso, algo deu errado (provavelmente usou WeasyPrint em vez de Chromium)\n- Verifique com: `ls -lh \"$PDF\"`\n- Se o PDF for muito pequeno (<200KB), refa\u00e7a com Chromium\n\n### Se o Chromium travar (timeout):\n- Remova as tags `<link href=\"https://fonts.googleapis.com/...\">` do HTML antes de gerar o PDF e use fontes do sistema como fallback\n- Use `--disable-dev-shm-usage` como flag extra\n- Aumente timeout para at\u00e9 120s\n\n---\n\n## \u26a0\ufe0f Regras atualizadas da pipeline\n\n### 1. Ranking \u00e9 INTERNO \u2014 nunca enviado\nUse o ranqueamento (Impacto \u00d7 Utilidade \u00d7 Intriga) para definir a ordem das se\u00e7\u00f5es (An\u00e1lise top 3, Radar, Pulso, Aplica\u00e7\u00e3o). A tabela de scores \u00e9 ferramenta editorial interna. **N\u00c3O inclua a tabela na resposta final nem salve em arquivo separado.**\n\n### 2. Salvar HTML ANTES de gerar PDF (CRON #4 precisa)\nSalve o HTML em `/opt/data/cron/history/iaf_$(date +%Y-%m-%d).html` **assim que estiver pronto** \u2014 antes de come\u00e7ar a renderiza\u00e7\u00e3o do PDF. O CRON #4 (07:50) precisa deste arquivo para fazer o deploy web. Se o HTML n\u00e3o estiver salvo, o CRON #4 n\u00e3o ter\u00e1 o que deployar.\n\n### 3. PDF com pagina\u00e7\u00e3o e fontes melhoradas\n\n#### @page e body\n```css\n@page { size: 210mm 297mm; margin: 0; }  /* NOT size: A4 */\nhtml, body {\n  margin: 0; padding: 0;\n  background-color: #ffffff;  /* NOT #e8edf0 */\n}\n```\n\n#### @media print\n```css\n@media print {\n  html, body { width: 100%; margin: 0; padding: 0; background: #ffffff; }\n  .page { overflow: visible !important; page-break-inside: auto; border: none !important; }\n  .cover-page { overflow: hidden !important; width: 100% !important; height: 100vh !important; }\n}\n```\n\n#### Font sizes m\u00ednimos (n\u00e3o usar abaixo)\n| Elemento | Tamanho | Line-height |\n|----------|---------|-------------|\n| Editorial body (Spectral) | 15.5px | 1.75 |\n| Card body (Inter) | 13.5px | 1.65 |\n| Bench table (Fira Code) | 10px | \u2014 |\n| Section titles (Outfit 700) | 17px | \u2014 |\n| Pull quotes (Spectral italic) | 20px | 1.45 |\n| Stat numbers (Outfit 900) | 32px | 1.0 |\n| Cover title (Outfit 900) | 46px | 1.15 |\n| Callout boxes | 13.5px | 1.65 |\n| Timeline text | 13px | 1.5 |\n| Footer | 9px | \u2014 |\n\n### 4. CSS duplo no HTML\nO HTML deve conter CSS otimizado para PDF (com @page, fontes m\u00ednimas, body branco) E `@media screen` para navega\u00e7\u00e3o em navegador (background #e8edf0, max-width 800px). Ambos no mesmo arquivo.\n\n## Fluxo\n\n### Passo 1 \u2014 Ler dados coletados\nLeia `/opt/data/cron/output/b874e9037245/` (CRON #1) e `/opt/data/cron/output/c03bb6e1124c/` (CRON #2). Extraia os arquivos mais recentes. Use web_search/web_extract se necess\u00e1rio para preencher lacunas.\n\n### Passo 2 \u2014 DEDUPLICA\u00c7\u00c3O (executar ANTES do ranqueamento)\nLeia o HTML da \u00faltima edi\u00e7\u00e3o em `/opt/data/cron/history/`. Extraia t\u00edtulos. Remova do seu conjunto qualquer not\u00edcia que j\u00e1 saiu. **Este passo \u00e9 obrigat\u00f3rio.**\n\n### Passo 3 \u2014 Ranqueamento interno\nPr\u00e9-selecione 10-15 itens (j\u00e1 deduplicados). Ranqueie cada um (Impacto \u00d7 Utilidade \u00d7 Intriga, 1-10). Use a m\u00e9dia para definir:\n- Top 3 \u2192 An\u00e1lise (Deep Dive)\n- Demais not\u00edcias \u2192 Radar\n- Demais discuss\u00f5es \u2192 Pulso\n- 1 maior Utilidade \u2192 Aplica\u00e7\u00e3o Pr\u00e1tica\n\nA tabela de ranqueamento \u00e9 USO INTERNO \u2014 n\u00e3o publique nem salve.\n\n### Passo 4 \u2014 Escrever a newsletter (HTML)\nSiga estrutura e regras das skills. Use `/opt/data/referencias/iaf_v3_reference.html` como base visual. Aplique as regras de PDF melhoradas (font sizes, @page, @media print, body white). Inclua `@media screen` para navega\u00e7\u00e3o.\n\n_NUNCA use emojis no HTML \u2014 SVGs inline com stroke=\"#06b8a0\"._\n_TODO item deve ter link da fonte original._\n\n### Passo 5 \u2014 Salvar HTML (antes do PDF!)\n```bash\ncp /caminho/html/gerado /opt/data/cron/history/iaf_$(date +%Y-%m-%d).html\n```\nVerifique se o HTML existe e tem conte\u00fado antes de prosseguir.\n\n### Passo 6 \u2014 Renderizar PDF COM CHROMIUM (OBRIGAT\u00d3RIO \u2014 N\u00c3O USE WEASYPRINT)\nUse o Chromium headless:\n\n```bash\nCHROMIUM=/tmp/chromium-extracted/usr/lib/chromium/chromium\nLD_LIBRARY_PATH=/tmp/chromium-extracted/usr/lib/chromium \\\n  timeout 120 $CHROMIUM \\\n  --headless --no-sandbox --disable-gpu \\\n  --disable-software-rasterizer \\\n  --no-pdf-header-footer \\\n  --deterministic-mode \\\n  --print-to-pdf=\"$PDF\" \"file://$HTML\"\n```\n\nSalve PDF: `/opt/data/cron/history/iaf_$(date +%Y-%m-%d).pdf`\nVerifique: `ls -lh \"$PDF\"` \u2014 m\u00ednimo **300KB**. Se for menor, refa\u00e7a com Chromium (provavelmente caiu em WeasyPrint).\n\n### Passo 7 \u2014 Entregar no Telegram\nResposta final DEVE conter:\n1. **Primeira linha:** `MEDIA:/opt/data/cron/history/iaf_$(date +%Y-%m-%d).pdf`\n2. Linha em branco\n3. Bloco ```text com o texto WhatsApp:\n```text\n\ud83d\udcf0 *IAF \u2014 Manh\u00e3 Aumentada* \u00b7 DD/MM/AAAA\n\n*[PRIMEIRA FRASE DO EDITORIAL EM NEGRITO]* Restante...\n\n\ud83d\udd25 *Destaques do dia*\n\u2022 [Top 1 do ranking \u2014 bullet curto]\n\u2022 [Top 2 do ranking \u2014 bullet curto]\n\u2022 [Top 3 do ranking \u2014 bullet curto]\n\n\ud83c\udfaf *Aplica\u00e7\u00e3o pr\u00e1tica de hoje:* [1 linha]\n```\n\nN\u00c3O inclua ranking, scores, metadados t\u00e9cnicos. S\u00f3 o PDF + WhatsApp text.",
+      "skills": [
+        "newsletter-curation",
+        "copywriting",
+        "humanizer",
+        "html-to-pdf-chromium",
+        "iaf-newsletter"
+      ],
+      "skill": "newsletter-curation",
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "context_from": [
+        "b874e9037245",
+        "c03bb6e1124c"
+      ],
+      "schedule": {
+        "kind": "cron",
+        "expr": "40 10 * * *",
+        "display": "40 10 * * *"
+      },
+      "schedule_display": "40 10 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 10
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-05T10:18:28.339710+00:00",
+      "next_run_at": "2026-06-12T10:40:00+00:00",
+      "last_run_at": "2026-06-11T10:43:39.484648+00:00",
+      "last_status": "ok",
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "origin",
+      "origin": {
+        "platform": "telegram",
+        "chat_id": "6171996969",
+        "chat_name": "Gustavo",
+        "thread_id": null
+      },
+      "enabled_toolsets": [
+        "terminal",
+        "file"
+      ],
+      "workdir": null,
+      "profile": null
+    },
+    {
+      "id": "c03bb6e1124c",
+      "name": "IAF \u2014 Newsletters (therundown + superhuman)",
+      "prompt": "# IAF \u2014 Coleta de Newsletters (07:30 GMT-3 / 10:30 UTC)\n\nSua miss\u00e3o \u00e9 extrair o conte\u00fado mais recente de duas newsletters de IA:\n\n## 1. The Rundown AI\n- URL: https://www.therundown.ai/\n- Extraia: t\u00edtulo de cada se\u00e7\u00e3o + resumo + links\n- Use web_extract para pegar o conte\u00fado da p\u00e1gina\n\n## 2. Superhuman AI\n- URL: https://superhuman.ai/\n- Extraia: t\u00edtulo de cada se\u00e7\u00e3o + resumo + links\n- Use web_extract para pegar o conte\u00fado da p\u00e1gina\n\n## Crit\u00e9rio\nCada entrada precisa de: t\u00edtulo, resumo curto (1-2 linhas), e **link clic\u00e1vel**.\n\n## Formato de sa\u00edda\nSalve em `/opt/data/cron/output/c03bb6e1124c/` com nome `iaf_newsletters_$(date +%Y-%m-%d_%H-%M-%S).md`\n\nUse markdown limpo, uma entrada por linha, com links.",
+      "skills": [
+        "hermes-agent"
+      ],
+      "skill": "hermes-agent",
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "30 10 * * *",
+        "display": "30 10 * * *"
+      },
+      "schedule_display": "30 10 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 7
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-05T10:21:41.308914+00:00",
+      "next_run_at": "2026-06-12T10:30:00+00:00",
+      "last_run_at": "2026-06-11T10:46:39.103562+00:00",
+      "last_status": "ok",
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "local",
+      "origin": {
+        "platform": "telegram",
+        "chat_id": "6171996969",
+        "chat_name": "Gustavo",
+        "thread_id": null
+      },
+      "enabled_toolsets": [
+        "web",
+        "file"
+      ],
+      "workdir": null,
+      "profile": null
+    },
+    {
+      "id": "31ec47d7c99a",
+      "name": "IAF \u2014 Deploy Web",
+      "prompt": "# IAF \u2014 Deploy Web (07:50 BRT)\n\nSua miss\u00e3o: pegar o HTML que gerou o PDF da edi\u00e7\u00e3o de hoje, adaptar para vers\u00e3o responsiva web, fazer deploy no Vercel, e avisar no Telegram.\n\n## Pr\u00e9-requisitos\n- CRON #3 (S\u00edntese + PDF, 07:40) j\u00e1 salvou o HTML em `/opt/data/cron/history/iaf_$(date +%Y-%m-%d).html`\n- O script de deploy est\u00e1 em `/opt/data/iaf-edicoes-archive/_deploy_new_edition.py`\n- Vercel CLI em `/opt/data/.npm-global/bin/vercel`\n\n## Dom\u00ednios\n- **Dom\u00ednio original (Vercel):** `iaf-edicoes-archive.vercel.app`\n- **Alias (dom\u00ednio personalizado):** `iaf-newsletter.vercel.app`\n- O projeto Vercel se chama `iaf-edicoes-archive`. O alias `iaf-newsletter.vercel.app` redireciona para ele.\n- Na URL de entrega, usar SEMPRE o alias: `https://iaf-newsletter.vercel.app/SLUG`\n\n## Fluxo\n\n### Passo 1 \u2014 Verificar se h\u00e1 edi\u00e7\u00e3o nova\nExecute o script de deploy:\n```bash\ncd /opt/data/iaf-edicoes-archive && python3 _deploy_new_edition.py\n```\n\nSe retornar `{\"success\": false, \"error\": \"No new editions to deploy\"}`, a resposta final \u00e9 `[SILENT]` \u2014 nada a fazer hoje. Pode acontecer se o CRON #3 n\u00e3o salvou o HTML a tempo.\n\n### Passo 2 \u2014 Se deploy bem-sucedido\nO script retorna JSON com `{success: true, slug, edition_url, link_text}`. Extraia:\n- `slug` \u2014 o slug da nova edi\u00e7\u00e3o (ex: 10062026)\n- `edition_url` \u2014 URL completa (ex: https://iaf-newsletter.vercel.app/10062026)\n\n### Passo 3 \u2014 Verificar o deploy\n```bash\ncurl -o /dev/null -s -w \"%{http_code}\" \"https://iaf-newsletter.vercel.app/$SLUG\"\n```\nDeve retornar 200.\n\n### Passo 4 \u2014 Entregar no Telegram\nResposta final. Use o alias `iaf-newsletter.vercel.app` na URL, N\u00c3O o dom\u00ednio original:\n```\n\ud83d\udcf0 *IAF \u2014 Manh\u00e3 Aumentada* \u00b7 DD/MM/AAAA\n\n\ud83c\udf10 *Vers\u00e3o web dispon\u00edvel:*\nhttps://iaf-newsletter.vercel.app/SLUG\n\n\ud83d\udcac Agora voc\u00ea pode ler e compartilhar a edi\u00e7\u00e3o de hoje direto do navegador \u2014 responsivo, r\u00e1pido e sem precisar baixar PDF.\n```\n\nInclua o slug correto na URL. Se o script falhar, reporte o erro em vez do link.",
+      "skills": [
+        "hermes-agent"
+      ],
+      "skill": "hermes-agent",
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "context_from": [
+        "e418042f0c99"
+      ],
+      "schedule": {
+        "kind": "cron",
+        "expr": "50 10 * * *",
+        "display": "50 10 * * *"
+      },
+      "schedule_display": "50 10 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 10
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-05T10:52:41.603604+00:00",
+      "next_run_at": "2026-06-12T10:50:00+00:00",
+      "last_run_at": "2026-06-11T10:52:02.561963+00:00",
+      "last_status": "ok",
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "origin",
+      "origin": {
+        "platform": "telegram",
+        "chat_id": "6171996969",
+        "chat_name": "Gustavo",
+        "thread_id": null
+      },
+      "enabled_toolsets": [
+        "file",
+        "terminal"
+      ],
+      "workdir": null,
+      "profile": null
+    },
+    {
+      "id": "e1407b09624a",
+      "name": "pi-dotfiles-sync",
+      "prompt": "Execute /opt/data/pi-dotfiles/scripts/sync-bidirectional.sh via terminal. This syncs the Pi Coder Agent dotfiles (skills, settings) bidirectionally with the GitHub repo gustavomello9600/pi-dotfiles. Report the output as a brief summary.",
+      "skills": [],
+      "skill": null,
+      "model": null,
+      "provider": null,
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 5 * * *",
+        "display": "0 5 * * *"
+      },
+      "schedule_display": "0 5 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 3
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-08T05:30:27.161123+00:00",
+      "next_run_at": "2026-06-12T05:00:00+00:00",
+      "last_run_at": "2026-06-11T05:00:46.576675+00:00",
+      "last_status": "ok",
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "local",
+      "origin": {
+        "platform": "telegram",
+        "chat_id": "6171996969",
+        "chat_name": "Gustavo",
+        "thread_id": null
+      },
+      "enabled_toolsets": [
+        "terminal"
+      ],
+      "workdir": null,
+      "profile": null
+    },
+    {
+      "id": "d86442793114",
+      "name": "ciclo-consolidacao-diario",
+      "prompt": "Execute o ciclo de consolida\u00e7\u00e3o completo conforme definido no AGENTS.md deste reposit\u00f3rio (/opt/data/skills/AGENTS.md).\n\nO ciclo consiste em 3 etapas, nesta ordem:\n\n## Etapa 1: Update\n1. `git status` + `git diff` para detectar mudan\u00e7as desde o \u00faltimo commit\n2. Escaneie todas as skills no reposit\u00f3rio\n3. Atualize o index.md com as mudan\u00e7as detectadas (usando read_file/patch/write_file \u2014 NUNCA regenerando do zero)\n4. Audite conformidade de descri\u00e7\u00f5es: varra todas as SKILL.md, verifique se o sum\u00e1rio \u00e9 ~80 chars sem truncamento e se h\u00e1 par\u00e1grafo descritivo com gatilhos de ativa\u00e7\u00e3o. Corrija as que estiverem fora do formato.\n5. Registre no log.md com prefixo `update`\n6. git add -A && git commit -m \"update: ...\"\n\n## Etapa 2: Evolve\n1. Estude o index.md completo e elabore plano de evolu\u00e7\u00e3o\n2. Salve o plano em reports/evolve-<YYYY-MM-DD-HHMM>.md\n3. Execute o plano (merges, deletes, consolida\u00e7\u00e3o de conte\u00fado). Durante a execu\u00e7\u00e3o: limpe aprendizados excessivamente espec\u00edficos, audite descri\u00e7\u00f5es.\n4. Revise skills \u00f3rf\u00e3s \u2014 skills sem rela\u00e7\u00f5es no grafo. Tente conectar ou justifique.\n5. Escreva relat\u00f3rio denso em reports/evolve-<YYYY-MM-DD>-report.md\n6. Atualize index.md p\u00f3s-transforma\u00e7\u00e3o\n7. Registre no log.md com prefixo `evolve`\n8. Gere grafo HTML interativo: `python3 scripts/generate_graph.py`\n9. git add -A && git commit -m \"evolve: ...\"\n\n## Etapa 3: Offload\n1. Leia a mem\u00f3ria persistente (use o tool memory com action='list' \u2014 ou pelo menos liste as entradas atuais)\n2. Para cada entrada, verifique se existe skill cobrindo o mesmo assunto (skills no diret\u00f3rio /opt/data/skills/)\n3. Se sim, remova da mem\u00f3ria (com `memory action='remove'` usando old_text para identificar)\n4. Registre no log.md com prefixo `offload`\n5. git add -A && git commit -m \"offload: ...\"\n\n## Push final\nAp\u00f3s as 3 etapas, fa\u00e7a:\n6. git push origin master\n\n## IMPORTANTE:\n- Use ferramentas LLM (read_file, patch, write_file) \u2014 NUNCA scripts para editar index.md\n- Scripts s\u00e3o permitidos APENAS para tarefas de apoio (generate_graph.py, an\u00e1lise de conex\u00f5es)\n- Trabalhe dentro de /opt/data/skills/ (workdir j\u00e1 configurado)\n- No final, sua resposta deve conter APENAS: o caminho do relat\u00f3rio de evolve gerado e o caminho do grafo HTML gerado. Use o formato:\n  REPORT:/opt/data/skills/reports/evolve-<DATA>-report.md\n  GRAPH:/opt/data/skills/skills_graph.html\n  SUMMARY: Breve resumo do que foi feito (mudan\u00e7as, merges, descri\u00e7\u00f5es corrigidas, rela\u00e7\u00f5es adicionadas)",
+      "skills": [
+        "skills-repo-curator",
+        "hermes-agent"
+      ],
+      "skill": "skills-repo-curator",
+      "model": "deepseek-v4-flash",
+      "provider": "opencode-go",
+      "base_url": null,
+      "script": null,
+      "no_agent": false,
+      "context_from": null,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 2 * * *",
+        "display": "0 2 * * *"
+      },
+      "schedule_display": "0 2 * * *",
+      "repeat": {
+        "times": null,
+        "completed": 2
+      },
+      "enabled": true,
+      "state": "scheduled",
+      "paused_at": null,
+      "paused_reason": null,
+      "created_at": "2026-06-10T08:52:25.005690+00:00",
+      "next_run_at": "2026-06-12T02:00:00+00:00",
+      "last_run_at": "2026-06-11T10:35:59.268637+00:00",
+      "last_status": "ok",
+      "last_error": null,
+      "last_delivery_error": null,
+      "deliver": "origin",
+      "origin": {
+        "platform": "telegram",
+        "chat_id": "6171996969",
+        "chat_name": "Gustavo",
+        "thread_id": null
+      },
+      "enabled_toolsets": null,
+      "workdir": "/opt/data/skills",
+      "profile": null
+    }
+  ],
+  "updated_at": "2026-06-11T11:48:08.260806+00:00"
+}

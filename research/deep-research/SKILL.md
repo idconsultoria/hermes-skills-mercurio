@@ -426,6 +426,7 @@ For SwiftUI apps, common bug patterns to trace:
 - `references/agent-memory-landscape-2026.md` — Agent memory open-source landscape (Mem0, Letta, Zep, Cognee, Hermes providers). Useful when user asks about memory/knowledge management for AI agents.
 - `references/research-to-batch-dev-pattern.md` — Proven pattern for research → phased batch development with parallel subagents (19 tasks, 7 phases). Useful when research is followed by implementation.
 - `references/kusto-investigation.md` — Consolidated Kusto/Azure Data Explorer investigation patterns: Phase 0.5 variant, iterative Kusto pattern, REST API helper, cluster details, pitfalls, and subagent guidance. Use when research target is an internal telemetry database rather than public web sources.
+- `references/data-to-frontier-chart.md` — Data compilation and frontier-chart generation from multiple web sources. Covers extracting numeric data from SPA leaderboards (browser console JS), cross-referencing parameter/size data, computing the upper convex envelope (frontier), and generating matplotlib scatter+frontier charts with log-scale axes. Use when research deliverables include a metric-vs-scale visualization with an efficient-frontier analysis.
 
 ### Research → Project Application (Fitness Check)
 

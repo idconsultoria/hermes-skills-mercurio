@@ -1,6 +1,6 @@
 ---
 name: skills-repo-curator
-description: "Gerencia o skills repo em /opt/data/skills/ com controle de versão Git: Ciclo de Consolidação (Update→Evolve→Offload), análise MECE, merges, revisão de órfãos, inferência depth-1 de relações, auditoria de conformidade de descrições, index.md/log.md/reports, geração de grafo D3 interativo e offload de memória.\n\nLoad this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, AGENTS.md updates, or any skills repository management task. Executes the full consolidation lifecycle: analyze portfolio, propose merges, delete redundant skills, review orphans, write reports, offload learned facts to skills, generate graph, and commit."
+description: "Gerencia o skills repo em /opt/data/skills/ com controle de versão Git e curadoria de skills comunitárias — Ciclo de Consolidação (Update→Evolve→Offload), descoberta/avaliação/instalação de skills externas, análise MECE, merges, revisão de órfãos, inferência depth-1 de relações, auditoria de conformidade de descrições, index.md/log.md/reports, geração de grafo D3 interativo e offload de memória.\n\nLoad this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, AGENTS.md updates, installing community skills, or any skills repository management task. Executes the full consolidation lifecycle: analyze portfolio, propose merges, delete redundant skills, review orphans, write reports, offload learned facts to skills, generate graph, and commit. Covers both internal repo maintenance (evolve/update/offload cycles) and external curation (discovering, evaluating, installing community skills from HermesHub, GitHub, or raw URLs)."
 category: software-development
 ---
 
@@ -26,6 +26,59 @@ category: software-development
 ```
 
 O ciclo é executado periodicamente (diariamente via cron às 02:00). Ele inicia os updates — não o contrário.
+
+## Fases do Gerenciamento de Skills
+
+Este skill cobre as **duas fases** do ciclo de vida de uma skill:
+
+### Fase 1 — External Curation & Installation (Descobrir, Avaliar, Instalar)
+
+**Quando usar:** O usuário quer descobrir, avaliar e instalar skills da comunidade ou de hubs externos.
+
+Cobre o workflow completo de curadoria externa:
+- Fontes confiáveis para encontrar skills (Awesome Hermes Agent, HermesHub, Hermes Atlas, GitHub)
+- Rubrica de avaliação multi-critério (5-point checklist)
+- Sistema de ranking por tiers (Elite/Strong/Utility)
+- 6 métodos de instalação (Hub, Tap+Install, Raw URL, Vendor scripts, Docker, From source)
+- Registro de MCP Server para ferramentas externas
+- Verificação pós-instalação
+
+**Trigger:** usuário diz "find skills for", "discover skills about", "install skill", "procurar skills", "adquirir skills", "melhores skills", ou pede para comparar/avaliar skills comunitárias.
+
+**Fontes de curadoria (ranked by reliability):**
+| Source | URL | Reliability |
+|--------|-----|:-----------:|
+| Awesome Hermes Agent | github.com/0xNyk/awesome-hermes-agent | ⭐⭐⭐⭐⭐ |
+| EasyClaw rankings | easyclaw.com/blog/knowledge/best-hermes-agent-skills | ⭐⭐⭐⭐⭐ |
+| Felo AI blog | felo.ai/blog/best-hermes-agent-skills-2026 | ⭐⭐⭐⭐ |
+| HermesHub | hermeshub.xyz | ⭐⭐⭐⭐ |
+| Hermes Atlas | hermesatlas.com | ⭐⭐⭐ |
+| GitHub search | `site:github.com hermes-agent skill <topic>` | ⭐⭐⭐ |
+| Official docs catalog | hermes-agent.nousresearch.com/docs/reference/skills-catalog | ⭐⭐⭐⭐⭐ |
+
+**Rubrica de Avaliação (5-point checklist):**
+1. Security scan: `hermes skills inspect <id>` — no badge = manual review
+2. Last commit: >60 days = possible incompatibility
+3. Install/usage count: <50 installs on >3mo old skill = suspicious
+4. Open issues: last 5 unresponded = abandoned
+5. Hermes version compat: pre-v0.9 may not work with v0.10+
+
+**Métodos de Instalação (preferência decrescente):**
+
+1. **Hub Install** `hermes skills install <skill-id> -y`
+2. **Tap + Install** `hermes skills tap add <user>/<repo> && hermes skills install <skill-name>`
+3. **Raw URL** `hermes skills install "https://raw.githubusercontent.com/..." --name <name> --category <cat> --yes`
+4. **Vendor scripts** — verificar Content-Type primeiro (muitos sites SPA retornam HTML)
+5. **Docker** — para ferramentas externas sem pacotes nativos
+6. **From source** — para ferramentas que precisam de Node/npm específicos
+
+**Pós-instalação:** `hermes skills list | grep <name> && skill_view(name='<skill-name>')` para verificar.
+
+**MCP Server Registration:** Se a ferramenta instalada expõe MCP server, registre com `hermes config set mcp_servers.<name>...`.
+
+Para detalhes completos, veja `references/external-tools-install-notes.md` e `references/deep-research-skills-ranking-2026-06.md`.
+
+---
 
 ## Estrutura do Repositório
 
@@ -239,6 +292,10 @@ grep "|- \`" index.md  # deve retornar vazio
 grep -rn 'description: >-' SKILL.md  # deve retornar vazio (YAML folded quebra o parser)
 grep "^### " index.md | wc -l  # total de skills
 grep -c "Relações" index.md  # skills com relações
+
+# Check for leaked subagent commentary in relation lines
+grep -n '(reason:' index.md  # deve retornar vazio — subagentes podem vazar notas nos relatórios
+grep -n 'Reason:' index.md   # mesma verificação, capitalização alternativa
 ```
 
 ## Pitfalls
@@ -270,4 +327,8 @@ grep -c "Relações" index.md  # skills com relações
    5. **Causas raiz comuns:**
       - **Cota de ferramentas estourada** na auditoria de descrições (passo 4 do update: varre TODAS as SKILL.md). Ciclo com muitas skills precisa de paralelismo ou timeout maior.
       - **Provider fallback com quota free tier esgotada.** O cron pinou `model: null, provider: null` no momento da criação → usa o provider ativo na época. Se o provider principal falha (429 rate limit), cai no `fallback_providers` do config.yaml. Gemini free tier tem limite de 250k input tokens — ao varrer 83+ SKILL.md o ciclo estoura a cota e recebe HTTP 429. **Diagnóstico:** `last_error` contém `HTTP 429` + `quota exceeded` + nome do modelo Gemini. **Prevenção:** (a) setar `model` e `provider` explicitamente no cron job via `cronjob(action='update', job_id=..., model={"model": "...", "provider": "..."})` para bypassar o fallback; (b) adicionar `context_length: 250000` ao fallback Gemini no config.yaml para conter a janela dentro do limite free tier.
-      - **Re-run deixou estado parcial.** `cronjob(action='run')` pode completar o Update mas falhar no Evolve, deixando batch reports e _analyze.py no working dir. Após recuperação manual, esses artefatos podem ser commitados sem dano ou descartados com `git restore`.
+      - **Re-run deixou estado parcial.** `cronjob(action='run')` pode completar o Update mas falhar no Evolve, deixando batch reports e `_analyze.py` / outros scripts temporários no working dir. Após recuperação manual, esses artefatos podem ser commitados sem dano ou descartados com `git restore`.
+
+⚠️ **Limpeza de scripts temporários.** Scripts de análise auxiliar (ex: `_analyze.py`, `_count_relations.py`) criados durante o ciclo DEVEM ser removidos antes do commit final. Eles poluem o repositório e não têm valor após o ciclo. Use `rm -f _analyze.py _*.py` como passo de limpeza antes do stage final.
+
+⚠️ **Leaked commentary de subagentes no index.md.** Subagentes podem incluir notas informais como `(reason: ...)` em suas propostas de relação. Quando o agente central aplica as relações manualmente via patch, é fácil copiar acidentalmente o comentário junto com a relação. Isso quebra o formato limpo do index.md. **Sempre verificar** com `grep -n '(reason:' index.md` e `grep -n 'Reason:' index.md` depois de aplicar patches de relação, e remover qualquer linha contaminada.

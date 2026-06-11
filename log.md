@@ -73,3 +73,8 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 ## [2026-06-11] evolve | Relations expanded + index.md cleanup. 83 skills, 260 edges (graph). 0 merges, 0 deletes.
 
 ## [2026-06-11] offload | No redundant memory found — all 6 entries are user preferences/environment facts, not procedural. Skipped.
+
+## [2026-06-11] evolve | Umbrella consolidation pass: 1 merge + 37 pruned. 83→46 skills. 37 archived.
+**Consolidation:** skill-curation → skills-repo-curator (external curation lifecycle merged into umbrella repo curator skill; reference files migrated)
+**Prunings (stale built-ins):** airtable, apple-notes, apple-reminders, architecture-diagram, arxiv, ascii-art, ascii-video, baoyu-infographic, blogwatcher, claude-design, comfyui, evaluating-llms-harness, excalidraw, findmy, github-issues, himalaya, huggingface-hub, imessage, jupyter-live-kernel, llama-cpp, llm-wiki, macos-computer-use, manim-video, maps, nano-pdf, obsidian, ocr-and-documents, p5js, polymarket, powerpoint, pretext, research-paper-writing, serving-llms-vllm, songwriting-and-ai-music, weights-and-biases, xurl, youtube-content
+**Rationale:** All 37 are built-in skills with zero usage/activity, mostly platform-unsupported (macOS on Linux) or too narrow for standalone entries. Prune-Builtins mode: `hermes update` restores them on explicit demand. skills-repo-curator description updated to cover external curation. skill-curation reference files moved to skills-repo-curator/references/.

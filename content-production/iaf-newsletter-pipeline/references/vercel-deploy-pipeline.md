@@ -5,6 +5,23 @@
 The IAF Newsletter web archive lives at `https://iaf-newsletter.vercel.app/`.  
 New editions are deployed automatically via CRON #4 (Deploy Web, 07:50 BRT).
 
+## Domain Architecture
+
+The Vercel project is named **`iaf-edicoes-archive`**. It has two URLs:
+
+| Type | URL | Purpose |
+|------|-----|---------|
+| **Original/production domain** | `https://iaf-edicoes-archive.vercel.app` | Set by Vercel at project creation; `vercel deploy --prod` aliases here by default |
+| **Custom alias** | `https://iaf-newsletter.vercel.app` | User-facing domain; must be set explicitly after deploy |
+
+**Key insight:** `vercel deploy --prod --yes` aliases the deploy to the project's original domain, NOT necessarily to the custom alias. After every deploy, verify the alias and re-set it if needed:
+
+```bash
+vercel alias set <deployment-url> iaf-newsletter.vercel.app
+```
+
+Where `<deployment-url>` is the URL shown in the deploy output (e.g., `https://iaf-newsletter-ob9n4z9uh-gustavos-projects-9b1060a6.vercel.app`). The alias only takes effect once explicitly assigned.
+
 ## Project Structure
 
 ```
@@ -24,6 +41,7 @@ New editions are deployed automatically via CRON #4 (Deploy Web, 07:50 BRT).
 3. **Transform:** Runs `_transform.py` to generate responsive mobile-friendly HTML in `edicoes/{slug}.html`
 4. **Build:** `vercel build --prod --yes` — outputs to `.vercel/output/`
 5. **Deploy:** `vercel deploy --prebuilt --prod --yes` — uploads to Vercel
+6. **Verify alias:** Check the deploy output for "Aliased" URL. If it's not `iaf-newsletter.vercel.app`, set it explicitly
 
 ## Manual Deploy (when CRON #4 missed or needs redo)
 
@@ -39,13 +57,36 @@ vercel build --prod --yes
 
 # 3. Deploy
 vercel deploy --prebuilt --prod --yes
+
+# 4. Ensure the custom alias is set
+# Extract deployment URL from deploy output and set alias
+vercel alias ls | grep iaf-newsletter
+vercel alias set $(vercel ls iaf-edicoes-archive --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d[0]['url'])" 2>/dev/null) iaf-newsletter.vercel.app
 ```
 
 ## Verification
 
 ```bash
-curl -o /dev/null -s -w "%{http_code}" "https://iaf-newsletter.vercel.app/{SLUG}"
-# → 200 means live
+# Check both URLs point to the same content
+curl -s -o /dev/null -w "archive: HTTP %{http_code}\n" "https://iaf-edicoes-archive.vercel.app/{SLUG}"
+curl -s -o /dev/null -w "alias:   HTTP %{http_code}\n" "https://iaf-newsletter.vercel.app/{SLUG}"
+# Both must return 200
+```
+
+## When deploy script says "No new editions to deploy"
+
+This is expected — it means today's slug is already registered in `_transform.py` EDITIONS.  
+If you've regenerated the HTML since the last deploy (e.g., after content corrections like dedup), skip the script and do a manual redeploy:
+
+```bash
+# 1. Copy the corrected HTML to the edicoes directory
+cp /opt/data/cron/history/iaf_YYYY-MM-DD.html /opt/data/iaf-edicoes-archive/edicoes/{SLUG}.html
+
+# 2. Transform, build, deploy
+cd /opt/data/iaf-edicoes-archive
+python3 _transform.py
+vercel build --prod --yes
+vercel deploy --prebuilt --prod --yes
 ```
 
 ## Key Paths
@@ -79,15 +120,6 @@ editorial, o problema é na função `extract_editorial_first_paragraph()`
 em `_deploy_new_edition.py`. A regex usada para extrair o editorial do
 HTML fonte precisa casar com `class="hot-take-box"` — veja o reference
 file `extract-editorial-excerpt-regex.md` para o diagnóstico e fix.
-
-This is expected — it means today's slug is already registered in `_transform.py` EDITIONS.  
-If you've regenerated the HTML since the last deploy (e.g., after content corrections), skip the script and do a manual redeploy:
-
-```bash
-python3 _transform.py
-vercel build --prod --yes
-vercel deploy --prebuilt --prod --yes
-```
 
 ## URL Format
 

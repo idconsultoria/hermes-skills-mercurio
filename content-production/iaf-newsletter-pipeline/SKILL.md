@@ -58,7 +58,19 @@ Only runs later because these newsletters update around 7h local time.
 
 ### Pipeline Steps
 
-> ⚠️ **ATENÇÃO: NÃO PULE A ETAPA DE DEDUP.** A etapa 2 (patrimônio) e etapa 4 (dedup) são OBRIGATÓRIAS. Já houve caso de newsletter refeita 3× porque o agente pulou a dedup. Leia os HTMLs do histórico para extrair títulos/links — não presuma que sabe o que já saiu.
+> ⚠️⚠️⚠️ **REGRA ABSOLUTA — DEDUP NÃO É OPCIONAL. ISTO NÃO É UMA SUGESTÃO.**
+> 
+> **Duas vezes seguidas** a newsletter saiu com notícias repetidas porque o agente pulou a dedup. Isso é **inaceitável**.
+> 
+> **Você DEVE:**
+> 1. Ler o HTML da edição anterior em `/opt/data/cron/history/iaf_$(date -d yesterday +%Y-%m-%d).html` (ou a mais recente disponível)
+> 2. Extrair TODOS os títulos e links
+> 3. Comparar com CADA item que você está considerando incluir
+> 4. Se o mesmo título OU link OU tópico já apareceu → **REMOVA**
+> 5. Verificar nos últimos 14 dias de histórico — não só na edição anterior
+> 
+> **Não confie na sua memória. Leia os arquivos.**
+> **Non-negotiable. Se você pular esta etapa, a newsletter sai com defeito.**
 
 1. **Read all collected files** from `/opt/data/cron/output/`
 2. **Build 14-day editorial patrimony** from `/opt/data/cron/history/` — extract all titles/links. Leia os HTMLs (`iaf_YYYY-MM-DD.html`) do período, não presuma. Um tópico publicado em edição anterior NÃO pode repetir.
@@ -78,6 +90,17 @@ Only runs later because these newsletters update around 7h local time.
 7. **Generate HTML** from template `/opt/data/references/iaf_v3_reference.html` — keep exact CSS/layout
    ⚠️ **Verifique o header-metadata-box.** O template tem placeholders `Hora:`, `Data:`, `Edição Diária`. NUNCA substitua `Hora:` por metadata interna do pipeline (ex: `Dedup: 14 dias ✓`). Isso já vazou para o leitor — a linha deve mostrar o horário de publicação, não métricas de curadoria. Confira visualmente no HTML gerado antes de salvar.
 8. **Convert to PDF** with Chromium headless → output named `manhã_aumentada_DDMMYYYY.pdf`
+   ⚠️ **REGRRA ABSOLUTA: NUNCA use WeasyPrint ou bibliotecas Python para gerar o PDF.** WeasyPrint perde CSS features (gradientes, webkit-background-clip, grid, glow) e produz PDF de ~100KB em vez de 500KB+. Use SEMPRE o Chromium Headless:
+   ```bash
+   CHROMIUM=/tmp/chromium-extracted/usr/lib/chromium/chromium
+   LD_LIBRARY_PATH=/tmp/chromium-extracted/usr/lib/chromium \
+     timeout 120 $CHROMIUM \
+     --headless --no-sandbox --disable-gpu \
+     --disable-software-rasterizer --no-pdf-header-footer \
+     --deterministic-mode \
+     --print-to-pdf="$PDF" "file://$HTML"
+   ```
+   **Verificação:** `ls -lh "$PDF"` — mínimo **300KB**. Se menor, refaça com Chromium.
 9. **Save to history**: `iaf_YYYY-MM-DD.html` + `.pdf`
 10. **Deliver** — response starts with `MEDIA:/tmp/manha_aumentada_DDMMYYYY.pdf` (first line, nothing before)
 
@@ -87,7 +110,22 @@ Only runs later because these newsletters update around 7h local time.
 **Deliver:** origin (Telegram)  \\\
 Chain: context_from Cron #3
 
-Faz o deploy da edição do dia no site `https://iaf-newsletter.vercel.app`. O fluxo:
+Faz o deploy da edição do dia no site `https://iaf-newsletter.vercel.app`.
+
+### Domínios — Arquitetura
+
+O projeto Vercel chama-se `iaf-edicoes-archive`. Ele tem duas URLs:
+
+| Tipo | URL |
+|------|-----|
+| **Domínio original (produção)** | `https://iaf-edicoes-archive.vercel.app` |
+| **Alias (domínio personalizado)** | `https://iaf-newsletter.vercel.app` |
+
+O `vercel deploy --prod` aliaseia automaticamente para o domínio original (`iaf-edicoes-archive.vercel.app`). O alias personalizado (`iaf-newsletter.vercel.app`) **pode NÃO ser atualizado** — é necessário verificar e re-aliasear explicitamente.
+
+**Sempre verificar e corrigir o alias após o deploy** (ver referência `vercel-deploy-pipeline.md` e a seção "Verifica alias" abaixo).
+
+### Fluxo de deploy
 
 1. Roda `python3 /opt/data/iaf-edicoes-archive/_deploy_new_edition.py`
 2. O script detecta o HTML mais recente em `/opt/data/cron/history/`, registra no arquivo, roda transform para versão web responsiva
