@@ -62,3 +62,10 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 
 ## [2026-06-10] update | Relations rebuilt depth-1 via 3 subagentes. 75/83 skills com relações.
 **Análise:** 3 subagentes leram cada skill + suas potenciais relações (profundidade 1), confirmaram bilateralmente. Total: ~223 relações analisadas, 141 arestas no grafo — 75 skills com `**Relações:**` em index.md.
+
+## [2026-06-11] update | Index.md synced with working-tree changes, 14 descriptions fixed, 5 YAML `>-`/`>` folded descriptions converted to quoted strings
+**Modified SKILL.md synced to index.md:** messaging-platforms, iaf-newsletter-pipeline, brand-studio-forge, hyperframes-video-production, agy, skills-repo-curator — sizes and descriptions updated.
+**YAML folded → quoted:** backlog-and-sprint, ideation-drilling, relatorio-de-custos, user-interview, skill-curation — `>-`/`>` descriptions converted to `"..."` format with explicit `\n\n` separation.
+**Descriptions fixed (added trigger + paragraph):** autonomous-ai-agents, product-pipeline, comfyui, style-guide-consultation, ai-voice-selfhost, oracle-host-access, vercel-deploy, hyperframes-video-production, read-reddit, polymarket, brand-iaf-conteudo, test-driven-development — all now have `Load this skill when` activation trigger and proper summary+paragraph format.
+**Index.md critical Resumo fixes:** product-pipeline, backlog-and-sprint, llama-cpp, skill-curation, style-guide-consultation, user-interview, relatorio-de-custos, taskflow-mcp, hermes-agent-skill-authoring — truncation and wrong summaries replaced.
+**Untracked reference files added:** 7 new reference files across iaf-newsletter-pipeline, brand-studio-forge, hyperframes-video-production.

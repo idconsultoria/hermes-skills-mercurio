@@ -1,6 +1,6 @@
 ---
 name: ai-voice-selfhost
-description: "Self-host TTS models (OmniVoice, Qwen3-TTS, Fish Speech) on Oracle ARM64 with Docker. Python and C++ inference patterns, OpenAI-compatible endpoints, Hermes TTS provider integration."
+description: "Self-host TTS models (OmniVoice, Qwen3-TTS, Fish Speech) on Oracle ARM64 with Docker — Python and C++ inference patterns, OpenAI-compatible endpoints.\n\nLoad this skill when setting up or maintaining a self-hosted TTS server on Oracle ARM64. Covers Docker deployment, OpenAI-compatible API endpoints, C++ GGUF inference with llama.cpp, Hermes TTS provider configuration, and model download from Hugging Face."
 version: 1.2.0
 author: Hermes agent (learned from session)
 category: infrastructure

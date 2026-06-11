@@ -1,11 +1,6 @@
 ---
 name: skill-curation
-description: >
-  Discover, evaluate, rank, and install community skills for Hermes Agent.
-  Covers the full curation lifecycle — web search for skills, extraction from
-  GitHub repos, cross-referencing reviews, tiered ranking with user feedback,
-  installation via tap+hub or raw URL, and post-install verification.
-  Does NOT cover authoring SKILL.md files (see hermes-agent-skill-authoring).
+description: "Discover, evaluate, rank, and install community skills for Hermes Agent — full curation lifecycle from search to verification.\n\nLoad this skill when you need to find, evaluate, and install community skills for Hermes. Covers web search for skills, extraction from GitHub repos, cross-referencing reviews, tiered ranking with user feedback, installation via tap+hub or raw URL, and post-install verification. Does NOT cover authoring SKILL.md files (see hermes-agent-skill-authoring)."
 version: 1.0.0
 author: Hermes Agent
 tags:

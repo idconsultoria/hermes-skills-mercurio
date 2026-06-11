@@ -1,10 +1,6 @@
 ---
 name: ideation-drilling
-description: >-
-  Orquestra a Fase 1 (Ideação) do pipeline de produto. Invoca o Pi Agent com a
-  skill ideation-drilling carregada para fazer perguntas profundas sobre a
-  ideia, refinar clareza, e produzir um documento Ideation Result.
-  Detecta o marcador <!-- PHASE_COMPLETE: ideation --> para avançar.
+description: "Orquestra a Fase 1 (Ideação) do pipeline de produto. Invoca o Pi Agent para fazer perguntas profundas, refinar clareza, e produzir um Ideation Result.\n\nLoad this skill at the start of the product pipeline (Fase 1). Covers invoking Pi Agent with the ideation-drilling skill loaded to conduct deep questioning about the idea, refine clarity, and produce an Ideation Result document. Detects the <!-- PHASE_COMPLETE: ideation --> marker to advance to the next phase."
 category: software-development
 ---
 

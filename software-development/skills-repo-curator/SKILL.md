@@ -1,13 +1,13 @@
 ---
 name: skills-repo-curator
-description: "Gerencia o skills repo em /opt/data/skills/ com controle de versão Git: Ciclo de Consolidação (Update→Evolve→Offload), análise MECE, merges, revisão de órfãos, inferência depth-1 de relações, auditoria de conformidade de descrições, index.md/log.md/reports, geração de grafo D3 interativo e offload de memória.\\\\\\\\n\\\\\\\\nLoad this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, AGENTS.md updates, or any skills repository management task. Executes the full consolidation lifecycle: analyze portfolio, propose merges, delete redundant skills, review orphans, write reports, offload learned facts to skills, generate graph, and commit."
+description: "Gerencia o skills repo em /opt/data/skills/ com controle de versão Git: Ciclo de Consolidação (Update→Evolve→Offload), análise MECE, merges, revisão de órfãos, inferência depth-1 de relações, auditoria de conformidade de descrições, index.md/log.md/reports, geração de grafo D3 interativo e offload de memória.\n\nLoad this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, AGENTS.md updates, or any skills repository management task. Executes the full consolidation lifecycle: analyze portfolio, propose merges, delete redundant skills, review orphans, write reports, offload learned facts to skills, generate graph, and commit."
 category: software-development
 ---
 
 # Skills Repository Curator
 
 > Gerencia o skills repo em `/opt/data/skills/` com controle de versão Git.
-> Macro: **Ciclo de Consolidação** — `Update → log → commit → Evolve → log → Offload → commit`.
+> Macro: **Ciclo de Consolidação** — `Update → log → commit → Evolve → log → Offload → commit → git push`.
 > Sub-etapa: **evolve** (9 passos) — estudo → plano → execução → orphan review → report → grafo → commit.
 
 ## Visão Geral — Ciclo de Consolidação vs Evolve
@@ -18,8 +18,8 @@ category: software-development
 ┌───────────────────────────────────────────────────────┐
 │                 Ciclo de Consolidação                  │
 │                                                       │
-│   Update ──→ Log ──→ Commit ──→ Evolve ──→ Log ──→ Offload ──→ Commit
-│   (6 passos)           (9 passos)            (4 passos)
+│   Update ──→ Log ──→ Commit ──→ Evolve ──→ Log ──→ Offload ──→ Commit ──→ git push
+│   (6 passos)           (9 passos)            (6 passos)
 │                                                       │
 │   As 3 etapas sempre rodam nesta ordem.               │
 └───────────────────────────────────────────────────────┘
@@ -94,6 +94,8 @@ description: "Geocode addresses, find POIs, calculate routes, and lookup timezon
 Load this skill when you need location-based data — converting addresses to coordinates, searching for points of interest, getting driving or walking directions with distance and ETA, or looking up timezone information. Uses free APIs (Nominatim, Overpass, OSRM) with no API key required."
 ```
 
+⚠️ **YAML `>-` (folded with strip) quebra o parser do `generate_graph.py`.** O script lê o frontmatter com regex simples (`^---\n(.*?)\n---`), e `description: >-` com múltiplas linhas indentadas pode fazer o parser perder o texto, caindo no fallback que extrai comandos aleatórios do corpo do SKILL.md — resultando em resumos como `node --version` no index.md. **Sempre usar string quoted (`"..."`) com `\n` explícito para parágrafos de múltiplas linhas. Verificar: `grep -rn 'description: >-' SKILL.md`.**
+
 ---
 
 ## Etapa 2: Evolve (9 passos)
@@ -112,8 +114,9 @@ Duas skills conectadas (similar/uses) só devem permanecer separadas se descreve
 2. **Salva** o plano em `reports/evolve-<YYYY-MM-DD-HHMM>.md`
 3. **Executa** o plano (merges, deletes, consolidação de conteúdo):
    - Limpa aprendizados excessivamente específicos das skills (debugging, workarounds temporários, timestamps únicos)
+   - **⚠️ NÃO remover info operacional reutilizável:** números de contato (telefones, WhatsApp JIDs/LIDs, group IDs de plataformas), IDs de usuário de sistemas externos, endereços de email usados para coleta periódica, tokens de serviço, chaves de API, URLs de webhook — tudo que o workflow consulta de novo em runs futuras. Só remova o estritamente inútil após a run (ex: `session_id` expirado, offset de paginação).
    - **Audita descrições** das skills afetadas
-   - **PII em skills:** verificar números de telefone reais, usernames, JIDs/LIDs de WhatsApp, IPs públicos, grupos reais, marcas do usuário. Skills são artefatos compartilháveis — dados pessoais devem ser substituídos por `[REDACTED]` ou placeholders.
+   - **PII vs operacional — distinção importante:** Dados pessoais reais (nome completo do usuário, endereço físico, CPF/CNPJ, telefone pessoal — NÃO de serviço) devem ser `[REDACTED]`. JIDs de grupo WhatsApp, emails de serviços, IDs de sistemas externos são **operacionais** e devem ser preservados se reutilizáveis. Skills são artefatos compartilháveis, mas dados operacionais não são PII.
    - **Limpeza de disco:** `rm -rf` de diretórios órfãos
 4. **Revisa skills órfãs** — skills sem relações no grafo:
    - Tenta encontrar conexão semântica com outras skills (lendo ambos os SKILL.md — **profundidade 1**). Se encontrar, adiciona relação bilateral (frontmatter + index.md).
@@ -146,7 +149,7 @@ O script `generate_graph.py` usa o regex `r"- `(\w+)` → `(.+)`"` para parsear 
 
 **Verificar SEMPRE antes de gerar o grafo:**
 ```bash
-grep "|- `" index.md
+grep "|- \`" index.md
 ```
 
 Se existir, corrigir com:
@@ -157,7 +160,7 @@ patch(path='/opt/data/skills/index.md', old_string='|- `', new_string='- `', rep
 
 ---
 
-## Etapa 3: Offload (4 passos)
+## Etapa 3: Offload (6 passos)
 
 **Esta é uma etapa do ciclo de consolidação.** Executa DEPOIS do evolve.
 
@@ -173,6 +176,8 @@ Memória guarda **preferências do usuário e fatos estáveis do ambiente**. Ski
 2. Para cada entrada, verifica se existe skill cobrindo o mesmo assunto
 3. Se sim, remove da memória com `memory(action='remove', old_text=...)`
 4. Registra no log.md com prefixo `offload`
+5. git add -A && git commit -m "offload: ..."
+6. **git push origin master** — sobe tudo para o GitHub
 
 ---
 
@@ -229,6 +234,7 @@ cd /opt/data/skills
 git log --oneline -5
 python3 scripts/generate_graph.py
 grep "|- \`" index.md  # deve retornar vazio
+grep -rn 'description: >-' SKILL.md  # deve retornar vazio (YAML folded quebra o parser)
 grep "^### " index.md | wc -l  # total de skills
 grep -c "Relações" index.md  # skills com relações
 ```
@@ -243,10 +249,20 @@ grep -c "Relações" index.md  # skills com relações
 
 ⚠️ **Descrição conforme requer escopo total — não incremental.** A auditoria de descrições varre **todas** as SKILL.md, sem exceção.
 
-⚠️ **PII em skills — auditar no passo 3 (execução do evolve).** Números reais, usernames, JIDs, IPs públicos, marcas do usuário devem ser substituídos.
+⚠️ **PII vs operacional — auditar no passo 3.** PII real (nome, CPF, endereço físico, telefone pessoal) deve ser `[REDACTED]`. JIDs de grupo, emails de serviço, IDs de sistemas externos são **operacionais** — preserve se reutilizável entre runs.
 
 ⚠️ **Batch-Report-Then-Apply.** Subagentes NUNCA editam o index.md diretamente — produzem relatórios. Um agente central aplica todos os patches.
 
 ⚠️ **Não parar no primeiro merge óbvio.** Analisar todas as skills, não apenas os alvos evidentes.
 
 ⚠️ **index.md nunca é regenerado do zero.** Apenas patches cirúrgicos via ferramentas LLM.
+
+⚠️ **YAML `>-` quebra o parser de descrições.** O script `generate_graph.py` lê frontmatter com regex simples e não suporta YAML folded (`>-`). Descrições devem usar string quoted (`"..."`) com `\n` explícito. Verificar com `grep -rn 'description: >-' SKILL.md`.
+
+⚠️ **Ciclo pode morrer no meio e deixar working directory sujo.** O cron job tem timeout — se o ciclo não completa, SKILL.md ficam modificados mas sem commit, index.md desatualizado, log.md sem entrada. **Recuperação:**
+
+   1. **Diagnóstico** — `cronjob(action='list')` → ver `last_status: error`. Depois `git status` no workdir pra ver o que ficou sujo.
+   2. **Avaliação** — `git diff --stat` mostra quais skills foram tocadas. `git diff <file>` pra ver se as mudanças são válidas ou corrompidas. Leia o diff — se parece produto de alucinação (ex: conteúdo duplicado, blocos truncados), discard.
+   3. **Se válido** — complete o ciclo manualmente: `git add -A`, escreva entrada no `log.md`, atualize `index.md`, `git commit -m "update: ..."`, `git push`.
+   4. **Se corrompido** — `git restore .` pra limpar o working directory. O próximo cron (02:00) recomeça do zero.
+   5. **Causa raiz comum** — o agente estourou cota de ferramentas durante a auditoria de descrições (passo 4 do update: varre TODAS as SKILL.md, cada uma requer `read_file` + possível `patch`). Ciclo com muitas skills precisa de paralelismo ou o job cron precisa de timeout maior.

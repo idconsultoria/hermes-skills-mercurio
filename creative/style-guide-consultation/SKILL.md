@@ -1,6 +1,6 @@
 ---
 name: style-guide-consultation
-description: "Catálogo e consulta de guias de estilo. Carrega o design system correto para qualquer tarefa visual."
+description: "Catálogo e consulta de guias de estilo — carrega o design system correto para qualquer tarefa visual.\n\nLoad this skill when you need to apply a brand or design system to any visual task. Covers loading the correct style guide (Hermes Agent, ID Consultoria, IAF Comunidade, IAF Newsletter) for visual output, ensuring brand-consistent HTML, diagrams, and presentations."
 version: 1.0.0
 tags: [design, style-guide, brand, visual-identity]
 ---

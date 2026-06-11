@@ -22,16 +22,7 @@ Full automated daily pipeline: coleta → ranqueamento → HTML → PDF → entr
 
 Four chained cron jobs, scheduled in **GMT-3** (user's local time). Cron system runs in UTC (+3h).
 
-```
-GMT-3          UTC           Cron
-─────────────────────────────────────────────────
-04:00      →  07:00    🔵  #1 Coleta de Fontes
-07:30      →  10:30    🟡  #2 Newsletters
-07:50      →  10:50    🔴  #3 Síntese + HTML + PDF
-07:55      →  10:55    🟢  #4 Entrega do Ranqueamento (.md)
-```
-
-Chaining: `#3 context_from: [#1, #2]` | `#4 context_from: [#3]`
+```\nGMT-3          UTC           Cron\n─────────────────────────────────────────────────\n04:00      →  07:00    🔵  #1 Coleta de Fontes\n07:30      →  10:30    🟡  #2 Newsletters\n07:40      →  10:40    🔴  #3 Síntese + PDF (ranking é interno)\n07:50      →  10:50    🟢  #4 Deploy Web (Vercel)\n```\n\nChaining: `#3 context_from: [#1, #2]` | `#4 context_from: [#3]`
 
 ## Cron #1 — Coleta de Fontes (04:00 GMT-3)
 
@@ -59,41 +50,63 @@ Extracts from:
 
 Only runs later because these newsletters update around 7h local time.
 
-## Cron #3 — Síntese + Ranqueamento + PDF (07:50 GMT-3)
+## Cron #3 — Síntese + PDF (07:40 GMT-3 / 10:40 UTC)
 
-**Toolsets:** terminal, file  \
-**Deliver:** origin (Telegram)  \
+**Toolsets:** terminal, file  \\
+**Deliver:** origin (Telegram)  \\
 **Skills:** copywriting, humanizer, html-to-pdf-chromium
 
 ### Pipeline Steps
 
+> ⚠️ **ATENÇÃO: NÃO PULE A ETAPA DE DEDUP.** A etapa 2 (patrimônio) e etapa 4 (dedup) são OBRIGATÓRIAS. Já houve caso de newsletter refeita 3× porque o agente pulou a dedup. Leia os HTMLs do histórico para extrair títulos/links — não presuma que sabe o que já saiu.
+
 1. **Read all collected files** from `/opt/data/cron/output/`
-2. **Build 14-day editorial patrimony** from `/opt/data/cron/history/` — extract all titles/links
+2. **Build 14-day editorial patrimony** from `/opt/data/cron/history/` — extract all titles/links. Leia os HTMLs (`iaf_YYYY-MM-DD.html`) do período, não presuma. Um tópico publicado em edição anterior NÃO pode repetir.
 3. **Pre-selection** — skim all items, pick **20** most interesting
-4. **Post-selection dedup** — check each of the 20 against the 14-day patrimony. Drop duplicates, pull replacements from the full pool until you have **20 strictly inéditos**
+4. **Post-selection dedup** — check each of the 20 against the 14-day patrimony. **Dica: busque por palavras-chave no conteúdo dos HTMLs históricos** (`search_files` com `file_glob`). Se um tópico já apareceu como deep dive ou radar nos últimos 14 dias, remova. Pull replacements from the full pool until you have **20 strictly inéditos**
 5. **Rank pre-selected items** on 3 criteria (1-10 each):
    - Impact (market relevance)
    - Utility (actionable today)
    - Intrigue (novelty/engagement)
-   - Average score → sorted table
-   - **Save ranking to `/tmp/iaf-ranking.md`** for Cron #4
+   - Average score → sorted table (uso interno apenas)
 6. **Select content** from ranking:
    - Editorial/hot take → top 5, highest emotional impact
-   - Radar → top 2-3 news (deep dive)
-   - Community → top 2-3 discussions (deep dive), no topic overlap with Radar
-   - Practical application → 1 item, step-by-step tutorial
+   - Análise → top 3 (deep dive)
+   - Radar → remaining news items (compact, 1-2 lines each)
+   - Community → top discussions
+   - Practical application → **1 item, must be broadly accessible (not tech/dev-only)**
 7. **Generate HTML** from template `/opt/data/references/iaf_v3_reference.html` — keep exact CSS/layout
+   ⚠️ **Verifique o header-metadata-box.** O template tem placeholders `Hora:`, `Data:`, `Edição Diária`. NUNCA substitua `Hora:` por metadata interna do pipeline (ex: `Dedup: 14 dias ✓`). Isso já vazou para o leitor — a linha deve mostrar o horário de publicação, não métricas de curadoria. Confira visualmente no HTML gerado antes de salvar.
 8. **Convert to PDF** with Chromium headless → output named `manhã_aumentada_DDMMYYYY.pdf`
-9. **Save to history**: `iaf_YYYY-MM-DD.html` + `.pdf` + `iaf-ranking_YYYY-MM-DD.md`
+9. **Save to history**: `iaf_YYYY-MM-DD.html` + `.pdf`
 10. **Deliver** — response starts with `MEDIA:/tmp/manha_aumentada_DDMMYYYY.pdf` (first line, nothing before)
 
-## Cron #4 — Entrega do Ranqueamento (07:55 GMT-3)
+## Cron #4 — Deploy Web (07:50 GMT-3 / 10:50 UTC)
 
-**Toolsets:** file, terminal  \
-**Deliver:** origin (Telegram)  \
+**Toolsets:** file, terminal  \\\
+**Deliver:** origin (Telegram)  \\\
 Chain: context_from Cron #3
 
-Reads latest output, extracts the ranking table, saves to `/tmp/iaf-ranking.md`, delivers via `MEDIA:/tmp/iaf-ranking.md`.
+Faz o deploy da edição do dia no site `https://iaf-newsletter.vercel.app`. O fluxo:
+
+1. Roda `python3 /opt/data/iaf-edicoes-archive/_deploy_new_edition.py`
+2. O script detecta o HTML mais recente em `/opt/data/cron/history/`, registra no arquivo, roda transform para versão web responsiva
+3. Executa `vercel build --prod --yes` + `vercel deploy --prebuilt --prod --yes`
+4. **Verifica alias:** o deploy `--prod` pode não atualizar `iaf-newsletter.vercel.app` se o alias de produção do projeto divergiu. Execute `vercel alias set <deployment-url> iaf-newsletter.vercel.app` para garantir.
+5. Entrega o link no Telegram: `https://iaf-newsletter.vercel.app/{SLUG}`
+
+Se o script retornar `"No new editions to deploy"`, a resposta deve ser `[SILENT]` (já foi deployado hoje).
+
+Vercel CLI em `/opt/data/.npm-global/bin/vercel`. Sempre usar `--prebuilt` para evitar rebuild do zero.
+
+Verificar deploy: `curl -o /dev/null -s -w "%{http_code}" "https://iaf-newsletter.vercel.app/{SLUG}"` → 200.
+
+**Script de deploy:** `/opt/data/iaf-edicoes-archive/_deploy_new_edition.py`
+
+### ⚠️ Pitfalls do deploy
+
+**Regex do excerpt editorial quebrado:**
+A função `extract_editorial_first_paragraph()` em `_deploy_new_edition.py` busca no HTML do template pelo texto do editorial para gerar o preview no index. O padrão original `class="hot-take"` não casa com `class="hot-take-box"` — o `"` literal no fim da regex exige que a classe termine exatamente em "hot-take". Use `class="hot-take[^"]*"` para casar qualquer classe que comece com "hot-take" (hot-take-box, hot-take-text, etc.). Se o regex falha, o fallback pega CSS bruto do `<style>` e o preview da edição no index mostra lixo. Verifique sempre o excerpt no index.html depois do deploy.
 
 ## Daily AI Digest Patterns
 
@@ -119,8 +132,8 @@ Alternative format: branded magazine-style digest (more visual, less structured)
 ```
 Collector (cron #1, local, no agent=True script pattern)
   → Newsletter fetcher (cron #2, local)
-  → Synthesizer (cron #3, deliver to user, context_from: [#1, #2])
-  → Ranking delivery (cron #4, deliver to user, context_from: [#3])
+  → Synthesizer + PDF (cron #3, deliver to user, context_from: [#1, #2])
+  → Deploy Web (cron #4, deliver to user, context_from: [#3])
 ```
 
 ### Key concepts:
@@ -201,6 +214,8 @@ Delivered inside ```text block:
 - **Every item must have a clickable link**
 - **Humanizer pass** at the end
 - **14-day context window** for deduplication
+- **Aplicação Prática: must be broadly accessible.** Não pode ser nichado para devs/engenheiros — exemplos que qualquer leitor possa usar no dia a dia (análise de documentos, simulação de conversas, roteiro de apresentações). Se o conteúdo for técnico demais, troque. ✨ *Exemplo bom: "5 perguntas para fazer ao Fable 5 hoje" — qualquer pessoa testa. Exemplo ruim: "Proteja seu pipeline de supply chain" — só dev entende.*
+- **Quando um tópico teve edição especial dedicada:** limite a cobertura a **1 artigo** na edição regular, apontando para o link da edição especial. O link deve ser o URL de produção (`https://iaf-newsletter.vercel.app/especial-{slug}`), não o caminho local.
 
 ## Filter Rules — AI-Only Content
 

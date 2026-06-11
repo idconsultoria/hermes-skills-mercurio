@@ -1,10 +1,6 @@
 ---
 name: relatorio-de-custos
-description: >-
-  Gera relatórios técnicos de custos de execução de projetos multi-agente.
-  Extrai dados reais do Hermes (state.db) e Pi Agent (.jsonl), calcula custos
-  com base nos preços dos modelos, e produz HTML com design Hermes Style Guide
-  (azul royal, Spectral + Space Mono, dourado) via Antigravity (agy).
+description: "Gera relatórios técnicos de custos de execução de projetos multi-agente com dados reais de tokens.\n\nLoad this skill when the user asks for cost reports, spending breakdowns, or project expense analysis. Extracts real data from Hermes (state.db) and Pi Agent (.jsonl) session logs, calculates costs based on model pricing per provider, and produces styled HTML reports via Antigravity (agy) with Hermes Style Guide design."
 category: productivity
 related_skills: [html-report-hermes, product-pipeline]
 ---

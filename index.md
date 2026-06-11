@@ -120,10 +120,10 @@ Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, an
 
 - **Nome:** `autonomous-ai-agents/messaging-platforms`
 - **Arquivo:** `autonomous-ai-agents/messaging-platforms/SKILL.md`
-- **Tamanho:** 11,222 chars
+- **Tamanho:** 15,243 chars
 - **Resumo:** Reference for Hermes cross-platform messaging — platform quirks, ID formats, and bridge workarounds.
 
-Hermes cross-platform messaging: platform quirks, JID/ID formats, bridge workarounds for Telegram, WhatsApp, more.
+Load this skill when troubleshooting message delivery across platforms. Covers Telegram MEDIA file delivery rules, WhatsApp JID/group ID formats, bridge processes for WhatsApp and Telegram, known file-type limitations, and platform-specific workarounds for reliable cross-platform messaging.
 
 **Relações:**
 - `similar` → `apple/imessage`
@@ -155,9 +155,11 @@ Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — n
 - **Nome:** `autonomous-ai-agents/product-pipeline`
 - **Arquivo:** `autonomous-ai-agents/product-pipeline/SKILL.md`
 - **Tamanho:** 80,167 chars
-- **Resumo:** ┌───────────────────────────────────────────────────┐ │                     Hermes     ...
+- **Resumo:** Multi-agent product pipeline from raw idea to MVP with iterative sprints — orchestrated by Hermes, executed by Pi Agent + Antigravity.
 
 Multi-agent product pipeline from raw idea to MVP with iterative sprints. Orchestrated by Hermes, executed by Pi Agent + Antigravity.
+
+Load this skill when building a product from scratch through the full pipeline — ideation, research, design, sprints, and delivery. Covers orchestrating a multi-agent team with Hermes as coordinator, Pi Agent for execution, and Antigravity for visual design review.
 
 **Relações:**
 - `uses` → `autonomous-ai-agents/pi-agent-coordination`
@@ -174,10 +176,10 @@ Multi-agent product pipeline from raw idea to MVP with iterative sprints. Orches
 
 - **Nome:** `content-production/iaf-newsletter-pipeline`
 - **Arquivo:** `content-production/iaf-newsletter-pipeline/SKILL.md`
-- **Tamanho:** 8,803 chars
+- **Tamanho:** 12,391 chars
 - **Resumo:** Umbrella skill for newsletter, briefing, and digest pipelines with cron scheduling and multi-source curation.
 
-Umbrella skill for newsletter/briefing/digest pipelines: IAF Manhã Aumentada, Daily AI Digest, editorial curation, cron scheduling. Covers multi-source collection, ranking, HTML→PDF, delivery.
+Load this skill to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline — IAF Manhã Aumentada, Daily AI Digest, or similar. Covers multi-source content collection, editorial ranking and dedup, HTML-to-PDF rendering, Telegram and WhatsApp delivery, and chained cron job architecture.
 
 **Relações:**
 - `uses` → `creative/copywriting`
@@ -273,7 +275,7 @@ Infographics: 21 layouts x 21 styles (信息图, 可视化).
 
 - **Nome:** `creative/brand-studio-forge`
 - **Arquivo:** `creative/brand-studio-forge/SKILL.md`
-- **Tamanho:** 17,756 chars
+- **Tamanho:** 20,607 chars
 - **Resumo:** Use when the user wants to create, refine, or evolve a brand identity
 
 Use when the user wants to create, refine, or evolve a brand identity. Covers brand interviews, identity kit generation (logo, color, type, voice, guidelines), brand-specific content skills, and ongoing content via cron. Not for UI design or non-brand creative tasks.
@@ -457,9 +459,11 @@ Songwriting craft and Suno AI music prompts.
 - **Nome:** `creative/style-guide-consultation`
 - **Arquivo:** `creative/style-guide-consultation/SKILL.md`
 - **Tamanho:** 5,729 chars
-- **Resumo:** Catálogo e consulta de guias de estilo: Hermes Agent (padrão), ID Consultoria, IAF Comu...
+- **Resumo:** Catálogo e consulta de guias de estilo — carrega o design system correto para qualquer tarefa visual.
 
-Catálogo e consulta de guias de estilo: Hermes Agent (padrão), ID Consultoria, IAF Comunidade, IAF Newsletter. Carrega o guia correto para qualquer tarefa visual.
+Catálogo e consulta de guias de estilo — carrega o design system correto para qualquer tarefa visual.
+
+Load this skill when you need to apply a brand or design system to any visual task. Covers loading the correct style guide (Hermes Agent, ID Consultoria, IAF Comunidade, IAF Newsletter) for visual output, ensuring brand-consistent HTML, diagrams, and presentations.
 
 **Relações:**
 - `uses` → `creative/brand-studio-forge`
@@ -652,7 +656,7 @@ Deploy static sites and frontend apps to Vercel — from zero to production. Cov
 
 - **Nome:** `media/hyperframes-video-production`
 - **Arquivo:** `media/hyperframes-video-production/SKILL.md`
-- **Tamanho:** 11,345 chars
+- **Tamanho:** 22,156 chars
 - **Resumo:** Produce deterministic MP4 videos using HyperFrames (HTML→video engine).
 
 Produce deterministic MP4 videos using HyperFrames (HTML→video engine). Generates HTML compositions with GSAP animations, renders locally via npx hyperframes. Hermes Style Guide is the default visual aesthetic for explainer/demo videos.
@@ -739,9 +743,9 @@ HuggingFace hf CLI: search/download/upload models, datasets.
 - **Nome:** `mlops/inference/llama-cpp`
 - **Arquivo:** `mlops/inference/llama-cpp/SKILL.md`
 - **Tamanho:** 8,880 chars
-- **Resumo:** llama
+- **Resumo:** Local GGUF inference with llama.cpp and model discovery via Hugging Face Hub.
 
-llama.cpp local GGUF inference + HF Hub model discovery.
+Local GGUF inference with llama.cpp and model discovery via Hugging Face Hub.
 
 **Relações:**
 - `uses` → `mlops/huggingface-hub`
@@ -924,9 +928,11 @@ Create, read, edit .pptx decks, slides, notes, templates.
 - **Nome:** `productivity/relatorio-de-custos`
 - **Arquivo:** `productivity/relatorio-de-custos/SKILL.md`
 - **Tamanho:** 9,688 chars
-- **Resumo:** Usuário pede relatório de custos do projeto X, breakdown de gastos, quanto custou o MVP
+- **Resumo:** Gera relatórios técnicos de custos de execução de projetos multi-agente com dados reais de tokens.
 
-Usuário pede relatório de custos do projeto X, breakdown de gastos, quanto custou o MVP. sqlite3 /opt/data/state.db " SELECT id, title, source, model,
+Gera relatórios técnicos de custos de execução de projetos multi-agente com dados reais de tokens.
+
+Load this skill when the user asks for cost reports, spending breakdowns, or project expense analysis. Extracts real data from Hermes (state.db) and Pi Agent (.jsonl) session logs, calculates costs based on model pricing per provider, and produces styled HTML reports via Antigravity (agy) with Hermes Style Guide design.
 
 **Relações:**
 - `uses` → `software-development/agy`
@@ -937,9 +943,9 @@ Usuário pede relatório de custos do projeto X, breakdown de gastos, quanto cus
 - **Nome:** `productivity/taskflow-mcp`
 - **Arquivo:** `productivity/taskflow-mcp/SKILL.md`
 - **Tamanho:** 4,485 chars
-- **Resumo:** TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Pr...
+- **Resumo:** TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Protocol) — conecta-se via SSE.
 
-TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Protocol). Conecta-se via SSE (StreamableHTTP POST não funciona — SSE deve ser explícito). Transport: SSE (StreamableHTTP POST padrão do Hermes não funciona)
+TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Protocol). Conecta-se via SSE (StreamableHTTP POST não funciona — SSE deve ser explícito).
 
 **Relações:**
 - `similar` → `productivity/notion`
@@ -1050,9 +1056,11 @@ Discover what the tech/AI community is discussing right now — trending topics,
 - **Nome:** `research/user-interview`
 - **Arquivo:** `research/user-interview/SKILL.md`
 - **Tamanho:** 9,161 chars
-- **Resumo:** - During the Research phase (Fase 2) of the product pipeline - Understanding user needs...
+- **Resumo:** Structured user/proxy interview protocol for product research — plan, frame, listen, synthesize, extract personas.
 
-- During the Research phase (Fase 2) of the product pipeline - Understanding user needs, pain points, and behaviors - Before defining personas or user stories
+Structured user/proxy interview protocol for product research — plan, frame, listen, synthesize, extract personas.
+
+Load this skill during the Research phase (Fase 2) of the product pipeline to understand user needs, pain points, and behaviors before defining personas or user stories. Covers interview planning, question framing, active listening techniques, synthesis of findings, and persona extraction. Can interview real humans or simulate interviews with AI agent profiles.
 
 **Relações:**
 - `used_by` → `software-development/ideation-drilling`
@@ -1092,10 +1100,10 @@ X/Twitter via xurl CLI: post, search, DM, media, v2 API.
 
 - **Nome:** `software-development/agy`
 - **Arquivo:** `software-development/agy/SKILL.md`
-- **Tamanho:** 8,099 chars
-- **Resumo:** Google Antigravity CLI (agy) — instalação, autenticação OAuth via tmux, e workflows de ...
+- **Tamanho:** 8,611 chars
+- **Resumo:** Google Antigravity CLI (agy) — installation, OAuth auth, and design workflows for HTML reports and prototyping.
 
-Google Antigravity CLI (agy) — instalação, autenticação OAuth via tmux, e workflows de design (image generation, prototipagem, subagentes paralelos, HTML reports).
+Load this skill for strategic design tasks — visual HTML output, brand presentations, UI mockups, SVGs, and prototypes. Covers agy installation, OAuth authentication via tmux, and design workflows including image generation, prototyping, parallel subagents, and HTML report generation. Part of the three-tier agent hierarchy (agy > Pi best > Pi cost) where agy serves as external specialist consultant.
 
 **Relações:**
 - `used_by` → `software-development/backlog-and-sprint`
@@ -1106,9 +1114,11 @@ Google Antigravity CLI (agy) — instalação, autenticação OAuth via tmux, e 
 - **Nome:** `software-development/backlog-and-sprint`
 - **Arquivo:** `software-development/backlog-and-sprint/SKILL.md`
 - **Tamanho:** 78,483 chars
-- **Resumo:** Usuário dá feedback │ ▼
+- **Resumo:** Backlog management and Sprint execution for product iteration (Fase 5) — mantém backlog não-estruturada e orquestra Sprints completas.
 
-Usuário dá feedback │ ▼
+Backlog management and Sprint execution for product iteration (Fase 5). Mantém uma backlog não-estruturada de pedidos de melhoria, e orquestra Sprints completas (PM → UX/UI → Engineering → Review → Close).
+
+Load this skill during the execution phase (Fase 5) of the product pipeline. Covers maintaining an unstructured backlog of improvement requests and orchestrating complete Sprints — from PM and UX/UI through Engineering, Review, and Close.
 
 **Relações:**
 - `uses` → `software-development/agy`
@@ -1120,7 +1130,7 @@ Usuário dá feedback │ ▼
 - **Nome:** `software-development/hermes-agent-skill-authoring`
 - **Arquivo:** `software-development/hermes-agent-skill-authoring/SKILL.md`
 - **Tamanho:** 8,523 chars
-- **Resumo:** Author in-repo SKILL
+- **Resumo:** Author in-repo SKILL.md and DESIGN.md token specs — frontmatter, validator, structure.
 
 Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structure. Merged with design-md skill.
 
@@ -1165,9 +1175,11 @@ Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bi
 - **Nome:** `software-development/skill-curation`
 - **Arquivo:** `software-development/skill-curation/SKILL.md`
 - **Tamanho:** 10,756 chars
-- **Resumo:** Hermes Agent has a rich ecosystem of **70+ bundled skills** and **hundreds of community...
+- **Resumo:** Discover, evaluate, rank, and install community skills for Hermes Agent — full curation lifecycle from search to verification.
 
-Hermes Agent has a rich ecosystem of **70+ bundled skills** and **hundreds of community skills** across GitHub, HermesHub (`hermeshub.xyz`), Hermes Atlas (`hermesatlas.com`), and the `skills.sh` marketplace. The challenge is not finding skills — it's finding the **right** skill and evaluating whether it's production-grade. This skill covers the full curation workflow: User request → Web search for skills → Extract details from repos
+Discover, evaluate, rank, and install community skills for Hermes Agent — full curation lifecycle from search to verification.
+
+Load this skill when you need to find, evaluate, and install community skills for Hermes. Covers web search for skills, extraction from GitHub repos, cross-referencing reviews, tiered ranking with user feedback, installation via tap+hub or raw URL, and post-install verification.
 
 **Relações:**
 - `uses` → `software-development/hermes-agent-skill-authoring`
@@ -1177,7 +1189,7 @@ Hermes Agent has a rich ecosystem of **70+ bundled skills** and **hundreds of co
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 11,208 chars
+- **Tamanho:** 16,395 chars
 - **Resumo:** Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidação MECE, ind
 
 Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidação MECE, index.md/log.md/reports, offload de memória, e manutenção de AGENTS.md. Executa o processo completo de análise, merge, delete, relatório e commit.

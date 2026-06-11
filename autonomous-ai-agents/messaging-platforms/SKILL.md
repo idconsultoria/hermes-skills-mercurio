@@ -48,6 +48,98 @@ Telegram's media handler only recognizes common types natively:
 
 One MEDIA per message. N files = N separate responses.
 
+### MEDIA Auto-Delivery Pitfall
+
+When `text_to_speech` returns a `MEDIA:` path, the platform's auto-delivery handles sending it as a native audio message — no extra step needed.
+
+**Do NOT also call `send_message` with the same `MEDIA:` path.** This causes the audio to arrive twice:
+
+```
+❌ Double-send (wrong):
+   text_to_speech(...) → returns MEDIA:/path
+   send_message(target="telegram", message="MEDIA:/path")  ← DUPLICATE
+
+✅ Let auto-delivery handle it (correct):
+   text_to_speech(...) → returns MEDIA:/path
+   (just let the response's MEDIA: tag deliver naturally)
+```
+
+This also applies to any file delivered via `MEDIA:` in a final response — the gateway sends it once automatically.
+
+---
+
+## Gateway Display — User-Facing Bot Mode
+
+### Display Settings Per-Platform
+
+The Hermes gateway resolves display/verbosity settings with this priority order:
+
+```
+1. display.platforms.<platform>.<key>   — explicit per-platform override
+2. display.<key>                         — global user setting
+3. Built-in platform default             — sensible default per platform
+4. Built-in global default               — last resort
+```
+
+**Key settings that control what users see:**
+
+| Setting | Values | Effect |
+|---------|--------|--------|
+| `tool_progress` | `all`, `new`, `off` / `none` | Show tool calls progress |
+| `interim_assistant_messages` | `true`, `false` | Show assistant chattering mid-execution |
+| `busy_ack_detail` | `true`, `false` | Verbose busy acknowledgements |
+| `long_running_notifications` | `true`, `false` | Heartbeat during long tasks |
+
+### Platform Defaults
+
+Telegram comes with a clean display by default (`tool_progress="off"`, `busy_ack_detail=false`) — but the **global** `display.tool_progress: all` in config.yaml overrides it. So if you set `display.tool_progress: all` globally, Telegram users see tool calls too.
+
+To make Telegram clean but keep CLI verbose:
+
+```yaml
+display:
+  tool_progress: all                       # CLI sees everything
+  platforms:
+    telegram:
+      tool_progress: off                   # Telegram users see clean responses
+      interim_assistant_messages: false    # no intermediate chatter
+```
+
+The per-platform override in `display.platforms.telegram` wins over the global setting.
+
+### Full Clean-Bot Config
+
+```yaml
+display:
+  tool_progress: none
+  interim_assistant_messages: false
+  long_running_notifications: false
+  busy_ack_detail: false
+  cleanup_progress: true                   # removes progress bubbles after final response
+```
+
+**Requires:** Gateway `/restart` or `hermes gateway restart` to take effect.
+**CLI unaffected:** These settings only change gateway behavior; CLI sessions remain unchanged.
+
+### Different UX for Yourself vs Other Users (Two-Bot Pattern)
+
+Display settings are **per-platform, not per-user** — all Telegram users see the same display. To have different experiences (verbose for you, clean for others), run two Telegram bots on separate Hermes profiles:
+
+| Profile | Bot Token | Config | Audience |
+|---------|-----------|--------|----------|
+| `default` | Bot A (private) | `tool_progress: all` | You see everything |
+| `public` | Bot B (public) | `tool_progress: none` | Public sees clean responses |
+
+Each profile runs its own gateway process. Steps:
+
+1. Create a second Telegram bot via [@BotFather](https://t.me/botfather)
+2. Create a Hermes profile: `hermes profile create public`
+3. Configure the public profile's Telegram gateway with the new bot token
+4. In the public profile's config.yaml, set `display.tool_progress: none`
+5. Start the second gateway: `hermes -p public gateway`
+
+This also lets you set different permitted features per profile (e.g., restrict terminal access on the public one).
+
 ## WhatsApp Bridge
 
 ### Target Format

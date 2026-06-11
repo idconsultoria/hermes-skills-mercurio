@@ -198,17 +198,26 @@ Systematically inspect a product/brand's visual identity using browser tools and
 
 ### Workflow
 
-1. **Scout** — `browser_navigate` to landing, feature, docs, and brand hub pages
-2. **See** — `browser_vision` on each page with structured questions (colors, typography, layout, components, decorative elements, interactive states, overall philosophy)
-3. **Dive** — Click interactive elements, toggle dark mode, scroll to capture full layout
-4. **Organize** — Structure findings: Philosophy → Color → Typography → Layout → Navigation → Components → Icons → Interactions → Voice → Design Principles
-5. **Produce** — Write polished markdown file at `/opt/data/<brand>-design-style-guide.md`, deliver via MEDIA:
+1. **Scout** — `browser_navigate` to landing, feature, docs, and brand hub pages. Also `web_extract` the main URL for structured text content (pricing, descriptions, value props).
+2. **Extract CSS** — Find the site's primary stylesheet URL (grep the page source for `.css` links or `<style>` blocks). Download it with `curl -s "<css-url>"`. Extract exact data:
+   - `grep -oP '#[0-9A-Fa-f]{6,8}' | sort | uniq -c | sort -rn` → definitive hex color ranking
+   - `grep -oP "font-family:\s*[^;]+" | sort | uniq -c | sort -rn` → definitive font stack
+   - `grep -iE 'gradient|button|primary|accent'` → design token hints
+   This is more reliable than vision analysis for colors and fonts — vision models approximate; CSS is exact.
+3. **See** — `browser_vision` on each page with structured questions about layout, components, decorative elements, interactive states, and overall philosophy. Use vision for spatial reasoning (card layouts, proportions, icon styles) — not for color/font identification.
+4. **Analyze the logo** — Download the logo file with `curl`, then use `vision_analyze` on the local file to describe: logo type (wordmark/icon/combo), exact shape elements, color regions, proportions. Cross-reference with CSS colors.
+5. **Harvest brand assets** — `browser_get_images` to find logo, icon, favicon, and partner-image URLs. Download actual asset files with `curl` to a dedicated directory (`/opt/data/<brand>-assets/`). Verify files are non-empty. These assets feed downstream production (video, social posts, ads).
+6. **Dive** — Click interactive elements, toggle dark mode, scroll to capture full layout.
+7. **Organize** — Structure findings: Philosophy → Color → Typography → Layout → Navigation → Components → Icons → Interactions → Voice → Design Principles. Include CSS-derived hex values in the palette section and CSS-derived font families in the typography section. Mark vision-approximated items with "(approx)".
+8. **Produce** — Write polished markdown style guide at `/opt/data/<brand>-design-style-guide.md`. Include an **asset manifest** section listing downloaded files and their paths. Deliver the guide via MEDIA: and mention the assets directory.
 
 ### Pitfalls
-- Vision model may be unreliable on colors/fonts — cross-reference with source
-- Interactive elements may be JS-dependent — try different click targets
-- Font identification is approximate — note "appears to be"
-- Different surfaces (marketing vs docs) may use different design systems
+- **Vision model may be unreliable on colors/fonts** — cross-reference with CSS source code. CSS hex values and `@font-face` declarations are definitive; vision is approximate. Use `curl` + `grep` on the site's stylesheet URL for exact data (see Step 2 — Extract CSS). For WordPress/Elementor sites with Litespeed Cache, see `references/wp-elementor-css-extraction.md` for the complete extraction pipeline including Elementor global variables and CORS workarounds.
+- **Reflex-reject fonts in existing brands** — the Shared Design Laws' reflex-reject list applies to brand *creation*, not *analysis*. When analyzing an existing brand, document the actual fonts used even if they appear on the reflex-reject list. The brand already chose them; your job is to record them accurately.
+- **Asset URLs may be behind lazy-loading** — scroll down fully before running `browser_get_images`
+- **Font identification is approximate** — note "appears to be" and suggest fallbacks
+- **Different surfaces (marketing vs docs) may use different design systems** — check at least the main site + one sub-page
+- **Cross-skill handoff** — when the brand analysis feeds a downstream skill (video, social media, print), pass the asset manifest and style guide path in the downstream context. The harvest step's downloaded files are the raw material.
 
 ---
 

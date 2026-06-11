@@ -1,10 +1,6 @@
 ---
 name: user-interview
-description: >-
-  Structured user/proxy interview protocol for product research. Covers
-  interview planning, question framing, active listening, synthesis, and
-  persona extraction. Can interview real humans OR simulate interviews with
-  AI agent profiles. Use during the Research phase before defining requirements.
+description: "Structured user/proxy interview protocol for product research — plan, frame, listen, synthesize, extract personas.\n\nLoad this skill during the Research phase (Fase 2) of the product pipeline to understand user needs, pain points, and behaviors before defining personas or user stories. Covers interview planning, question framing, active listening techniques, synthesis of findings, and persona extraction. Can interview real humans or simulate interviews with AI agent profiles."
 category: research
 ---
 

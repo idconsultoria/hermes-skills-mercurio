@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: "TDD: enforce RED-GREEN-REFACTOR, tests before code."
+description: "TDD: enforce RED-GREEN-REFACTOR, tests before code — write the test first, then the implementation.\n\nLoad this skill when practicing Test-Driven Development. Covers the RED-GREEN-REFACTOR cycle, writing tests before implementation, triangulation patterns, keeping tests small and focused, and integrating TDD into the development workflow."
 version: 1.1.0
 author: Hermes Agent (adapted from obra/superpowers)
 license: MIT

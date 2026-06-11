@@ -1,6 +1,6 @@
 ---
 name: polymarket
-description: "Query Polymarket: markets, prices, orderbooks, history.\n\nRead-only access to Polymarket prediction market data via three public REST APIs (Gamma, CLOB, Data) — no authentication required. Search markets, fetch real-time prices and orderbooks, retrieve price history, and present probabilities as human-readable percentages. Covers double-encoded JSON field parsing, rate limits, and the events-to-markets data model."
+description: "Query Polymarket: markets, prices, orderbooks, history — read-only access via public REST APIs.\n\nLoad this skill when you need prediction market data for research or analysis. Covers searching markets, fetching real-time prices and orderbooks, retrieving price history via three public Polymarket APIs (Gamma, CLOB, Data) — no authentication required. Presents probabilities as human-readable percentages. Includes double-encoded JSON field parsing, rate limits, and the events-to-markets data model."
 version: 1.0.0
 author: Hermes Agent + Teknium
 tags: [polymarket, prediction-markets, market-data, trading]

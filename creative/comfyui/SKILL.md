@@ -1,6 +1,6 @@
 ---
 name: comfyui
-description: "Generate images, video, and audio with ComfyUI. Install, manage nodes/models, run workflows via comfy-cli and direct REST/WebSocket API."
+description: "Generate images, video, and audio with ComfyUI — install, manage nodes/models, run workflows via comfy-cli and REST/WebSocket API.\n\nLoad this skill when you need to generate, edit, or process visual media using ComfyUI. Covers installation via pipx/uvx, launching ComfyUI locally or in Docker, managing nodes and custom models, running workflows via comfy-cli and direct API calls, and common troubleshooting for GPU/OOM issues."
 version: 5.1.0
 author: [kshitijk4poor, alt-glitch, purzbeats]
 license: MIT

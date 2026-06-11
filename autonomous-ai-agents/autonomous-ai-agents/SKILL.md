@@ -1,6 +1,6 @@
 ---
 name: autonomous-ai-agents
-description: Delegate tasks to autonomous AI coding agent CLIs via Hermes. One-shot, PR review, and session orchestration patterns.
+description: "Delegate tasks to autonomous AI coding agent CLIs via Hermes — one-shot, PR review, and session orchestration.\n\nLoad this skill when you need to delegate coding tasks to external AI coding agents (Claude Code, Codex, OpenCode, etc.). Covers one-shot delegation patterns, PR review workflows, session orchestration, and choosing the right agent for the task."
 category: autonomous-ai-agents
 ---
 

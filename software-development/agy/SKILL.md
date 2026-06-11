@@ -20,6 +20,7 @@ category: software-development
 - User says "make an HTML", "create a visual", "apresente em HTML"
 - Tarefa complexa/estratégica que requer file I/O ou design/UX
 - User asks to use agy for design tasks
+- **Video layout audit** — user asks agy to review a HyperFrames HTML composition before render. See `hyperframes-video-production` skill for the workflow.
 
 For user Gustavo Mello: agy is the primary design tool. Não use HTML manual quando agy está disponível.
 
