@@ -76,6 +76,7 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 
 ## [2026-06-12] update | Index synced 83→46 skills (38 archived removed). Description audit on all 46 SKILL.md — 40 summaries trimmed to ≤85 chars, 2 missing trigger phrases fixed, 4 corrupted GitHub descriptions restored from git. YAML folded format eliminated. Stale temp files cleaned.
 ## [2026-06-12] evolve | Zero merges (46 skills MECE after prior archival). Google Workspace empty Relações fixed (+3 relations). Graph regenerated (46 nodes, 364 edges).
+## [2026-06-12] offload | No memory to offload — cron session has memory disabled (skip_memory=true). No procedural facts in memory for this profile.
 
 ## [2026-06-11] evolve | Umbrella consolidation pass: 1 merge + 37 pruned. 83→46 skills. 37 archived.
 **Consolidation:** skill-curation → skills-repo-curator (external curation lifecycle merged into umbrella repo curator skill; reference files migrated)
