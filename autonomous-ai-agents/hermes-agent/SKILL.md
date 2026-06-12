@@ -1,6 +1,10 @@
 ---
 name: hermes-agent
-description: "Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, and multi-agent orchestration.\n\nLoad this skill when working with Hermes Agent itself. Covers initial setup and configuration, managing profiles, creating and installing skills, multi-agent spawning patterns, CLI usage, gateway configuration, and contributing to the Hermes codebase."
+description: "Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, and
+
+Load this skill when working with Hermes Agent itself. Covers initial setup and configuration, managing profiles, creating and installing skills, multi-agent spawning patterns, CLI usage, gateway configuration, and contributing to the Hermes codebase."
+
+Load this skill when working with Hermes Agent itself. Covers initial setup and configuration, managing profiles, creating and installing skills, multi-agent spawning patterns, CLI usage, gateway configuration, and contributing to the Hermes codebase."
 version: 2.1.0
 author: Hermes Agent + Teknium
 license: MIT

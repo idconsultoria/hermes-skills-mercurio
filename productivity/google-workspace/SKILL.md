@@ -1,6 +1,10 @@
 ---
 name: google-workspace
-description: "Gmail, Calendar, Drive, Docs, and Sheets via the gws CLI or Python library.\n\nLoad this skill when you need to interact with Google Workspace services programmatically. Covers sending and reading Gmail messages, managing Calendar events, accessing Drive files, creating and editing Docs and Sheets via CLI commands or the gws Python library with OAuth2 authentication."
+description: "Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation.
+
+Load this skill when you need to automate Google Workspace. Covers gws CLI installation and OAuth2 setup from Google Cloud Console credentials, then using it for Gmail operations, Calendar management, Drive file operations, Docs editing, and Sheets data manipulation."
+
+Load this skill when you need to automate Google Workspace. Covers gws CLI installation and OAuth2 setup from Google Cloud Console credentials, then using it for Gmail operations, Calendar management, Drive file operations, Docs editing, and Sheets data manipulation."
 version: 1.1.0
 author: Nous Research
 license: MIT

@@ -1,6 +1,10 @@
 ---
 name: plan
-description: "Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bite-sized tasks, exact paths, complete code."
+description: "Write actionable markdown plans to .hermes/plans — bite-sized tasks, exact paths.
+
+Load this skill when you need to plan before executing. Produces actionable markdown plans saved to .hermes/plans/ with bite-sized tasks, exact file paths, and complete code examples — just structured planning with dependencies and timeline estimates, no execution."
+
+Load this skill when you need to plan before executing. Produces actionable markdown plans saved to .hermes/plans/ with bite-sized tasks, exact file paths, and complete code examples — no execution, just structured planning with dependencies and timeline estimates."
 version: 2.0.0
 author: Hermes Agent (writing-craft adapted from obra/superpowers)
 license: MIT

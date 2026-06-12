@@ -1,6 +1,10 @@
 ---
 name: vercel-deploy
-description: "Deploy static sites and frontend apps to Vercel — from zero to production, CLI install, auth, deploy, custom domains, env vars.\n\nLoad this skill when deploying a static site or frontend app to Vercel. Covers CLI installation in restricted environments (no root, npm global prefix), device-flow OAuth authentication, project creation, deployment commands, custom domain setup, environment variable configuration, and common pitfalls like alias mismatches."
+description: "Deploy static sites and frontend apps to Vercel — from zero to production.
+
+Load this skill when deploying frontend applications to Vercel. Covers CLI installation in restricted environments (no root, npm global prefix), device-flow authentication, project creation and linking, deployment with custom domains, environment variable management, and common deployment pitfalls."
+
+Load this skill when deploying frontend applications to Vercel. Covers CLI installation in restricted environments (no root, npm global prefix), device-flow authentication, project creation and linking, deployment with custom domains, environment variable management, and common deployment pitfalls."
 version: 1.0.0
 author: Hermes Agent
 tags: [vercel, deploy, static-site, frontend, hosting, jamstack]

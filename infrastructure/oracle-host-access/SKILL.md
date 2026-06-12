@@ -1,6 +1,10 @@
 ---
 name: oracle-host-access
-description: "SSH access from a Hermes Docker container to its Oracle Linux host — key setup, SSH config quirks, and diagnostics.\n\nLoad this skill when you need to SSH from the Hermes Docker container to the Oracle Linux host. Covers SSH key generation and deployment, Docker host discovery via gateway IP, SSH config quirks in container environments, host diagnostics, and common connection troubleshooting."
+description: "SSH from Hermes Docker container to Oracle Linux host — key setup and diagnostics.
+
+Load this skill when you need the Hermes Docker container to reach its host machine. Covers SSH key generation and deployment, SSH config quirks for container-to-host connections, Docker host network discovery, and host-level diagnostics from within the container."
+
+Load this skill when you need the Hermes Docker container to reach its host machine. Covers SSH key generation and deployment, SSH config quirks for container-to-host connections, Docker host network discovery, and host-level diagnostics from within the container."
 category: infrastructure
 metadata:
   hermes:

@@ -1,6 +1,10 @@
 ---
 name: skills-repo-curator
-description: "Gerencia o skills repo em /opt/data/skills/ com controle de versão Git e curadoria de skills comunitárias — Ciclo de Consolidação (Update→Evolve→Offload), descoberta/avaliação/instalação de skills externas, análise MECE, merges, revisão de órfãos, inferência depth-1 de relações, auditoria de conformidade de descrições, index.md/log.md/reports, geração de grafo D3 interativo e offload de memória.\n\nLoad this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, AGENTS.md updates, installing community skills, or any skills repository management task. Executes the full consolidation lifecycle: analyze portfolio, propose merges, delete redundant skills, review orphans, write reports, offload learned facts to skills, generate graph, and commit. Covers both internal repo maintenance (evolve/update/offload cycles) and external curation (discovering, evaluating, installing community skills from HermesHub, GitHub, or raw URLs)."
+description: "Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph.
+
+Load this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, or installing community skills. Covers the full consolidation lifecycle: update, evolve, offload, commit, push, and interactive D3 graph generation."
+
+Load this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, or installing community skills. Covers the full consolidation lifecycle: update, evolve, offload, commit, push, and interactive D3 graph generation."
 category: software-development
 ---
 
@@ -147,7 +151,7 @@ description: "Geocode addresses, find POIs, calculate routes, and lookup timezon
 Load this skill when you need location-based data — converting addresses to coordinates, searching for points of interest, getting driving or walking directions with distance and ETA, or looking up timezone information. Uses free APIs (Nominatim, Overpass, OSRM) with no API key required."
 ```
 
-⚠️ **YAML `>-` (folded with strip) quebra o parser do `generate_graph.py`.** O script lê o frontmatter com regex simples (`^---\n(.*?)\n---`), e `description: >-` com múltiplas linhas indentadas pode fazer o parser perder o texto, caindo no fallback que extrai comandos aleatórios do corpo do SKILL.md — resultando em resumos como `node --version` no index.md. **Sempre usar string quoted (`"..."`) com `\n` explícito para parágrafos de múltiplas linhas. Verificar: `grep -rn 'description: >-' SKILL.md`.**
+⚠️ **YAML `>-` (folded with strip) quebra o parser do `generate_graph.py`.** O script lê o frontmatter com regex simples (`^---\n(.*?)\n---`), e `description:` com múltiplas linhas indentadas pode fazer o parser perder o texto, caindo no fallback que extrai comandos aleatórios do corpo do SKILL.md — resultando em resumos como `node --version` no index.md. **Sempre usar string quoted (`"..."`) com `\n` explícito para parágrafos de múltiplas linhas. Verificar: `grep -rn 'description:' SKILL.md`.**
 
 ---
 
@@ -289,7 +293,7 @@ cd /opt/data/skills
 git log --oneline -5
 python3 scripts/generate_graph.py
 grep "|- \`" index.md  # deve retornar vazio
-grep -rn 'description: >-' SKILL.md  # deve retornar vazio (YAML folded quebra o parser)
+grep -rn 'description:' SKILL.md  # deve retornar vazio (YAML folded quebra o parser)
 grep "^### " index.md | wc -l  # total de skills
 grep -c "Relações" index.md  # skills com relações
 
@@ -316,7 +320,7 @@ grep -n 'Reason:' index.md   # mesma verificação, capitalização alternativa
 
 ⚠️ **index.md nunca é regenerado do zero.** Apenas patches cirúrgicos via ferramentas LLM.
 
-⚠️ **YAML `>-` quebra o parser de descrições.** O script `generate_graph.py` lê frontmatter com regex simples e não suporta YAML folded (`>-`). Descrições devem usar string quoted (`"..."`) com `\n` explícito. Verificar com `grep -rn 'description: >-' SKILL.md`.
+⚠️ **YAML `>-` quebra o parser de descrições.** O script `generate_graph.py` lê frontmatter com regex simples e não suporta YAML folded (`>-`). Descrições devem usar string quoted (`"..."`) com `\n` explícito. Verificar com `grep -rn 'description:' SKILL.md`.
 
 ⚠️ **Ciclo pode morrer no meio e deixar working directory sujo.** O cron job tem timeout — se o ciclo não completa, SKILL.md ficam modificados mas sem commit, index.md desatualizado, log.md sem entrada. **Recuperação:**
 

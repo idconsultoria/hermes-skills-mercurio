@@ -1,6 +1,8 @@
 ---
 name: dogfood
-description: "Exploratory QA of web applications — find bugs, gather evidence, and write reports.\n\nLoad this skill for manual or automated quality assurance of web apps. Covers systematic exploratory testing workflows, bug discovery techniques, capturing screenshots and logs as evidence, documenting reproducible steps, and producing structured QA reports with severity ratings."
+description: "Exploratory QA of web applications — find bugs, gather evidence, produce reports.
+
+Load this skill when you need to test a web application for issues. Covers systematic exploratory testing, bug discovery with screenshots and logs as evidence, structured bug reporting with reproduction steps, and QA summary reports for development teams."
 version: 1.1.0
 platforms: [linux, macos, windows]
 metadata:

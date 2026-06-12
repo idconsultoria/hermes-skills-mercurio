@@ -1,6 +1,10 @@
 ---
 name: backlog-and-sprint
-description: "Backlog management and Sprint execution for product iteration (Fase 5). Mantém uma backlog não-estruturada de pedidos de melhoria, e orquestra Sprints completas (PM → UX/UI → Engineering → Review → Close).\n\nLoad this skill during the execution phase (Fase 5) of the product pipeline. Covers maintaining an unstructured backlog of improvement requests and orchestrating complete Sprints — from PM and UX/UI through Engineering, Review, and Close."
+description: "Backlog management and Sprint execution for product iteration (Fase 5) —
+
+Load this skill during the execution phase (Fase 5) of the product pipeline. Covers maintaining an unstructured backlog of improvement requests and orchestrating complete Sprints from PM and UX/UI through Engineering, Review, and Close."
+
+Load this skill during the execution phase (Fase 5) of the product pipeline. Covers maintaining an unstructured backlog of improvement requests and orchestrating complete Sprints from PM and UX/UI through Engineering, Review, and Close."
 category: software-development
 ---
 

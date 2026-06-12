@@ -1,6 +1,10 @@
 ---
 name: deep-research
-description: "Multi-agent deep research pipeline that decomposes topics, dispatches parallel agents, and produces cited reports.\n\nLoad this skill for thorough multi-source research. Inspired by GPT-Researcher, this pipeline decomposes complex questions into sub-queries, dispatches parallel research agents across web, GitHub, news, and academic sources, runs independent reviewers for source verification, then conducts cross-validation and a roundtable discussion. Produces a final cited report with confidence-graded findings (HIGH/MEDIUM/LOW/CONTESTED). Supports three depth levels (Quick, Standard, Deep), adaptive phase skipping, and local codebase analysis."
+description: "Multi-agent deep research: decompose, dispatch agents, cross-validate, synthesize.
+
+Load this skill when you need thorough research on complex topics. Inspired by GPT-Researcher, this pipeline decomposes questions into sub-queries, dispatches parallel research agents across web, GitHub, news, and academic sources, runs independent reviewers, then cross-validates and synthesizes. Produces cited reports with confidence-graded findings across three depth levels."
+
+Load this skill when you need thorough research on complex topics. Inspired by GPT-Researcher, this pipeline decomposes questions into sub-queries, dispatches parallel research agents across web, GitHub, news, and academic sources, runs independent reviewers, then cross-validates and synthesizes. Produces cited reports with confidence-graded findings across three depth levels."
 triggers:
   - 深度调研
   - deep research

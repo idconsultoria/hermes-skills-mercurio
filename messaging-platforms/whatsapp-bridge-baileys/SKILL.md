@@ -1,6 +1,10 @@
 ---
 name: whatsapp-bridge-baileys
-description: "Send messages, discover group IDs, and manage media via a local WhatsApp Baileys bridge.\n\nLoad this skill when you need to interact with WhatsApp programmatically. Covers the local Node.js HTTP bridge on port 3000 using @whiskeysockets/baileys — sending text and media messages, editing sent messages, discovering group IDs from sender-key files, self-chat mode behavior, and common pitfalls including silent delivery failures and emoji issues. Always verify group names before sending to avoid wrong-group-ID errors."
+description: "Send messages, discover group IDs, manage media via local WhatsApp Baileys bridge.
+
+Load this skill when you need to interact with WhatsApp programmatically. Covers the local Node.js HTTP bridge using @whiskeysockets/baileys — sending text and media messages, editing sent messages, discovering group IDs from sender-key files, self-chat mode, and common pitfalls."
+
+Load this skill when you need to interact with WhatsApp programmatically. Covers the local Node.js HTTP bridge on port 3000 using @whiskeysockets/baileys — sending text and media messages, editing sent messages, discovering group IDs from sender-key files, self-chat mode behavior, and common pitfalls including silent delivery failures and emoji issues."
 metadata:
   hermes:
     tags: [whatsapp, baileys, bridge, messaging, nodejs]

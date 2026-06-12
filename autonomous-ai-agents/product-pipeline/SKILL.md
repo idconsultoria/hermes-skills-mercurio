@@ -1,6 +1,10 @@
 ---
 name: product-pipeline
-description: "Multi-agent product pipeline from raw idea to MVP with iterative sprints — orchestrated by Hermes, executed by Pi Agent + Antigravity.\n\nLoad this skill when building a product from scratch through the full pipeline — ideation, research, design, sprints, and delivery. Covers orchestrating a multi-agent team with Hermes as coordinator, Pi Agent for execution, and Antigravity for visual design review."
+description: "Multi-agent product pipeline from idea to MVP — orchestrated by Hermes, Pi Agent.
+
+Load this skill when building a product from scratch through the full pipeline — ideation, research, design, sprints, and delivery. Covers orchestrating a multi-agent team with Hermes as coordinator, Pi Agent for execution, and Antigravity for visual design review."
+
+Load this skill when building a product from scratch through the full pipeline — ideation, research, design, sprints, and delivery. Covers orchestrating a multi-agent team with Hermes as coordinator, Pi Agent for execution, and Antigravity for visual design review."
 category: autonomous-ai-agents
 ---
 

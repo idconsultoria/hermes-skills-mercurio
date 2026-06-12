@@ -1,6 +1,10 @@
 ---
 name: spike
-description: "Throwaway experiments to validate an idea before building it.\n\nLoad this skill when you need to quickly prototype or validate a concept before committing to full implementation. Covers creating isolated throwaway experiments, defining success criteria, running fast validation cycles, and documenting findings to inform build decisions."
+description: "Throwaway experiments to validate an idea before building — fast, focused
+
+Load this skill when you need to validate an approach before committing to a full implementation. Covers rapid prototyping patterns, hypothesis-driven experimentation, minimal viable tests, and structured decision-making from spike results with clear go/no-go criteria."
+
+Load this skill when you need to validate an approach before committing to a full implementation. Covers rapid prototyping patterns, hypothesis-driven experimentation, minimal viable tests, and structured decision-making from spike results — with clear go/no-go criteria."
 version: 1.0.0
 author: Hermes Agent (adapted from gsd-build/get-shit-done)
 license: MIT

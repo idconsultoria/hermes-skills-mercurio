@@ -1,6 +1,10 @@
 ---
 name: hyperframes-video-production
-description: "Produce deterministic MP4 videos using HyperFrames (HTML→video engine) — GSAP animations, templates, and brand integration.\n\nLoad this skill when creating video content programmatically — explainer videos, product ads, brand content. Covers composing HTML scenes with GSAP animations, horizontal and vertical video layouts, brand color adaptation for motion graphics, layout audit workflows, and rendering via HyperFrames. Hermes Style Guide is the default visual aesthetic."
+description: "Produce deterministic MP4 videos via HyperFrames — HTML compositions to video.
+
+Load this skill when creating programmatic video content. Covers HTML composition with GSAP animations, local rendering via npx hyperframes, Hermes Style Guide integration for explainer/demo videos, and deterministic output for consistent regeneration."
+
+Load this skill when creating programmatic video content. Covers HTML composition with GSAP animations, local rendering via npx hyperframes, Hermes Style Guide integration for explainer/demo videos, and deterministic output for consistent regeneration."
 category: media
 ---
 

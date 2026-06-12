@@ -1,6 +1,10 @@
 ---
 name: brand-iaf-conteudo
-description: "Conteúdo da comunidade IA que Funciona (IAF) — constantes de marca, voz, tom, paleta, templates.\n\nLoad this skill when generating any text or visual content for the IAF community. Covers brand voice and tone guidelines, color palette and typography, language rules (PT-BR), content templates for newsletter, posts, discussions, and welcome messages. Integrates with iaf-newsletter-pipeline and xurl for publishing."
+description: "Content for IA que Funciona community — brand constants, voice, tone, templates.
+
+Load this skill when creating content for the IA que Funciona (IAF) community. Contains brand constants, voice and tone guidelines, color palette, typography rules, language rules, and content templates. Use for daily newsletter, social posts, discussions, and welcome messages."
+
+Load this skill when creating content for the IA que Funciona (IAF) community. Contains brand constants, voice and tone guidelines, color palette, typography rules, language rules, and content templates. Use for daily newsletter, social posts, discussions, and welcome messages."
 version: 1.0.0
 author: Gustavo Mello
 tags: [iaf, comunidade, brand, conteudo, newsletter, social-media]

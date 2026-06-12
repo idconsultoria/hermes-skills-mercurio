@@ -1,6 +1,10 @@
 ---
 name: pi-session-audit
-description: "Audita sessões do Pi Agent extraindo duração, tokens, custo e modelo dos arquivos .jsonl.\n\nLoad this skill to analyze Pi Agent session logs and calculate costs per provider. Extracts real usage metrics from session JSONL files, computes costs based on model pricing, and produces audit reports for tracking agent usage and spending."
+description: "Audit Pi Agent sessions — duration, tokens, costs, and model from JSONL files.
+
+Load this skill to analyze Pi Agent session logs and calculate costs per provider. Extracts real usage metrics from session JSONL files, computes costs based on model pricing, and produces audit reports for tracking agent usage and spending."
+
+Load this skill to analyze Pi Agent session logs and calculate costs per provider. Extracts real usage metrics from session JSONL files, computes costs based on model pricing, and produces audit reports for tracking agent usage and spending."
 category: autonomous-ai-agents
 metadata:
   hermes:

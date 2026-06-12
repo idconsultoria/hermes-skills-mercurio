@@ -1,7 +1,11 @@
 ---
 name: model-benchmark-frontier
 category: research
-description: Comparação de modelos de IA — inteligência vs parâmetros, fronteira convex hull, análise de hardware local para inferência. Pesquisa multi-fonte, compilação de dataset, geração de gráfico de fronteira + tabelas .md.
+description: "Compare AI models — intelligence vs parameters, convex hull, local hardware analysis.
+
+Load this skill when you need to compare AI models across intelligence and parameter counts. Produces convex hull frontier charts comparing open vs closed models, VRAM requirements tables for local inference, cost-benefit analyses for inference hardware setups, and multi-source research compilation."
+
+Load this skill when you need to compare AI models across intelligence and parameter counts. Produces convex hull frontier charts comparing open vs closed models, VRAM requirements tables for local inference, cost-benefit analyses for inference hardware setups, and multi-source research compilation."
 triggers:
   - "Gráfico de inteligência vs parâmetros"
   - "Qual modelo é melhor para meu hardware"

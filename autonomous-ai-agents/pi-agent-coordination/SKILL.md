@@ -1,6 +1,10 @@
 ---
 name: pi-agent-coordination
-description: "Invoke Pi Agent locally from Hermes with provider/model hierarchy, session recovery, and stall detection.\n\nLoad this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code tasks), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring. Includes GoUsageLimitError handling and pre-launch session reuse checks."
+description: "Invoke Pi Agent locally from Hermes — provider/model hierarchy and session recovery.
+
+Load this skill for running Pi Coder Agent as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring."
+
+Load this skill for running Pi Coder Agent as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring."
 category: autonomous-ai-agents
 metadata:
   hermes:

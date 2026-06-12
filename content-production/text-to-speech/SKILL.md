@@ -1,7 +1,11 @@
 ---
 name: text-to-speech
 category: content-production
-description: "Umbrella skill for TTS covering voice design, multi-provider fallback, and full lifecycle from persona to audio.\n\nLoad this skill for any text-to-speech task — Gemini TTS prompting with voice selection and audio tags, Hermes TTS system with multi-provider fallback chain and config, self-hosted Fish Speech inference on ARM64, and iterative voice design patterns for persona creation. Covers the complete pipeline from voice design to audio file delivery."
+description: "Umbrella skill for TTS — voice design, multi-provider fallback, persona to audio.
+
+Load this skill for text-to-speech workflows across any provider. Covers voice design with persona development, Gemini prompting for voice style, multi-provider fallback (Edge TTS, ElevenLabs, OpenAI), self-hosted Fish Speech setup, and Hermes TTS provider configuration for the full lifecycle from persona to audio delivery."
+
+Load this skill for text-to-speech workflows across any provider. Covers voice design with persona development, Gemini prompting for voice style, multi-provider fallback (Edge TTS, ElevenLabs, OpenAI), self-hosted Fish Speech setup, and Hermes TTS provider configuration for the full lifecycle from persona to audio delivery."
 metadata:
   hermes:
     tags: [tts, voice, gemini, fish-speech, audio, prompting, speech]

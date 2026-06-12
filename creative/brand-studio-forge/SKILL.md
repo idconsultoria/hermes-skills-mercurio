@@ -1,6 +1,10 @@
 ---
 name: brand-studio-forge
-description: Use when the user wants to create, refine, or evolve a brand identity. Covers brand interviews, identity kit generation (logo, color, type, voice, guidelines), brand-specific content skills, and ongoing content via cron. Not for UI design or non-brand creative tasks.
+description: "Create, refine, or evolve a brand identity: interviews, identity kit, content
+
+Load this skill when the user wants to create, refine, or evolve a brand identity. Covers brand interviews, identity kit generation (logo, color, type, voice, guidelines), brand-specific content skills, and ongoing content via cron. Not for UI design or non-brand creative tasks."
+
+Load this skill when the user wants to create, refine, or evolve a brand identity. Covers brand interviews, identity kit generation (logo, color, type, voice, guidelines), brand-specific content skills, and ongoing content via cron. Not for UI design or non-brand creative tasks."
 version: 1.0.0
 user-invocable: true
 argument-hint: "[interview · forge · name · evolve · author | critique · audit | polish | content · schedule] [target]"
