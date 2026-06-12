@@ -428,6 +428,9 @@ Load this skill when you need to interact with WhatsApp programmatically. Covers
 Google OAuth2 client credentials (downloaded from Google Cloud Console)
 
 **Relações:**
+- `similar` → `productivity/notion`
+- `similar` → `productivity/taskflow-mcp`
+- `used_by` → `content-production/iaf-newsletter-pipeline`
 
 ### HTML Report — Hermes Design System
 
