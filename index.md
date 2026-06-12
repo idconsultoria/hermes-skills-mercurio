@@ -75,8 +75,6 @@ Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — n
 
 **Relações:**
 - `uses` → `autonomous-ai-agents/pi-session-audit`
-
-**Relações:**
 - `similar` → `autonomous-ai-agents/autonomous-ai-agents`
 - `used_by` → `autonomous-ai-agents/product-pipeline`
 - `parent` → `autonomous-ai-agents/hermes-agent`
