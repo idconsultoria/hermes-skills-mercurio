@@ -1,9 +1,8 @@
 ---
 name: product-pipeline
-description: |-
-  Multi-agent product pipeline — da ideia bruta ao MVP entregue com sprints iterativos. Orquestrado por Hermes, executado por Pi Agent (ideacao/PM/design/engenharia) + Antigravity (autoridade visual/revisor).
+description: "Multi-agent product pipeline — da ideia bruta ao MVP com sprints iterativos. Orquestrado por Hermes, executado por Pi Agent + Antigravity.
 
-  Load this skill when building a product from scratch through the full pipeline — ideation, research, design, sprints, and delivery. Covers orchestrating a multi-agent team with Hermes as coordinator, Pi Agent for execution, and Antigravity for visual design review.
+Load this skill when building a product from scratch through the full pipeline — ideation, research, design, sprints, and delivery. Covers orchestrating a multi-agent team with Hermes as coordinator, Pi Agent for execution, and Antigravity for visual design review."
 category: autonomous-ai-agents
 ---
 
@@ -36,7 +35,7 @@ Este bloco codifica o estilo de trabalho das pessoas que usam este pipeline.
 - **Pre-flight check antes de cada fase:** Usuário não quer gastar tokens debugando permissão.
 
 ### Preferências de documento
-- **Formato limpo e enxuto:** Documentos de produto (personas, PRD, etc.) DEVEM ser focados no que importa — sem poluição de fontes inline, sem metadados de pesquisa no texto. Fontes são implícitas ou registradas no histórico, não no corpo.
+- **Formato limpo e enxuto:** Documentos de produto (personas, PRD, etc.) DEVEM ser focados no que importa — sem poluição de fontes inline, sem metadados de pesquisa no texto. Fontes são implícitas ou registradas no histórico, não no corpo. Exemplo real: user-personas foi reduzido de 265 linhas para 106 (60% mais enxuto) a pedido do usuário.
 - **Template proto-persona do Pi Agent:** Usar o formato do Pi Agent (`~/.pi/agent/skills/pm-skills/skills/proto-persona/template.md`) como referência de estrutura: Bio & Demographics → Quotes (2-3) → Pains (2-3) → What/Goals → Attitudes & Influences. Sem tabelas enormes, sem fontes a cada linha.
 - **Clone digital é insumo, não verdade absoluta:** Dados de clone digital alimentam a persona, mas NÃO substituem o que o usuário confirma sobre si mesmo. Se o usuário corrigir algo do clone, a correção vence — o clone pode ter alucinado características.
 
@@ -660,11 +659,29 @@ product/management/
    - **Agy executa do HOST, não do container**
 
 6. **Stitch MCP — geração de telas finais (último passo):**
-   Com o design system aprovado, usar Stitch MCP para gerar cada tela:
-   - `generate_screen_from_text` pra cada view (Dashboard, Tarefas, Agentes, Contexto, Timeline)
-   - Aplicar design system já definido como base visual
-   - Iterar com `edit_screens` + `generate_variants` se necessário
-   - Stitch é o passo final — só depois que agy aprovou o design system
+   Com o design system aprovado, usar Stitch MCP para gerar cada tela.
+
+   **Pré-requisitos:**
+   - Stitch MCP configurado como HTTP direto no `/opt/data/config.yaml` (NÃO no `.hermes/config.yaml`)
+   - Design system verificado e atualizado ANTES de gerar — conferir: `colorMode` (DARK/LIGHT), fontes, cores primárias
+   - `/reload-mcp` feito para ativar as tools
+
+   **Workflow:**
+   a) **Verificar design system existente** no projeto Stitch via `list_design_systems`
+   b) **Atualizar/criar** design system com tokens corretos antes de gerar screens
+      - Atenção: `UpdateDesignSystem` não aceita todas as fontes (BRICOLAGE_GROTESQUE falha, usar SPACE_GROTESK)
+      - `CreateDesignSystem` aceita mais fontes mas pode dropá-las silenciosamente
+   c) **Gerar mobile primeiro** (`deviceType=MOBILE`), depois desktop (`deviceType=DESKTOP`)
+      - Usar `generate_screen_from_text` com prompts detalhados (mencionar tokens exatos: hex colors, font names, radius)
+      - Incluir sempre `designSystem: assets/<id>` para consistência visual
+   d) **Baixar screenshots** full-res: URL + `=s0` → salvar em `/opt/data/delfos-screens/`
+   e) **Enviar via MEDIA** para o usuário
+   f) **Gerar protótipo HTML** via agy após Stitch screens aprovadas:
+      ```bash
+      ssh oracle-host "cat prompt.txt | /home/ubuntu/.local/bin/agy --print --model gemini-3.1-pro --print-timeout 5m"
+      ```
+   g) Iterar com `edit_screens` + `generate_variants` se necessário
+   - Stitch é o passo final da F4a — só depois que agy aprovou o design system
 
 ### Saída
 
@@ -886,6 +903,20 @@ Itens a verificar:
 
 ## Pitfalls
 
+⚠️ **agy via SSH pode quebrar permissões do container** — agy (SSH host, uid 1001) pode executar `sudo chown -R ubuntu:ubuntu` no diretório do projeto, e o container Hermes (uid 10000) perde escrita. **Fix:** rodar `ssh oracle-host 'sudo chmod -R 777 ...'`. Verificar permissões após agy executar.
+
+⚠️ **Stitch MCP — config no `/opt/data/config.yaml`, NÃO no `.hermes/config.yaml`** — O override (`~/.hermes/config.yaml`) funciona para desenvolvimento rápido, mas o config principal (`/opt/data/config.yaml`) é o repositório oficial. Stitch MCP HTTP não funciona via npx proxy — usar `url:` + `headers:` + `transport: http`. A API key vai no header `X-Goog-Api-Key`. Editar via SSH no host com Python (não sed) para evitar YAML malformado.
+
+⚠️ **Stitch MCP — design system ANTES das screens** — Sempre verificar/atualizar o design system no Stitch antes de gerar screens. Screens geradas com tokens errados (LIGHT em vez de DARK, fonte errada) precisam ser descartadas e regeneradas.
+
+⚠️ **Stitch UpdateDesignSystem — fontes limitadas** — BRICOLAGE_GROTESQUE não funciona no UpdateDesignSystem. Usar SPACE_GROTESK como alternativa. Testar fontes no Update antes de tentar no Create.
+
+⚠️ **Stitch MCP — usar o mesmo design system id em todas as telas** — Para consistência visual, passar `designSystem: assets/<id>` em toda chamada de `generate_screen_from_text`.
+
+⚠️ **agy prototype — executar no host, não no container** — agy está em `/home/ubuntu/.local/bin/agy` no host Oracle. Usar `ssh oracle-host` com `--print` para geração não-interativa. O modelo `gemini-3.1-pro` funciona bem para protótipos complexos. `--print-timeout 5m` evita timeout prematuro.
+
+⚠️ **Stitch MCP — usar HTTP direto, não stdio proxy** — A API key funciona no header `X-Goog-Api-Key` quando usada via HTTP MCP direto (`url:` + `headers:`). O `@_davideast/stitch-mcp` package tem um subcomando `tool` que NÃO funciona com API key. Usar `transport: http` com headers no config do Hermes. Ver `skill_view(name='product-pipeline', file_path='references/google-stitch-mcp.md')`.
+
 ⚠️ **Pi best não streama stdout intermediário** — Com MiniMax M3, Pi pode levar 4-5 min por documento sem produzir stdout. Monitorar pelos arquivos de saída, não pelo output do processo. Usar `terminal(background=true)` + `ls -la` periódico.
 
 ⚠️ **Pi PATH pode não estar definido** — Pi está em `/opt/data/pi-global/bin/pi`. Se `which pi` falhar, exportar PATH ou usar caminho absoluto.
@@ -914,7 +945,7 @@ Itens a verificar:
 
 ⚠️ **Hermes coleta evidência, NÃO diagnóstica bugs na 4e** — Só reportar o que viu.
 
-⚠️ **agy -p timeout com prompts longos** — Usar tmux interativo.
+⚠️ **Permissão do container — agy pode quebrar com chown** — evitar. Ver pitfall "agy via SSH" acima.
 
 ⚠️ **agy output token limit (>70KB)** — Quebrar em CSS/HTML/JS separados.
 

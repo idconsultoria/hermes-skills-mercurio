@@ -1,9 +1,6 @@
 ---
 name: iaf-newsletter-pipeline
 description: "Umbrella skill for newsletters and digests — cron scheduling, multi-source curation.
-
-Load this skill to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline. Covers multi-source content collection, editorial ranking and dedup, HTML-to-PDF rendering, Telegram and WhatsApp delivery, and chained cron job architecture."
-
 Load this skill to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline. Covers multi-source content collection, editorial ranking and dedup, HTML-to-PDF rendering, Telegram and WhatsApp delivery, and chained cron job architecture."
 trigger: User asks to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline. Also when designing cron-based content aggregation patterns.
 metadata:
@@ -26,7 +23,16 @@ Full automated daily pipeline: coleta → ranqueamento → HTML → PDF → entr
 
 Four chained cron jobs, scheduled in **GMT-3** (user's local time). Cron system runs in UTC (+3h).
 
-```\nGMT-3          UTC           Cron\n─────────────────────────────────────────────────\n04:00      →  07:00    🔵  #1 Coleta de Fontes\n07:30      →  10:30    🟡  #2 Newsletters\n07:40      →  10:40    🔴  #3 Síntese + PDF (ranking é interno)\n07:50      →  10:50    🟢  #4 Deploy Web (Vercel)\n```\n\nChaining: `#3 context_from: [#1, #2]` | `#4 context_from: [#3]`
+```
+GMT-3          UTC           Cron
+─────────────────────────────────────────────────
+04:00      →  07:00    🔵  #1 Coleta de Fontes
+07:30      →  10:30    🟡  #2 Newsletters
+07:40      →  10:40    🔴  #3 Síntese + PDF (ranking é interno)
+07:50      →  10:50    🟢  #4 Deploy Web (Vercel)
+```
+
+Chaining: `#3 context_from: [#1, #2]` | `#4 context_from: [#3]`
 
 ## Cron #1 — Coleta de Fontes (04:00 GMT-3)
 
@@ -56,44 +62,68 @@ Only runs later because these newsletters update around 7h local time.
 
 ## Cron #3 — Síntese + PDF (07:40 GMT-3 / 10:40 UTC)
 
-**Toolsets:** terminal, file  \\
-**Deliver:** origin (Telegram)  \\
-**Skills:** copywriting, humanizer, html-to-pdf-chromium
+**Toolsets:** terminal, file  \\\
+**Deliver:** origin (Telegram)  \\\
+**Skills configuradas:** copywriting, humanizer, html-to-pdf-chromium, newsletter-curation, iaf-newsletter
+
+> ⚠️ **Skills que podem não existir:** `newsletter-curation` e `iaf-newsletter` não existem em todas as instalações. Se estiverem faltando, o agente recebe um aviso no topo do contexto que polui o prompt e degrada a qualidade da síntese. Antes de uma execução crítica, verifique com `skills_list()` se as skills carregam sem erro. Se não existirem, remova-as do cron job com `cronjob(action='update', skills=[...])` e confie apenas em `copywriting + humanizer + html-to-pdf-chromium`.
 
 ### Pipeline Steps
 
+> ⚠️⚠️⚠️ **REGRA ABSOLUTA — VERIFIQUE DATAS ANTES DE SELECIONAR. STALE NEWS QUEIMAM CREDIBILIDADE.**
+>
+> A coleta de fontes (Cron #1) **não filtra por data**. Itens de dias ou semanas atrás aparecem lado a lado com os de hoje. Cabe a você verificar a data de publicação de cada item antes de incluí-lo. Ver referência `references/news-verification-pitfalls.md` para o método completo.
+>
+> **Passo obrigatório entre a leitura dos arquivos e a pré-seleção:**
+> 1. Para cada item candidato, verifique a data de publicação real (não a data de coleta)
+> 2. Se o item tem mais de 48h, DESCARTE — a menos que seja um desenvolvimento novo sobre um tópico contínuo (ex: Fable 5 SHUTDOWN é novo, mesmo sendo sobre Fable 5 que foi lançado antes)
+> 3. Prefira fontes com data explícita (artigos de news, comunicados oficiais) a posts de Reddit/HN sem data clara
+> 4. Desconfie de listas "top N coisas que aconteceram" — essas sempre misturam old e new
+
 > ⚠️⚠️⚠️ **REGRA ABSOLUTA — DEDUP NÃO É OPCIONAL. ISTO NÃO É UMA SUGESTÃO.**
 > 
-> **Duas vezes seguidas** a newsletter saiu com notícias repetidas porque o agente pulou a dedup. Isso é **inaceitável**.
+> **Três vezes seguidas** a newsletter saiu com notícias repetidas porque o agente pulou ou fez dedup superficial. Isso é **inaceitável**.
 > 
-> **Você DEVE:**
-> 1. Ler o HTML da edição anterior em `/opt/data/cron/history/iaf_$(date -d yesterday +%Y-%m-%d).html` (ou a mais recente disponível)
-> 2. Extrair TODOS os títulos e links
-> 3. Comparar com CADA item que você está considerando incluir
-> 4. Se o mesmo título OU link OU tópico já apareceu → **REMOVA**
-> 5. Verificar nos últimos 14 dias de histórico — não só na edição anterior
+> A partir de junho/2026, o dedup usa um **manifesto de títulos** (~6KB JSON em vez de ler 14 HTMLs = ~560KB). O script `dedup_manifest.py` extrai e mantém o manifesto. Você NÃO lê os HTMLs brutos — lê o JSON.
 > 
-> **Não confie na sua memória. Leia os arquivos.**
+> **Seu trabalho:**
+> 1. Rode o script (pré-escrita): `python3 /opt/data/cron/scripts/dedup_manifest.py`
+> 2. Leia `/opt/data/cron/history/iaf_manifest.json` — use `titles_flat` como patrimônio editorial
+> 3. Compare CADA item selecionado contra o manifesto
+> 4. Se o mesmo título OU tópico central já apareceu nos últimos 14 dias → **REMOVA**
+> 5. Depois de salvar o HTML, rode o script de novo (pós-escrita) pra atualizar o manifesto
+> 
+> **Não confie na sua memória. Leia o manifesto.**
 > **Non-negotiable. Se você pular esta etapa, a newsletter sai com defeito.**
 
 1. **Read all collected files** from `/opt/data/cron/output/`
-2. **Build 14-day editorial patrimony** from `/opt/data/cron/history/` — extract all titles/links. Leia os HTMLs (`iaf_YYYY-MM-DD.html`) do período, não presuma. Um tópico publicado em edição anterior NÃO pode repetir.
-3. **Pre-selection** — skim all items, pick **20** most interesting
-4. **Post-selection dedup** — check each of the 20 against the 14-day patrimony. **Dica: busque por palavras-chave no conteúdo dos HTMLs históricos** (`search_files` com `file_glob`). Se um tópico já apareceu como deep dive ou radar nos últimos 14 dias, remova. Pull replacements from the full pool until you have **20 strictly inéditos**
-5. **Rank pre-selected items** on 3 criteria (1-10 each):
+2. **Verify publication dates** — Before selecting anything, scan each item for date signals (URL dates, datelines, Reddit timestamps). Cross-reference against `references/news-verification-pitfalls.md`. **Discard anything >48h old** unless it's a genuine new development on a continuing story (Fable 5 shutdown is new; Fable 5 launch from last week is not).
+3. **Build 14-day editorial patrimony via manifest** — Run `python3 /opt/data/cron/scripts/dedup_manifest.py` (script em `scripts/dedup_manifest.py`), then read `/opt/data/cron/history/iaf_manifest.json`. Use `titles_flat` — a lista plana de todos os títulos publicados nos últimos 14 dias. Compare por similaridade semântica aproximada (palavras-chave, entidades nomeadas, tópico central), não apenas igualdade exata de string. O script é idempotente e custa 0 tokens.
+4. **Pre-selection** — skim all items, pick **20** most interesting
+5. **Post-selection dedup** — check each of the 20 against `titles_flat` do manifesto. Se um tópico já apareceu como deep dive ou radar nos últimos 14 dias, remova. Pull replacements from the full pool until you have **20 strictly inéditos**.
+   
+   ⚠️ **Não confie em similaridade aproximada para excluir um match do manifesto.** Se o tópico central é o mesmo (ex: "Google AI Overviews liability" = "Alemanha decide que Google é responsável"), mesmo com título diferente, ele é duplicata e deve ser removido. **Grep manual de cada título contra `titles_flat` é obrigatório antes de finalizar a seleção.**
+6. **🔍 LOG obrigatório da dedup** — após concluir a dedup, DOCUMENTE explicitamente no seu raciocínio:
+    - Quantos itens foram descartados por já terem sido publicados (ex: "3 itens descartados: 'Drones autônomos' (edit. 11/06), 'Flórida vs OpenAI' (edit. 11/06)")
+    - Quantos itens de reposição foram puxados do pool completo
+    - Confirmação final: **"20 itens rigorosamente inéditos ✓"**
+    - Se zero descartes, diga expressamente: "0 duplicatas encontradas no patrimônio de 14 dias"
+    
+    ⚠️ **Este log é essencial para auditoria.** A etapa de dedup é invisível no output final — sem este log, não há como verificar se foi executada. Pular o log é considerado **não ter feito a dedup**.
+6. **Rank pre-selected items** on 3 criteria (1-10 each):
    - Impact (market relevance)
    - Utility (actionable today)
    - Intrigue (novelty/engagement)
    - Average score → sorted table (uso interno apenas)
-6. **Select content** from ranking:
+7. **Select content** from ranking:
    - Editorial/hot take → top 5, highest emotional impact
    - Análise → top 3 (deep dive)
    - Radar → remaining news items (compact, 1-2 lines each)
    - Community → top discussions
    - Practical application → **1 item, must be broadly accessible (not tech/dev-only)**
-7. **Generate HTML** from template `/opt/data/references/iaf_v3_reference.html` — keep exact CSS/layout
+8. **Generate HTML** from template `/opt/data/references/iaf_v3_reference.html` — keep exact CSS/layout
    ⚠️ **Verifique o header-metadata-box.** O template tem placeholders `Hora:`, `Data:`, `Edição Diária`. NUNCA substitua `Hora:` por metadata interna do pipeline (ex: `Dedup: 14 dias ✓`). Isso já vazou para o leitor — a linha deve mostrar o horário de publicação, não métricas de curadoria. Confira visualmente no HTML gerado antes de salvar.
-8. **Convert to PDF** with Chromium headless → output named `manhã_aumentada_DDMMYYYY.pdf`
+9. **Convert to PDF** with Chromium headless → output named `manhã_aumentada_DDMMYYYY.pdf`
    ⚠️ **REGRRA ABSOLUTA: NUNCA use WeasyPrint ou bibliotecas Python para gerar o PDF.** WeasyPrint perde CSS features (gradientes, webkit-background-clip, grid, glow) e produz PDF de ~100KB em vez de 500KB+. Use SEMPRE o Chromium Headless:
    ```bash
    CHROMIUM=/tmp/chromium-extracted/usr/lib/chromium/chromium
@@ -105,8 +135,9 @@ Only runs later because these newsletters update around 7h local time.
      --print-to-pdf="$PDF" "file://$HTML"
    ```
    **Verificação:** `ls -lh "$PDF"` — mínimo **300KB**. Se menor, refaça com Chromium.
-9. **Save to history**: `iaf_YYYY-MM-DD.html` + `.pdf`
-10. **Deliver** — response starts with `MEDIA:/tmp/manha_aumentada_DDMMYYYY.pdf` (first line, nothing before)
+10. **Save to history**: `iaf_YYYY-MM-DD.html` + `.pdf`
+11. **Update dedup manifest** (pós-escrita): `python3 /opt/data/cron/scripts/dedup_manifest.py` — adiciona a edição de hoje ao manifesto rolante
+12. **Deliver** — response starts with `MEDIA:/tmp/manha_aumentada_DDMMYYYY.pdf` (first line, nothing before)
 
 ## Cron #4 — Deploy Web (07:50 GMT-3 / 10:50 UTC)
 
@@ -201,9 +232,12 @@ The script's stdout is delivered verbatim.
 - **Intrigue:** Novelty / engagement / surprise factor
 
 ### Dedup methodology:
-- 14-day sliding window editorial patrimony
-- Compare titles AND topic centroids
+- 14-day sliding window via **manifest script**: `python3 /opt/data/cron/scripts/dedup_manifest.py` → lê `iaf_manifest.json`
+- ~6KB JSON (vs ~560KB de HTMLs brutos) — redução de ~99% tokens
+- Script roda **pré-dedup** (prepara referência) e **pós-escrita** (atualiza com edição nova)
+- Compare titles AND topic centroids contra `titles_flat`
 - Pull replacements from full pool until 20 strictly inéditos
+- **🔍 LOG obrigatório** — documente descartes, reposições, confirmação final (ver step 5 do Cron #3)
 
 ### Section allocation:
 - **Editorial (Hot Take):** top 5 by emotional impact, merged into narrative
@@ -223,13 +257,23 @@ Use when Cron #3 failed but #1 and #2 succeeded.
 4. Read canonical HTMLs (`iaf_YYYY-MM-DD.html`, no suffix)
 
 ### Process
-1. Read 5 collection files → extract title, description, link, category
-2. Build 14-day patrimony from history
-3. Pre-select 20 items, dedup, rank (Impact/Utility/Intrigue)
-4. Allocate by section (Editorial/Analysis/Radar/Community/Practical)
-5. Generate HTML from `/opt/data/references/iaf_v3_reference.html`
-6. Convert to PDF with Chromium headless
-7. Save to history + deliver MEDIA
+
+1. **Check cron job skills** — `cronjob(action='list')` and verify the skills list for Cron #3.
+   - If skills show as missing, run `skills_list()` to check if they still exist
+   - **Skills may have been merged/renamed** during a prior consolidation cycle (check `log.md` in the skills repo for merge records: `grep -i "newsletter\|curation" /opt/data/skills/log.md`). The fix is typically to replace the old skill names with the umbrella skill that absorbed them.
+   - Update the cron job with `cronjob(action='update', job_id='...', skills=[...])` — keep only skills that actually exist
+
+2. **Execute the full Pipeline Steps (1-12 above)** — the complete workflow IS the recovery process. Start at Step 1 (read collected files) and proceed through all 12 steps without skipping:
+   - Read collected files → dedup → pre-select → rank → write HTML → convert PDF → save history → update manifest → deliver
+   - All 12 steps are designed to work in manual mode as well as cron mode
+
+3. **Run the deploy** (Cron #4) separately:
+   - Execute `python3 /opt/data/iaf-edicoes-archive/_deploy_new_edition.py`
+   - ⚠️ **Verifique o alias Vercel:** após o deploy, o domínio personalizado `iaf-newsletter.vercel.app` pode não ser atualizado. Teste com `curl -o /dev/null -s -w "%{http_code}" "https://iaf-newsletter.vercel.app/{SLUG}"` — se 404, re-aliasseie:
+     ```
+     vercel alias set <deployment-url-from-script> iaf-newsletter.vercel.app
+     ```
+   - Confirme 200 no alias antes de entregar o link
 
 ## WhatsApp Companion Format
 
@@ -250,6 +294,8 @@ Delivered inside ```text block:
 ```
 
 ## Content Rules
+
+> 📖 **Leia também:** `references/news-verification-pitfalls.md` — guia completo para verificar datas de publicação e evitar notícias desatualizadas ou duplicadas.
 
 - **Zero anglicisms** — 100% Portuguese
 - **Tone:** warm, opinionated, professional (Stratechery/Every style)

@@ -4,7 +4,6 @@ description: "Manage the Hermes skills repo — consolidation cycles, MECE analy
 
 Load this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, or installing community skills. Covers the full consolidation lifecycle: update, evolve, offload, commit, push, and interactive D3 graph generation."
 
-Load this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, or installing community skills. Covers the full consolidation lifecycle: update, evolve, offload, commit, push, and interactive D3 graph generation."
 category: software-development
 ---
 
@@ -114,7 +113,9 @@ skills/
 
 **Scripts são permitidos para tarefas de apoio** — análise de conexões, extração de metadados dos SKILL.md, geração do grafo HTML, relatórios. O output desses scripts informa o agente, que então edita o index.md manualmente.
 
-O index.md **evolui commit a commit** — nunca é regenerado do zero. O agente usa `git diff` entre o último commit e o estado atual para detectar mudanças, depois aplica patches cirúrgicos. Cada commit adiciona uma camada sem destruir o histórico.
+O index.md **evolui commit a commit** — nunca é regenerado do zero por scripts. O agente usa `git diff` entre o último commit e o estado atual para detectar mudanças, depois aplica patches cirúrgicos. Cada commit adiciona uma camada sem destruir o histórico.
+
+**Exceção prática:** quando >30% das entradas mudam (ex: remoção em massa de skills arquivadas), a regeneração completa via `write_file` (ferramenta LLM) é **mais confiável** que dezenas de patches individuais que falham por deslocamento de linha. A proibição é contra scripts (Python/sed/awk) editarem o index.md — `write_file` é ferramenta de agente LLM e respeita a regra de julgamento humano-assistido. Ao regenerar, preserve a estrutura exata de cada bloco (nome, arquivo, tamanho, resumo, descrição, relações) e nunca perca metadados.
 
 ---
 
@@ -151,7 +152,15 @@ description: "Geocode addresses, find POIs, calculate routes, and lookup timezon
 Load this skill when you need location-based data — converting addresses to coordinates, searching for points of interest, getting driving or walking directions with distance and ETA, or looking up timezone information. Uses free APIs (Nominatim, Overpass, OSRM) with no API key required."
 ```
 
-⚠️ **YAML `>-` (folded with strip) quebra o parser do `generate_graph.py`.** O script lê o frontmatter com regex simples (`^---\n(.*?)\n---`), e `description:` com múltiplas linhas indentadas pode fazer o parser perder o texto, caindo no fallback que extrai comandos aleatórios do corpo do SKILL.md — resultando em resumos como `node --version` no index.md. **Sempre usar string quoted (`"..."`) com `\n` explícito para parágrafos de múltiplas linhas. Verificar: `grep -rn 'description:' SKILL.md`.**
+⚠️ **YAML `>-` (folded with strip) quebra o parser do `generate_graph.py`.** O script lê o frontmatter com regex simples, e `description: >-` com múltiplas linhas indentadas faz o parser perder o texto — resultando em resumos como `node --version` no index.md. **Usar string quoted (`"..."`) com QUEBRA DE LINHA REAL (não escape `\\n`) para separar sumário do parágrafo:**
+
+```yaml
+description: "Summary line here (≤85 chars).
+
+Load this skill when [trigger]. Expanded capabilities paragraph."
+```
+
+Isso é YAML válido, mais legível, e parseia corretamente tanto por parsers YAML quanto por regex simples. O script `generate_graph.py` lê a primeira linha após `description: "` como sumário e o restante até o `"` de fechamento como parágrafo. **Não usar `\\n` literal** — parsers simples não expandem escapes. Verificar: `grep -rn 'description: >-' SKILL.md`.
 
 ---
 
@@ -300,6 +309,25 @@ grep -c "Relações" index.md  # skills com relações
 # Check for leaked subagent commentary in relation lines
 grep -n '(reason:' index.md  # deve retornar vazio — subagentes podem vazar notas nos relatórios
 grep -n 'Reason:' index.md   # mesma verificação, capitalização alternativa
+
+# Check for empty Relações blocks
+grep -A1 'Relações:' index.md | grep -E '^--$|^Relações' -v | grep -E '^$' | head -3 && echo 'WARNING: empty Relações found'
+
+# Check for duplicate Relações in same entry
+python3 -c "
+import re
+with open('index.md') as f:
+    # Count Relações vs skill entries
+    relacoes = len(re.findall(r'\*\*Relações:\*\*', f.read()))
+    skills = len(re.findall(r'^### ', open('index.md').read()))
+    if relacoes > skills:
+        print(f'WARNING: {relacoes} Relações blocks for {skills} skills (duplicates)')
+    else:
+        print(f'OK: {relacoes} Relações blocks for {skills} skills')
+"
+
+# Check for truncated descriptions in SKILL.md (description without closing quote)
+grep -rn 'description:' SKILL.md | grep -v 'description: "' | head -5 && echo 'WARNING: descriptions without opening quote found'
 ```
 
 ## Pitfalls
@@ -320,7 +348,15 @@ grep -n 'Reason:' index.md   # mesma verificação, capitalização alternativa
 
 ⚠️ **index.md nunca é regenerado do zero.** Apenas patches cirúrgicos via ferramentas LLM.
 
-⚠️ **YAML `>-` quebra o parser de descrições.** O script `generate_graph.py` lê frontmatter com regex simples e não suporta YAML folded (`>-`). Descrições devem usar string quoted (`"..."`) com `\n` explícito. Verificar com `grep -rn 'description:' SKILL.md`.
+⚠️ **YAML `>-` quebra o parser de descrições.** O script `generate_graph.py` lê frontmatter com regex simples e não suporta YAML folded (`>-`). Descrições devem usar string quoted (`"..."`) com quebra de linha real (não escape `\\n`). Verificar com `grep -rn 'description: >' SKILL.md`.
+
+⚠️ **Relações vazias após filtragem de skills arquivadas.** Ao remover relações para skills arquivadas do index.md, algumas entradas podem ficar com `**Relações:**` vazio (0 relações). Detectar com `grep -A1 '**Relações:**' index.md | grep -B1 '^$'` ou script similar. Ação corretiva: ou remove o bloco vazio, ou adiciona novas relações com skills ativas.
+
+⚠️ **Blocos `**Relações:**` duplicados no index.md fonte.** Algumas skills (ex: `pi-agent-coordination`) têm dois blocos `**Relações:**` consecutivos por histórico de edição. Verificar com `grep -c 'Relações' index.md | ...` se o total excede o número de skills. Se existirem, mesclar num único bloco durante o update.
+
+⚠️ **Descrições SKILL.md com `\\n` literal vs quebra de linha real.** Arquivos que usam `\\n\\n` (escape literal) em vez de quebra de linha real dentro da string quoted do YAML não parseiam corretamente com parsers de frontmatter simples. Ao fazer batch-edit de descrições, SEMPRE usar quebra de linha real entre sumário e parágrafo, NUNCA `\\n` literal. Scripts de batch que fazem replace de descrições devem verificar o formato atual e tratar ambos os casos, sob risco de corromper o frontmatter YAML (truncar a descrição no meio).
+
+⚠️ **Batch-edit de SKILL.md requer verificação pós-aplicação.** Scripts que editam múltiplas SKILL.md em lote (ex: para corrigir descrições) podem corromper arquivos com formato de descrição diferente do esperado. Após qualquer batch-edit, verificar com `grep -rn 'description:' SKILL.md` se alguma descrição ficou truncada (linha termina sem aspas de fechamento ou sem `---` na linha seguinte). Restaurar com `git checkout HEAD -- <file>` e re-fixar manualmente.
 
 ⚠️ **Ciclo pode morrer no meio e deixar working directory sujo.** O cron job tem timeout — se o ciclo não completa, SKILL.md ficam modificados mas sem commit, index.md desatualizado, log.md sem entrada. **Recuperação:**
 

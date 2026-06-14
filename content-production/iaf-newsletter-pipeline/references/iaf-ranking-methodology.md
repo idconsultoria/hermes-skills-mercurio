@@ -15,6 +15,12 @@ Before ranking, ensure no item repeats content from a previous published edition
    - Se o MESMO tópico (ex: "Anthropic RSI report" ou "ChatGPT Dreaming memory") já apareceu → **descartar**
 4. **Puxar substituto** do pool completo (não só dos pré-selecionados). Pegar o próximo mais interessante que NÃO esteja no índice
 5. **Repetir** até ter 20 itens rigorosamente inéditos
+6. **🔍 LOG obrigatório da dedup** — documente no raciocínio:
+   - Quantos itens descartados (e quais títulos específicos)
+   - Quantos itens de reposição puxados
+   - "20 itens rigorosamente inéditos ✓" ou "0 duplicatas encontradas"
+   
+   ⚠️ Sem este log, a dedup não é auditável. Pular o log = não ter feito.
 
 ### Regras
 - Dedup é contra a edição publicada mais recente APENAS (não contra rascunhos/vespertinas)

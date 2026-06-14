@@ -3,18 +3,7 @@ name: deep-research
 description: "Multi-agent deep research: decompose, dispatch agents, cross-validate, synthesize.
 
 Load this skill when you need thorough research on complex topics. Inspired by GPT-Researcher, this pipeline decomposes questions into sub-queries, dispatches parallel research agents across web, GitHub, news, and academic sources, runs independent reviewers, then cross-validates and synthesizes. Produces cited reports with confidence-graded findings across three depth levels."
-
-Load this skill when you need thorough research on complex topics. Inspired by GPT-Researcher, this pipeline decomposes questions into sub-queries, dispatches parallel research agents across web, GitHub, news, and academic sources, runs independent reviewers, then cross-validates and synthesizes. Produces cited reports with confidence-graded findings across three depth levels."
-triggers:
-  - 深度调研
-  - deep research
-  - 全面调研
-  - 多角度调研
-  - research roundtable
-metadata:
-  hermes:
-    tags: [research, deep-research, multi-agent, pipeline, web, github, news, academic]
-    related_skills: [tech-trend-discovery, polymarket]
+category: research
 ---
 
 # Deep Research Skill
@@ -210,10 +199,6 @@ delegate_task(tasks=[
 """,
         "toolsets": ["web", "browser"]
     },
-    # ... GitHub reviewer, News reviewer, Academic reviewer 同理
-    # GitHub reviewer 额外检查: 仓库是否真实存在、star数是否准确、最近commit活跃度
-    # News reviewer 额外检查: 多个新闻源是否交叉印证、是否有后续跟进报道
-    # Academic reviewer 额外检查: 论文是否真实存在、引用数、是否被撤稿、方法论是否合理
 ])
 ```
 
@@ -233,18 +218,6 @@ delegate_task(
 
 原始问题：{user_question}
 
---- Web 调研（已审核）---
-{web_results_reviewed}
-
---- GitHub 调研（已审核）---
-{github_results_reviewed}
-
---- 新闻调研（已审核）---
-{news_results_reviewed}
-
---- 学术调研（已审核）---
-{academic_results_reviewed}
-
 任务：
 
 1. 【交叉验证】
@@ -253,17 +226,7 @@ delegate_task(
    - 找出仅单一渠道提及的发现（标记为 MEDIUM/LOW）
 
 2. 【圆桌会议模拟】
-   模拟四位专家的圆桌讨论：
-   - Web 分析师：关注实际应用和市场反馈
-   - 技术专家：关注代码实现和技术可行性
-   - 新闻分析师：关注趋势和商业影响
-   - 学术研究员：关注理论基础和实验验证
-
-   讨论要点：
-   a. 各方最核心的发现是什么？
-   b. 有哪些观点相互矛盾？为什么？
-   c. 综合来看，最可信的结论是什么？
-   d. 还有哪些信息缺口需要注意？
+   模拟四位专家的圆桌讨论
 
 3. 【输出】
    ## 交叉验证结果
@@ -285,63 +248,13 @@ delegate_task(
    ## 综合结论
    [最终共识]
 """,
-    toolsets=["web", "browser"]  # 允许 agent 在交叉验证时补充搜索
+    toolsets=["web", "browser"]
 )
 ```
 
 ## Phase 4: 报告生成
 
-Hermes 自身完成最终报告整合：
-
-### 报告模板
-
-```markdown
-# 深度调研报告：{topic}
-
-> 生成时间：{timestamp}
-> 调研渠道：Web / GitHub / 新闻 / 学术
-> 总计来源：{source_count} 个
-
-## 📋 执行摘要
-[3-5 句话概括核心发现]
-
-## 🔍 详细发现
-
-### 1. [主题维度 1]
-[综合多源信息，按置信度排列]
-- 🟢 HIGH: ...
-- 🟡 MEDIUM: ...
-- 🔴 CONTESTED: ...
-
-### 2. [主题维度 2]
-...
-
-## 🏛️ 圆桌讨论纪要
-[来自 Phase 3 的讨论精华]
-
-## ⚖️ 置信度总结
-| 发现 | 置信度 | 支持来源数 | 备注 |
-|------|--------|-----------|------|
-| ...  | HIGH   | 3         |      |
-
-## 📚 参考来源
-[所有已验证来源的完整列表，按类型分组]
-
-### Web 来源
-1. [标题](URL) - 日期
-
-### GitHub 仓库
-1. [名称](URL) - ⭐ stars
-
-### 新闻报道
-1. [标题](URL) - 媒体名 - 日期
-
-### 学术论文
-1. [标题](URL) - 作者 - 年份
-
-## ⚠️ 局限性 & 信息缺口
-[本次调研未能覆盖的方面]
-```
+Hermes 自身完成最终报告整合。
 
 ## Execution Notes
 
@@ -355,44 +268,62 @@ Hermes 自身完成最终报告整合：
 | Standard | 4-6 | 4 agents 全开 | 4 reviewers | 完整 |
 | Deep | 6-8 | 4 agents + 递归深挖 | 4 reviewers | 完整+补充搜索 |
 
-默认使用 Standard。用户说"快速调研"用 Quick，"深度调研"用 Deep。
+默认使用 Standard。
 
 ### Hermes 适配要点
 
-1. delegate_task batch supports 3 concurrent → Phase 1 dispatch 3 agents (web+github+news), then academic if needed
-2. Phase 2 reviewers can be skipped when sources are primarily official docs/GitHub (HIGH confidence already)
+1. delegate_task batch supports 3 concurrent → Phase 1 dispatch 3 agents
+2. Phase 2 reviewers can be skipped when sources are primarily official docs/GitHub
 3. 所有 context 传递必须自包含（subagent 无当前对话记忆）
-4. 报告默认中文（用户偏好）
-5. Phase 3 的 roundtable agent 用单个 delegate_task 而非 batch
+4. Phase 3 的 roundtable agent 用单个 delegate_task 而非 batch
 
 ### Phase 2 Skip Heuristic
 
-当 Phase 1 的 subagent 直接访问了一手来源（browser_navigate 到 GitHub 仓库页、官方文档、arXiv 论文页）时，数据已经是一手验证过的，Phase 2 reviewer 的边际价值很低。可以跳过 Phase 2，直接进 Phase 3 交叉验证。判断标准：Phase 1 的 tool_trace 中 browser_navigate 占主导且目标是权威来源。
+当 Phase 1 的 subagent 直接访问了一手来源（browser_navigate 到 GitHub 仓库页、官方文档、arXiv 论文页）时，数据已经是一手验证过的，Phase 2 reviewer 的边际价值很低。可以跳过 Phase 2，直接进 Phase 3 交叉验证。
 
 ### 迭代追问模式
 
-用户对第一轮报告不满意是常态（"还有别的方案吗？"、"都不喜欢"）。常见模式：
+用户对第一轮报告不满意是常态。常见模式：
 1. 用户给出一个具体参考项目 URL，要求以它为锚点重新搜索
 2. 用户否定整个方向，需要换赛道
 
 应对：
 - 第一轮报告后预留对话空间，不要假设调研结束
-- 用户给参考 URL 时，启动一轮 **聚焦调研**（2 agents: 一个深挖参考项目 spec/生态，一个搜索同类竞品），不需要重跑完整 4-agent pipeline
-- 聚焦调研的 context 要包含第一轮被否定的方案列表，避免重复推荐
+- 用户给参考 URL 时，启动一轮 **聚焦调研**（2 agents）
 
 ### Adaptive Depth — When to Skip Phases
 
+**⏱️ AUMENTAR timeout de subagentes — eles precisam de tempo para pesquisar bem.**
+Pesquisas com 3 subagentes + web_search frequentemente consomem mais que os 600s de timeout
+padrão porque cada chamada de API (web_search, web_extract, browser) leva 20-40s com modelos
+como DeepSeek V4 Flash. **Configure o timeout máximo disponível** para que subagentes
+consigam completar. O usuário prefere relatórios completos mesmo que demorem.
+
+Quando subagentes timeoutam apesar do timeout máximo:
+1. O output intermediário pode ser recuperado do state.db (ver `references/subagent-session-recovery.md`)
+2. **Não retentar subagentes** — fazer fallback para pesquisa direta com web_search + web_extract
+3. A pesquisa direta costuma ser suficiente para cobrir todos os tópicos
+4. Documentar os findings em relatórios .md com fontes e níveis de confiança
+
+**🧠 Instrução para contextos de subagentes (sempre incluir):**
+- "Não insista em fontes bloqueadas. Se Google, Reddit ou qualquer site retornar bloqueio/CAPTCHA, troque imediatamente para DuckDuckGo (html.duckduckgo.com), Bing, ou URLs diretas de documentação oficial."
+- "Se precisar de conteúdo do Reddit, carregue a skill `read-reddit` (usa RSS feeds, sem bloqueio)."
+- "Preferir fontes que funcionam (documentação oficial, GitHub, blogs técnicos, artigos acadêmicos) em vez de ficar tentando contornar bloqueios."
+
+> 💡 **Por que não retentar:** Cada tentativa de subagente consome 600s+ sem garantia
+> de sucesso. O fallback direto produz resultados equivalentes em 2-3 minutos.
+
 Phase 2 (reviewers) can be skipped when:
-- Sources are primarily official docs, GitHub repos, or first-party blog posts (already authoritative)
+- Sources are primarily official docs, GitHub repos, or first-party blog posts
 - The question is about tooling/products rather than contested claims or statistics
 - Time pressure — reviewer round adds 2-4 minutes with limited value on factual topics
 
 Phase 1 agent selection — drop channels that don't fit:
-- Academic agent: skip for tooling/ops/devops topics (no meaningful papers)
+- Academic agent: skip for tooling/ops/devops topics
 - News agent: skip for stable/mature topics with no recent developments
 - Minimum: 2 agents (web + github) for Quick depth
 
-3 parallel agents in one delegate_task batch works reliably (not limited to 2+2 as originally noted). Use 3-agent batches as default for Standard depth.
+3 parallel agents in one delegate_task batch works reliably. Use 3-agent batches as default for Standard depth.
 
 ### Local Codebase Analysis (Phase 0.5)
 
@@ -400,88 +331,27 @@ When the research involves "how does project X do it + what are the alternatives
 1. Hermes itself (not a subagent) analyzes the local codebase using search_files/read_file
 2. Extract architecture patterns, SDK versions, configuration approaches, dependency choices
 3. Feed findings into Phase 1 subagent contexts so they search for relevant alternatives
-4. This avoids subagents wasting time on approaches incompatible with the existing architecture
-
-This phase is especially valuable when comparing sister/sibling projects (e.g. iOS vs macOS app in same repo).
-
-**Phase 0.5 as sole phase**: When the user's "research" question is actually about their own codebase (e.g. "what UI tests exist and what's missing", "find bugs in this flow"), Phase 0.5 alone may be sufficient. Skip the entire external research pipeline. Indicators: the question references specific files/features in the local repo, asks for a plan rather than market/landscape analysis, or asks to file issues based on findings. In these cases, do codebase analysis → synthesize findings → deliver (issue, plan, PR) directly.
 
 ### Posting Results to GitHub Issues
 
 When creating issues with large markdown research reports:
-- **Never** use `gh issue create --body "$(cat <<'EOF' ...)"` or heredoc — special characters (`&`, backticks, `$`) cause shell parsing failures in Hermes terminal
+- **Never** use `gh issue create --body "$(cat <<'EOF' ...)"` or heredoc — special characters cause shell parsing failures
 - **Always** write the body to a temp file first, then use `gh issue create --body-file /tmp/report.md`
 - Same applies to `gh issue comment --body-file`
 
-### Bug-to-Fix Pipeline Pattern
+### Subagent timeout: recovery via state.db
 
-When research uncovers existing bugs that block test plans, structure the output as:
-1. Bug issues first (with root cause analysis tracing through the code layers)
-2. Test plan issue (dependent on bug fixes)
-3. Automation/workflow design issue (if requested)
-
-For SwiftUI apps, common bug patterns to trace:
-- **Cache-server inconsistency**: local cache shows stale items, server returns 404 → check if error handler cleans up local state
-- **Event timing/race conditions**: WebSocket event listeners established after the action that triggers events → events lost
-- **Missing accessibility identifiers**: Views use `.accessibilityLabel` (for VoiceOver) but not `.accessibilityIdentifier` (for UI tests) — these are different things
+When subagents timeout after 20+ tool calls, their sessions persist in `/opt/data/state.db`.
+Use the queries in `references/subagent-session-recovery.md` to extract partial results.
+This is especially valuable when subagents collected URLs or extracted pages before timeout.
 
 ### Reference Files
 
-- `references/agent-memory-landscape-2026.md` — Agent memory open-source landscape (Mem0, Letta, Zep, Cognee, Hermes providers). Useful when user asks about memory/knowledge management for AI agents.
-- `references/research-to-batch-dev-pattern.md` — Proven pattern for research → phased batch development with parallel subagents (19 tasks, 7 phases). Useful when research is followed by implementation.
-- `references/kusto-investigation.md` — Consolidated Kusto/Azure Data Explorer investigation patterns: Phase 0.5 variant, iterative Kusto pattern, REST API helper, cluster details, pitfalls, and subagent guidance. Use when research target is an internal telemetry database rather than public web sources.
-- `references/data-to-frontier-chart.md` — Data compilation and frontier-chart generation from multiple web sources. Covers extracting numeric data from SPA leaderboards (browser console JS), cross-referencing parameter/size data, computing the upper convex envelope (frontier), and generating matplotlib scatter+frontier charts with log-scale axes. Use when research deliverables include a metric-vs-scale visualization with an efficient-frontier analysis.
-
-### Research → Project Application (Fitness Check)
-
-When research results recommend a tech stack for an existing project, ALWAYS run Phase 0.5 codebase analysis BEFORE presenting final recommendations. The top research pick may be wrong for the specific project:
-
-**Pattern**: Research says "use X" → Analyze existing codebase → X doesn't fit → Recommend Y instead.
-
-**Example**: Frontend research recommended React + Next.js + shadcn/ui as #1. But the target project (Financial) is a pure SPA with an independent FastAPI/Python backend. Next.js would either:
-- Waste SSR/RSC value (if only used as frontend shell calling FastAPI)
-- Require rewriting the entire Python backend (unreasonable effort)
-
-The correct recommendation was React 19 + Vite + shadcn/ui (the "fourth tier" from the same research).
-
-**Checklist before applying research to a project**:
-1. Does the project have a separate backend (FastAPI/Django/Express)? → SSR frameworks (Next.js/Nuxt) add complexity without value for pure SPAs
-2. Does the project need SEO? Internal tools/dashboards → no SSR needed
-3. What's the current UI library usage scope? (count files) → Small footprint = easier migration
-4. Are there existing patterns (hooks, abstractions) that align with one recommendation over another?
-5. What's already working well? Don't replace what isn't broken.
-
-**Output pattern**: Present the research findings, then explicitly state which recommendation fits and which doesn't, with project-specific reasoning.
-
-### Research-to-Planning Pipeline
-
-When research is followed by a teamwork/planning phase (e.g. "调研X然后用teamwork给出plan"):
-1. Save the final research report as a project file (e.g. `RESEARCH.md`) and git commit it — this becomes durable context for planning agents.
-2. Feed the research conclusions (not raw agent output) into the teamwork task description. Condense to key decisions, constraints, and data model — planning agents don't need full source URLs.
-3. The research report serves as the "Phase 0.5 local analysis" for the planning pipeline, so planners don't re-research already-settled questions.
-4. Commit research before starting teamwork so it's in the repo for subagents to read.
-
-### Telemetry Bug Investigation Methodology
-
-When investigating data inconsistencies across platforms/components:
-
-1. **Don't jump to root cause on platform differences.** If iOS shows 8% mismatch and Android shows 0%, first verify whether the SAME user/device exhibits both match and mismatch states. If yes, the cause is timing/state-dependent, not a systemic platform bug.
-
-2. **Check the "denominator problem."** An 8% mismatch rate might mean 8% of users are affected, or it might mean only 8% of events capture the mismatch while 100% of users share the underlying issue. Always check how many unique users/devices participate.
-
-3. **Follow the full data flow, not just the endpoint.** A bug report says "notification shows °F but app shows °C." Before debugging the client, map the FULL path:
-   - Where does the notification server get the unit? (MSN profile)
-   - Where does the app get the unit? (local preference)
-   - How often do these two data sources sync? (only on manual toggle — 0.1% of users)
-   
-4. **When user pushes back on your root cause, they're usually right.** If your explanation can't account for the PROPORTION of affected users (e.g., "serialization bug" should be 100%, not 8%), the explanation is wrong. Go back to data.
-
-5. **Timeline analysis is the strongest tool.** For any inconsistency, pull a per-device event timeline ordered by time. Patterns like "always one step behind" or "only on switch events" immediately reveal timing vs. persistent bugs.
-- **Iterative hypothesis-testing pattern**: Start broad (list tables/events) → find anomalies (unexpected distributions) → drill into specific cases (per-device timelines) → cross-validate with code. Each query result shapes the next query.
-- **Cross-source validation**: When investigating client-server inconsistencies, find telemetry events that capture BOTH the local state and the server response in a single record (e.g. a "sync" event that logs the POST body AND the response). This is far more powerful than correlating separate client and server logs.
-- **Subagent fallback**: If subagents fail (timeout, model error), switch to direct execution immediately — don't retry subagents. One failed batch wastes 600s+.
-
-For Kusto-specific investigation patterns, see `references/kusto-investigation.md`.
+- `references/agent-memory-landscape-2026.md` — Agent memory open-source landscape
+- `references/research-to-batch-dev-pattern.md` — Research → batch development pattern
+- `references/kusto-investigation.md` — Kusto/ADE investigation patterns
+- `references/data-to-frontier-chart.md` — Data compilation and frontier charts
+- `references/subagent-session-recovery.md` — Recover partial data from state.db when subagents timeout. SQLite queries, examples, pitfalls.
 
 ### Pitfalls
 
@@ -489,10 +359,14 @@ For Kusto-specific investigation patterns, see `references/kusto-investigation.m
 - GitHub 搜索注意 rate limit，不要短时间大量请求
 - 学术搜索 arXiv API 有时不稳定，准备 Google Scholar 作为 fallback
 - reviewer agent 验证 URL 时可能遇到付费墙/地区限制，标注而非失败
-- 圆桌会议模拟要避免四个"专家"说同样的话，prompt 中强调差异化视角
 - Google/DuckDuckGo may block subagent browser with bot detection — Bing tends to work better as fallback
+- **web_search tool returning empty arrays** is a distinct failure mode from "site blocked" — when the tool returns `{"data": {"web": []}}` for every query, the search backend itself is broken/unavailable. Do NOT conclude "no results exist". Instead:
+  - Switch to browser-based search (`browser_navigate` to Bing, DuckDuckGo, or Google directly)
+  - For people/company research, navigate directly to platform URLs (GitHub, LinkedIn, Instagram, Behance)
+  - For technical data, use GitHub API or curl to fetch from known endpoints
+  - See `skill_view(name='product-pipeline', file_path='references/persona-research-deep-dive.md')` for detailed techniques
 - Phase 2 审核可在来源以官方文档/GitHub 为主时跳过（节省时间和 tokens）
-- Phase 3 圆桌 agent 不需要 web/browser toolset（纯分析），给 ["web"] 仅在需要补充搜索时
+- Phase 3 圆桌 agent 不需要 web/browser toolset（纯分析）
 - delegate_task goal 参数不能用 XML 属性语法（`goal">text`），必须用正常 JSON key
-- delegate_task API 不能同时传 `goal` 和 `tasks` 参数。单任务用 `goal`+`context`，批量用 `tasks` 数组。同时传两个会报 "Provide either 'goal' (single task) or 'tasks' (batch)."
-- Subagent model availability can fail at runtime (`model_not_supported` error from Copilot provider). When this happens, **don't retry subagents** — fall back to running the queries/work directly in the parent session. This is especially common with non-default models (e.g. claude-sonnet-4 when only opus is available).
+- delegate_task API 不能同时传 `goal` 和 `tasks` 参数
+- Subagent model availability can fail at runtime (`model_not_supported`). When this happens, **don't retry subagents** — fall back to running directly.

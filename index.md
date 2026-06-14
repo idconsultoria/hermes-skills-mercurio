@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 46 skills*
+*Total: 47 skills*
 
 ---
 
@@ -85,7 +85,7 @@ Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — n
 
 - **Nome:** `autonomous-ai-agents/product-pipeline`
 - **Arquivo:** `autonomous-ai-agents/product-pipeline/SKILL.md`
-- **Tamanho:** 80,167 chars
+- **Tamanho:** 46,809 chars
 - **Resumo:** Multi-agent product pipeline from raw idea to MVP with iterative sprints — orchestrated by Hermes, executed by Pi Agent + Antigravity.
 
 Multi-agent product pipeline from raw idea to MVP with iterative sprints. Orchestrated by Hermes, executed by Pi Agent + Antigravity.
@@ -123,7 +123,7 @@ Audita sessões do Pi Agent extraindo duração, tokens, custo e modelo dos arqu
 
 - **Nome:** `content-production/iaf-newsletter-pipeline`
 - **Arquivo:** `content-production/iaf-newsletter-pipeline/SKILL.md`
-- **Tamanho:** 12,391 chars
+- **Tamanho:** 18,864 chars
 - **Resumo:** Umbrella skill for newsletter, briefing, and digest pipelines with cron scheduling and multi-source curation.
 
 Load this skill to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline — IAF Manhã Aumentada, Daily AI Digest, or similar. Covers multi-source content collection, editorial ranking and dedup, HTML-to-PDF rendering, Telegram and WhatsApp delivery, and chained cron job architecture.
@@ -196,7 +196,7 @@ Load this skill when the user needs marketing copy — landing pages, homepage s
 
 - **Nome:** `creative/humanizer`
 - **Arquivo:** `creative/humanizer/SKILL.md`
-- **Tamanho:** 30,025 chars
+- **Tamanho:** 30,225 chars
 - **Resumo:** Humanize text by stripping AI-isms and adding authentic voice and personality.
 
 Humanize text: strip AI-isms and add real voice.
@@ -352,7 +352,7 @@ CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr.io → SSH deploy 
 
 - **Nome:** `infrastructure/oracle-host-access`
 - **Arquivo:** `infrastructure/oracle-host-access/SKILL.md`
-- **Tamanho:** 35,840 chars
+- **Tamanho:** 28,347 chars
 - **Resumo:** SSH access from a Hermes Docker container to its Oracle Linux host
 
 SSH access from a Hermes Docker container to its Oracle Linux host. Covers key setup, SSH config quirks, Docker host discovery, and host diagnostics.
@@ -366,7 +366,7 @@ SSH access from a Hermes Docker container to its Oracle Linux host. Covers key s
 
 - **Nome:** `infrastructure/vercel-deploy`
 - **Arquivo:** `infrastructure/vercel-deploy/SKILL.md`
-- **Tamanho:** 19,814 chars
+- **Tamanho:** 19,909 chars
 - **Resumo:** Deploy static sites and frontend apps to Vercel — from zero to production
 
 Deploy static sites and frontend apps to Vercel — from zero to production. Covers CLI install, device-flow authentication, project creation, deploy, custom domains, env vars, and common pitfalls. Works in restricted environments (no root, npm global install with custom prefix).
@@ -499,7 +499,7 @@ Load this skill when the user asks for cost reports, spending breakdowns, or pro
 
 - **Nome:** `productivity/taskflow-mcp`
 - **Arquivo:** `productivity/taskflow-mcp/SKILL.md`
-- **Tamanho:** 4,485 chars
+- **Tamanho:** 7,532 chars
 - **Resumo:** TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Protocol) — conecta-se via SSE.
 
 TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Protocol). Conecta-se via SSE (StreamableHTTP POST não funciona — SSE deve ser explícito).
@@ -516,7 +516,7 @@ TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Co
 
 - **Nome:** `research/deep-research`
 - **Arquivo:** `research/deep-research/SKILL.md`
-- **Tamanho:** 33,335 chars
+- **Tamanho:** 10,938 chars
 - **Resumo:** 基于 GPT-Researcher 架构，适配 Hermes delegate_task 的多 agent 深度调研流水线
 
 Multi-agent deep research pipeline: decompose topics, dispatch parallel agents, review, cross-validate, synthesize.
@@ -577,6 +577,22 @@ Load this skill when you need to compare AI models across intelligence and param
 **Relações:**
 - `similar` → `research/deep-research`
 - `similar` → `research/tech-trend-discovery`
+
+### Digital Clone Persona
+
+- **Nome:** `research/digital-clone-persona`
+- **Arquivo:** `research/digital-clone-persona/SKILL.md`
+- **Tamanho:** 9,796 chars
+- **Resumo:** Create digital clone personas through deep web research — discover, extract, and embody a person's identity and expertise.
+
+Create digital clone personas through deep web research — discover, extract, and embody a person's identity, voice, and expertise as an AI-roleplayable persona.
+
+Load this skill when the user asks you to create an AI persona or "clone digital" of a real person through research. Combines deep-web reconnaissance with persona-crafting to produce a roleplayable character that can act as consultant, mentor, critic, or strategist in that person's voice.
+
+**Relações:**
+- `uses` → `research/deep-research`
+- `uses` → `research/user-interview`
+- `uses` → `autonomous-ai-agents/product-pipeline`
 
 ## Social Media
 
@@ -652,9 +668,9 @@ Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structu
 - **Nome:** `software-development/ideation-drilling`
 - **Arquivo:** `software-development/ideation-drilling/SKILL.md`
 - **Tamanho:** 14,550 chars
-- **Resumo:** - O usuário diz: \"Tenho uma ideia para um produto/feature\" - O usuário pede: \"Me ajude ...
+- **Resumo:** Product ideation (Fase 1): refine raw ideas through structured drilling.
 
-- O usuário diz: \"Tenho uma ideia para um produto/feature\" - O usuário pede: \"Me ajude a refinar essa ideia\" - Início do pipeline de produto (Fase 1)
+Product ideation (Fase 1): refine raw ideas through structured drilling. Covers user research, competitor analysis, and producing a refined product concept ready for further pipeline stages.
 
 **Relações:**
 - `uses` → `research/user-interview`
@@ -687,8 +703,8 @@ Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bi
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 16,395 chars
-- **Resumo:** Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidação MECE, ind
+- **Tamanho:** 23,850 chars
+- **Resumo:** Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidação MECE, análise de relações e offload
 
 Gerencia o repositório git de skills do Hermes — ciclo evolve de consolidação MECE, index.md/log.md/reports, offload de memória, e manutenção de AGENTS.md. Executa o processo completo de análise, merge, delete, relatório e commit.
 

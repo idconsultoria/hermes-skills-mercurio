@@ -3,8 +3,6 @@ name: vercel-deploy
 description: "Deploy static sites and frontend apps to Vercel — from zero to production.
 
 Load this skill when deploying frontend applications to Vercel. Covers CLI installation in restricted environments (no root, npm global prefix), device-flow authentication, project creation and linking, deployment with custom domains, environment variable management, and common deployment pitfalls."
-
-Load this skill when deploying frontend applications to Vercel. Covers CLI installation in restricted environments (no root, npm global prefix), device-flow authentication, project creation and linking, deployment with custom domains, environment variable management, and common deployment pitfalls."
 version: 1.0.0
 author: Hermes Agent
 tags: [vercel, deploy, static-site, frontend, hosting, jamstack]
@@ -521,6 +519,7 @@ TOKEN="$(python3 -c "import json; print(json.load(open('/opt/data/home/.local/sh
 ## Reference Files
 
 - `references/iframe-reader-ux.md` — full pattern for static archive sites with iframe edition reader, postMessage parent-child communication, smooth close transitions, and CSS grid cards that prevent badge/title overlap. Consult this when building any "landing page + content viewer" static site on Vercel.
+- `references/custom-domain-alias-pitfall.md` — explains why manually-assigned aliases survive --prod deploys and how to reassign them.
 
 ## Quick Reference
 

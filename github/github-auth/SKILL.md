@@ -1,6 +1,8 @@
 ---
 name: github-auth
-description: "GitHub authentication setup — HTTPS tokens, SSH keys, and gh CLI login.\n\nLoad this skill to configure GitHub authentication for development workflows. Covers generating and using personal access tokens for HTTPS, setting up SSH keys for secure git operations, and logging in via the gh CLI for authenticated API access."
+description: "GitHub authentication setup — HTTPS tokens, SSH keys, and gh CLI login.
+
+Load this skill to configure GitHub authentication for development workflows. Covers generating and using personal access tokens for HTTPS, setting up SSH keys for secure git operations, and logging in via the gh CLI for authenticated API access."
 version: 1.2.0
 author: Hermes Agent
 license: MIT
