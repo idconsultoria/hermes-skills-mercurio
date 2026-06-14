@@ -6,6 +6,8 @@ Diário cronológico de operações no repositório de skills.
 
 ## [2026-06-14] update | Index synced with working tree — 7 sizes updated, 1 new skill (digital-clone-persona), 2 resumos fixed. Descriptions audited: 6 YAML formats fixed (4 `|`→`"..."`, 5 `\n\n`→real newlines), 2 summaries shortened (product-pipeline, digital-clone-persona). ideation-drilling corrupted description replaced.
 
+## [2026-06-14] evolve | Description cleanup cycle: 12 Resumo truncations fixed, 3 duplicate paragraphs removed. 0 merges, 0 orphans. 47 skills MECE. Graph regenerated (47 nodes).
+
 ## [2026-06-10] update | First seed — scanned 113 skills, generated initial index.md
 Repositório git iniciado em /opt/data/skills/. AGENTS.md, index.md e log.md criados.
 113 skills catalogadas do estado atual instalado.

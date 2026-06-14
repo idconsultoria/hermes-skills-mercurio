@@ -12,7 +12,7 @@
 - **Nome:** `autonomous-ai-agents/autonomous-ai-agents`
 - **Arquivo:** `autonomous-ai-agents/autonomous-ai-agents/SKILL.md`
 - **Tamanho:** 3,200 chars
-- **Resumo:** Delegate coding tasks to autonomous AI coding agent CLIs (Claude Code, Codex, OpenCode)...
+- **Resumo:** Delegate coding tasks to AI coding agent CLIs via Hermes: one-shot, review
 
 Delegate tasks to autonomous AI coding agent CLIs via Hermes. One-shot, PR review, and session orchestration patterns.
 
@@ -86,7 +86,7 @@ Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — n
 - **Nome:** `autonomous-ai-agents/product-pipeline`
 - **Arquivo:** `autonomous-ai-agents/product-pipeline/SKILL.md`
 - **Tamanho:** 46,809 chars
-- **Resumo:** Multi-agent product pipeline from raw idea to MVP with iterative sprints — orchestrated by Hermes, executed by Pi Agent + Antigravity.
+- **Resumo:** Multi-agent product pipeline — idea to MVP via sprints. Hermes orchestration.
 
 Multi-agent product pipeline from raw idea to MVP with iterative sprints. Orchestrated by Hermes, executed by Pi Agent + Antigravity.
 
@@ -161,7 +161,7 @@ Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback,
 - **Nome:** `creative/brand-studio-forge`
 - **Arquivo:** `creative/brand-studio-forge/SKILL.md`
 - **Tamanho:** 20,607 chars
-- **Resumo:** Use when the user wants to create, refine, or evolve a brand identity
+- **Resumo:** Create, refine, or evolve a brand identity: interviews, identity kit, content
 
 Use when the user wants to create, refine, or evolve a brand identity. Covers brand interviews, identity kit generation (logo, color, type, voice, guidelines), brand-specific content skills, and ongoing content via cron. Not for UI design or non-brand creative tasks.
 
@@ -322,7 +322,7 @@ Clone/create/fork repos; manage remotes, releases.
 - **Nome:** `infrastructure/ai-voice-selfhost`
 - **Arquivo:** `infrastructure/ai-voice-selfhost/SKILL.md`
 - **Tamanho:** 30,160 chars
-- **Resumo:** Self-host AI voice/TTS models (OmniVoice, Qwen3-TTS, Fish Speech S2 Pro GGUF) on Oracle...
+- **Resumo:** Self-host TTS models (OmniVoice, Qwen3-TTS, Fish Speech) on Oracle ARM64 with Docker.
 
 Self-host TTS models (OmniVoice, Qwen3-TTS, Fish Speech) on Oracle ARM64 with Docker. Python and C++ inference patterns, OpenAI-compatible endpoints, Hermes TTS provider integration.
 
@@ -435,7 +435,7 @@ Google OAuth2 client credentials (downloaded from Google Cloud Console)
 - **Nome:** `productivity/html-report-hermes`
 - **Arquivo:** `productivity/html-report-hermes/SKILL.md`
 - **Tamanho:** 15,051 chars
-- **Resumo:** Render dense research reports, analyses, and data summaries as beautiful standalone HTM...
+- **Resumo:** Render research reports as dark-themed HTML with SVG charts and Tufte typography.
 
 Render research reports as dark-themed HTML with SVG charts and Tufte-inspired typography.
 
@@ -454,7 +454,7 @@ Two design systems in one skill: Hermes CRT (amber/blue inversion, scanlines, te
 - **Nome:** `productivity/html-to-pdf-chromium`
 - **Arquivo:** `productivity/html-to-pdf-chromium/SKILL.md`
 - **Tamanho:** 5,924 chars
-- **Resumo:** Convert HTML files to high-fidelity PDF using Chromium headless (via Debian
+- **Resumo:** Convert HTML to high-fidelity PDF using Chromium headless via .deb extraction.
 
 Convert HTML files to high-fidelity PDF using Chromium headless (via Debian .deb extraction, no root or Playwright required). Use when weasyprint or other tools lose CSS features like gradients, webkit-background-clip, grid, and glow effects.
 
@@ -535,7 +535,7 @@ Inspired by GPT-Researcher, this pipeline decomposes complex questions into sub-
 - **Nome:** `research/tech-trend-discovery`
 - **Arquivo:** `research/tech-trend-discovery/SKILL.md`
 - **Tamanho:** 15,028 chars
-- **Resumo:** Discover what the tech/AI community is discussing right now — trending topics, hot disc...
+- **Resumo:** Discover what tech and AI communities discuss — trending topics and hot discussions.
 
 Discover what the tech/AI community is discussing right now — trending topics, hot discussions, and breaking conversations. Covers Reddit alternatives and HN Algolia API as primary sources when traditional search tools fail.
 
@@ -685,7 +685,7 @@ Product ideation (Fase 1): refine raw ideas through structured drilling. Covers 
 - **Nome:** `software-development/plan`
 - **Arquivo:** `software-development/plan/SKILL.md`
 - **Tamanho:** 11,315 chars
-- **Resumo:** Plan mode: write an actionable markdown plan to
+- **Resumo:** Write actionable markdown plans to .hermes/plans — bite-sized tasks, exact paths.
 
 Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bite-sized tasks, exact paths, complete code.
 
@@ -788,7 +788,7 @@ Exploratory QA of web apps: find bugs, evidence, reports.
 - **Nome:** `read-reddit`
 - **Arquivo:** `read-reddit/SKILL.md`
 - **Tamanho:** 7,130 chars
-- **Resumo:** How to read Reddit subreddits reliably using RSS feeds — bypassing API rate limits and ...
+- **Resumo:** Read Reddit subreddits via RSS feeds — bypasses API rate limits and bot detection.
 
 Read Reddit subreddits reliably via RSS feeds — bypasses API rate limits and bot detection. For research, curation, or news gathering.
 
