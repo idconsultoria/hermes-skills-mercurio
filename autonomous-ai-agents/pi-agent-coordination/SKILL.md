@@ -1,10 +1,8 @@
 ---
 name: pi-agent-coordination
-description: "Invoke Pi Agent locally from Hermes — provider/model hierarchy and session recovery.
+description: "Invoke Pi Agent locally from Hermes — provider/model hierarchy and session recovery. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, tmux-based monitoring, and the absolute rule: always use terminal background, never delegate_task.
 
-Load this skill for running Pi Coder Agent as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring."
-
-Load this skill for running Pi Coder Agent as a local npm binary — no Docker, no SSH. Covers the three-tier hierarchy (agy for strategy, Pi best via MiniMax M3 for planning, Pi cost via DeepSeek V4 Flash for code), provider/model selection with fallback chains, session recovery from interrupted runs, stall detection and diagnosis, parallel execution patterns, and tmux-based monitoring."
+Load this skill for running Pi Coder Agent as a local npm binary — no Docker, no SSH."
 category: autonomous-ai-agents
 metadata:
   hermes:
@@ -219,6 +217,10 @@ O binário `pi` não está no PATH do user hermes — **sempre usar caminho comp
 `/opt/data/pi-global/bin/pi`. O `--user hermes` é obrigatório para acessar
 as chaves em `/opt/data/home/.pi/agent/auth.json`.
 
+## ⚠️ REGRA ABSOLUTA: Pi Agent = Terminal Background, NUNCA Delegate
+
+Pi Agents são **sempre** invocados como processo de terminal em background — `terminal(background=true, notify_on_complete=true)`. **Nunca** usar `delegate_task` para Pi Agents. `delegate_task` cria subagentes isolados sem acesso ao filesystem real do projeto, cancelados se o turno do orquestrador terminar. Pi Agents precisam de acesso direto aos arquivos e podem rodar por 10-30 minutos — `terminal(background=true)` é o único modo seguro. Esta regra vale para Pi best e Pi cost, qualquer provider.
+
 ## Como Invocar
 
 ### Padrão A — Prompt inline (curto, sem `$`, `` ` ``, `'`)
@@ -347,6 +349,32 @@ Verificar:
 ```bash
 wc -l ~/.pi/agent/sessions/--*/$(ls -t ~/.pi/agent/sessions/--*/ | head -1)
 ```
+
+**Progress-check rápido para múltiplos Pi Agents paralelos** (executar do container Hermes):
+
+```bash
+python3 -c "
+import json, glob
+for path in sorted(glob.glob('/opt/data/home/.pi/agent/sessions/--opt-data-*--/202*.jsonl')):
+    name = path.split('setor-')[1].split('--')[0] if 'setor-' in path else path.split('--')[-2][:30]
+    entries = sum(1 for _ in open(path))
+    writes = 0; last_read = '?'
+    with open(path) as f:
+        for line in f:
+            if line.strip():
+                e = json.loads(line)
+                if e.get('type') == 'message':
+                    for c in e.get('message', {}).get('content', []):
+                        if isinstance(c, dict) and c.get('type') == 'toolCall':
+                            if c.get('name') == 'read' and last_read == '?':
+                                last_read = c.get('arguments', {}).get('path', '')[-50:]
+                            if c.get('name') == 'write':
+                                writes += 1
+    print(f'{name:10s} | {entries:3d}e | reads→{last_read} | writes={writes}')
+"
+```
+
+Isso mostra entradas crescendo, último arquivo lido, e se já começou a escrever output.
 
 **Sinal de leitura normal:** entradas crescendo, custo acumulando, última
 entrada contendo snippets de código, diffs, ou schemas.

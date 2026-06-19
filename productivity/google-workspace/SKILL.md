@@ -1,10 +1,6 @@
 ---
 name: google-workspace
-description: "Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation.
-
-Load this skill when you need to automate Google Workspace. Covers gws CLI installation and OAuth2 setup from Google Cloud Console credentials, then using it for Gmail operations, Calendar management, Drive file operations, Docs editing, and Sheets data manipulation."
-
-Load this skill when you need to automate Google Workspace. Covers gws CLI installation and OAuth2 setup from Google Cloud Console credentials, then using it for Gmail operations, Calendar management, Drive file operations, Docs editing, and Sheets data manipulation."
+description: "Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation. Load this skill when you need to automate Google Workspace. Covers gws CLI installation and OAuth2 setup from Google Cloud Console credentials, then using it for Gmail operations, Calendar management, Drive file operations, Docs editing, and Sheets data manipulation."
 version: 1.1.0
 author: Nous Research
 license: MIT
@@ -23,17 +19,38 @@ metadata:
 
 # Google Workspace
 
-Gmail, Calendar, Drive, Contacts, Sheets, and Docs — through Hermes-managed OAuth and a thin CLI wrapper. When `gws` is installed, the skill uses it as the execution backend for broader Google Workspace coverage; otherwise it falls back to the bundled Python client implementation.
+Gmail, Calendar, Drive, Contacts, Sheets, and Docs — through Hermes-managed OAuth and a thin CLI wrapper.
+
+## Hermes-specific paths
+
+On this host (Oracle Linux, Hermes container), the scripts and credentials live at:
+
+```bash
+GSETUP="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/setup.py"
+GAPI="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/google_api.py"
+```
+
+Always verify auth before first use:
+```bash
+$GSETUP --check
+# AUTHENTICATED (partial) → see references/scope-recovery.md
+```
 
 ## References
 
 - `references/gmail-search-syntax.md` — Gmail search operators (is:unread, from:, newer_than:, etc.)
 - `references/setup-pitfalls.md` — PEP 668 workaround, 403 fix, range syntax, client JSON creation
+- `references/docs-table-extraction.md` — Como extrair tabelas e checkboxes de Google Docs via REST API (o comando `docs get` perde tabelas e não expõe estado de checkboxes)
+- `references/scope-recovery.md` — how to fix partial auth (missing scopes)
+- `references/clone-spreadsheet.md` — Clonar planilha via Drive API, mover entre pastas, limpar dados por aba preservando headers
+- `references/sheets-column-padding.md` — Fix for "N columns passed, passed data had M columns" when reading Sheets into pandas (API trims trailing empty cells per row)
+- `references/service-account-sharing.md` — Cross-account Drive access: service account vs user OAuth visibility (404 on valid IDs, sharing patterns)
 
 ## Scripts
 
 - `scripts/setup.py` — OAuth2 setup (run once to authorize)
-- `scripts/google_api.py` — compatibility wrapper CLI. It prefers `gws` for operations when available, while preserving Hermes' existing JSON output contract.
+- `scripts/google_api.py` — compatibility wrapper CLI
+- `scripts/gws_bridge.py` — bridge for gws CLI backend
 
 ## First-Time Setup
 
@@ -83,15 +100,16 @@ GAPI="/path/to/google-venv/bin/python ${HERMES_HOME:-$HOME/.hermes}/skills/produ
 
 Before starting OAuth setup, ask the user TWO questions:
 
-**Question 1: "What Google services do you need? Just email, or also\nCalendar/Drive/Sheets/Docs?"**\n\n- **Email only** → They don't need this skill at all. Use the `himalaya` skill\n  instead — it works with a Gmail App Password (Settings → Security → App\n  Passwords) and takes 2 minutes to set up. No Google Cloud project needed.\n  Load the himalaya skill and follow its setup instructions.\n\n- **Any other combination (Calendar, Drive, Sheets, Docs, etc.)** → Continue\n  with this skill. The setup script uses a fixed full-scope consent screen\n  covering Gmail, Calendar, Drive, Contacts, Sheets, and Docs. There is no\n  `--services` flag — scope narrowing is not supported by the current script.\n  Revoke and create a stripped-down OAuth client in Cloud Console if you need\n  truly minimal scopes.
+**Question 1: "What Google services do you need? Just email, or also Calendar/Drive/Sheets/Docs?"**
 
-**Question 2: "Does your Google account use Advanced Protection (hardware
-security keys required to sign in)? If you're not sure, you probably don't
-— it's something you would have explicitly enrolled in."**
+- **Email only** → They don't need this skill at all. Use the `himalaya` skill instead — it works with a Gmail App Password (Settings → Security → App Passwords) and takes 2 minutes to set up. No Google Cloud project needed. Load the himalaya skill and follow its setup instructions.
+
+- **Any other combination (Calendar, Drive, Sheets, Docs, etc.)** → Continue with this skill. The setup script uses a fixed full-scope consent screen covering Gmail, Calendar, Drive, Contacts, Sheets, and Docs. There is no `--services` flag — scope narrowing is not supported by the current script. Revoke and create a stripped-down OAuth client in Cloud Console if you need truly minimal scopes.
+
+**Question 2: "Does your Google account use Advanced Protection (hardware security keys required to sign in)? If you're not sure, you probably don't — it's something you would have explicitly enrolled in."**
 
 - **No / Not sure** → Normal setup. Continue below.
-- **Yes** → Their Workspace admin must add the OAuth client ID to the org's
-  allowed apps list before Step 4 will work. Let them know upfront.
+- **Yes** → Their Workspace admin must add the OAuth client ID to the org's allowed apps list before Step 4 will work. Let them know upfront.
 
 ### Step 2: Create OAuth credentials (one-time, ~5 minutes)
 
@@ -142,7 +160,7 @@ Agent rules for this step:
 - Tell the user that the browser will likely fail on `http://localhost:1` after approval, and that this is expected.
 - Tell them to copy the ENTIRE redirected URL from the browser address bar.
 - If the user gets `Error 403: access_denied`, send them directly to `https://console.cloud.google.com/auth/audience` to add themselves as a test user.
-  - If the direct URL redirects or fails, guide through the UI: console.cloud.google.com → Search bar → "Audience"/"Público-alvo" → OAuth consent screen → Test users → Add users → enter email → Save.
+  - If the direct URL redirects or fails, guide through the UI: console.cloud.google.com → Search bar → "Audience" → OAuth consent screen → Test users → Add users → enter email → Save.
   - After adding, have them retry the same auth URL (no need to regenerate).
 
 ### Step 4: Exchange the code
@@ -277,6 +295,8 @@ $GAPI drive delete FILE_ID
 $GAPI drive delete FILE_ID --permanent
 ```
 
+**Batch download pattern:** for structured folder trees (e.g., project folders with subfolders per process), see `references/drive-batch-download-pattern.md` — covers listing, mapping, per-type download, parallelism, and case-sensitivity pitfalls.
+
 ### Contacts
 
 ```bash
@@ -296,10 +316,10 @@ $GAPI sheets get SHEET_ID "Sheet1!A1:D10"
 $GAPI sheets get SHEET_ID "A1:Z100"
 
 # Write
-$GAPI sheets update SHEET_ID "Sheet1!A1:B2" --values '[["Name","Score"],["Alice","95"]]'
+$GAPI sheets update SHEET_ID "Sheet1!A1:B2" --values '[[\"Name\",\"Score\"],[\"Alice\",\"95\"]]'
 
 # Append rows
-$GAPI sheets append SHEET_ID "Sheet1!A:C" --values '[["new","row","data"]]'
+$GAPI sheets append SHEET_ID "Sheet1!A:C" --values '[[\"new\",\"row\",\"data\"]]'
 ```
 
 ### Docs
@@ -307,6 +327,8 @@ $GAPI sheets append SHEET_ID "Sheet1!A:C" --values '[["new","row","data"]]'
 ```bash
 # Read
 $GAPI docs get DOC_ID
+# ⚠️ Returns plain text only — tables and checkboxes are stripped.
+#    For table extraction, see references/docs-api-table-extraction.md
 
 # Create a new Doc (optionally seeded with body text)
 $GAPI docs create --title "Meeting Notes"
@@ -350,20 +372,33 @@ All commands return JSON. Parse with `jq` or read directly. Key fields:
 4. **Calendar times must include timezone** — always use ISO 8601 with offset (e.g., `2026-03-01T10:00:00-06:00`) or UTC (`Z`).
 5. **Respect rate limits** — avoid rapid-fire sequential API calls. Batch reads when possible.
 
-## Troubleshooting
+## Programmatic Automation (Python API)
+
+For programmatic Google Drive and Sheets patterns (folder trees, batch population, cross-account sharing, service account operations), see `references/workspace-automation-patterns.md` (absorbed from former `workspace-automation` skill). Also see `references/drive-trashed-files-pitfall.md` for the critical trashed-files filtering bug when using `supportsAllDrives=True`.
 
 | Problem | Fix |
 |---------|-----|
 | `NOT_AUTHENTICATED` | Run setup Steps 2-5 above |
 | `REFRESH_FAILED` | Token revoked or expired — redo Steps 3-5 |
-| `HttpError 403: Insufficient Permission` | Missing API scope — `$GSETUP --revoke` then redo Steps 3-5 |
-| `AUTHENTICATED (partial)` or "Token missing scopes" | New write capabilities (Drive write/delete, Docs create/edit) require re-authorization. `$GSETUP --revoke` then redo Steps 3-5 to grant the upgraded scopes. |
+| `HttpError 403: Insufficient Permission` | Missing API scope — `$GSETUP --revoke` then redo Steps 3-5. Check scope list with `--check` first. |
+| `AUTHENTICATED (partial)` or "Token missing scopes" | Token has fewer scopes than the consent screen requests. See `references/scope-recovery.md` for the revoke-and-re-auth procedure. |
 | `HttpError 403: Access Not Configured` | API not enabled — user needs to enable it in Google Cloud Console |
 | `ModuleNotFoundError` | Python mismatch. First check: `$GSETUP --check` — if it says AUTHENTICATED, the venv exists but GAPI is using the wrong Python. Use the **same** Python for both GSETUP and GAPI (see PEP 668 note above). Otherwise run `$GSETUP --install-deps`, or on PEP 668 systems use the `uv venv` workaround in the setup section |
 | Advanced Protection blocks auth | Workspace admin must allowlist the OAuth client ID |
+| `Ocorreu um erro: N columns passed, passed data had M columns` | Google Sheets trims trailing empty cells per row. Data rows end up with fewer columns than the header row. Fix: pad each row to match the header length before creating the DataFrame. See `references/sheets-column-padding.md`. |
+| `File not found` when sharing a service-account-created folder via user OAuth | Service accounts and user OAuth have separate Drive scopes. Folders created by one are invisible to the other until explicitly shared. Share the folder to the other account's email FIRST, then operate. |
+| Service account can't access a user-owned folder/spreadsheet | Use user OAuth (`GAPI` or `drive share`) to share the resource with the service account email (Editor role). Then retry with service account credentials. See `references/service-account-sharing.md`. |
+| `HttpError 400: Invalid Value` on `drive search "'ID' in parents"` | Missing `--raw-query` flag. Without it, the CLI interprets the `'ID' in parents` string as a `fullText contains` search. Always use `--raw-query` for Drive parent-child queries. Also: Drive IDs are **case-sensitive** — verify with `drive get` before searching children. |
+| Google Docs downloaded as `.pdf` instead of text | Add `--export-mime text/plain` to download Docs as readable text. Without it, the default export is PDF. |
 
 ## Revoking Access
 
 ```bash
 $GSETUP --revoke
 ```
+
+## Histórico de Atualizações
+
+| Data | Mudança |
+|------|---------|
+| 2026-06-19 | Adicionados pitfalls: `drive search` parent queries exigem `--raw-query` (400 Invalid Value sem ele); Drive IDs case-sensitive; Docs precisam de `--export-mime text/plain` para download como texto. |

@@ -125,16 +125,98 @@ urls = re.findall(r'"url"\s*:\s*"(https?://[^"]+)"', content)
 | MCP+LLM | 55 | 40 | **94 URLs**, 23 web_extract (MCP servers, ClickUp, GitHub) |
 | UX+Tiimo | 63 | 42 | **116 URLs**, Tiimo browser_vision, ADHD sources |
 
-## Limitações
+## ⚠️ XML Wrapper Format — web_extract results
 
-1. **Assistant messages são pobres** — subagentes escrevem "Vou pesquisar..."
-   em vez de sintetizar findings. O valor está nos tool results.
-2. **Google bloqueia** — muitas web_search retornam vazias. Fonte confiável:
-   DuckDuckGo html mode, Bing, URLs diretas, GitHub, docs oficiais.
-3. **Lock contention** — não consultar state.db enquanto subagentes estão
-   rodando ativamente (pode dar lock). Esperar término ou timeout.
-4. **IDs truncados** — session_id tem comprimento variável (22-33 chars).
-   Usar substring matching quando logs mostrarem apenas os primeiros N chars.
+Tool results stored in `messages.content` are **wrapped in XML tags**, NOT raw JSON.
+The actual JSON payload is embedded inside `<untrusted_tool_result source="web_extract">` ... `</untrusted_tool_result>`.
+
+Example of raw content from state.db:
+```
+<untrusted_tool_result source="web_extract">
+The following content was retrieved from an external source...
+{
+  "results": [
+    {
+      "url": "https://example.com",
+      "title": "Page Title",
+      "content": "# Markdown body..."
+    }
+  ]
+}
+[/untrusted_tool_result]
+```
+
+### Parsing function
+
+Use this to extract the JSON from the wrapper:
+
+```python
+import json, re
+
+def extract_from_wrapper(raw: str) -> dict | None:
+    \"\"\"Extract JSON payload from state.db's XML-wrapped tool results.\"\"\"
+    # Find the outermost JSON object (brace-delimited)
+    start = raw.find('{')
+    end = raw.rfind('}')
+    if start >= 0 and end > start:
+        try:
+            return json.loads(raw[start:end+1])
+        except json.JSONDecodeError:
+            pass
+    return None
+```
+
+### Multi-result vs single-result shape
+
+web_extract results come in two shapes:
+- **Array shape** (`"results": [{...}, {...}]`) — 3 URLs per call → iterate `data['results']`
+- **Single shape** (`"url": "...", "content": "..."`) — 1 URL per call → use directly
+
+Both parse correctly with the function above. Check for `'results'` key to distinguish.
+
+## Tool usage diagnosis
+
+Before extracting large volumes, check what tools were called and how much content each produced:
+
+```python
+# Quick scan: what tools did the subagent use, and how many have real content?
+tool_summary = conn.execute('''
+    SELECT tool_name, COUNT(*) AS total,
+           SUM(CASE WHEN LENGTH(content) > 500 THEN 1 ELSE 0 END) AS with_body
+    FROM messages
+    WHERE session_id = ? AND role = "tool"
+    GROUP BY tool_name
+    ORDER BY total DESC
+''', (session_id,)).fetchall()
+# web_extract with with_body > 0 = pages successfully extracted
+# web_search with total >> with_body = search backend blocked
+# assistant with length(content) > 200 = some synthesis happened
+```
+
+## Exemplo real 2 (Deep Research Augmentação — 18 Jun 2026)
+
+2 subagentes timeoutaram com dezenas de tool calls cada. Recuperação bem-sucedida:
+
+| Subagente | Msgs | Tool calls | Conteúdo recuperado |
+|-----------|------|------------|---------------------|
+| AI Agencies & Tech Stack | 76 | **50** | 18 web_extract: LangChain, Anthropic, Dify, RAGFlow, GitHub Copilot, Loop Engineering |
+| Org Change & Modelos Emergentes | 128 | **85** | 22 web_extract: Deloitte Tech Trends, WEF Future of Jobs, HITL vs HOTL, Kotter+IA, AI Literacy, Superagency McKinsey |
+
+**Recovery steps performed:**
+
+1. **Find sessions** — Query `sessions` WHERE `parent_session_id IS NOT NULL` AND `end_reason IS NULL` (timed out). Sort by `started_at DESC`, limit 15.
+2. **Diagnose tool usage** — `SELECT tool_name, COUNT(*), SUM(LENGTH(content)>500) ... GROUP BY tool_name` to see what was collected and what has real content.
+3. **Extract web_search URLs** — Parse JSON from each result, deduplicate by URL, prioritize URLs with descriptions.
+4. **Extract web_extract pages** — Parse XML wrapper (see above), extract url/title/content. Filter to results with `len(content) > 300` to skip error/redirect pages.
+5. **Extract browser_navigate URLs** — Highest-value sources (primary docs, GitHub repos, official blogs).
+6. **Assess coverage** — If 20+ pages and 50+ URLs exist, do targeted fallback only on gaps.
+7. **Fallback + synthesize** — 2-3 direct web searches on uncovered topics, then full synthesis.
+
+**Lições da recuperação:**
+- Se o agente fez mais `web_extract` do que `web_search`, o recovery quase sempre vale a pena
+- Se o agente só fez `web_search` (retornando vazio por bloqueio), o recovery rende pouco
+- Foque em extrair o `content` dos resultados de `web_extract` — é onde está o valor real
+- **Assistant messages são meta-pobres** — subagentes escrevem "Vou pesquisar..." em vez de sintetizar. O valor está nos tool results, não nas mensagens de assistente.
 
 ## Quando usar
 

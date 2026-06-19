@@ -65,6 +65,29 @@ Hermes 自身完成，不需要 delegate。
 问题：{user_question}
 ```
 
+### Phase 0.1: 确认 a Granularidade do Output (CRÍTICO)
+
+Quando o usuário pedir uma "base de conhecimento", "pasta de referências", "índice de soluções" ou "catálogo" — **antes de começar a pesquisar**, confirme explicitamente qual é a unidade mínima que conta como item.
+
+Padrão correto (validado em sessão 18/jun/2026 com user Gustavo Mello):
+- **Case** = o case study inteiro de uma empresa (ex: "Klarna implantou AI assistant")
+- **Solução** = cada alteração isolada e replicável dentro do case (ex: "IA resolve autonomamente tickets nível 1", "humanos revisam casos sensíveis", "humano usa IA como co-piloto no nível 2") — são **soluções distintas** dentro do mesmo case
+- **Critério:** se um humano pode aprender e aplicar a alteração de forma independente, é uma solução candidata
+
+> **Pergunta obrigatória antes de prosseguir:** "Posso confirmar o conceito de solução: cada alteração isolada e replicável dentro de um processo, com seu próprio input/output/ganho, conta como uma solução distinta. Para o case X com N agentes ou N subprocessos, isso significa N soluções. Posso seguir com essa interpretação?"
+
+Se o usuário confirmar, decomponha. Se não, peça clarificação adicional. **Não comece a escrever arquivos sem essa confirmação** — o user vai corrigir a abordagem inteira depois, desperdiçando 10+ minutos de trabalho.
+
+### Phase 0.2: Confirmar Formato de Saída (para bases de conhecimento)
+
+Quando o output é uma **pasta de referências** (não um relatório executivo), confirme:
+- Granularidade dos itens (1 solução = 1 arquivo, ou agrupar?)
+- Formato do index.md (só listagem, ou inclui instruções/padrões?)
+- Tabelas vs texto corrido com markdown (preferência deste user: **texto com formatação markdown, sem tabelas** em indexes)
+- Frontmatter YAML por item, ou só metadados no body?
+
+Defaults seguros se o user não especificou: 1 arquivo por solução, index só listagem, texto com markdown, frontmatter YAML.
+
 ## Phase 1: 并行调研 Agents
 
 使用 delegate_task 的 batch 模式，4 个 agent 并行执行：
@@ -279,7 +302,74 @@ Hermes 自身完成最终报告整合。
 
 ### Phase 2 Skip Heuristic
 
-当 Phase 1 的 subagent 直接访问了一手来源（browser_navigate 到 GitHub 仓库页、官方文档、arXiv 论文页）时，数据已经是一手验证过的，Phase 2 reviewer 的边际价值很低。可以跳过 Phase 2，直接进 Phase 3 交叉验证。
+Quando Phase 1 的 subagent 直接访问了一手来源（browser_navigate 到 GitHub 仓库页、官方文档、arXiv 论文页）时，数据已经是一手验证过的，Phase 2 reviewer 的边际价值很低。可以跳过 Phase 2，直接进 Phase 3 交叉验证。
+
+### Granular Decomposition of Cases (User-Defined Lição)
+
+Quando o user pede uma "pasta de soluções" ou "catálogo de cases", a unidade de saída **NÃO é o case inteiro** — é a **alteração isolada que produziu ganho mensurável**.
+
+**Lição do usuário (18 Jun 2026, ID Consultoria):** Case da Allianz Nemo tem 7 agentes orquestrados = 7 soluções distintas (Triage, Document, Policy, Fraud, Cost, Communication, Approval). Harvey tem 4 capabilities = 4 soluções. McKinsey Lilli tem N soluções (pesquisa, "tone of voice", CaseAI, etc.).
+
+**Critério de granularidade:** se um agente humano consegue **aprender e aplicar a alteração de forma independente**, ela é uma solução candidata.
+
+**Quando aplicar:** qualquer user pedir "pasta de cases", "catálogo de soluções", "referências de boas práticas" ou similar. Default para granularidade: cada subprocesso ou capability distinta = 1 solução.
+
+**Saída:** cada solução = 1 arquivo .md com frontmatter YAML (id, titulo, case_pai, categoria, tipo, setor, ferramentas, fonte, ganhos) + arquivo index.md que lista todas as soluções. Ver `references/solution-template-yaml.md` para template testado (inclui as 5 seções do corpo: Contexto, A Solução em Detalhe, Resultados Obtidos, Como Replicar, Onde Seria Relevante).
+
+**Pipeline de produção em massa:** `references/expansion-pipeline.md` contém o workflow completo com dispatch de subagentes (3 paralelos, 1 case_pai por subagente), modelo de template, verificação de qualidade, e recovery de timeout.
+
+**Backup defensivo:** antes de refazer do zero, sempre `mv pasta pasta-backup-v1`. O user valoriza preservação explícita do material.
+
+### Dispatch Pattern (3 Parallel, 1 Case Per Subagent)
+
+**Validated by user in session 18-Jun-2026 (Gustavo Mello, ID Consultoria):**
+
+```
+                    ┌─────────────────────────────┐
+                    │  50-100 arquivos pendentes   │
+                    └─────────────┬───────────────┘
+                                  │
+                                  ▼
+                    ┌─────────────────────────────┐
+                    │  Agrupar por case_pai        │
+                    │  Ex: Allianz Nemo → 4 files  │
+                    │       Clay → 3 files         │
+                    │       Perplexity → 2 files   │
+                    └─────────────┬───────────────┘
+                                  │
+                                  ▼
+                    ┌─────────────────────────────┐
+                    │  Dispatch 3 cases em         │
+                    │  paralelo (delegate_task)    │
+                    │  Cada subagente: 1 case      │
+                    └─────────────┬───────────────┘
+                                  │
+                    ┌─────────────▼───────────────┐
+                    │  Batch 1: case A, B, C      │
+                    │  Batch 2: case D, E, F      │
+                    │  ...                        │
+                    └─────────────┬───────────────┘
+                                  │
+                                  ▼
+                    ┌─────────────────────────────┐
+                    │  Cada subagente:             │
+                    │  1. read_file(guia)          │
+                    │  2. read_file(cada arquivo)  │
+                    │  3. write_file(expandido)    │
+                    │  4. terminal(wc -l)          │
+                    │  5. report                   │
+                    └─────────────────────────────┘
+
+
+### Web Search Bug: Double Quotes
+
+**Sintoma:** `web_search` com aspas duplas na query (ex: `"Reclaim.ai"`) retorna `[]` ou resultados de dicionário irrelevantes.
+
+**Causa:** Bing interpreta aspas duplas como busca de frase exata do termo literal, ignorando o resto da query.
+
+**Diagnóstico:** se a query tem aspas duplas, fazer a busca sem aspas primeiro. Se o backend retornar array vazio, **NÃO é falha do backend** — é query mal-formada.
+
+**Workaround:** use `web_extract` em URL direta (blog, case studies, page de empresa) quando precisar buscar por nome exato.
 
 ### 迭代追问模式
 
@@ -342,8 +432,55 @@ When creating issues with large markdown research reports:
 ### Subagent timeout: recovery via state.db
 
 When subagents timeout after 20+ tool calls, their sessions persist in `/opt/data/state.db`.
-Use the queries in `references/subagent-session-recovery.md` to extract partial results.
+Use the queries and code in `references/subagent-session-recovery.md` to extract partial results.
 This is especially valuable when subagents collected URLs or extracted pages before timeout.
+
+### Timeout Recovery Workflow (Priority Order)
+
+When one or more subagents timeout, follow this sequence — **do not jump straight to re-running them**:
+
+```
+         ┌─────────────────────────────┐
+         │   N subagents timed out     │
+         └─────────────┬───────────────┘
+                       │
+                       ▼
+         ┌─────────────────────────────┐
+         │ 1. RECOVER from state.db    │ ← Tente primeiro (ver ref acima)
+         │    • Find timeout session   │
+         │    • Extract web_search URLs│
+         │    • Extract web_extract    │
+         └─────────────┬───────────────┘
+                       │
+                       ▼
+         ┌─────────────────────────────┐
+         │ 2. ASSESS what was captured │
+         │    • Já cobre os tópicos?   │ → Se sim, sintetize direto
+         │    • Faltam ângulos?        │
+         └─────────────┬───────────────┘
+                       │ se faltar
+                       ▼
+         ┌─────────────────────────────┐
+         │ 3. FALLBACK pesquisa direta │ ← Nunca retente subagentes!
+         │    • web_search+web_extract │
+         │    • Foco nos gaps          │
+         │    • 2-3 min resolve        │
+         └─────────────┬───────────────┘
+                       │
+                       ▼
+         ┌─────────────────────────────┐
+         │ 4. SYNTHESIZE tudo          │
+         │    + Dados recuperados      │
+         │    + Fallback findings      │
+         └─────────────────────────────┘
+```
+
+**Regras:**
+- **Sempre tente o state.db primeiro.** O output intermediário (URLs, páginas, buscas) quase sempre tem valor.
+- **Nunca retente subagentes timeoutados.** Cada tentativa consome 600s+ sem garantia.
+- **Recuperação + fallback combinados** entregam 80-100% do que o subagente completo teria entregue.
+- **Assistant messages no state.db são meta-rasas** ("Vou pesquisar X..."). O valor real está nos tool results.
+- **web_extract results no state.db vêm encapsulados em XML wrapper** `<untrusted_tool_result>` — veja o reference file para o parser.
 
 ### Reference Files
 
@@ -351,7 +488,8 @@ This is especially valuable when subagents collected URLs or extracted pages bef
 - `references/research-to-batch-dev-pattern.md` — Research → batch development pattern
 - `references/kusto-investigation.md` — Kusto/ADE investigation patterns
 - `references/data-to-frontier-chart.md` — Data compilation and frontier charts
-- `references/subagent-session-recovery.md` — Recover partial data from state.db when subagents timeout. SQLite queries, examples, pitfalls.
+- `references/subagent-session-recovery.md` — Recover partial data from state.db when subagents timeout. SQLite queries, examples, pitfalls, and the XML-wrapper parsing technique for web_extract content.
+- `references/web-search-debugging.md` — Modes of failure for `web_search` tool, root cause for empty-array returns, and the "aspas duplas em nome próprio" pattern that breaks Bing.
 
 ### Pitfalls
 
@@ -360,11 +498,14 @@ This is especially valuable when subagents collected URLs or extracted pages bef
 - 学术搜索 arXiv API 有时不稳定，准备 Google Scholar 作为 fallback
 - reviewer agent 验证 URL 时可能遇到付费墙/地区限制，标注而非失败
 - Google/DuckDuckGo may block subagent browser with bot detection — Bing tends to work better as fallback
+- **web_search queries with quoted phrases can return garbage instead of empty arrays.** When you wrap terms in double quotes (e.g. `web_search(query='"Reclaim.ai" case study')`), Bing interprets the query as a literal phrase match for the string AND may prioritize dictionary/definition results that happen to contain those words. Symptom: results returned, but completely unrelated to your intent. **Fix:** drop the double quotes, use natural language queries. If you need exact-name search, navigate directly to the platform's website via `browser_navigate` or `web_extract(urls=[...])` instead of fighting the search backend.
+
 - **web_search tool returning empty arrays** is a distinct failure mode from "site blocked" — when the tool returns `{"data": {"web": []}}` for every query, the search backend itself is broken/unavailable. Do NOT conclude "no results exist". Instead:
   - Switch to browser-based search (`browser_navigate` to Bing, DuckDuckGo, or Google directly)
   - For people/company research, navigate directly to platform URLs (GitHub, LinkedIn, Instagram, Behance)
   - For technical data, use GitHub API or curl to fetch from known endpoints
   - See `skill_view(name='product-pipeline', file_path='references/persona-research-deep-dive.md')` for detailed techniques
+- **web_search com aspas duplas em nome próprio trava o Bing** — buscar por `"Reclaim.ai"` (com aspas) fez o Bing interpretar como frase exata e retornar definições de dicionário em vez de cases reais. Pattern identificado em sessão 18/jun/2026. **Regra:** para nomes próprios, prefira query sem aspas (`Reclaim.ai case study` em vez de `"Reclaim.ai" case study`). Reserve aspas para frases exatas longas onde a busca por sinônimos seria ruidosa.
 - Phase 2 审核可在来源以官方文档/GitHub 为主时跳过（节省时间和 tokens）
 - Phase 3 圆桌 agent 不需要 web/browser toolset（纯分析）
 - delegate_task goal 参数不能用 XML 属性语法（`goal">text`），必须用正常 JSON key

@@ -1,14 +1,14 @@
 ---
 name: agy
-description: "Google Antigravity CLI: installation, OAuth auth, design workflows for HTML and
+description: "Versatile skill for coordinating Google Antigravity CLI for any design project type.
 
-Load this skill for strategic design tasks — visual HTML output, brand presentations, UI mockups, SVGs, and prototypes. Covers agy installation, OAuth authentication via tmux, and design workflows including image generation, prototyping, parallel subagents, and HTML report generation."
-
-Load this skill for strategic design tasks — visual HTML output, brand presentations, UI mockups, SVGs, and prototypes. Covers agy installation, OAuth authentication via tmux, and design workflows including image generation, prototyping, parallel subagents, and HTML report generation."
+Load this skill when you need to generate any visual output via Antigravity CLI — from simple HTML reports and brand visuals to full interactive websites with Three.js, GSAP, and cinematic effects. Covers install, OAuth auth, and multiple design workflows: image generation, prototyping, parallel subagents, full site generation with iterative strategy, and HTML report generation. Always invoke agy as a background terminal process — never with timeout."
 category: software-development
 ---
 
 # agy — Antigravity CLI (Consultor Externo)
+
+> ⚡ **Stitch MCP:** Se esta tarefa envolver prototipagem de telas, mockups interativos ou UI design que exija ferramenta visual, ative o Stitch MCP primeiro: edite `/opt/data/config.yaml` mudando `stitch.enabled` para `true` e execute `/reload-mcp`.
 
 > **Papel na hierarquia:** Consultor externo especialista. Usar em momentos estratégicos.
 > Prompt complexo, leitura de arquivos, design/UX → agy. Tarefa simples, code task → Pi cost.
@@ -16,15 +16,20 @@ category: software-development
 >
 > Ver pi-agent-coordination para a hierarquia completa (agy > Pi best > Pi cost).
 
-**PRIMARY design tool** — agy (Gemini Flash 3.5 via --print mode) é o DEFAULT para qualquer output visual. Use FIRST, não como fallback.
+**PRIMARY design tool** — agy (Gemini Flash 3.5 via `--print` mode) é o DEFAULT para qualquer output visual. Use FIRST, não como fallback.
+
+**⚠️ REGRA DE INVOCAÇÃO:** agy é **sempre** invocado como processo de terminal em background — `terminal(background=true, notify_on_complete=true)`. **Nunca** usar `timeout` no comando. Acompanhar progresso com `process(action='poll')` e coletar resultado com `process(action='wait')`.
 
 ## Trigger
 
 - User asks for any visual design output — HTML pages, brand presentations, UI mockups, SVGs, prototypes
 - User says "make an HTML", "create a visual", "apresente em HTML"
+- User asks for charts, graphs, dashboards, or data visualization — use CSS puro (sem Chart.js, sem CDN) no HTML. Ver `data-report-prompt-pattern.md`.
+- User asks for full interactive websites — with Three.js, GSAP ScrollTrigger, Web Audio API, 3D scenes, cinematic scrolling, or complex visual effects. Use iterative strategy (see Full Site Generation below).
 - Tarefa complexa/estratégica que requer file I/O ou design/UX
 - User asks to use agy for design tasks
 - **Video layout audit** — user asks agy to review a HyperFrames HTML composition before render. See `hyperframes-video-production` skill for the workflow.
+- User asks for "consulting style", "padrão McKinsey", "clean chart sem branding" — use agy with the consulting-style data visualization workflow below
 
 For user Gustavo Mello: agy is the primary design tool. Não use HTML manual quando agy está disponível.
 
@@ -83,6 +88,56 @@ ssh oracle-host 'tmux capture-pane -t agy-auth -p -S -10'
 ssh oracle-host 'echo "n" | timeout 12 env HOME=/home/ubuntu /home/ubuntu/.local/bin/agy 2>&1 | head -10'
 ```
 
+## Prompt Design — Size & Base64
+
+### Keep prompts under ~25KB
+
+Quando o prompt (incluindo base64 do logo) ultrapassa ~25KB, agy pode travar sem produzir output por minutos — o shell argument fica pesado e o Gemini demora a responder.
+
+**Regra prática:** o prompt final (após substituir placeholders) deve ficar abaixo de 25KB.
+
+### Base64 logo: tamanho e formato
+
+Use um logo **redimensionado para ~150px de largura** antes de converter para base64. Isso gera ~14KB de base64 em vez de 59KB (para um logo 400px).
+
+```bash
+# Redimensionar com Pillow antes de converter
+uv run python3 -c "
+from PIL import Image
+img = Image.open('logo.png').convert('RGBA')
+w = 150
+h = int(img.size[1] * w / img.size[0])
+img = img.resize((w, h), Image.LANCZOS)
+img.save('logo_small.png')
+"
+base64 -w 0 logo_small.png > /tmp/logo_b64.txt
+# Juntar com o prefixo data URI
+echo -n "data:image/png;base64," > /tmp/logo_uri.txt
+cat /tmp/logo_b64.txt >> /tmp/logo_uri.txt
+```
+
+**CUIDADO com prefixo duplicado:** se o template do prompt já contém `data:image/png;base64,` e o arquivo base64 também começa com esse prefixo, o resultado será `data:image/png;base64,data:image/png:base64,...`. Verifique com `grep -c "data:image" prompt.md` — deve aparecer exatamente 1 vez no contexto da data URI real.
+
+### Monitoramento de execução
+
+agy pode levar 2-3 minutos (ou mais para sites complexos). **Sempre executar como `terminal(background=true, notify_on_complete=true)`** — nunca com `timeout` no comando:
+
+```bash
+# Exemplo de invocação via Hermes (não executar diretamente no shell):
+terminal(
+  command="ssh oracle-host 'export PATH=$PATH:/home/ubuntu/.local/bin && agy --dangerously-skip-permissions --print \"$(cat /tmp/prompt.txt)\"'",
+  background=true,
+  notify_on_complete=true
+)
+
+# Acompanhar com poll
+process(action='poll', session_id='...')
+# Coletar resultado final
+process(action='wait', session_id='...')
+# Copiar resultado para entrega
+ssh oracle-host 'sudo cp /home/ubuntu/arquivo.html /home/ubuntu/selfhost/hermes/data/'
+```
+
 ## Design Workflows
 
 ### 1. Image & Visual Generation
@@ -91,7 +146,7 @@ Generate logos, banners, brand kits, illustrations using Gemini Flash 3.5's buil
 
 ```bash
 ssh oracle-host 'export PATH=$PATH:/home/ubuntu/.local/bin && \
-  timeout 300 agy --dangerously-skip-permissions --print \
+  agy --dangerously-skip-permissions --print \
   "Generate a [logo/banner/brand-kit/image] for [subject]. \
    Style: [description]. Colors: [exact hexes]."'
 ```
@@ -125,14 +180,14 @@ cat > /tmp/prompt.md << 'PROMPT'
 [detailed prompt with ALL data, colors, specs inline]
 PROMPT
 scp -F ~/.ssh/config /tmp/prompt.md oracle-host:/tmp/prompt.txt
-ssh oracle-host 'export PATH=$PATH:/home/ubuntu/.local/bin && timeout 300 agy --print "$(cat /tmp/prompt.txt)"'
+ssh oracle-host 'export PATH=$PATH:/home/ubuntu/.local/bin && agy --print "$(cat /tmp/prompt.txt)"'
 ```
 
 **Mode B — Edit existing file (preferred when user provides one):**
 ```bash
 scp -F ~/.ssh/config /path/to/original.html oracle-host:/home/ubuntu/file.html
 # Write focused prompt describing exact edits
-ssh oracle-host 'export PATH=$PATH:/home/ubuntu/.local/bin && timeout 600 agy --print "$(cat /tmp/prompt.txt)"'
+ssh oracle-host 'export PATH=$PATH:/home/ubuntu/.local/bin && agy --print "$(cat /tmp/prompt.txt)"'
 ssh oracle-host 'sudo cp /home/ubuntu/file.html /home/ubuntu/selfhost/hermes/data/'
 ```
 
@@ -164,24 +219,56 @@ ssh oracle-host 'sudo cat ~/.gemini/antigravity-cli/brain/<uuid>/<file>.png | ba
   base64 -d > /opt/data/<filename>.png
 ```
 
-## Hermes Style Guide (for agy prompts)
+### 7. Full Site Generation (Iterative Strategy)
 
-Default to this design system for visual outputs:
+**agy é a ferramenta primária para sites completos** — incluindo projetos com Three.js, GSAP ScrollTrigger, Web Audio API, animações 3D e múltiplas seções cinematográficas.
 
-```css
---primary: #0000FF;
---blue-bg: #F0F5FF;
---blue-border: #CCD9FF;
---gold-accent: #E8B830;
---green-accent: #059669;
---text-dark: #1C1C1E;
---text-muted: #666680;
+**Estratégia iterativa para projetos grandes (500KB+):**
+
+```
+1. GERAR ESQUELETO: agy --print com prompt descrevendo estrutura completa (seções, layout, design tokens)
+   → ~50KB HTML+CSS base, executar em background sem timeout
+
+2. GERAR SEÇÕES: agy --print para cada seção complexa individualmente
+   → Cada chamada gera HTML parcial que é montado no esqueleto via script Python
+
+3. GERAR JAVASCRIPT: agy --print para lógica complexa (Three.js, GSAP, áudio)
+   → Arquivos .js separados, linkados no HTML principal
+
+4. MONTAR: script Python que junta as peças no HTML final
+   → Substitui placeholders, resolve paths, minifica se necessário
 ```
 
-- **Headings:** 'Spectral', Georgia, serif
-- **Numbers/Code:** 'Space Mono', monospace
-- **Body:** 'Inter', sans-serif
-- **Report structure:** Hero (gradient blue, gold total), Executive Summary (blue bg, negative margin), Sections (white, blue borders), Footer
+**Alternativa: `/goal` mode** para projetos que precisam de múltiplos arquivos com estrutura de diretórios:
+
+```bash
+agy /goal "Build a complete interactive website with [specs]. 
+Output as multiple files in a directory structure."
+```
+
+O `/goal` gera: `implementation_plan.md` + estrutura de diretórios + arquivos individuais + `walkthrough.md`.
+
+**Regra:** nunca abandone o agy por causa de tamanho. Adapte o workflow — quebre em iterações, use `/goal` para multi-arquivo, monte com script. O agy entrega altíssima qualidade visual; o trabalho de montagem compensa.
+
+## Hermes Style Guide (for agy prompts)
+
+Default to this design system for visual outputs. **Sempre carregar o guia completo** (`/opt/data/referencias/hermes-agent/hermes-agent-style-guide.html`) como contexto no prompt do agy — não apenas os tokens resumidos abaixo. O guia HTML contém 15 componentes com previews visuais que servem como referência de layout.
+
+```css
+--blue-royal: #0000F2;
+--white: #FFFFFF;
+--charcoal: #171717;
+--paper: #F5F5F7;
+--amber: #FFBD38;
+--red: #FF0000;
+```
+
+- **Giant titles:** 'Cormorant Garamond', serif (700, uppercase, -0.02em tracking)
+- **Section headers:** 'Syncopate', sans-serif (uppercase, 0.08em tracking)
+- **Body/Code:** 'Space Mono', monospace
+- **UI labels/Badges:** 'VT323', monospace (pixel font)
+- **Report structure:** Hero (blue #0000F2 bg, white text, giant serif title), Cards (white bg, blue border, chamfered corner), Tables (dashed dividers, hover rows), Footer (blue top border)
+- **Components disponíveis no guia:** CRT overlay, cursor terminal, tech grid, terminal showcase, install block, botão isométrico, platform tabs, retro header, card chanfrado, status tags, tech table, scroll logs, meta list, tech footer
 
 ## Key Commands Reference
 
@@ -196,6 +283,55 @@ Default to this design system for visual outputs:
 | `agy -p` | Print mode (non-interactive) |
 | `agy --dangerously-skip-permissions` | Skip approval prompts (file writes) |
 
+## Auditoria de Sessões — Extração de Tokens via Protobuf
+
+Diferente do Pi Agent (JSONL com `usage` explícito) e do Hermes (state.db SQLite), o agy armazena dados de sessão em **85+ SQLite DBs com blobs protobuf do Google Cloud Code**. É possível extrair tokens com engenharia reversa usando schemas do GitHub.
+
+### Localização
+
+```bash
+~/.gemini/antigravity-cli/conversations/<uuid>.db   # 85+ DBs (~35 MB total)
+~/.gemini/antigravity-cli/log/cli-<timestamp>.log   # Logs do language server
+```
+
+### Schemas Protobuf
+
+Os schemas foram extraídos e estão disponíveis em:
+
+- **`jkfujinami/antigravity-grpc-schemas`** — Schemas gRPC/Protobuf completos do Antigravity v2.0 (MIT)
+- **`ag-donald/Antigravity-Database-Manager`** — Schema da trajectory no `state.vscdb`
+
+### Hierarquia de Mensagens para Tokens
+
+```
+Trajectory (field numbers do DB são auto-increment)
+  └── gen_metadata (table) = CortexStepGeneratorMetadata[]
+       └── field 1 → ChatModelMetadata (oneof: chat_model)
+            ├── field 3 → model (enum)
+            └── field 4 → ModelUsageStats
+                 ├── field 2 → input_tokens (uint64)
+                 ├── field 3 → output_tokens (uint64)
+                 ├── field 4 → cache_write_tokens (uint64)
+                 ├── field 5 → cache_read_tokens (uint64)
+                 ├── field 9 → thinking_output_tokens (uint64)
+                 └── field 10 → response_output_tokens (uint64)
+```
+
+### Modelos Disponíveis (via `agy models`)
+
+Os modelos reais são obtidos rodando `agy models` no host, não dos enums do schema proto:
+
+| Display Name (agy models) | Modelo | Sessões típicas |
+|---------------------------|--------|:---------------:|
+| Gemini 3.5 Flash | gemini-3.5-flash | ~32 (rápidas, baratas) |
+| Gemini 3.1 Pro | gemini-3.1-pro | ~52 (complexas, pesadas) |
+
+O enum interno do proto (1016, 1020) **não corresponde** aos modelos 2.5 do schema público — na prática são Gemini 3.x.
+
+### Script de Extração
+
+Veja `references/session-audit-proto.md` para o script completo de extração de tokens de todas as 84+ sessões, geração de CSV, e mapeamento de modelos.
+
 ## Pitfalls
 
 ⚠️ **`--print` syntax non-obvious.** `--print` takes a STRING argument. Pipe/redirect do NOT work.
@@ -206,13 +342,13 @@ Default to this design system for visual outputs:
 
 ⚠️ **PKCE one-time use.** Auth code invalidated if agy restarts.
 
-⚠️ **Output token limit** em arquivos grandes. agy pode truncar se >75KB. Quebrar em partes.
+⚠️ **Output token limit** em arquivos grandes. agy pode truncar se >75KB em uma única chamada. Para sites completos, gerar em múltiplas iterações (esqueleto → seções → JS → montagem) ou usar `/goal` mode.
 
 ⚠️ **$HOME must be set.** agy crashes without it.
 
 ⚠️ **Keyring only on host.** OAuth tokens cached on host keyring, NOT inside containers. Always run agy on host via SSH.
 
-⚠️ **Timeout:** Para HTML multi-section, use `timeout 300`. Para editar arquivos HTML grandes (600KB+), use `timeout 600`.
+⚠️ **Nunca usar `timeout` com agy.** Invocar **sempre** como `terminal(background=true, notify_on_complete=true)`. O timeout pode matar o processo antes da conclusão, especialmente em sites complexos. Acompanhar com `process(action='poll')` e `process(action='wait')`.
 
 ⚠️ **Prefira editar existente a regenerar:** Editar preserva ajustes manuais.
 
@@ -222,16 +358,120 @@ Default to this design system for visual outputs:
 
 ⚠️ **`DOMContentLoaded` timing** em slides HTML interativos. Usar padrão `readyState === 'loading'` para init.
 
-⚠️ **Base64 images inline** inflam arquivos HTML. Usar uma única variável JS `const LOGO_URI = "data:..."`.
+⚠️ **Base64 images inline** inflam o HTML, mas o formato importa: usar `data:image/png;base64,...` para logos com transparência, nunca `data:image/jpeg;base64,...` (JPEG achata canal alfa em fundo branco). Usar uma única variável JS `const LOGO_URI = "data:..."`. Converter PNG para base64: `base64 -w 0 logo.png > /tmp/b64.txt`.
 
 ⚠️ **Path confusion.** Sempre usar caminho absoluto completo nos prompts.
 
 ⚠️ **First-run color scheme picker.** Cached after first use.
 
-⚠️ **Quota exhaustion.** agy compartilha quota do Google Cloud. Fallback para HTML manual com os mesmos tokens visuais.
+⚠️ **Telegram aceita .html.** Enviar direto com `MEDIA:/path/arquivo.html`. Se o usuário reportar que não recebeu, tentar com `.txt`.\n\n⚠️ **Quota exhaustion.** agy compartilha quota do Google Cloud. Fallback para HTML manual com os mesmos tokens visuais.
+
+⚠️ **agy para sites complexos exige estratégia iterativa.** Sites completos com Three.js (cenas 3D, partículas, iluminação), GSAP ScrollTrigger, Web Audio API e múltiplas seções ultrapassam 75KB — o `--print` trunca se tudo for gerado de uma vez. Estratégia: (1) Gerar esqueleto HTML+CSS base, (2) Gerar JS complexo (Three.js, GSAP, áudio) em chamadas separadas, (3) Usar `/goal` mode para projetos multi-arquivo, (4) Montar peças com script Python. **Nunca abandone o agy** por causa de tamanho — adapte o workflow. O agy entrega qualidade visual superior; a montagem final compensa o esforço.
+
+⚠️ **Chart.js CDN não renderiza em ambientes restritos.** O agy gera o HTML, mas Chart.js via CDN falha quando o usuário abre offline. Sempre especificar CSS puro no prompt. Mais seguro que depender de CDN.
+
+⚠️ **Gráfico de pizza/donut = rejeição imediata do usuário.** Explicitamente proibir no prompt. Sempre pedir "barras horizontais".
+
+⚠️ **Texto prolixo é corrigido.** Manter descrições em 1 frase. Se o agy gerar texto longo (descriptions, parágrafos de recomendação), encurtar com patch. O usuário prefere conciso.
+
+
+
+## Data Visualization (CSS Puro — SEM Chart.js)
+
+agy pode gerar HTML com gráficos em CSS puro para visualização de dados tabulares. **NÃO use Chart.js ou CDNs** — o ambiente pode bloquear requisições externas e os gráficos não renderizam.
+
+For cost-comparison charts specifically, see `references/cost-comparison-chart-pattern.md` (absorbed from former `cost-comparison-chart` skill) — covers CSS-only horizontal bars, honest linear scale, mobile-first layout, storytelling structure, and color coding by model family.
+
+### Preferências do usuário (Gustavo Mello)
+
+- **Foco em melhorias de processos e fluxos de trabalho, não em showcase de software** (validado em sessão 18/jun/2026). Quando o conteúdo do relatório é sobre uma ferramenta, enquadre como **case de augmentação aplicado em um processo real** — a ferramenta é meio, o processo é o fim. Se o user pedir explicitamente um relatório sobre uma categoria de ferramenta, aí software-por-software vale.
+- **SEM Chart.js, SEM CDN** — gráficos em CSS puro (divs com width percentual, `@keyframes slideIn`)
+- **SEM pizza/donut/rosca** — só barras horizontais
+- **Texto CONCISO** — descrições de uma frase no máximo
+- **Relações de dados explícitas** — se X alimenta Y, mostre a conexão
+- **Fontes do sistema** (Georgia, Courier New, system-ui) se Google Fonts falhar
+- **Tabela de apoio abaixo de CADA gráfico** com dados completos
+
+### Workflow
+
+```bash
+# 1. Escrever prompt com dados inline e especificações de design
+cat > /tmp/chart-prompt.md << 'PROMPT'
+Gere um HTML autônomo com gráficos em CSS puro (SEM Chart.js, SEM CDN).
+
+## Dados
+| Categoria | Metrica A | Metrica B | Metrica C |
+|---|---|---|---|
+| Item 1 | 10.5 | 20.3 | 30.1 |
+| Item 2 | 15.2 | 25.1 | 35.0 |
+
+## Estilo
+- Design system Hermes Agent (ver tokens no guia)
+- Barras horizontais (divs com width percentual, @keyframes slideIn)
+- SEM Chart.js, SEM CDN, SEM Google Fonts
+- Tabela de apoio abaixo de cada gráfico
+- Texto conciso (descrições de 1 frase)
+
+## Layout
+1. Hero + Título
+2. Gráficos CSS + tabelas de apoio
+3. Footer
+PROMPT
+
+# 2. Enviar e executar
+scp -F ~/.ssh/config /tmp/chart-prompt.md oracle-host:/tmp/chart-prompt.md
+ssh oracle-host 'export PATH=$PATH:/home/ubuntu/.local/bin && \
+  agy --dangerously-skip-permissions --print "$(cat /tmp/chart-prompt.md)"'
+
+# 3. Copiar resultado
+ssh oracle-host 'sudo cp /home/ubuntu/arquivo.html /home/ubuntu/selfhost/hermes/data/'
+```
+
+### Estilo Consultoria (Alto Nível, Sem Branding)
+
+Quando o usuário pedir "padrão consultoria" ou "estilo McKinsey/BCG":
+
+- **Fundo:** off-white suave (#F8F9FA), NUNCA escuro
+- **Card:** branco (#FFFFFF) com sombra quase imperceptível (`0 4px 24px rgba(0,0,0,0.03)`)
+- **Cores:** sóbrias e profissionais — verde escuro, azul acinzentado, âmbar
+- **Tipografia:** Inter (corpo, títulos finos), Space Mono (dados)
+- **Grid:** linhas quase invisíveis (#E8ECF0), sem bordas chamativas
+- **Nada decorativo:** sem gradientes, sem ícones decorativos, sem logotipos, sem badges coloridos
+- **Tooltip:** fundo branco, borda sutil, padding generoso
+- **Nada de Chart.js em escala logarítmica:** Chart.js v4 tem bug com `type: 'logarithmic'` + `indexAxis: 'y'` — as barras não renderizam. Usar escala linear OU CSS puro (divs com width percentual). **CSS puro é o padrão preferido** — sem dependência de CDN.
+- **Dados:** exatos nos labels das barras, tabela de apoio sempre presente
+- **Proporção:** espaçamento amplo, ar arejado
+
+### Tipos de Gráfico por Contexto
+
+| Tipo | Quando usar | Notas |
+|------|-------------|-------|
+| Barras horizontais | **PADRÃO** — rankings, comparativos, distribuição de custos | Ordem decrescente, label à esquerda, valor à direita |
+| Barras agrupadas | Comparar categorias com múltiplas métricas (ex: hit/miss/output) | 3-4 barras por grupo |
+| Barras empilhadas | Mostrar proporção/composição | Melhor para percentuais que somam 100% |
+| Linha | Séries temporais | Raro em relatórios de consumo |
+
+**⚠️ NUNCA use pizza/donut/rosca — rejeitado pelo usuário.**
+
+### Relatório Multi-Sessão (Padrão Data-Report)
+
+Para relatórios completos de consultoria com **múltiplas tabelas + gráficos + análise textual** (ex: análise de custos, KPI mensais, comparativos), use o padrão documentado em `references/data-report-prompt-pattern.md`.
+
+**Essência do padrão:**
+1. Estruture você mesmo os dados crus do usuário em markdown limpo
+2. Pré-calcule todas as análises e percentuais (agy não é bom em contas)
+3. Embeba os tokens de design system completos no prompt
+4. Especifique exatamente a ordem e conteúdo de cada seção
+5. Envie como prompt único autossuficiente via SCP → agy --print
 
 ## Verification
 ```bash
 agy --version        # → 1.0.5+
 agy doctor           # → "All checks passed" (requires auth)
 ```
+
+## Histórico de Atualizações
+
+| Data | Autor | Mudança |
+|------|-------|---------|
+| 2026-06-19 | Hermes (Gustavo Mello) | Description reposicionada como "versatile skill for any type of design project". Adicionada REGRA DE INVOCAÇÃO: sempre `terminal(background=true, notify_on_complete=true)`, nunca timeout. Removidos todos os `timeout` dos comandos de exemplo (workflows 1, 2, data viz, full site). Pitfall de timeout substituído. Workflow §7 Full Site Generation adicionado com estratégia iterativa. |

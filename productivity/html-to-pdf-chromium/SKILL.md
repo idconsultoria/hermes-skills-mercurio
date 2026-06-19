@@ -108,3 +108,7 @@ Isso funciona porque o `<span>` ocupa apenas o espaço do texto renderizado, sem
 - **Print styles não podem converter para grayscale:** Se o HTML tiver `@media print` que converte cores para preto-e-branco (agy costuma fazer isso para "high contrast"), o PDF sai monocromático. A correção: substituir as regras grayscale por `-webkit-print-color-adjust: exact !important` + `print-color-adjust: exact !important` no `*` universal, e manter os CSS custom properties com as cores reais da marca.
 - **Logo não renderiza no PDF:** O Chromium headless precisa encontrar o arquivo de logo via path relativo ao HTML. Crie um symlink no mesmo diretório do HTML apontando pro logo real: `ln -sf /caminho/real/logo.png /caminho/do/html/logo.png`
 - **Screenshots com Chromium:** `--screenshot=/path.png --window-size=W,H` para capturar screenshot headless. Útil para debug visual em servidores sem display.
+
+## Casos de uso relacionados
+
+- **Renderização BPMN 2.0 → PNG:** Mesmo Chromium + bpmn-js (motor do Camunda Modeler) para converter diagramas BPMN XML em imagens. Setup e wrapper Python em [`references/bpmn-rendering.md`](references/bpmn-rendering.md).

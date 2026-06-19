@@ -37,7 +37,7 @@ Pipeline de 4 etapas que transforma **POPs, diarizações de entrevistas e diagr
 
 | Etapa | Entrada | Saída | Agente(s) |
 |-------|---------|-------|-----------|
-| **1. Análise** | Pastas setoriais (POPs + entrevistas + diagramas) | Relatórios .md + diagramas de loop causal HTML/D3.js + análise de ciclos | Pi Agent (MiniMax M3, contexto longo) |
+| **1. Análise** | Pastas setoriais (POPs + entrevistas + diagramas) | Relatórios .md + diagramas de loop causal HTML/D3.js + análise de ciclos | Pi Agent × setor (MiniMax M3) + Pi Agent final (global) |
 | **2. Brainstorming** | Relatórios da etapa 1 + Index de soluções de referência | Soluções de aumentação (1.5-2× número de nós), agrupadas por cluster do grafo causal | Hermes (orquestrador) |
 | **3. Avaliação** | Soluções da etapa 2 | Tabela multicritério + top 10 aprofundadas + projeto de implantação | Hermes (orquestrador) |
 | **4. Empacotamento** | Top 10 + diagramas + relatórios | Site Three.js com 4 telas + exportação PDF + trilha sonora opcional + deploy Vercel | agy (primário, iterativo) + humanizer + copywriting |
@@ -92,11 +92,13 @@ gh repo create id-consultoria/<projeto>-aumentacao --private --source=. --push
 
 ```
 <projeto>-aumentacao/
+├── LEIA-ME.md                           ← Guia de navegação para revisão humana
 ├── etapa-1-analise/
 │   ├── setor-<nome>/
-│   │   └── relatorio-dores.md       ← Pi Agent por setor (template: references/template-relatorio-dores.md)
-│   ├── relatorio-integracao.md      ← Hermes pós-setores (template: references/template-relatorio-integracao.md)
-│   └── analise-sistemica.html       ← Hermes pós-setores (spec: references/spec-analise-sistemica.md)
+│   │   ├── relatorio-dores.md           ← Pi Agent: dores e gargalos do setor
+│   │   └── analise-sistemica.html       ← Pi Agent: diagrama causal + ciclos (MESMO prompt)
+│   ├── relatorio-integracao.md          ← Pi Agent final: interfaces cross-setor (ÚNICO .md global)
+│   └── analise-sistemica.html           ← Pi Agent final: TODOS os nós (~82) + cross-setor
 ├── etapa-2-brainstorming/
 │   └── propostas-solucoes.md
 ├── etapa-3-avaliacao/
@@ -123,19 +125,25 @@ gh repo create id-consultoria/<projeto>-aumentacao --private --source=. --push
    - Códigos: `DOR-<SETOR>-NN` e `GAR-<SETOR>-NN`
    - Matriz de incidência por processo + resumo quantitativo
 
-**Após todos os setores (Hermes — orquestrador):**
+2. **`analise-sistemica.html`** — Documento único com diagrama de loop causal + análise de ciclos do setor.
+   - Segue a especificação `references/spec-analise-sistemica-setorial.md`
+   - Diagrama D3.js force-directed com todos os nós do setor, coloridos por natureza
+   - Detecção de ciclos, nomeação e análise textual de cada um
+   - Classificação de nós por participação em ciclos (ranking de alavancas)
+   - **IMPORTANTE:** o Pi Agent deve gerar este HTML no MESMO prompt que o `relatorio-dores.md`. Ambos os arquivos de saída são listados no prompt como deliverables.
 
-2. **`relatorio-integracao.md`** — Relatório ÚNICO de integração entre TODOS os setores.
+**Após todos os setores (Pi Agent final — MiniMax M3):**
+
+3. **`relatorio-integracao.md`** — Relatório ÚNICO de integração entre TODOS os setores.
    - Segue o template `references/template-relatorio-integracao.md`
    - Matriz de interfaces com tipo (ENTRADA/SAÍDA/BIDIRECIONAL) e qualidade (FLUIDA/FRICCIONAL/ROMPIDA)
    - Análise das interfaces críticas com evidência e causa raiz
    - Recomendações de integração cross-setor
 
-3. **`analise-sistemica.html`** — Documento ÚNICO contendo três seções integradas:
+4. **`analise-sistemica.html` (GLOBAL)** — Documento cross-setor com foco nas interfaces entre setores.
    - Segue a especificação `references/spec-analise-sistemica.md`
-   - **Seção 1:** Diagrama de loop causal global (D3.js force-directed com TODOS os setores)
-   - **Seção 2:** Análise sistêmica — visão geral, padrões de recorrência, influência mútua entre setores
-   - **Seção 3:** Análise de ciclos — nomeação, funcionamento, ranking de nós-alavanca, hierarquia de Meadows
+   - Setores como meta-nós + interfaces como conexões + dores transversais
+   - Análise de interfaces críticas e ciclos cross-setor
 
 ### 1.2 Como executar
 
@@ -152,13 +160,19 @@ terminal(
 )
 ```
 
-**Tempo esperado:** MiniMax M3 leva **5-10+ minutos só lendo** os arquivos antes de começar a escrever. Não confundir leitura com stall — ver 1.4 Monitoramento.
+**Tempo esperado:** MiniMax M3 leva **5-10+ minutos só lendo** os arquivos antes de começar a escrever. Não confundir leitura com stall — ver 1.3 Monitoramento.
+
+**Prompt do Pi Agent:** deve instruir o agente a produzir DOIS arquivos de saída:
+1. `relatorio-dores.md` — seguindo `references/template-relatorio-dores.md`
+2. `analise-sistemica.html` — seguindo `references/spec-analise-sistemica-setorial.md`
+
+O prompt deve incluir as instruções completas de ambos os formatos para que o Pi Agent gere os dois no mesmo contexto, garantindo consistência entre os nós do relatório e os nós do diagrama.
 
 **Paralelismo:** Disparar um Pi Agent por setor simultaneamente via `terminal(background=true)`. Usar `process(action='poll')` para acompanhar progresso e `process(action='wait')` para coletar resultados.
 
-**Commit por setor:** `git add etapa-1-analise/setor-<nome>/ && git commit -m "etapa 1: <setor> — N dores, M gargalos" && git push`
+**Commit por setor:** `git add etapa-1-analise/setor-<nome>/ && git commit -m "etapa 1: <setor> — N dores, M gargalos, X ciclos" && git push`
 
-### 1.4 Monitoramento do Pi Agent
+### 1.3 Monitoramento do Pi Agent
 
 ⚠️ Pi best (MiniMax M3) **não produz stdout durante a fase de leitura** (5-10+ min). O `output_preview` dos processos background ficará vazio, mas isso **não é stall**. Verificar progresso real pelo arquivo de sessão JSONL:
 
@@ -194,24 +208,42 @@ for path in sorted(glob.glob('/opt/data/home/.pi/agent/sessions/--opt-data-<proj
 
 **Commit ao final do setor:** `git add etapa-1-analise/setor-<nome>/ && git commit -m "etapa 1: <setor>" && git push`
 
-### 1.5 Consolidação global (Hermes)
+### 1.4 Consolidação global cross-setor (Pi Agent final)
 
-Após TODOS os Pi Agents concluírem, o orquestrador (Hermes) consolida:
+Após TODAS as análises sistêmicas setoriais estarem concluídas e commitadas, o orquestrador (Hermes) dispara **UM último Pi Agent** (MiniMax M3, contexto longo) para produzir os documentos globais.
 
-1. **`relatorio-integracao.md`** — lê os 4 `relatorio-dores.md` + dados de integração per-setor e redige o documento global seguindo `references/template-relatorio-integracao.md`.
+Este Pi Agent ingere:
+- Todos os `relatorio-dores.md` setoriais (4 arquivos)
+- Todas as `analise-sistemica.html` setoriais (4 arquivos)
 
-2. **`analise-sistemica.html`** — lê todos os `relatorio-dores.md` + integração, extrai nós e arestas, e gera HTML único com D3.js + análise textual + ciclos, seguindo `references/spec-analise-sistemica.md`.
+E produz:
 
-**Commit final da etapa 1:**
-```bash
-git add etapa-1-analise/relatorio-integracao.md etapa-1-analise/analise-sistemica.html
-git commit -m "etapa 1: consolidação global — integração + análise sistêmica" && git push
+1. **`relatorio-integracao.md`** — documento global de integração entre setores seguindo `references/template-relatorio-integracao.md`. Foco nas interfaces (matriz com tipo e qualidade), não repete dores intra-setor.
+
+2. **`analise-sistemica.html` (GLOBAL)** — HTML único cross-setor seguindo `references/spec-analise-sistemica.md`, contendo:
+   - Diagrama de loop causal com TODOS os ~80-95 nós individuais (dores + gargalos + ganhos) de todos os setores
+   - Conexões cross-setor extraídas do relatório de integração
+   - Ciclos cross-setor + intra-setor combinados: nomeação, funcionamento, ranking de alavancas
+   - Símbolos +/- e setas direcionais em todas as arestas
+
+**Comando do Pi Agent final:**
+
+```
+terminal(
+  command="/opt/data/pi-global/bin/pi -p \"$(cat /tmp/pi-prompt-global.md)\" --provider opencode-go --model minimax-m3 --name \"<projeto>-etapa1-global\"",
+  workdir="/opt/data/<projeto>-aumentacao/etapa-1-analise",
+  background=true,
+  notify_on_complete=true
+)
 ```
 
-**Pitfalls da consolidação:**
-- **Não delegar a Pi Agents.** A consolidação é feita pelo Hermes diretamente (leitura + raciocínio + write_file), não por subagentes.
-- **Os nós já estão codificados** nos `relatorio-dores.md` — extrair e combinar, não reinventar.
-- **O HTML é complexo mas autossuficiente.** Usar D3.js inline no `<script>`, dados como JSON inline, estética ID Consultoria.
+**Prompt (salvo em `/tmp/pi-prompt-global.md` antes de disparar):** deve instruir o Pi Agent a ler todos os arquivos setoriais, identificar interfaces cross-setor, detectar ciclos que atravessam fronteiras organizacionais, e gerar ambos os documentos de saída. Ver `references/template-relatorio-integracao.md` e `references/spec-analise-sistemica.md` como referência de formato.
+
+**Após conclusão do Pi Agent — commit:**
+```bash
+git add etapa-1-analise/relatorio-integracao.md etapa-1-analise/analise-sistemica.html
+git commit -m "etapa 1: consolidação global — integração + análise sistêmica cross-setor (Pi Agent)" && git push
+```
 
 ### 1.3 Pitfalls da Etapa 1
 
@@ -226,13 +258,19 @@ git commit -m "etapa 1: consolidação global — integração + análise sistê
 
 ### 2.1 O que produz
 
-Lista de propostas de solução (1.5× a 2× o número total de nós do grafo sistêmico), cada uma associada a um ou mais nós do diagrama causal.
+Arquivo `propostas-solucoes.md` com a lista completa de propostas (1.5× a 2× o número total de nós do grafo sistêmico), cada uma associada a um ou mais nós do diagrama causal. O formato padrão é o estabelecido na execução real do Sergipetec (539 linhas, 38 KB):
+
+- **Header:** metodologia, total de engramas consultados, total de chamadas Vulcano, total de nós e meta de soluções
+- **Por cluster:** tabela de referências Vulcano (engrama | case | padrão extraído), seguida de soluções numeradas
+- **Cada solução:** nó(s) alvo, categoria × tipo, engrama(s) de referência (obrigatório), descrição (2-4 frases com menção a pessoas/processos reais), mecanismo de ganho com métrica concreta quando disponível
+- **Resumo final:** tabela de clusters, matriz Categoria × Tipo com totais consistentes (soma = número total de soluções), tabela de distribuição taxonômica
 
 Cada proposta deve especificar:
-- **Nó(s) alvo:** referência `S<setor>-<número>`
+- **Nó(s) alvo:** referência `DOR-<SETOR>-NN`, `GAR-<SETOR>-NN` ou `INT-NN`
 - **Categoria × Tipo:** notação `A·I`, `B·II`, etc.
-- **Descrição curta:** 2-3 frases
-- **Mecanismo de ganho:** o que muda e por que resolve o nó
+- **Engrama(s) de referência:** caso(s) do Vulcano que inspiraram a solução (obrigatório — garante rastreabilidade)
+- **Descrição:** 2-4 frases, com menção a pessoas/processos reais quando possível
+- **Mecanismo de ganho:** o que muda, por que resolve o nó, com métrica concreta quando disponível (ex.: "redução de ~90% no tempo, de 30-60 min para 2-3 min")
 
 ### 2.2 Como executar
 
@@ -240,24 +278,32 @@ Cada proposta deve especificar:
 
 **Para cada grupo:**
 
-1. **Calcula o impacto acumulado:** soma do número de ciclos dos quais cada nó participa (calculado na Etapa 1.5)
+1. **Calcula o impacto acumulado:** soma do número de ciclos dos quais cada nó participa (calculado na Etapa 1)
 2. **Determina quantas soluções alocar ao grupo:** proporcional ao impacto do grupo ÷ impacto total. Grupos com mais impacto recebem mais propostas.
-3. **Consulta as soluções de referência via Vulcano** (`vulcano_search` e `vulcano_context`):
-   - Busca semântica no vault de referências com `vulcano_search(query="<descrição do cluster>")` para encontrar engramas relevantes
-   - Carrega as mais relevantes com `vulcano_context(query="<cluster>", max_tokens=2000)` para trazer ao contexto
-   - Usa como inspiração, sem replicar cegamente
-   - **Nota:** o vault de referências contém soluções granulares e isoláveis (padrão do repositório). Na ideação para clientes, vale pensar tanto em soluções pontuais quanto sistêmicas — a restrição de isolabilidade é só para o catálogo de referências, não para as propostas ao cliente.
+3. **⚠️ PROTOCOLO VULCANO OBRIGATÓRIO — executar ANTES de propor soluções:**
+   - `vulcano_context(query="<descrição do cluster>", max_tokens=2500)` — **1 chamada por cluster**, não opcional
+   - Extrair de cada engrama retornado os 4 campos da **Ficha de Engrama** (ver `references/vulcano-brainstorming-protocol.md`):
+     a) **Arquitetura da solução** — etapas, componentes, fluxo
+     b) **Métricas de ganho** — números concretos de redução de tempo/custo/erro
+     c) **Armadilhas** — onde a solução falha, edge cases
+     d) **Onde NÃO aplicar** — perfil de organização/processo para o qual a solução é contraindicada
+   - Citar o engrama de referência em cada solução proposta (campo `Referência:`), garantindo rastreabilidade
+   - Usar como inspiração, **nunca replicar cegamente** — adaptar ao contexto real
+   - **Protocolo completo em `references/vulcano-brainstorming-protocol.md`** — inclui Ficha de Engrama, verificação de qualidade e armadilhas
 4. **Propõe soluções** originais adaptadas ao contexto real dos processos mapeados
 
-**Repete até atingir o número-alvo** (1.5-2× total de nós).
+**Repete até atingir o número-alvo** (1.5-2× total de nós). Arquivo final: `propostas-solucoes.md` com todas as soluções e citações de engramas.
 
-**Commit ao final:** `git add etapa-2-brainstorming/ && git commit -m "etapa 2: N propostas de solução geradas" && git push`
+**Commit ao final:** `git add etapa-2-brainstorming/ && git commit -m "etapa 2: N propostas de solução — Vulcano (X engramas)" && git push`
 
 ### 2.3 Pitfalls da Etapa 2
 
+- ⚠️ **Vulcano subutilizado é o erro mais comum.** A execução real do Sergipetec mostrou que 2 chamadas superficiais produzem soluções genéricas (nota 1.2/10); 7 chamadas com extração ativa produzem soluções arquiteturalmente densas (nota 7.2/10). **NUNCA pular o protocolo Vulcano** — é a diferença entre um brainstorming raso e um de consultoria.
+- ⚠️ **Ler engramas passivamente não basta.** Extraia ATIVAMENTE os 4 campos da Ficha de Engrama (arquitetura, métricas, armadilhas, contraindicações) ANTES de propor soluções. A leitura passiva produz "inspiração vaga"; a extração ativa produz padrões de implementação.
 - **Não listar ferramentas de IA como soluções.** Ferramenta é meio — a solução é a alteração no processo.
-- **Não repetir soluções de referência** sem adaptação ao contexto real.
+- **Não repetir soluções de referência** sem adaptação ao contexto real. A métrica de qualidade é: > 80% das soluções devem citar o engrama mas demonstrar adaptação profunda (não replicação). No Sergipetec Vulcano, 92% atingiram esse critério.
 - **Soluções podem ser pontuais ou sistêmicas.** Na ideação para clientes, não há restrição de isolabilidade — vale propor desde otimizações granulares até reengenharias completas que abrangem múltiplos nós do grafo causal. A restrição de granularidade existe apenas para o catálogo de referências (`augmentation-process-design`), não para as propostas ao cliente.
+- **Cobrir lacunas do vault.** Se o Vulcano retornar engramas de baixa relevância para um cluster (ex.: Comunicação Corporativa, Cultura), isso é um sinal de que o vault precisa ser expandido — não um sinal para pular o cluster. Adapte engramas de domínios vizinhos e documente a lacuna para curadoria futura.
 
 ---
 
@@ -416,14 +462,14 @@ Etapa 1 ──→ Etapa 2 ──→ Etapa 3 ──→ Etapa 4
   │            │            │            └── agy (iterativo) + humanizer + copywriting
   │            │            └── Hermes (sequencial, 1 etapa)
   │            └── Hermes (iterativo, grupos de nós)
-  └── Pi Agent (paralelo, 1 por setor)
+  └── Pi Agent × setor (paralelo) + Pi Agent final (global)
 ```
 
 ### Modelos
 
 | Etapa | Modelo | Justificativa |
 |-------|--------|---------------|
-| 1. Análise | **MiniMax M3** (opencode-go) | Contexto longo + multimodal (lê imagens de diagramas) |
+| 1. Análise | **MiniMax M3** (opencode-go) — Pi Agent × setor + Pi Agent final global | Contexto longo + multimodal (lê imagens de diagramas) |
 | 2. Brainstorming | **DeepSeek V4 Pro** (opencode-go) | Raciocínio criativo, tradução de referências para contexto real |
 | 3. Avaliação | **DeepSeek V4 Pro** | Julgamento analítico, estimativas ponderadas |
 | 4. Site | **agy** — estratégia iterativa (esqueleto → seções → JS → montagem) + **DeepSeek V4 Pro** (textos, copy, orquestração da montagem) | Design visual superior com agy; código complexo gerado em iterações |
@@ -446,23 +492,29 @@ cd /opt/data/<projeto>-aumentacao
 # 1. Etapa 1 — relatórios de dores por setor?
 ls etapa-1-analise/setor-*/relatorio-dores.md
 
-# 2. Relatório de integração global?
+# 2. Análises sistêmicas setoriais (HTML)?
+ls etapa-1-analise/setor-*/analise-sistemica.html && grep -c "d3" etapa-1-analise/setor-*/analise-sistemica.html
+
+# 3. Relatório de integração global?
 ls etapa-1-analise/relatorio-integracao.md
 
-# 3. Análise sistêmica HTML?
-ls etapa-1-analise/analise-sistemica.html && grep -c "d3" etapa-1-analise/analise-sistemica.html
+# 4. Análise sistêmica global (HTML cross-setor)?
+ls etapa-1-analise/analise-sistemica.html && grep -c "cross-setor\|SETOR-" etapa-1-analise/analise-sistemica.html
 
-# 4. Número de soluções coerente?
-grep -c "^### " etapa-2-brainstorming/propostas-solucoes.md
+# 5. Número de soluções coerente?
+grep -c "^### S-" etapa-2-brainstorming/propostas-solucoes.md
 
-# 4. Top 10 selecionadas?
+# 5b. Vulcano usado? (deve ser ≥ número de clusters)
+grep -c "Referência:" etapa-2-brainstorming/propostas-solucoes.md
+
+# 6. Top 10 selecionadas?
 ls etapa-3-avaliacao/top-10/ | wc -l
 
-# 5. Site funcional?
+# 7. Site funcional?
 ls etapa-4-site/*.html
 
-# 6. Git remoto atualizado?
-git log --oneline -4
+# 8. Git remoto atualizado?
+git log --oneline -5
 ```
 
 ---
@@ -471,7 +523,17 @@ git log --oneline -4
 
 ⚠️ **Pi Agent com MiniMax M3 pode ser caro.** Monitorar tokens por setor via `pi-session-audit`. Se estourar orçamento, reduzir contexto (só POPs, sem diarização).
 
-⚠️ **Diagrama D3.js em headless.** Testar abrindo o HTML gerado antes de commitar. Se d3 não carregar (bloqueio de CDN), usar implementação inline (d3 inteiro no `<script>`).
+⚠️ **Cores das classificações nos diagramas D3.js:** Usar SEMPRE a tríade distinta: Cultural = #C9A227 (kintsugi-gold), Técnica = #66E8F1 (electric-teal), Organizacional = #6366F1 (índigo). **NUNCA usar #4AC6D3 (teal-ciano) para organizacional** — é indistinguível do electric-teal. Ver `references/html-regeneration-pattern.md` para o padrão completo.
+
+⚠️ **TODAS as arestas devem ter arrowheads** (setas direcionais preenchidas). Arestas tracejadas (reforço negativo/mitigação) NUNCA devem ter `marker-end: null`. O marcador é idêntico para ambos os tipos: `url(#arrow)`.
+
+⚠️ **Labels +/- próximos à seta**, não no ponto médio. Posicionar a 78% da distância source→target: `d.source.x*0.22 + d.target.x*0.78`. O label no meio da aresta dificulta a associação visual com a direção da seta.
+
+⚠️ **Linhas tracejadas devem ser visíveis.** Mesma opacidade das sólidas (0.55), largura 1.5px, dasharray 6,4. Se ficarem com opacidade 0.4 ou largura 1px, são praticamente invisíveis em fundo escuro.
+
+⚠️ **Markdown deve ser convertido para HTML** nos textos de análise de ciclos e descrições de nós. `**texto**` → `<strong>texto</strong>`, `*texto*` → `<em>texto</em>`, `` `código` `` → `<code>código</code>`. O navegador não renderiza markdown cru — aparece como texto literal.
+
+⚠️ **Descrições de ciclos e nós: sweet-spot = 2 parágrafos.** Ciclos: 1º parágrafo = mecanismo causal específico, 2º = consequência + ponto de intervenção. Nós: 1º = descrição do problema, 2º = evidência literal + natureza + processos afetados. Descrições de 1 linha são genéricas demais; 3+ parágrafos são excessivos para leitura rápida.
 
 ⚠️ **Soluções não são lista de ferramentas.** Correção explícita do usuário. A solução descreve alteração no processo, a ferramenta é meio. Foco em "como o trabalho muda".
 
@@ -481,7 +543,11 @@ git log --oneline -4
 
 ⚠️ **Não confundir guias de estilo.** O pipeline é sempre ID Consultoria. Se o usuário não especificar marca, ID Consultoria é o padrão deste pipeline.
 
-⚠️ **Repositório versionado desde o início.** Não começar a gerar arquivos sem `git init` + remote configurado.
+⚠️ **Relatórios de efetividade de ferramenta: separar intrínseco de extrínseco.** Quando o usuário pede análise da efetividade de uma ferramenta usada no pipeline (Vulcano, Pi Agent, agy), o relatório DEVE ter duas seções distintas: (a) Sumário Executivo analisando a robustez INTRÍNSECA da ferramenta (indexação, conteúdo, arquitetura), e (b) Considerações Finais com limitações EXTRÍNSECAS (protocolo de uso, cobertura do vault, custo de contexto). Não fundir as duas — o usuário corrigiu isso explicitamente. Template completo em `references/relatorio-efetividade-template.md`.
+
+⚠️ **Markdown nunca deve ser convertido via regex no HTML final.** Os caracteres `**`, `*` e `` ` `` aparecem no código JavaScript do D3.js. Aplicar regex de conversão ao HTML completo corrompe o script e faz os nós desaparecerem. A conversão de formatação deve ser feita nas strings Python ANTES de concatená-las ao template HTML. Use `<strong>`, `<code>`, `<em>` diretamente nas f-strings do gerador. Ver `references/generator-template.py` para o padrão correto.
+
+⚠️ **ZIP para revisão humana sempre inclui LEIA-ME.md.** Quando o usuário pedir ZIP da etapa ("faça o ZIP para revisão humana"), gerar o ZIP com zipfile e incluir um `LEIA-ME.md` na raiz do repositório com: estrutura de pastas explicada, ordem sugerida de leitura, como interagir com os HTMLs, tabela de cores e seus significados, resumo dos achados por setor, e menção às próximas etapas. O LEIA-ME.md é commitado junto com o resto. Ver o LEIA-ME.md do Sergipetec como referência de formato.
 
 ---
 
@@ -495,3 +561,8 @@ git log --oneline -4
 | 2026-06-19 | Hermes (Gustavo Mello) | Etapa 2: consulta de referências migrada para Vulcano (vulcano_search + vulcano_context). Removida restrição de isolabilidade para propostas ao cliente — soluções podem ser pontuais ou sistêmicas. |
 | 2026-06-19 | Hermes (Gustavo Mello) | Etapa 1 reestruturada: Pi Agents produzem apenas relatorio-dores.md por setor. Relatório de integração e análise sistêmica (HTML único com diagrama + análise + ciclos) são consolidados pelo Hermes após todos os setores. Templates de referência em references/. |
 | 2026-06-19 | Hermes (run real Sergipetec) | Etapa 1.2: corrigido binário `pi-agent` → `/opt/data/pi-global/bin/pi`. Adicionado `--name` e `workdir` ao comando. Nova seção 1.4 Monitoramento do Pi Agent com script de verificação de progresso via JSONL. Pitfall: transcrições obrigatórias — verificar antes de disparar Pi Agents. Tempo real validado: 5-10 min leitura + escrita. |
+| 2026-06-19 | Hermes (run real Sergipetec) | Pitfall crítico documentado: markdown nunca via regex no HTML final (corrompe JS do D3). Adicionado `references/generator-template.py` como referência canônica de código. Specs atualizadas com regra de tags HTML diretas. |
+| 2026-06-19 | Hermes (run real Sergipetec) | Specs atualizadas com identidade visual ID Consultoria (cores gold/teal/indigo, fontes Bricolage+Nunito+IBM Plex). Adicionados símbolos +/- nas arestas dos diagramas. Pitfall: ZIP para revisão humana sempre inclui LEIA-ME.md. Referência: `references/html-regeneration-pattern.md` para regeneração de HTMLs pelo Hermes. |
+| 2026-06-19 | Hermes (revisão pós-sessão) | Adicionados 6 pitfalls visuais/D3.js da execução real: cor organizacional #6366F1 (não #4AC6D3), todas as arestas com arrowheads, labels +/- a 78%, linhas tracejadas com mesma opacidade, markdown→HTML obrigatório, sweet-spot 2 parágrafos. `references/html-regeneration-pattern.md` reescrito com todas as regras. |
+| 2026-06-19 | Hermes (validação Vulcano) | Etapa 2: protocolo Vulcano tornado **obrigatório** (1 vulcano_context por cluster), adicionada Ficha de Engrama (4 campos: arquitetura, métricas, armadilhas, contraindicações), citação de engrama obrigatória em cada solução. Novo pitfall: subutilização do Vulcano (2 chamadas = nota 1.2/10; 7+ chamadas = nota 7.2/10). Adicionado `references/vulcano-brainstorming-protocol.md` com protocolo completo e verificação de qualidade. |
+| 2026-06-19 | Hermes (revisão de efetividade) | Adicionado `references/relatorio-efetividade-template.md` com estrutura de relatório de efetividade de ferramenta (Sumário Executivo intrínseco + Considerações Finais extrínsecas). Novo pitfall: separar limitações da ferramenta das limitações do contexto/projeto. |

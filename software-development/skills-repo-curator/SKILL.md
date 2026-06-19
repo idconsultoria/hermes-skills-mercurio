@@ -68,6 +68,17 @@ Cobre o workflow completo de curadoria externa:
 
 **Métodos de Instalação (preferência decrescente):**
 
+0. **Manual install from GitHub repo** — quando `hermes skills install` CLI não está disponível:
+   ```bash
+   # 1. Achar a skill no GitHub (ex: mattpocock/skills)
+   # 2. Baixar SKILL.md
+   curl -sL 'https://raw.githubusercontent.com/<user>/<repo>/main/skills/<cat>/<name>/SKILL.md' -o /tmp/SKILL.md
+   # 3. Criar diretório e escrever
+   mkdir -p /opt/data/skills/<category>/<skill-name>/references
+   cp /tmp/SKILL.md /opt/data/skills/<category>/<skill-name>/SKILL.md
+   # 4. Baixar references se houver (DEEPENING.md, HTML-REPORT.md, etc.)
+   ```
+   Se a skill tem dependências externas (`/codebase-design`, `/grilling`, etc.), baixe todas, leia, e consolide os vocabulários e workflows numa única SKILL.md autossuficiente — sem referências a skills externas. Arquivos de referência (formatos, templates) ficam em `references/` e são carregados com `skill_view(name, file_path='references/<file>')`.
 1. **Hub Install** `hermes skills install <skill-id> -y`
 2. **Tap + Install** `hermes skills tap add <user>/<repo> && hermes skills install <skill-name>`
 3. **Raw URL** `hermes skills install "https://raw.githubusercontent.com/..." --name <name> --category <cat> --yes`
@@ -76,6 +87,8 @@ Cobre o workflow completo de curadoria externa:
 6. **From source** — para ferramentas que precisam de Node/npm específicos
 
 **Pós-instalação:** `hermes skills list | grep <name> && skill_view(name='<skill-name>')` para verificar.
+
+Para skills comunitárias que dependem de outras skills (`/codebase-design`, `/grilling`, etc.), veja `references/self-contained-skill-consolidation.md` — padrão para fundir dependências em uma única skill autossuficiente com arquivos de referência no lugar de skills externas.
 
 **MCP Server Registration:** Se a ferramenta instalada expõe MCP server, registre com `hermes config set mcp_servers.<name>...`.
 
@@ -133,6 +146,14 @@ Sincroniza o index.md com o estado atual das skills.
    - **Parágrafo de resumo:** explica gatilhos de ativação ("Load this skill when...") e expande a descrição com capacidades específicas, ferramentas utilizadas e o que produz.
    - Lista **todas as skills fora do formato** com o problema específico, edita a SKILL.md original, depois atualiza o index.md.
    - **Sem exceção** — faz para todas as skills fora do formato.
+   - **Verifica Resumo drift no index.md** — após corrigir as SKILL.md, verifique se os campos `Resumo:` no index.md correspondem à primeira linha (sumário) do `description:` da SKILL.md. O index.md pode ter resumos truncados, desatualizados ou corrompidos — especialmente em skills cujo SKILL.md foi editado mas o index.md não foi sincronizado. Use um script para comparar:
+     ```python
+     # Extrai sumário de cada SKILL.md e compara com Resumo do index.md
+     sk_desc = content[content.find('description: "')+14:]
+     sk_desc = sk_desc[:sk_desc.find('"')]
+     summary = sk_desc.split('\\n\\n', 1)[0] if '\\n\\n' in sk_desc else sk_desc.split('\\\\n\\\\n', 1)[0]
+     ```
+     Skills com `Resumo` que termina em `...` ou difere do sumário real devem ter o Resumo corrigido.
 5. Registra no log.md com prefixo `update` incluindo o resumo de tudo que foi alterado
 6. **Stage + commit**
 
@@ -152,7 +173,7 @@ description: "Geocode addresses, find POIs, calculate routes, and lookup timezon
 Load this skill when you need location-based data — converting addresses to coordinates, searching for points of interest, getting driving or walking directions with distance and ETA, or looking up timezone information. Uses free APIs (Nominatim, Overpass, OSRM) with no API key required."
 ```
 
-⚠️ **YAML `>-` (folded with strip) quebra o parser do `generate_graph.py`.** O script lê o frontmatter com regex simples, e `description: >-` com múltiplas linhas indentadas faz o parser perder o texto — resultando em resumos como `node --version` no index.md. **Usar string quoted (`"..."`) com QUEBRA DE LINHA REAL (não escape `\\n`) para separar sumário do parágrafo:**
+⚠️ **YAML formatos escalares (`|`, `|-`, `>`, `>-`) quebram o parser do `generate_graph.py`.** O script lê o frontmatter com regex simples (não é parser YAML completo). Qualquer block scalar (`|`, `|-`, `>`, `>-`) faz o parser perder o texto da descrição — resultando em resumos vazios ou truncados no index.md. **Usar string quoted (`"..."`) com QUEBRA DE LINHA REAL (não escape `\n`) para separar sumário do parágrafo:**
 
 ```yaml
 description: "Summary line here (≤85 chars).
@@ -160,7 +181,7 @@ description: "Summary line here (≤85 chars).
 Load this skill when [trigger]. Expanded capabilities paragraph."
 ```
 
-Isso é YAML válido, mais legível, e parseia corretamente tanto por parsers YAML quanto por regex simples. O script `generate_graph.py` lê a primeira linha após `description: "` como sumário e o restante até o `"` de fechamento como parágrafo. **Não usar `\\n` literal** — parsers simples não expandem escapes. Verificar: `grep -rn 'description: >-' SKILL.md`.
+Isso é YAML válido, mais legível, e parseia corretamente tanto por parsers YAML quanto por regex simples. O script `generate_graph.py` lê a primeira linha após `description: "` como sumário e o restante até o `"` de fechamento como parágrafo. **Não usar `\n` literal** — parsers simples não expandem escapes. Verificar: `grep -rn '^description:\s*[|>]' SKILL.md` (apanha `|`, `|-`, `>`, `>-`).
 
 ---
 
@@ -293,6 +314,20 @@ Gera um force-directed graph com 83+ nós coloridos por categoria, modal com sum
 
 Dependências: Python 3 stdlib. Nenhum pacote externo.
 
+### `scripts/audit-descriptions.py` — Auditoria de Descrições
+
+```bash
+cd /opt/data/skills
+python3 scripts/audit-descriptions.py           # escaneia todas as SKILL.md
+python3 scripts/audit-descriptions.py --drift   # compara Resumo index.md vs summary real
+```
+
+Verifica conformidade de descrições em todas as SKILL.md: formatação (quoted string vs block scalar), tamanho do sumário (≤85 chars, sem `...`), presença de gatilho ("Load this skill when..."), e detecção de `\n\n` escapes literais. Também detecta drift entre o Resumo no index.md e o sumário real da SKILL.md.
+
+Use este script **antes** da auditoria manual (passo 4 do update) para identificar rapidamente quais skills precisam de correção. O output informa o agente LLM, que aplica as correções nas SKILL.md e index.md via ferramentas LLM.
+
+Dependências: Python 3 stdlib. Nenhum pacote externo.
+
 ---
 
 ## Verification
@@ -328,6 +363,9 @@ with open('index.md') as f:
 
 # Check for truncated descriptions in SKILL.md (description without closing quote)
 grep -rn 'description:' SKILL.md | grep -v 'description: "' | head -5 && echo 'WARNING: descriptions without opening quote found'
+
+# Check for Resumo drift — index.md Resumo vs actual SKILL.md summary
+python3 scripts/audit-descriptions.py | grep 'RESUMO DRIFT' -A 10
 ```
 
 ## Pitfalls

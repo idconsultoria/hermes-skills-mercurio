@@ -186,7 +186,12 @@ Detalhes do fluxo de conversao WAV→OGG e o gotcha da extensao ffmpeg em `refer
 
 ## Fish Speech S2 Pro GGUF (self-hosted)
 
-Deployed via Docker on Oracle ARM64. OpenAI-compatible endpoint.
+Deployed via Docker on Oracle ARM64. For full deployment patterns (Dockerfiles, ARM64 CPU torch pitfalls, multi-quant architecture, voice cloning, Pattern B C++ inference), see `references/selfhost-tts-models.md` (absorbed from former `ai-voice-selfhost` skill). Additional references:
+- `references/selfhost-benchmarks.md` — RTF benchmarks for all models on Oracle ARM64
+- `references/fish-speech-s2-pro-research.md` — architecture + GGUF research
+- `references/gpu-options.md` — GPU acceleration alternatives
+- `references/qwen3-tts-deployment.md` — Qwen3-TTS deployment details
+- `templates/fish-speech-server.py` — Known-good FastAPI wrapper for s2.cpp
 
 **Quick commands:**
 ```bash

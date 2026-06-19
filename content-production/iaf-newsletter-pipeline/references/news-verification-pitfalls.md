@@ -53,7 +53,26 @@ Even after running `dedup_manifest.py` and reading the manifest, **check each se
 
 **Fix:** Before writing the HTML, paste each of your 20 titles into a manual grep against `titles_flat`. Do not rely on memory or "close enough" similarity.
 
-## If the User Corrects Your News
+### Entity-Based Dedup (added 15/06/2026)
+
+Duplicate detection through string comparison is not enough — the same story can have very different headlines. **Use entity extraction**:
+
+For each selected item, identify the 2-3 core **entities** (named nouns that define the topic):
+- Company names: Anthropic, OpenAI, Meta, Google, Microsoft, xAI, S&P 500
+- Model names: Fable 5, Mythos, DiffusionGemma, Llama 4, Grok 5
+- People: Bezos, Zuckerberg, Altman, Amodei, Yang
+- Events: IPO, hackathon, moratorium, layoff, hack, lawsuit, shutdown
+- Indices/indexes: S&P 500, NASDAQ, SWE-bench, GSM8K
+
+**Grep each entity separately against `titles_flat`.** If the same entity appears in the SAME ROLE (e.g., "S&P 500" as subject of a rejection/blocking story), it's a duplicate — even if the verb is different.
+
+### Frequency Cap (added 15/06/2026)
+
+Any topic (identified by its entity cluster) can appear at most **3 times** in a 14-day window. After the 3rd appearance, the topic is EXHAUSTED — do not include it again until it falls outside the window. This applies even to "new developments" on a continuing story.
+
+To check: count how many editions in `titles_by_edition` contain the same entity cluster. If ≥3, the topic is blocked.
+
+## If The User Corrects Your News
 
 The user will correct you quickly on three things:
 1. **Wrong dates** — news from last week presented as today's

@@ -1,10 +1,6 @@
 ---
 name: messaging-platforms
-description: "Reference for Hermes cross-platform messaging — platform quirks, ID formats, bridge
-
-Load this skill when troubleshooting message delivery across platforms. Covers Telegram MEDIA file delivery rules, WhatsApp JID/group ID formats, bridge processes for WhatsApp and Telegram, known file-type limitations, and platform-specific workarounds."
-
-Load this skill when troubleshooting message delivery across platforms. Covers Telegram MEDIA file delivery rules, WhatsApp JID/group ID formats, bridge processes for WhatsApp and Telegram, known file-type limitations, and platform-specific workarounds for reliable cross-platform messaging."
+description: "Reference for Hermes cross-platform messaging — platform quirks, ID formats, bridge processes, and platform-specific workarounds. Load this skill when troubleshooting message delivery across platforms. Covers Telegram MEDIA file delivery rules, WhatsApp JID/group ID formats, bridge processes for WhatsApp and Telegram, known file-type limitations, and platform-specific workarounds."
 metadata:
   hermes:
     tags: [messaging, platforms, telegram, whatsapp, signal, matrix, discord, slack, bridge]
@@ -144,9 +140,26 @@ Each profile runs its own gateway process. Steps:
 
 This also lets you set different permitted features per profile (e.g., restrict terminal access on the public one).
 
-## WhatsApp Bridge
+## WhatsApp Bridge (Baileys)
 
-### Target Format
+The bridge runs as a Node.js process on port 3000. For full bridge internals (endpoints, self-chat mode, sender-key group discovery, media sending, message editing), see `references/whatsapp-baileys-bridge.md` (absorbed from the former `whatsapp-bridge-baileys` skill).
+
+### Quick Reference
+
+```bash
+# Health check
+curl -s http://localhost:3000/health
+
+# Send text
+curl -s -X POST http://localhost:3000/send \
+  -H "Content-Type: application/json" \
+  -d '{"chatId":"120363XXXXX@g.us","message":"Your message"}'
+
+# Send media
+curl -s -X POST http://localhost:3000/send-media \
+  -H "Content-Type: application/json" \
+  -d '{"chatId":"120363XXXXX@g.us","filePath":"/path/file.html","mediaType":"document"}'
+```
 
 The `send_message` tool accepts WhatsApp targets in several formats, but the bridge (Baileys) **requires JID format**: `number@s.whatsapp.net`.
 
@@ -241,7 +254,19 @@ In self-chat mode the bridge **ignores ALL group messages** — both your own (`
 
 Note: `send_message` cannot resolve group JIDs through the channel directory. Group delivery must go through the bridge API directly.
 
-### Discovering Group IDs
+### 📌 Contact Reference — Verified Group IDs & Contacts
+
+⚠️ **Durable reference — setor é deletado por consolidação de skills.** O skills-repo-curator evolve phase pode remover JIDs das skills (ocorreu em 15/06/2026). Salvar em 3 lugares: esta skill, whatsapp-bridge-baileys Contatos Salvos, e memória.
+
+| Nome | JID | Notas |
+|-------|-----|-------|
+| ID [Núcleo] | `120363170662612284@g.us` | ID Consultoria interno |
+| IA que Funciona | `120363419131378682@g.us` | Comunidade IAF |
+| Tácio Brito | `557991441720@s.whatsapp.net` | Sócio ID Consultoria |
+
+Verificar nome: `curl -s http://localhost:3000/chat/JID | python3 -c "import sys,json; print(json.load(sys.stdin).get('name'))"`
+
+### Discovering Group IDs Without /groups Endpoint
 
 The bridge has no built-in endpoint to list groups. Add one:
 
@@ -351,6 +376,10 @@ In self-chat mode, `formatOutgoingMessage()` prepends `⚕ *Hermes Agent*\n─�
 ### Discovering Group IDs Without /groups Endpoint
 
 If the `GET /groups` endpoint hasn't been added to bridge.js yet, group IDs can still be discovered from the session filesystem:
+
+**Known WhatsApp Groups (ID Consultoria):**
+- ID [Núcleo]: `120363170662612284@g.us`
+- IA que Funciona: `120363419131378682@g.us`
 
 ```bash
 # List all groups the bot is participating in

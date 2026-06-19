@@ -23,6 +23,7 @@ User offers SSH access to the host machine, or you need to inspect/control the D
 > **Reference:** See `references/npm-database-schema.md` for Nginx Proxy Manager SQLite schema and proxy host CRUD operations.
 > **Reference:** See `deployment-pipeline` skill → `references/selfhost-initial-setup.md` for the pattern to set up a new selfhost service (Dockerfile, compose, SSH tunnel).
 > **Reference:** See `ai-voice-selfhost` skill for patterns specific to AI/ML services on ARM64 — PyTorch CPU build, model cache volumes, Hermes TTS command provider integration, voice steering, network setup (ai_mesh), and test workflow.
+> **Reference:** See `references/vulcano-mcp-deploy.md` for deploying Vulcano (or any Docker-based MCP service with custom adapters) on the host and connecting it to Hermes via ai_mesh.
 
 ## Step-by-step
 ### 1. Save the Key
@@ -349,7 +350,13 @@ mcp_servers:
     connect_timeout: 30
 ```
 
-⚠️ `hermes mcp add taskflow --url "..."` não suporta `--headers`. Para SSE com custom headers, editar o config.yaml manualmente com `sed` ou `hermes config edit`.
+⚠️ **`hermes mcp add` é interativo e falha em SSH aninhado.** O CLI pergunta "Does this server require authentication?" e aguarda input no TTY. Dentro de `docker exec` via SSH, não há TTY — o comando trava. Solução: editar o `config.yaml` diretamente via Python ou `sed` no host.
+
+⚠️ **SSE MCP exige `transport: sse` no config.yaml.** Sem esta chave, o Hermes MCP client usa StreamableHTTP (POST apenas), que falha com `405 Method Not Allowed` no endpoint `/sse` (que só aceita GET). Veja `references/fastmcp-async-stdio.md` para detalhes.
+
+⚠️ **MCP com `enabled: false` reduz contexto sem perder config.** Servidores MCP inativos (Stitch, TaskFlow) carregam schemas grandes (ex: Stitch tem enums de 68+ fontes, schemas `DesignTheme`/`Typography` que pesam ~8-10K) toda vez que entram na tool list. Usar `enabled: false` no config.yaml para desligar sem remover a config. Reativar: patch para `true` + `/reload-mcp`.
+
+⚠️ **Contexto fixo de MCPs é cumulativo.** Cada servidor MCP adiciona tool definitions ao prompt. Com 3+ servidores, o overhead pode chegar a 15-18K de contexto fixo por turno. Monitore e desligue (`enabled: false`) servidores não utilizados na sessão atual. Skills que precisam de um MCP específico devem ter um callout para reativá-lo.
 
 ⚠️ **`patch` tool bloqueia editar `/opt/data/config.yaml`?** Use `sudo python3 << 'PYEOF'` heredoc via SSH no host — mais seguro que sed para YAML com blocos aninhados e valores especiais. Ver `references/config-edit-python-heredoc.md` para o pattern completo, localização do arquivo no host, e qual config editar (principal vs override).
 
@@ -421,11 +428,16 @@ If the branch is already checked out (e.g., `sprint1-v2`), read files directly w
 
 ⚠️ **Container restarts = lost session?** If you restart `hermes_agent`, your current conversation dies. Schedule restarts via cron or ask the user to do it.
 
-⚠️ **Accidental key deletion during cleanup (common!)**: When removing old infrastructure (e.g., migrating Pi from Docker to local), `rm -f` on SSH keys can nuke unrelated keys. **Always check `ls -la ~/.ssh/` before bulk cleanup.** If you delete the oracle SSH key:
+⚠️ **Accidental key deletion during cleanup (common!):** When removing old infrastructure (e.g., migrating Pi from Docker to local), `rm -f` on SSH keys can nuke unrelated keys. **Always check `ls -la ~/.ssh/` before bulk cleanup.** If you delete the oracle SSH key:
    - Do NOT panic or try SSH tricks — the host's authorized_keys entry still exists
    - Ask the user to paste the key file content into `clarify` (multi-line paste)
    - Save with `write_file(path='/opt/data/home/.ssh/id_rsa_oracle', content='...')`
    - Run `chmod 600 /opt/data/home/.ssh/id_rsa_oracle` and test
+
+⚠️ **`hermes mcp add` POSTs to the SSE URL, getting 405.** The CLI sends a POST request to the SSE endpoint, but SSE only accepts GET. This fails with "405 Method Not Allowed".
+**Fix:** Add the MCP server directly to config.yaml via Python yaml dump or manual edit. See `references/vulcano-mcp-deploy.md` for the exact pattern.
+
+⚠️ **`batch_indexer.py` ignores ADAPTER env var.** When deploying Vulcano with a custom adapter, the batch_indexer creates `VulcanoEngine` without passing `adapter=`. It reports 0 engrams because it defaults to scanning `engramas/` dirs. **Patch the script** to read `ADAPTER` and pass the correct adapter. See `references/vulcano-mcp-deploy.md` Step 5.
 
 ⚠️ **Data loss fear on update?** Users often worry about this. Proactively explain bind mount persistence (Section 8). Confirm with `docker inspect` before the update.
 

@@ -37,6 +37,8 @@ sqlite3 /opt/data/state.db "
 "
 ```
 
+📘 **Reference completa:** `references/token-usage-breakdown.md` — queries para breakdown diário por fonte, hora, modelo, cache hit rate, e múltiplos dias.
+
 **Schema real da tabela `sessions` (colunas de token/custo):**
 
 | Coluna | Tipo | Descrição |

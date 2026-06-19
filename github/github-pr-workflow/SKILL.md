@@ -1,9 +1,9 @@
 ---
 name: github-pr-workflow
-description: "GitHub PR lifecycle — branch, commit, open PR, CI checks, and merge.
+description: "GitHub umbrella — authentication, PR lifecycle, code review, and repo management.
 
-Load this skill for the complete pull request workflow. Covers creating branches, making commits, opening pull requests, monitoring CI status, requesting reviews, and merging with appropriate strategies. Uses gh CLI and REST API for GitHub operations."
-version: 1.1.0
+Load this skill for any GitHub operation: auth (PAT, SSH, gh CLI), branch-and-PR workflows, code review with inline comments, and repository management (clone, create, fork, releases, secrets, CI). Uses gh CLI and REST API with curl fallbacks for headless environments."
+version: 1.2.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -13,24 +13,34 @@ metadata:
     related_skills: [github-auth, github-code-review, deployment-pipeline, oracle-host-access]
 ---
 
-# GitHub Pull Request Workflow
+# GitHub — Complete Workflow Umbrella
 
-Complete guide for managing the PR lifecycle. Each section shows the `gh` way first, then the `git` + `curl` fallback for machines without `gh`.
+Covers the full GitHub lifecycle: authentication, repository management, pull request workflow, and code review. Each section shows `gh` first, then `git` + `curl` fallback.
 
-## Prerequisites
+## GitHub Authentication
 
-- Authenticated with GitHub (see `github-auth` skill)
-- Inside a git repository with a GitHub remote
+Set up GitHub authentication for agent workflows. Two paths: `gh` CLI (richer API) or `git` + `curl` (always available). See `references/github-auth-headless-pat-setup.md` for non-interactive PAT storage and `scripts/gh-env-auth.sh` for quick auth detection.
 
-### Quick Auth Detection
+### Detection Flow
 
 ```bash
-# Determine which method to use throughout this workflow
-if command -v gh &>/dev/null && gh auth status &>/dev/null; then
-  AUTH="gh"
+git --version
+gh --version 2>/dev/null || echo "gh not installed"
+gh auth status 2>/dev/null || echo "gh not authenticated"
+git config --global credential.helper 2>/dev/null || echo "no git credential helper"
+```
+
+**Decision tree:**
+1. If `gh auth status` shows authenticated → use `gh` everywhere
+2. If `gh` installed but not authenticated → use `gh auth login`
+3. If `gh` not installed → use `git` + `curl` with personal access token
+
+### Quick Auth Detection (reusable snippet)
+
+```bash
+if command -v gh &>/dev/null && gh auth status &>/dev/null; then AUTH="gh"
 else
   AUTH="git"
-  # Ensure we have a token for API calls
   if [ -z "$GITHUB_TOKEN" ]; then
     if [ -f ~/.hermes/.env ] && grep -q "^GITHUB_TOKEN=" ~/.hermes/.env; then
       GITHUB_TOKEN=$(grep "^GITHUB_TOKEN=" ~/.hermes/.env | head -1 | cut -d= -f2 | tr -d '\n\r')
@@ -39,8 +49,38 @@ else
     fi
   fi
 fi
-echo "Using: $AUTH"
 ```
+
+### Install gh Without sudo (Linux)
+```bash
+ARCH=$(uname -m)
+case "$ARCH" in x86_64|amd64) GH_ARCH="amd64" ;; aarch64|arm64) GH_ARCH="arm64" ;; *) echo "Unsupported"; exit 1 ;; esac
+LATEST=$(curl -sI "https://github.com/cli/cli/releases/latest" | grep -i "^location:" | grep -oP 'tag/v\K[0-9.]+')
+curl -sL "https://github.com/cli/cli/releases/download/v${LATEST}/gh_${LATEST}_linux_${GH_ARCH}.tar.gz" -o /tmp/gh.tar.gz
+tar xzf /tmp/gh.tar.gz -C /tmp/
+mkdir -p ~/.local/bin && cp "/tmp/gh_${LATEST}_linux_${GH_ARCH}/bin/gh" ~/.local/bin/gh && chmod +x ~/.local/bin/gh
+```
+
+### Token-Based Login (Headless)
+```bash
+env -u GITHUB_TOKEN gh auth login --with-token <<< "$GITHUB_TOKEN"
+gh auth setup-git
+```
+
+> **Full auth reference:** `references/github-auth-headless-pat-setup.md` — SSH keys, PAT scopes (`repo`, `workflow`, `read:org`), credential helpers, git identity config, multi-account patterns.
+
+## Pull Request Workflow
+
+Complete PR lifecycle: branch → commit → open PR → CI checks → merge.
+
+## Prerequisites
+
+- Authenticated with GitHub (see Authentication section above)
+- Inside a git repository with a GitHub remote
+
+### Quick Auth Detection
+
+> The auth snippet above is the single source. See `scripts/gh-env-auth.sh` for a standalone version.
 
 ### Extracting Owner/Repo from the Git Remote
 
@@ -248,11 +288,84 @@ curl -s -X POST \
   -d "{\"query\": \"mutation { enablePullRequestAutoMerge(input: {pullRequestId: \\\"$PR_NODE_ID\\\", mergeMethod: SQUASH}) { clientMutationId } }\"}"
 ```
 
-## 6. Preview / Deploy CI
+## 6. Code Review
 
-For PR preview environments, deploy CI, and deployment pipeline patterns, see `deployment-pipeline`. For SSH-based host access during deployment, see `oracle-host-access`.
+Perform code reviews on local changes before pushing, or review open PRs on GitHub. See `references/code-review-output-template.md` for the review output format.
 
-## 7. Complete Workflow Example
+### Reviewing Local Changes (Pre-Push)
+```bash
+git diff main...HEAD --stat      # scope
+git diff main...HEAD              # full diff
+git diff main...HEAD --name-only  # file list
+```
+
+### Review Checklist
+- **Correctness:** Edge cases handled? Error paths graceful?
+- **Security:** No hardcoded secrets, input validation, SQL injection/XSS
+- **Code Quality:** Clear naming, no duplication, single-responsibility functions
+- **Testing:** New code paths tested? Edge cases covered?
+- **Performance:** No N+1 queries, appropriate caching, no blocking ops in async paths
+- **Documentation:** Public APIs documented, non-obvious logic explained
+
+### Leave Inline Review Comments
+```bash
+# With gh
+gh pr review 123 --approve --body "LGTM!"
+gh pr review 123 --request-changes --body "See inline comments."
+
+# With curl — atomic multi-comment review
+HEAD_SHA=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/repos/$OWNER/$REPO/pulls/$PR_NUMBER \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['head']['sha'])")
+curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/repos/$OWNER/$REPO/pulls/$PR_NUMBER/reviews \
+  -d "{\"commit_id\":\"$HEAD_SHA\",\"event\":\"COMMENT\",\"body\":\"Review\",\"comments\":[...]}"
+```
+
+> **Full code review workflow:** `references/code-review-output-template.md` — structured output format, review checklist, end-to-end PR review recipe with checkout + test + post pattern.
+
+
+
+
+## 7. Repository Management
+
+Clone, create, fork, and manage repos. See `references/github-api-cheatsheet.md` for the full reference table.
+
+### Common Operations
+```bash
+# Clone
+git clone https://github.com/owner/repo.git
+git clone --depth 1 https://github.com/owner/repo.git  # shallow
+
+# Create (gh)
+gh repo create my-project --public --clone
+
+# Create (curl)
+curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" \
+  https://api.github.com/user/repos \
+  -d '{"name":"my-project","private":false,"auto_init":true}'
+
+# Fork
+gh repo fork owner/repo --clone
+
+# Releases
+gh release create v1.0.0 --generate-notes
+
+# Secrets
+gh secret set API_KEY --body "value"
+
+# Workflows
+gh workflow list
+gh run list --limit 10
+gh run rerun <RUN_ID> --failed
+```
+
+### Committing Files Without a Local Clone
+Use the Git Data API (blob→tree→commit→refs) or the simpler Contents API for single-file edits. See `references/github-api-cheatsheet.md` for full curl equivalents and the Python blob/tree/commit/refs pattern.
+
+> **Full repo management reference:** `references/github-api-cheatsheet.md` — all operations with gh + curl fallbacks.
+
+## 8. Complete Workflow Example
 
 ```bash
 # 1. Start from clean main

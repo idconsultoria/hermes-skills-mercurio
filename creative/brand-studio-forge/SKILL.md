@@ -15,7 +15,9 @@ metadata:
 allowed-tools:
   - Bash(python3 forge/scripts/*.py *)
   - Bash(bash forge/scripts/setup.sh)
----
+# Brand Studio Forge
+
+> ⚡ **Stitch MCP:** Se esta tarefa envolver criação de telas, mockups UI ou prototipagem visual, ative o Stitch MCP primeiro: edite `/opt/data/config.yaml` mudando `stitch.enabled` para `true` e execute `/reload-mcp`.
 
 Generates and evolves brand identities, then authors brand-specific skills that produce ongoing content.
 

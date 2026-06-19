@@ -1,15 +1,13 @@
 ---
 name: style-guide-consultation
-description: "Catalog of style guides — load the correct design system for any visual task.
-
-Load this skill when you need to apply a brand or design system to any visual task. Covers loading the correct style guide (Hermes Agent, ID Consultoria, IAF Comunidade, IAF Newsletter) for visual output, ensuring brand-consistent HTML, diagrams, and presentations."
-
-Load this skill when you need to apply a brand or design system to any visual task. Covers loading the correct style guide (Hermes Agent, ID Consultoria, IAF Comunidade, IAF Newsletter) for visual output, ensuring brand-consistent HTML, diagrams, and presentations."
+description: "Catalog of style guides — load the correct design system for any visual task. Load this skill when you need to apply a brand or design system to any visual task. Covers loading the correct style guide (Hermes Agent, ID Consultoria, IAF Comunidade, IAF Newsletter) for visual output, ensuring brand-consistent HTML, diagrams, and presentations."
 version: 1.0.0
 tags: [design, style-guide, brand, visual-identity]
 ---
 
 # Style Guide Consultation
+
+> ⚡ **Stitch MCP:** Se esta tarefa envolver design de telas, aplicação de design system ou prototipagem visual, ative o Stitch MCP primeiro: edite `/opt/data/config.yaml` mudando `stitch.enabled` para `true` e execute `/reload-mcp`.
 
 Catálogo centralizado de todos os guias de estilo disponíveis. Use esta skill para carregar o design system correto antes de qualquer tarefa visual.
 
@@ -23,7 +21,7 @@ Se o usuário especificar explicitamente uma marca (ID, IAF, etc.), carregue o g
 
 | # | Guia | Caminho | Formato | Quando usar |
 |---|------|---------|---------|-------------|
-| 1 | **Hermes Agent** (padrão) | `/opt/data/referencias/hermes-agent/hermes-agent-design-style-guide.md` | Markdown | 🔵 **Sempre que não especificado.** Azul #0000FF, fundo #F0F5FF, Spectral títulos, Space Mono números, Inter corpo, dourado #E8B830 |
+| 1 | **Hermes Agent** (padrão) | `/opt/data/referencias/hermes-agent/hermes-agent-style-guide.html` | HTML | 🔵 **Sempre que não especificado.** Azul royal #0000F2, branco #FFFFFF, Cormorant Garamond serif, Space Mono corpo, Syncopate headers, VT323 UI |
 | 2 | **Consulting Brand** | `/opt/data/referencias/[brand]/[brand]-style-guide.html` | HTML | Quando o output for para a marca de consultoria. Teal escuro, fonte display customizada, dark mode |
 | 3 | **Community Brand** | `/opt/data/referencias/[community]/[community]-identity-manual.html` | HTML | Para conteúdo da comunidade. Teal accent, dark background, fontes customizadas |
 | 4 | **Newsletter Brand** | `/opt/data/referencias/[newsletter]/[newsletter]-visual-identity.html` | HTML | Para o newsletter diário. Variação com foco em legibilidade editorial |
@@ -44,9 +42,9 @@ Pergunte-se: "Este output visual é para qual marca/projeto?"
 ```python
 from hermes_tools import read_file
 
-# Para Hermes Agent (padrão)
-content = read_file('/opt/data/referencias/hermes-agent/hermes-agent-design-style-guide.md', limit=200)
-# Extraia design tokens do conteúdo
+# Para Hermes Agent (padrão) — leia o HTML e extraia os tokens CSS do <style>:root
+content = read_file('/opt/data/referencias/hermes-agent/hermes-agent-style-guide.html', limit=100)
+# Extraia as variáveis CSS :root para cores, fontes, etc.
 
 # Para HTML (outras marcas), leia as primeiras 100 linhas para os tokens CSS
 content = read_file('/opt/data/referencias/[brand]/[brand]-style-guide.html', limit=100)
@@ -59,20 +57,18 @@ Para guias HTML, procure na tag `<style>` pelas variáveis `:root`:
 
 ```css
 :root {
-    --bg-color: #050A0F;
-    --deep-teal: #003B46;
-    --electric-teal: #66E8F1;
-    --font-headline: 'Bricolage Grotesque', sans-serif;
-    --font-body: 'Nunito Sans', sans-serif;
+    --blue-royal: #0000F2;
+    --white: #FFFFFF;
+    --charcoal: #171717;
+    --font-serif: 'Cormorant Garamond', serif;
+    --font-mono: 'Space Mono', monospace;
+    --font-wide: 'Syncopate', sans-serif;
+    --font-pixel: 'VT323', monospace;
     ...
 }
 ```
 
-Para guias Markdown (Hermes Agent), os tokens estão em tabelas no formato:
-
-| Token | Hex | Uso |
-|-------|-----|-----|
-| `--blue-primary` | `#0000FF` | Background principal |
+O Hermes Agent usa os tokens CSS acima. Para consultar um componente específico, localize a classe CSS correspondente no HTML (ex: `.hero-giant-title`, `.isometric-btn`, `.tech-table`).
 
 ### 4. Aplicar no output visual
 
@@ -84,15 +80,16 @@ Para guias Markdown (Hermes Agent), os tokens estão em tabelas no formato:
 
 ### Hermes Agent (PADRÃO)
 ```css
---blue-primary: #0000FF;
---blue-bg: #F0F5FF;
---blue-border: #CCD9FF;
---gold-accent: #E8B830;
---text-dark: #1C1C1E;
---text-muted: #666680;
---font-heading: 'Spectral', Georgia, serif;
+--blue-royal: #0000F2;
+--white: #FFFFFF;
+--charcoal: #171717;
+--paper: #F5F5F7;
+--amber: #FFBD38;
+--red: #FF0000;
+--font-serif: 'Cormorant Garamond', serif;
+--font-wide: 'Syncopate', sans-serif;
 --font-mono: 'Space Mono', monospace;
---font-body: 'Inter', sans-serif;
+--font-pixel: 'VT323', monospace;
 ```
 
 ### Consulting Brand
@@ -130,8 +127,7 @@ Para guias Markdown (Hermes Agent), os tokens estão em tabelas no formato:
 ```
 ├── STYLE_GUIDES_INDEX.md
 ├── hermes-agent/
-│   ├── hermes-agent-design-style-guide.md   (39KB, 782 linhas)
-│   └── hermes-agent-style-guide.md          (8KB)
+│   └── hermes-agent-style-guide.html          (44KB, HTML autossuficiente com 15 componentes + console interativo)
 ├── consulting-brand/
 │   ├── style-guide.html                     (112KB, 2798 linhas)
 │   ├── guide-logo.png                       (460KB)
@@ -144,7 +140,11 @@ Para guias Markdown (Hermes Agent), os tokens estão em tabelas no formato:
 
 ## Pitfalls
 
-⚠️ **Não confundir guias.** O Hermes Agent tem tons de azul royal #0000FF; outras marcas têm paletas distintas. Misturar os dois quebra a identidade visual.
+⚠️ **Carregue o guia ANTES de escrever qualquer CSS/HTML.** Não comece a construir com design tokens genéricos e depois tentar corrigir. Quando o usuário menciona uma marca (ID, IAF, etc.), esta skill deve ser a PRIMEIRA coisa carregada — antes de agy, antes de escrever style.css, antes de qualquer output visual. O usuário teve que corrigir o agente duas vezes em uma sessão porque o CSS foi escrito com tokens inventados em vez do guia real da marca.
+
+⚠️ **Não confundir guias.** O Hermes Agent tem azul royal #0000F2, Cormorant Garamond serif, Space Mono corpo; outras marcas têm paletas distintas. Misturar os dois quebra a identidade visual.
 ⚠️ **Guias HTML precisam de parsing.** Extraia os tokens CSS do bloco `<style>` — não tente renderizar o HTML inteiro.
 ⚠️ **O Hermes Agent é SEMPRE o fallback.** Se não houver menção explícita de marca, use Hermes.
 ⚠️ **Para agy (Antigravity), carregue o guia primeiro e extraia os tokens.** Depois inclua os tokens no prompt do agy como constraints de design.
+⚠️ **O guia Hermes Agent tem 15 componentes visuais.** O HTML é uma página interativa com previews e código de cada componente. Use como referência visual e de código, não apenas como lista de tokens.
+⚠️ **Para relatórios de consultoria com agy,** carregue a skill `agy` primeiro e siga o padrão `references/data-report-prompt-pattern.md`. Ele já inclui como embutir os tokens Hermes no prompt.
