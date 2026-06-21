@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 56 skills*
+*Total: 57 skills*
 
 ---
 
@@ -126,6 +126,7 @@ Load this skill when you need to create sound effects, ambient audio, or UI soun
 
 **Relações:**
 - `similar` → `content-production/sound-design`
+- `similar` → `content-production/text-to-speech`
 
 ### IAF Newsletter Pipeline — Manhã Aumentada
 
@@ -318,6 +319,7 @@ Load this skill when the user wants Ares (War God persona) as a fitness coach. C
 
 **Relações:**
 - `similar` → `health-fitness/body-recomposition`
+- `uses` → `health-fitness/body-recomposition`
 
 ## Health & Fitness
 
@@ -332,6 +334,7 @@ Load this skill when tracking body recomposition metrics — weight, body fat, a
 
 **Relações:**
 - `similar` → `health/ares-fitness-coach`
+- `used_by` → `health/ares-fitness-coach`
 
 ## Infrastructure
 
@@ -346,6 +349,7 @@ Reliability patterns for batch data pipelines: exponential backoff, API call saf
 
 **Relações:**
 - `similar` → `infrastructure/deployment-pipeline`
+- `used_by` → `software-development/dedalo-squad`
 
 ### Deployment Pipeline — Docker + GitHub Actions + SSH Deploy
 
@@ -372,6 +376,7 @@ Exponential backoff for Google Gemini API rate limits (HTTP 429). Covers monkey-
 
 **Relações:**
 - `similar` → `infrastructure/data-pipeline-patterns`
+- `used_by` → `software-development/dedalo-squad`
 
 ### Oracle VM — SSH Access from Hermes Container
 
@@ -512,6 +517,8 @@ Read Reddit subreddits reliably via RSS feeds — bypasses API rate limits and b
 
 **Relações:**
 - `similar` → `research/tech-trend-discovery`
+- `similar` → `research/deep-research`
+- `used_by` → `content-production/iaf-newsletter-pipeline`
 
 ## Research
 
@@ -721,6 +728,8 @@ Scan a codebase for deepening opportunities, present them as a structured report
 
 **Relações:**
 - `similar` → `github/codebase-inspection`
+- `similar` → `software-development/systematic-debugging`
+- `uses` → `software-development/spike`
 
 ### Plan Mode
 
@@ -765,6 +774,7 @@ Parallel 3-agent cleanup of recent code changes — each agent handles a separat
 
 **Relações:**
 - `similar` → `software-development/systematic-debugging`
+- `similar` → `software-development/improve-codebase-architecture`
 
 ### Skills Repository Curator
 
