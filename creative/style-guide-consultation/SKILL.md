@@ -98,7 +98,6 @@ O Hermes Agent usa os tokens CSS acima. Para consultar um componente específico
 --deep-teal: #003B46;
 --electric-teal: #66E8F1;
 --teal-ciano: #4AC6D3;
---kintsugi-gold: #C9A227;
 --deep-indigo: #1B2A6B;
 --font-headline: 'Bricolage Grotesque', sans-serif;
 --font-body: 'Nunito Sans', sans-serif;
@@ -141,6 +140,8 @@ O Hermes Agent usa os tokens CSS acima. Para consultar um componente específico
 ## Pitfalls
 
 ⚠️ **Carregue o guia ANTES de escrever qualquer CSS/HTML.** Não comece a construir com design tokens genéricos e depois tentar corrigir. Quando o usuário menciona uma marca (ID, IAF, etc.), esta skill deve ser a PRIMEIRA coisa carregada — antes de agy, antes de escrever style.css, antes de qualquer output visual. O usuário teve que corrigir o agente duas vezes em uma sessão porque o CSS foi escrito com tokens inventados em vez do guia real da marca.
+
+⚠️ **Gold (#C9A227 / --kintsugi-gold) foi REMOVIDO da paleta ID Consultoria.** Era temporário para um evento já encerrado. NÃO use em nenhum output da ID. A paleta agora é teal-only: #050A0F, #003B46, #4AC6D3, #66E8F1. Indigo (#6366F1) também removido.
 
 ⚠️ **Não confundir guias.** O Hermes Agent tem azul royal #0000F2, Cormorant Garamond serif, Space Mono corpo; outras marcas têm paletas distintas. Misturar os dois quebra a identidade visual.
 ⚠️ **Guias HTML precisam de parsing.** Extraia os tokens CSS do bloco `<style>` — não tente renderizar o HTML inteiro.

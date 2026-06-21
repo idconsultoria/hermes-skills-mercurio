@@ -366,7 +366,7 @@ Veja `references/session-audit-proto.md` para o script completo de extração de
 
 ⚠️ **Telegram aceita .html.** Enviar direto com `MEDIA:/path/arquivo.html`. Se o usuário reportar que não recebeu, tentar com `.txt`.\n\n⚠️ **Quota exhaustion.** agy compartilha quota do Google Cloud. Fallback para HTML manual com os mesmos tokens visuais.
 
-⚠️ **agy para sites complexos exige estratégia iterativa.** Sites completos com Three.js (cenas 3D, partículas, iluminação), GSAP ScrollTrigger, Web Audio API e múltiplas seções ultrapassam 75KB — o `--print` trunca se tudo for gerado de uma vez. Estratégia: (1) Gerar esqueleto HTML+CSS base, (2) Gerar JS complexo (Three.js, GSAP, áudio) em chamadas separadas, (3) Usar `/goal` mode para projetos multi-arquivo, (4) Montar peças com script Python. **Nunca abandone o agy** por causa de tamanho — adapte o workflow. O agy entrega qualidade visual superior; a montagem final compensa o esforço.
+⚠️ **Prompt grande com expansão de shell pode travar o agy.** Na execução real do pipeline Sergipetec (Etapa 4), um prompt de ~6.6KB passado via `$(cat /tmp/prompt.txt)` no SSH fez o agy travar por >3 min sem produzir output — o processo ficou vivo no host (PID, RAM alocada) mas sem stdout. A solução foi fatiar: (1) gerar esqueleto HTML+CSS com prompt curto (~800 bytes), (2) editar o arquivo existente para adicionar conteúdo com segundo prompt (~4.7KB). Se um prompt full-site travar, **não insista** — mate o processo e reduza o escopo para esqueleto primeiro, conteúdo depois.
 
 ⚠️ **Chart.js CDN não renderiza em ambientes restritos.** O agy gera o HTML, mas Chart.js via CDN falha quando o usuário abre offline. Sempre especificar CSS puro no prompt. Mais seguro que depender de CDN.
 
@@ -474,4 +474,4 @@ agy doctor           # → "All checks passed" (requires auth)
 
 | Data | Autor | Mudança |
 |------|-------|---------|
-| 2026-06-19 | Hermes (Gustavo Mello) | Description reposicionada como "versatile skill for any type of design project". Adicionada REGRA DE INVOCAÇÃO: sempre `terminal(background=true, notify_on_complete=true)`, nunca timeout. Removidos todos os `timeout` dos comandos de exemplo (workflows 1, 2, data viz, full site). Pitfall de timeout substituído. Workflow §7 Full Site Generation adicionado com estratégia iterativa. |
+| 2026-06-19 | Hermes (Sergipetec Etapa 4) | Adicionado pitfall sobre prompt grande travando agy via expansão de shell. Solução: fatiar em esqueleto primeiro (~800B), conteúdo depois (~4.7KB). Padrão validado: gerar skeleton HTML+CSS com agy, depois editar o mesmo arquivo com segundo agy para preencher conteúdo. |

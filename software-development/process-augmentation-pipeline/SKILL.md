@@ -2,7 +2,7 @@
 name: process-augmentation-pipeline
 description: "Pipeline ID Consultoria: análise de processos, brainstorming de soluções e site 3D.
 
-Load this skill quando o usuário solicitar o pipeline de aumentação de processos da ID Consultoria — mapeamento de dores/oportunidades/gargalos, diagramas de loop causal, brainstorming de soluções de aumentação, avaliação e priorização, aprofundamento das top 10 soluções e empacotamento em site interativo com animações 3D. Cobre as 4 etapas do pipeline: (1) Análise — relatórios setoriais + diagramas de loop causal via Pi Agent com MiniMax M3, (2) Brainstorming — soluções de aumentação guiadas pelo grafo causal, (3) Avaliação e Aprofundamento — tabela multicritério + seleção top 10 + projeto de implantação, (4) Empacotamento — site Three.js com animações cinematográficas, trilha sonora opcional e exportação PDF. Orquestração Hermes com subagentes paralelos. Usa style-guide-consultation (guia ID Consultoria), augmentation-process-design (taxonomia A/B × I/II/III), agy (design/código), humanizer + copywriting (textos)."
+Load this skill quando o usuário solicitar o pipeline de aumentação de processos da ID Consultoria — mapeamento de dores/oportunidades/gargalos, diagramas de loop causal, brainstorming de soluções de aumentação, avaliação e priorização por setor com compliance check, e empacotamento em site interativo com animações 3D. Cobre as 4 etapas do pipeline: (1) Análise — relatórios setoriais + diagramas de loop causal via Pi Agent com MiniMax M3, (2) Brainstorming — soluções de aumentação guiadas pelo grafo causal com Vulcano obrigatório, (3) Avaliação — tabela multicritério + top 3 por setor + top 3 intersetorial + projeto de implantação, (4) Empacotamento — site Three.js com exportação PDF. Orquestração Hermes com subagentes paralelos. Usa style-guide-consultation (guia ID Consultoria), augmentation-process-design (taxonomia A/B × I/II/III), agy, humanizer, copywriting."
 version: 1.0.0
 category: software-development
 tags: [consultoria, processos, aumentacao, pipeline, diagrama-causal, brainstorming, avaliacao, site, threejs, ID-Consultoria]
@@ -39,7 +39,7 @@ Pipeline de 4 etapas que transforma **POPs, diarizações de entrevistas e diagr
 |-------|---------|-------|-----------|
 | **1. Análise** | Pastas setoriais (POPs + entrevistas + diagramas) | Relatórios .md + diagramas de loop causal HTML/D3.js + análise de ciclos | Pi Agent × setor (MiniMax M3) + Pi Agent final (global) |
 | **2. Brainstorming** | Relatórios da etapa 1 + Index de soluções de referência | Soluções de aumentação (1.5-2× número de nós), agrupadas por cluster do grafo causal | Hermes (orquestrador) |
-| **3. Avaliação** | Soluções da etapa 2 | Tabela multicritério + top 10 aprofundadas + projeto de implantação | Hermes (orquestrador) |
+| **3. Avaliação** | Soluções da etapa 2 + relatórios setoriais da etapa 1 | Tabela multicritério (130 soluções) + top 3 por setor + top 3 intersetorial com compliance check + projeto de implantação — consolidados em `tabela-priorizacao.md` | Hermes (orquestrador) |
 | **4. Empacotamento** | Top 10 + diagramas + relatórios | Site Three.js com 4 telas + exportação PDF + trilha sonora opcional + deploy Vercel | agy (primário, iterativo) + humanizer + copywriting |
 
 **Regra de ouro:** Cada etapa versiona seus artefatos (stage → commit → push). Repositório Git dedicado, remote GitHub.
@@ -57,7 +57,7 @@ Pipeline de 4 etapas que transforma **POPs, diarizações de entrevistas e diagr
 --deep-teal: #003B46;
 --electric-teal: #66E8F1;
 --teal-ciano: #4AC6D3;
---kintsugi-gold: #C9A227;
+--teal-ciano: #4AC6D3;
 --deep-indigo: #1B2A6B;
 --font-headline: 'Bricolage Grotesque', sans-serif;
 --font-body: 'Nunito Sans', sans-serif;
@@ -102,9 +102,8 @@ gh repo create id-consultoria/<projeto>-aumentacao --private --source=. --push
 ├── etapa-2-brainstorming/
 │   └── propostas-solucoes.md
 ├── etapa-3-avaliacao/
-│   ├── tabela-priorizacao.md
-│   ├── top-10/
-│   └── projeto-implantacao.md
+│   ├── tabela-priorizacao.md           ← Hermes: 130 soluções pontuadas + top 3 por setor + compliance check
+│   └── solucoes-expandidas.md          ← Hermes: 15 soluções expandidas (~1 pág. cada, ferramentas não-prescritivas, custos em faixas)
 ├── etapa-4-site/
 └── README.md
 ```
@@ -307,7 +306,22 @@ Cada proposta deve especificar:
 
 ---
 
-## Etapa 3 — Avaliação e Aprofundamento
+## Etapa 3 — Avaliação por Setor e Priorização
+
+### 3.0 Princípio
+
+A Etapa 3 **não seleciona um top 10 global**. Em vez disso, classifica as soluções por setor beneficiado (ASP, Jurídico, Inovação, CVT) + intersetorial, e seleciona o **top 3 de cada**. Isso garante que cada setor receba atenção proporcional, evitando que setores com menos dores (ex.: ASP, 10 dores) sejam eclipsados por setores com muitas dores (ex.: Inovação, 46 dores).
+
+**Antes de pontuar, extrair as restrições conhecidas dos processos** a partir das transcrições de entrevistas e POPs da Etapa 1. Exemplos da execução real Sergipetec:
+
+| Restrição | Setor | Impacto |
+|-----------|-------|---------|
+| Lista de presença física com assinatura obrigatória | CVT | Check-in digital deve preservar artefato físico; pode aumentar, não substituir |
+| Termo de Autorização de Imagem obrigatório | CVT | Inscrição online deve incluir coleta do termo |
+| Fluxo de aditivos e auxílio creche integralmente físico | Jurídico | Assinatura digital só para contratos principais |
+| Retenção documental mínima de 5 anos | ASP | Qualquer solução de digitalização deve incluir backup de longo prazo |
+
+Cada solução candidata ao top 3 deve ser explicitamente verificada contra essas restrições (campo "Compliance check" ou seção "Aderência a restrições").
 
 ### 3.1 Tabela de Priorização
 
@@ -325,27 +339,74 @@ Para **cada proposta de solução**, preencher:
 
 **Estimativas reais de custo** (R$, horas, equipe) só aparecem no aprofundamento, não na tabela preliminar.
 
-### 3.2 Seleção Top 10
+### 3.2 Seleção Top 3 por Setor + Top 3 Intersetorial
 
-Ordenar por nota ponderada decrescente. Selecionar as 10 primeiras, com regra:
-- Se duas soluções forem **incompatíveis** (uma inviabiliza a outra), pular a de menor nota e avançar na lista até completar 10.
+1. Classificar cada solução pelo setor primariamente beneficiado (ASP, Jurídico, Inovação, CVT) ou como Intersetorial (impacta ≥2 setores simultaneamente ou ataca interfaces INT-NN)
+2. Para cada setor, listar soluções candidatas com nota ponderada e compliance check
+3. Selecionar as 3 de maior nota que PASSAM no compliance check
+4. Para o top 3 intersetorial, priorizar soluções que atacam interfaces com maior nota de retorno — mesmo que a nota ponderada seja mais baixa (ex.: state machines com nota 5.4 mas retorno 9)
+5. Se uma solução viola uma restrição conhecida, ela pode ser **ajustada** (não descartada): documentar o ajuste e reavaliar
 
 ### 3.3 Aprofundamento — Projeto de Implantação
 
-Para cada uma das top 10, detalhar:
+Para cada uma das soluções selecionadas, detalhar nesta ordem exata:
 
-1. **Diferencial para a realidade atual**
-2. **Processo TO BE** — fluxo redesenhado com a aumentação
-3. **Cronograma realista de implantação** — fases, marcos, durações
-4. **Metas de performance** — KPIs com baseline e target
-5. **Custos envolvidos** — ferramentas, equipe, treinamento, infraestrutura
-6. **Plano de contenção de riscos e compliance** — LGPD, segurança, resistência à mudança
+1. **Diferencial para a realidade atual** — o que muda e por que importa. **Obrigatório:** as duas primeiras linhas após o heading devem ser:
+   - `**Nós associados:** DOR-xxx, GAR-xxx, INT-xxx` — referências diretas aos nós do diagrama causal da Etapa 1
+   - `**Categoria × Tipo:** A·I` — notação taxonômica
+2. **Processo TO BE** — fluxo redesenhado com a aumentação (preferir diagrama ASCII para versionamento em git)
+3. **Aderência a restrições** — como a solução respeita (ou contorna) as limitações conhecidas do processo. Esta seção é absorvida pelo plano de contenção (abaixo) — as restrições de compliance viram riscos com mitigação documentada
+4. **Cronograma realista de implantação** — fases, marcos, durações (preferir tabela markdown)
+5. **Metas de performance** — KPIs com baseline (valor atual) e target (valor esperado), em tabela markdown
+6. **Custos envolvidos** — ferramentas, equipe, treinamento, infraestrutura (implantação + mensal)
+7. **Plano de contenção de riscos** — tabela com risco, probabilidade, impacto e mitigação. **Incluir aqui as restrições de compliance como linhas da tabela**, com probabilidade `—` (não é risco, é requisito) e impacto `Crítico`. Exemplo real Sergipetec:
 
-### 3.4 Commit
+| Risco | Prob. | Impacto | Mitigação |
+|-------|:-----:|:-------:|-----------|
+| **Compliance: lista física obrigatória (CVT-003)** | — | Crítico | A lista física é preservada e pré-preenchida; o aluno assina — o artefato existe |
+| **Compliance: retenção de 5 anos (ASP-003)** | — | Crítico | Versionamento com 30 versões; verificação SHA-256 semanal |
 
+**⚠️ Estrutura completa é inegociável.** O usuário corrigiu explicitamente quando a seção de aprofundamento perdeu os diagramas TO BE, cronogramas faseados e tabelas de risco. O formato completo (Diferencial com metadados → TO BE → Cronograma → Metas → Custos → Riscos) deve ser mantido para cada solução, sem encurtar. A qualidade está na densidade de informação por solução, não no volume de texto narrativo.
+
+### 3.4 Soluções Expandidas (arquivo separado)
+
+As 15 soluções selecionadas são expandidas em **arquivo próprio** (`solucoes-expandidas.md`), separado da tabela de priorização. A `tabela-priorizacao.md` referencia este arquivo e não repete as expansões.
+
+**Formato de cada solução expandida (~1 página):**
+
+- **Header:** nome da solução, nós associados e categoria × tipo
+- **Diferencial:** o que muda e por que importa — com menção a evidências das transcrições
+- **Processo TO BE:** fluxo redesenhado (preferir diagrama ASCII)
+- **Cronograma:** fases com durações (tabela compacta)
+- **Metas:** KPIs com baseline e target (tabela)
+- **Custos:** faixas de valor (não valores exatos), assumindo preferência por ferramentas de baixo custo e equipe interna
+- **Riscos e Compliance:** tabela de riscos com mitigação; restrições de compliance como linhas com impacto Crítico
+
+**Regras de redação:**
+
+- **Ferramentas como referenciais, nunca prescritivas.** Ex.: "plataforma de planejamento visual (planilha enriquecida ou low-code)" — não "Airtable". A Sergipetec decide a implementação concreta.
+- **Custos em faixas.** Ex.: "R$ 300–700" — não "R$ 530". A estimativa comunica ordem de grandeza sem falsa precisão.
+- **~1 página por solução.** Densidade de informação, não volume de texto. Cada seção é concisa: 1–2 parágrafos de prosa + tabelas para cronograma, metas, custos e riscos.
+
+### 3.5 Visão Consolidada
+
+Ao final, gerar tabela-resumo com os 15 selecionados (3 × 4 setores + 3 intersetorial), custo total de implantação e mensal, e calendário sugerido de 12 semanas.
+
+### 3.5 Pitfalls da Etapa 3
+
+- ⚠️ **Soluções que interagem com artefatos físicos: prefira modelos multimodais a OCR.** Quando uma solução precisa ler documentos físicos (ex.: lista de presença manuscrita), usar modelo multimodal (Gemini Flash, GPT-4V) em vez de OCR tradicional. O multimodal lida com caligrafias variadas, entende contexto da página e recebe instruções em linguagem natural. Correção explícita do usuário na execução Sergipetec (S-009).
+- ⚠️ **Terminologia palatável para tomadores de decisão leigos.** Evitar jargão técnico que assusta stakeholders não-técnicos. "State machine" vira **"motor inteligente de processos"** ou **"agente de IA que segue um processo estruturado"**. "OCR" vira **"leitura inteligente de documentos"**. Aplicar em todas as seções voltadas ao cliente (Diferencial, TO BE, sumário executivo). Correção explícita do usuário: "É importante que essas soluções soem palatáveis e empolgantes para os tomadores de decisão que são, em muitos sentidos, leigos."
+- ⚠️ **Soluções "em elaboração" exigem estimativa por cluster.** A Etapa 2 frequentemente deixa blocos de soluções não detalhadas (ex.: "S-015 a S-024 — 10 soluções adicionais"). Na pontuação, atribuir a esses blocos a **média estimada do cluster**, indicando claramente que é estimativa (não pontuação individual).
+- ⚠️ **Compliance check é obrigatório.** Toda solução candidata ao top 3 deve ser verificada contra as restrições extraídas das transcrições. Uma solução que "substitui" um artefato obrigatório (ex.: lista física) deve ser rejeitada ou ajustada para "aumenta" o artefato.
+- **Processo TO BE em diagrama ASCII.** Facilita leitura e versionamento em Markdown. Não usar imagens — o ASCII é auto-contido e diff'ável no git.
+- **KPIs com baseline e target.** Para cada meta de performance, declarar o valor atual (baseline) e o valor esperado (target). Ex.: "Tempo de conferência manual: baseline ~4h/mês → target <10 min/mês".
+
+**Commit ao final:**
 ```bash
-git add etapa-3-avaliacao/ && git commit -m "etapa 3: top 10 soluções avaliadas e aprofundadas" && git push
+git add etapa-3-avaliacao/ && git commit -m "etapa 3: top 3 por setor + top 3 intersetorial — compliance check (N restrições)" && git push
 ```
+
+A Etapa 3 produz dois arquivos complementares: `tabela-priorizacao.md` (pontuação + seleção) e `solucoes-expandidas.md` (projetos de implantação). Ambos são commitados juntos.
 
 ---
 
@@ -507,8 +568,11 @@ grep -c "^### S-" etapa-2-brainstorming/propostas-solucoes.md
 # 5b. Vulcano usado? (deve ser ≥ número de clusters)
 grep -c "Referência:" etapa-2-brainstorming/propostas-solucoes.md
 
-# 6. Top 10 selecionadas?
-ls etapa-3-avaliacao/top-10/ | wc -l
+# 6b. Top 3 por setor identificados?
+grep -c "🥇\\|🥈\\|🥉" etapa-3-avaliacao/tabela-priorizacao.md
+
+# 6c. Soluções expandidas em arquivo separado?
+ls etapa-3-avaliacao/solucoes-expandidas.md && grep -c "^## " etapa-3-avaliacao/solucoes-expandidas.md
 
 # 7. Site funcional?
 ls etapa-4-site/*.html
@@ -523,7 +587,7 @@ git log --oneline -5
 
 ⚠️ **Pi Agent com MiniMax M3 pode ser caro.** Monitorar tokens por setor via `pi-session-audit`. Se estourar orçamento, reduzir contexto (só POPs, sem diarização).
 
-⚠️ **Cores das classificações nos diagramas D3.js:** Usar SEMPRE a tríade distinta: Cultural = #C9A227 (kintsugi-gold), Técnica = #66E8F1 (electric-teal), Organizacional = #6366F1 (índigo). **NUNCA usar #4AC6D3 (teal-ciano) para organizacional** — é indistinguível do electric-teal. Ver `references/html-regeneration-pattern.md` para o padrão completo.
+⚠️ **Cores das classificações nos diagramas:** Tríade: Cultural = #66E8F1 (electric-teal), Técnica = #4AC6D3 (teal-ciano), Organizacional = #4AC6D3 (teal-ciano). Gold removido da paleta ID.
 
 ⚠️ **TODAS as arestas devem ter arrowheads** (setas direcionais preenchidas). Arestas tracejadas (reforço negativo/mitigação) NUNCA devem ter `marker-end: null`. O marcador é idêntico para ambos os tipos: `url(#arrow)`.
 
@@ -566,3 +630,5 @@ git log --oneline -5
 | 2026-06-19 | Hermes (revisão pós-sessão) | Adicionados 6 pitfalls visuais/D3.js da execução real: cor organizacional #6366F1 (não #4AC6D3), todas as arestas com arrowheads, labels +/- a 78%, linhas tracejadas com mesma opacidade, markdown→HTML obrigatório, sweet-spot 2 parágrafos. `references/html-regeneration-pattern.md` reescrito com todas as regras. |
 | 2026-06-19 | Hermes (validação Vulcano) | Etapa 2: protocolo Vulcano tornado **obrigatório** (1 vulcano_context por cluster), adicionada Ficha de Engrama (4 campos: arquitetura, métricas, armadilhas, contraindicações), citação de engrama obrigatória em cada solução. Novo pitfall: subutilização do Vulcano (2 chamadas = nota 1.2/10; 7+ chamadas = nota 7.2/10). Adicionado `references/vulcano-brainstorming-protocol.md` com protocolo completo e verificação de qualidade. |
 | 2026-06-19 | Hermes (revisão de efetividade) | Adicionado `references/relatorio-efetividade-template.md` com estrutura de relatório de efetividade de ferramenta (Sumário Executivo intrínseco + Considerações Finais extrínsecas). Novo pitfall: separar limitações da ferramenta das limitações do contexto/projeto. |
+| 2026-06-19 | Hermes (revisão Etapa 3) | Metodologia alterada: de top 10 global para top 3 por setor (ASP, Jurídico, Inovação, CVT) + top 3 intersetorial. Adicionado compliance check obrigatório contra restrições extraídas das transcrições (ex.: lista física do CVT, fluxo físico do Jurídico). Novo pitfall: preferir modelos multimodais a OCR para leitura de artefatos físicos (S-009). Seção 3.0 com princípio; 3.2 com seleção setorial; 3.4 com visão consolidada. |
+| 2026-06-19 | Hermes (terminologia cliente) | Adicionado pitfall de terminologia palatável para tomadores de decisão leigos: "state machine" → "motor inteligente de processos", "OCR" → "leitura inteligente de documentos". Aplicar em todas as seções voltadas ao cliente. |

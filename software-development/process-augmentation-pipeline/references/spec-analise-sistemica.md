@@ -12,7 +12,7 @@ Documento HTML único e autossuficiente contendo TODAS as dores, gargalos, ganho
 ### 1. Diagrama de Loop Causal Global (D3.js)
 
 **Nós:** Todos os ~80-95 itens (DOR-*, GAR-*, OPO-*) de todos os setores.
-- Raio ~17px, cor por natureza: cultural (#C9A227), técnica (#66E8F1), organizacional (#4AC6D3)
+- Raio ~17px, cor por natureza: cultural (#6366F1 — indigo substituiu gold), técnica (#66E8F1), organizacional (#4AC6D3)
 - Label: código (IBM Plex Mono 9px) + nome curto (Nunito Sans 10px)
 - Identificação do setor pelo prefixo do código (ASP-/JUR-/INV-/CVT-)
 

@@ -61,8 +61,25 @@ Dotfiles: gh:[username]/pi-dotfiles
 | `deepseek` (API direta) | `deepseek-v4-flash` | `DEEPSEEK_API_KEY` | $0.14/M input | **Pi cost** 🥉 |
 | `opencode-go` (Go) | `minimax-m3` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** 🥇 |
 | `opencode-go` (Go) | `deepseek-v4-pro` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** fallback 1 🥈 |
+| `opencode-go` (Go) | `glm-5.2` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** alt — criativo, sites, design |
+| `opencode-go` (Go) | `kimi-k2.6` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** alt — raciocínio longo |
+| `opencode-go` (Go) | `qwen3.7-max` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** alt — contextos extensos |
 | `deepseek` (API direta) | `deepseek-v4-pro` | `DEEPSEEK_API_KEY` | $0.14/M + $0.42/M | **Pi best** fallback 2 🥉 |
 | `openrouter` | `openrouter/<model-id>` | `OPENROUTER_API_KEY` | Variável | Reserva |
+
+### ⚠️ Modelos não registrados no Pi (Custom Model ID)
+
+O Pi Agent tem um registry interno de modelos. Modelos que existem na API do provider
+mas NÃO estão nesse registry ainda funcionam — o Pi emite um warning e os trata como
+"custom model id". O warning é cosmético, não afeta a execução:
+
+```
+Warning: Model "glm-5.2" not found for provider "opencode-go". Using custom model id.
+```
+
+Para confirmar se um modelo funciona: `pi --provider opencode-go --model <id> --print "OK"`
+
+Para listar modelos disponíveis na API: `curl -s https://opencode.ai/zen/go/v1/models -H "Authorization: Bearer $OPENCODE_API_KEY" | python3 -c "import sys,json; [print(m['id']) for m in json.load(sys.stdin)['data']]"`
 
 ### ⚠️ GoUsageLimitError — Cota do OpenCode Go
 
@@ -147,9 +164,10 @@ pi --session ~/.pi/agent/sessions/--<dir>--/<timestamp>_<uuid>.jsonl \
 mais entradas é o que morreu mais tarde (mais progresso). Pi append ao mesmo
 arquivo quando retomado — não cria um novo.
 
-**Flags conflitantes:** `--session` e `-p` são mutuamente exclusivos.
-`--session` carrega o prompt original da sessão. Se precisar modificar o
-prompt, edite a primeira entrada do `.jsonl` diretamente.
+**Combinando `--session` + `-p`:** Embora documentados como exclusivos, na prática
+funcionam juntos. Pi carrega o histórico da sessão E processa o novo prompt,
+adicionando-o como entrada adicional. Útil para dar instruções de continuação
+sem precisar editar o JSONL manualmente. Exemplo real funcionou com Pi v0.78.1.
 
 ## OpenCode Go — Cota Mensal de 5h
 
@@ -332,7 +350,55 @@ if last.get('type')=='message':
 - ❌ Relançar sem verificar se já existe arquivo de output
 - ❌ Ignorar sessão `--session` viável e criar nova do zero
 
-## ⚠️ Stall Detection & Parallel Execution
+## ⚠️ Image Input Crash — OpenCode Go Rejects Images from ALL Models
+
+OpenCode Go NÃO suporta image inputs em NENHUM modelo — nem GLM 5.2 (text-only),
+nem MiniMax M3 (nativamente multimodal). Qualquer tentativa de ler screenshot,
+PNG, ou enviar imagem via `read` resultará em:
+
+```
+400 Error from provider: This model does not support image inputs
+```
+
+### Como acontece
+
+Pi pode tentar ler screenshots que ele mesmo gerou com Playwright (`read /tmp/site-shot.png`).
+O `read` tool retorna a imagem como blob, o provider tenta processar e rejeita.
+
+### Recuperação — Editar o JSONL
+
+NÃO relance do zero — a sessão tem contexto valioso. Edite o JSONL para remover
+as entradas de imagem:
+
+```python
+import json
+
+session_path = 'caminho/da/sessao.jsonl'
+with open(session_path) as f:
+    entries = [json.loads(l) for l in f if l.strip()]
+
+# Encontrar entradas com imagem
+for i, e in enumerate(entries):
+    content = e.get('message',{}).get('content','')
+    if isinstance(content, list):
+        has_image = any(isinstance(c, dict) and c.get('type') == 'image' for c in content)
+        if has_image:
+            print(f'Entry {i}: IMAGE — cortando aqui')
+
+# Truncar antes da primeira imagem
+safe = entries[:cut_idx]
+with open(session_path, 'w') as f:
+    for e in safe:
+        f.write(json.dumps(e) + '\n')
+```
+
+Depois relance com `--session` e o mesmo modelo (ou MiniMax M3 se preferir).
+
+### ⚠️ Prevenção
+
+Ao dar prompts que mencionam Playwright ou screenshots, INSTRUA o Pi:
+> "Do NOT use Playwright, Chromium, or read any image/screenshot files.
+> This provider does NOT support image inputs. Use only text-based verification."
 
 ### ⚠️ Pi best (MiniMax M3) é LENTO — não confunda com stall
 
@@ -471,6 +537,27 @@ tmux kill-session -t pi-sessao 2>/dev/null; true
 
 **Vantagem:** visibilidade em tempo real do que Pi está gerando, mesmo quando não crasha mas também não produz output.
 
+### 🔍 Monitoramento via Cron (tarefas muito longas, 30min+)
+
+Para tarefas que podem levar 30+ minutos (sites completos, codebases), o tmux
+não escala — o agente precisa continuar trabalhando em outras coisas. Use cron
+jobs para verificação periódica:
+
+```bash
+# Criar cronjob que checa a cada 5 minutos
+cronjob(
+  action='create',
+  schedule='5m',
+  repeat=20,
+  name='check-pi-progress',
+  enabled_toolsets=['terminal'],
+  deliver='origin',
+  prompt='Verifique o progresso do Pi Agent ... e relate APENAS formato conciso.'
+)
+```
+
+Referência completa de monitoramento: `skill_view(name='pi-agent-coordination', file_path='references/cron-progress-monitor.md')`
+
 ### Modelos: V4 Flash > V4 Pro para code tasks
 
 DeepSeek **V4 Flash é mais confiável** que V4 Pro para code tasks. V4 Pro stallou mais vezes com prompts equivalentes no mesmo setup. Usar V4 Pro APENAS para:
@@ -478,7 +565,70 @@ DeepSeek **V4 Flash é mais confiável** que V4 Pro para code tasks. V4 Pro stal
 - Documentos com análise de riscos/custos
 - Prompts curtos (< 10 linhas) onde a profundidade do raciocínio importa
 
-## Skills (21)
+
+## ⚠️ Prompt Quality for Complex Creative Tasks
+
+When Pi Agent is tasked with **creative output** (sites, visual design, multi-file
+projects, generative art, complex UIs), the prompt MUST be specification-grade — not
+a loose description. A basic prompt ("build a site with Three.js and 4 screens")
+produces low-quality, monolithic output that the user will reject.
+
+### Antipattern (REJECTED by user)
+
+```
+Build a single-page site with Three.js, GSAP, and 4 screens: Hero, Map, Report, Projects.
+```
+
+### Required Structure for Complex Prompts
+
+Every high-quality prompt for creative Pi tasks must include:
+
+1. **Project architecture** — exact file tree, module responsibilities, CDN versions
+2. **Design tokens** — exact CSS custom properties (colors, fonts, radii, glows)
+3. **Technical specifications** — renderer config, light setup, material parameters,
+   shader requirements. Give exact values for NON-NEGOTIABLES (tone mapping, shadow
+   maps, dark mode, no-gradients rule). Describe INTENT for creative choices (animation
+   timing, audio design, camera movement) — let the model exercise judgment
+4. **Screen-by-screen breakdown** — for each screen: 3D scene CONCEPT + HTML overlay
+   CONCEPT + interaction INTENT. Do NOT prescribe exact pixel sizes or animation
+   durations unless they define visual identity
+5. **Data sources** — exact file paths within the repo that contain the data to render
+6. **Asset pipeline** — how procedural fallbacks work, where external assets would
+   plug in, structure of `assets-requisitados.md`
+7. **Audio specification** — Web Audio API approach, emotional direction (e.g. "drone
+   em tonalidade menor, contemplativo"), not exact frequencies
+8. **Responsive breakpoints** — exact px values with behavior INTENT per tier
+9. **Performance budget** — FCP, TTI, framerate, page weight targets
+10. **Verification checklist** — 20+ specific, testable items
+
+### ⚠️ The Line Between Spec and Creative Freedom
+
+The user REJECTED a prompt that was too rigid — exact light intensities, exact
+font sizes in px, exact animation durations in seconds, exact audio frequencies
+in Hz. These micro-decisions belong to the model, not the spec.
+
+**Specify as exact values:** colors (hex), non-negotiable constraints (no gradients,
+no emojis, dark mode), design tokens, data sources (file paths), performance budgets,
+CDN URLs, shadow map type, tone mapping algorithm, responsive breakpoints.
+
+**Specify as intent/direction:** animation style, timing feel, audio mood, camera
+angles, particle density, font sizes beyond the token system, exact Three.js light
+positions, shader parameter values.
+
+> Regra: se o valor exato define a IDENTIDADE VISUAL, vá no hex. Se define
+> implementação, deixe o modelo decidir.
+
+### Rule of Thumb
+
+If the prompt is under 400 lines, it's too vague. A complex creative Pi task
+(site, dashboard, generative experience) needs **400-600 lines** of specification.
+The Pi Agent has context capacity — use it. Specificity reduces drift, prevents
+monolithic output, and produces artifacts the user accepts on first delivery.
+
+### User Preference
+
+The user reviews prompts before agents execute. Send the `.md` prompt file for
+approval BEFORE launching the Pi process. Do not launch and ask for forgiveness.
 
 | Categoria | Skills | Qtd |
 |-----------|--------|-----|
@@ -513,6 +663,103 @@ ls -lt ~/.pi/agent/sessions/--*/ | head -3
 ```
 
 Carregar `pi-session-audit` para script completo de extração de tokens, custo e duração.
+
+## ⚠️ OpenCode Go NÃO Suporta Image Inputs (Nenhum Modelo)
+
+**Causa:** o provider `opencode-go` rejeita image inputs em TODOS os modelos —
+GLM-5.2, MiniMax M3, DeepSeek V4 Pro, todos. Não é limitação do modelo, é do
+provider. A API do OpenCode Go simplesmente não implementa o tipo `image` no
+schema de mensagens.
+
+**Sintoma:** Pi tenta ler um arquivo de imagem (screenshot, PNG de diagrama) e o
+provider retorna:
+
+```
+400 Error from provider: This model does not support image inputs
+```
+
+Pi termina com `exit code 1`. A sessão fica com a entrada da imagem travada no
+JSONL — qualquer tentativa de retomar com `--session` falha igual.
+
+**Modelos afetados (via OpenCode Go):** todos — `glm-5.2`, `minimax-m3`,
+`deepseek-v4-pro`, `deepseek-v4-flash`, `kimi-k2.6`, `qwen3.7-max`.
+
+**Modelos NÃO afetados:** `deepseek` (API direta), `opencode` (Zen), `openrouter`.
+
+⚠️ GLM-5.2 e MiniMax M3 são nativamente multimodais, mas a capacidade de visão
+não é exposta pelo provider OpenCode Go. Se precisar de visão, use outro provider.
+
+**Prevenção (no prompt):** sempre que o Pi for gerar código que possa envolver
+screenshots, Playwright, Puppeteer, ou leitura de imagens, incluir explicitamente:
+
+```
+Do NOT use Playwright, Chromium, or read any image/screenshot files.
+This provider (OpenCode Go) does NOT support image inputs.
+Any attempt to read images will crash the session.
+Use only text-based verification.
+```
+
+**Recuperação:** editar o JSONL para remover as entradas problemáticas. Ver
+`### ⚠️ Cirurgia de JSONL — Remover Entradas Problemáticas` abaixo.
+
+## ⚠️ GLM-5.2 é Texto Puro (Modelo de Visão é GLM-5V-Turbo)
+
+A família GLM tem dois ramos separados:
+
+| Modelo | Tipo | Provider |
+|--------|------|----------|
+| `glm-5.2` | Texto puro, 1M contexto | `opencode-go` |
+| `glm-5v-turbo` | Multimodal (visão) | Não disponível no OpenCode Go |
+
+Mesmo que o modelo base suporte visão, o provider OpenCode Go só expõe o modo
+texto. Para tarefas que exigem visão, usar `minimax-m3` via `deepseek` provider
+(API direta) ou `openrouter`.
+
+## ⚠️ Cirurgia de JSONL — Remover Entradas Problemáticas
+
+Quando uma sessão Pi trava por entrada inválida (imagem, token excedido, formato
+quebrado), é possível EDITAR o JSONL para remover as entradas problemáticas e
+relançar com `--session`. Isso preserva TODO o contexto anterior — horas de
+leitura e raciocínio não são perdidas.
+
+**Procedimento:**
+
+```bash
+# 1. Identificar entradas problemáticas
+python3 -c "
+import json
+with open('session.jsonl') as f:
+    entries = [json.loads(l) for l in f if l.strip()]
+for i, e in enumerate(entries):
+    content = e.get('message',{}).get('content','')
+    if isinstance(content, list):
+        for c in content:
+            if isinstance(c, dict) and c.get('type') == 'image':
+                print(f'Entry {i}: IMAGE — cortar aqui')
+"
+
+# 2. Truncar o JSONL antes da primeira entrada problemática
+python3 -c "
+import json
+with open('session.jsonl') as f:
+    entries = [json.loads(l) for l in f if l.strip()]
+# Manter entradas 0 até safe_idx-1
+safe = entries[:SAFE_IDX]
+with open('session.jsonl', 'w') as f:
+    for e in safe:
+        f.write(json.dumps(e) + '\n')
+print(f'Cortado: {len(entries)} -> {len(safe)} entries')
+"
+
+# 3. Relançar com --session
+pi --session session.jsonl --provider opencode-go --model minimax-m3
+```
+
+**Cenário típico:** Pi construiu todo o código (24 arquivos, site completo),
+verificou que funciona, tirou screenshot para auto-verificação, e travou ao
+tentar processar a imagem. Solução: cortar as últimas 5-8 entradas (Playwright +
+screenshot + resposta travada) e relançar. O trabalho NÃO é perdido — os
+arquivos já estão no disco.
 
 ## ⚠️ Model Drift — Pi Best (MiniMax M3) Refatora Sem Aviso
 
@@ -638,13 +885,62 @@ Se o clone não existe, o arquivo está perdido — só recuperável da sessão 
 **Prevenção:** antes de mudar de branch numa working tree com untracked files,
 verificar com `git status --short | grep '^??'` e fazer stash ou commit primeiro.
 
-## Verificação
+## ⚠️ Monitoramento Manual com Sleep (Preferido do Usuário)
+
+O usuário rejeitou cron jobs para monitoramento de Pi Agent. Prefere controle
+manual: o agente dorme (`sleep 300`) com `notify_on_complete=true`, acorda,
+checa o progresso, relata, e dorme de novo. Isso mantém o agente no loop e
+evita automação desnecessária.
 
 ```bash
-pi --version                    # → 0.78.1
-pi -p "OK" --provider deepseek --model deepseek-v4-flash  # → OK
-ls ~/.pi/agent/skills/          # → 21 skills
+# Padrão: loop manual de sleep + check + relato
+terminal(
+  command="sleep 300 && echo 'ACORDEI'",
+  background=true,
+  notify_on_complete=true,
+  timeout=320
+)
 ```
+
+A cada despertar, executar o script de progresso (ver `pi-session-audit`),
+relatar no formato:
+
+```
+⏱️ Progresso — X min
+- Entradas: N  |  Reads: N | Writes: N | Bash: N
+- Arquivos criados: N
+- Última ação: [descrição]
+- Fase: [LENDO | PLANEJANDO | ESCREVENDO | FINALIZANDO]
+```
+
+Se o Pi terminar (exit code != null no processo), relatar o resultado final
+## ⚠️ Pre-Flight Verification de Sites Estáticos
+
+Após Pi gerar um site, fazer verificação antes do deploy:
+
+```bash
+# 1. Sintaxe JS (todos os arquivos)
+cd etapa-4-site && for f in js/*.js; do node -c "$f" 2>&1 || echo "FAIL: $f"; done
+
+# 2. Imports resolvem (checar main.js)
+grep -rn "from '" js/main.js
+
+# 3. Servir localmente e testar
+python3 -m http.server 8765 &
+sleep 2
+curl -sI http://localhost:8765/index.html  # esperado: 200
+for f in css/*.css js/*.js; do
+  code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8765/$f)
+  [ "$code" != "200" ] && echo "FAIL: $f ($code)"
+done
+kill %1
+
+# 4. Deploy
+npx vercel --prod --yes
+```
+
+Verificação visual: `browser_navigate(url)` + `browser_vision` para confirmar
+que elementos 3D renderizam e textos aparecem.
 
 ## Referências
 

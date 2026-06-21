@@ -3,8 +3,6 @@ name: copywriting
 description: "Expert conversion copywriting: write, rewrite, or improve marketing copy with
 
 Load this skill when the user needs marketing copy — landing pages, homepage sections, pricing copy, CTAs, taglines, or value propositions. Provides a complete framework for gathering context, applying copywriting principles (clarity over cleverness, benefits over features), and producing organized output with annotations and alternatives."
-
-Load this skill when the user needs marketing copy — landing pages, homepage sections, pricing copy, CTAs, taglines, or value propositions. Provides a complete framework for gathering context, applying copywriting principles (clarity over cleverness, benefits over features), and producing organized output with annotations and alternatives."
 version: 2.0.0
 author: coreyhaines31/marketingskills
 metadata:

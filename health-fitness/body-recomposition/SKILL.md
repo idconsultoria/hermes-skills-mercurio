@@ -1,6 +1,8 @@
 ---
 name: body-recomposition
-description: Tracking de métricas corporais (peso, BF, composição) + cálculos de TDEE/BMR, déficit calórico e timeline para recomposição. Cobre setup de CSVs, cálculo de métricas e geração de gráficos de evolução.
+description: "Tracking de métricas corporais (peso, BF, composição) + cálculos de TDEE/BMR, déficit calórico e timeline para recomposição.
+
+Load this skill when tracking body recomposition metrics — weight, body fat, and composition. Covers CSV data management, TDEE/BMR calculations, caloric deficit planning, timeline projections, and chart generation for progress visualization."
 category: health-fitness
 ---
 
