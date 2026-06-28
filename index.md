@@ -21,6 +21,8 @@ Load this skill when you need to delegate coding tasks to autonomous AI coding a
 - `similar` → `autonomous-ai-agents/pi-agent-coordination`
 - `parent` → `autonomous-ai-agents/product-pipeline`
 - `similar` → `autonomous-ai-agents/messaging-platforms`
+- `similar` → `autonomous-ai-agents/hephaistos`
+- `uses` → `github/github-pr-workflow`
 
 ### Hephaistos — Hermes Meta-Framework
 
@@ -36,6 +38,8 @@ Hephaistos meta-framework — Hermes-orchestrated project pipeline using delegat
 **Relações:**
 - `similar` → `autonomous-ai-agents/autonomous-ai-agents`
 - `uses` → `software-development/agy`
+- `similar` → `autonomous-ai-agents/product-pipeline`
+- `uses` → `autonomous-ai-agents/hermes-agent`
 
 ### Hermes Agent
 
@@ -72,6 +76,7 @@ Load this skill when troubleshooting message delivery across platforms, or when 
 **Relações:**
 - `used_by` → `autonomous-ai-agents/product-pipeline`
 - `parent` → `autonomous-ai-agents/hermes-agent`
+- `used_by` → `content-production/text-to-speech`
 
 ### Pi Agent (Local)
 
@@ -90,6 +95,7 @@ Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — n
 - `similar` → `autonomous-ai-agents/autonomous-ai-agents`
 - `used_by` → `autonomous-ai-agents/product-pipeline`
 - `parent` → `autonomous-ai-agents/hermes-agent`
+- `uses` → `software-development/agy`
 
 ### Pi Agent Session Audit
 
@@ -106,6 +112,7 @@ Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl) and agy (p
 - `used_by` → `autonomous-ai-agents/pi-agent-coordination`
 - `used_by` → `autonomous-ai-agents/product-pipeline`
 - `similar` → `autonomous-ai-agents/autonomous-ai-agents`
+- `similar` → `productivity/relatorio-de-custos`
 
 ### Product Development Pipeline
 
@@ -126,6 +133,10 @@ Load this skill when building a product from scratch through the full pipeline �
 - `similar` → `content-production/iaf-newsletter-pipeline`
 - `uses` → `creative/copywriting`
 - `uses` → `creative/humanizer`
+- `uses` → `software-development/ideation-drilling`
+- `uses` → `research/user-interview`
+- `uses` → `research/deep-research`
+- `uses` → `read-reddit`
 
 ## Content Production
 
@@ -161,6 +172,8 @@ Load this skill to set up, modify, run, or troubleshoot any daily newsletter, br
 - `similar` → `autonomous-ai-agents/product-pipeline`
 - `similar` → `creative/style-guide-consultation`
 - `uses` → `social-media/brand-iaf-conteudo`
+- `uses` → `productivity/html-to-pdf-chromium`
+- `uses` → `infrastructure/data-pipeline-patterns`
 
 ### Sound Design — AI SFX & Audio Production
 
@@ -191,6 +204,9 @@ Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback,
 **Relações:**
 - `parent` → `autonomous-ai-agents/hermes-agent`
 - `uses` → `creative/humanizer`
+- `uses` → `autonomous-ai-agents/messaging-platforms`
+- `uses` → `infrastructure/oracle-host-access`
+- `uses` → `infrastructure/gemini-rate-limit-backoff`
 
 ## Creative
 
@@ -226,6 +242,7 @@ Use when the user wants to create, refine, or evolve a brand identity. Covers br
 - `uses` → `creative/style-guide-consultation`
 - `similar` → `creative/style-guide-consultation`
 - `uses` → `creative/copywriting`
+- `uses` → `software-development/agy`
 
 ### Copywriting
 
@@ -293,6 +310,7 @@ Catalog and consultation of style guides — load the correct design system for 
 - `similar` → `creative/popular-web-designs`
 - `similar` → `creative/brand-studio-forge`
 - `used_by` → `infrastructure/vercel-deploy`
+- `uses` → `creative/popular-web-designs`
 
 ## Dogfood
 
@@ -311,6 +329,7 @@ Load this skill when you need to test a web application for issues. Covers syste
 **Relações:**
 - `similar` → `github/codebase-inspection`
 - `similar` → `software-development/systematic-debugging`
+- `similar` → `github/github-pr-workflow`
 
 ## Github
 
@@ -328,6 +347,7 @@ Multi-layered codebase diagnostics: structural mapping, dependency audit, git hi
 **Relações:**
 - `similar` → `software-development/systematic-debugging`
 - `similar` → `software-development/improve-codebase-architecture`
+- `uses` → `github/github-pr-workflow`
 
 ### GitHub Pull Request Workflow
 
@@ -345,6 +365,7 @@ GitHub PR lifecycle: branch, commit, open, CI, merge.
 - `uses` → `infrastructure/oracle-host-access`
 - `similar` → `github/codebase-inspection`
 - `similar` → `software-development/systematic-debugging`
+- `uses` → `software-development/test-driven-development`
 
 ## Health
 
@@ -379,6 +400,8 @@ Load this skill when tracking body recomposition metrics — weight, body fat, a
 **Relações:**
 - `similar` → `health/ares-fitness-coach`
 - `used_by` → `health/ares-fitness-coach`
+- `parent` → `health/ares-fitness-coach`
+- `similar` → `productivity/html-report-hermes`
 
 ## Infrastructure
 
@@ -396,6 +419,7 @@ Reliability patterns for batch data pipelines: exponential backoff, API call saf
 **Relações:**
 - `similar` → `infrastructure/deployment-pipeline`
 - `used_by` → `software-development/dedalo-squad`
+- `parent` → `infrastructure/gemini-rate-limit-backoff`
 
 ### Deployment Pipeline — Docker + GitHub Actions + SSH Deploy
 
@@ -412,6 +436,7 @@ CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr.io → SSH deploy 
 - `uses` → `infrastructure/oracle-host-access`
 - `similar` → `infrastructure/vercel-deploy`
 - `similar` → `infrastructure/data-pipeline-patterns`
+- `parent` → `infrastructure/vercel-deploy`
 
 ### Gemini Rate Limit Backoff
 
@@ -442,6 +467,7 @@ SSH from Hermes Docker container to Oracle Linux host — key setup and diagnost
 **Relações:**
 - `used_by` → `infrastructure/deployment-pipeline`
 - `used_by` → `github/github-pr-workflow`
+- `used_by` → `productivity/relatorio-de-custos`
 
 ### Vercel Deploy — Skill
 
@@ -475,6 +501,8 @@ Produce deterministic MP4 videos using HyperFrames (HTML→video engine). Genera
 **Relações:**
 - `uses` → `creative/brand-studio-forge`
 - `uses` → `creative/style-guide-consultation`
+- `similar` → `productivity/html-report-hermes`
+- `similar` → `media/kindle-manga`
 
 ### Kindle Manga — Quality-Gated Manga to EPUB/MOBI
 
@@ -489,6 +517,8 @@ Load this skill when putting manga or comics on a Kindle, converting CBR/CBZ/PDF
 
 **Relações:**
 - `similar` → `media/manga-anime-data`
+- `uses` → `productivity/google-workspace`
+- `uses` → `media/manga-anime-data`
 
 ### Manga & Anime Data Research via AniList API
 
@@ -521,6 +551,7 @@ Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation
 - `similar` → `productivity/notion`
 - `similar` → `productivity/taskflow-mcp`
 - `used_by` → `content-production/iaf-newsletter-pipeline`
+- `uses` → `infrastructure/data-pipeline-patterns`
 
 ### HTML Report — Hermes Design System
 
@@ -553,6 +584,7 @@ Convert HTML files to high-fidelity PDF using Chromium headless (via Debian .deb
 **Relações:**
 - `uses` → `productivity/html-report-hermes`
 - `used_by` → `productivity/html-report-hermes`
+- `similar` → `infrastructure/data-pipeline-patterns`
 
 ### Notion
 
@@ -584,6 +616,7 @@ Generate cost reports for multi-agent projects with real token data from Hermes 
 - `uses` → `software-development/agy`
 - `uses` → `productivity/html-report-hermes`
 - `similar` → `software-development/backlog-and-sprint`
+- `similar` → `productivity/taskflow-mcp`
 
 ### TaskFlow MCP — Ferramentas e Workflows
 
@@ -599,6 +632,7 @@ TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Co
 **Relações:**
 - `similar` → `productivity/notion`
 - `similar` → `software-development/backlog-and-sprint`
+- `used_by` → `autonomous-ai-agents/hermes-agent`
 
 ## Read Reddit
 
@@ -617,6 +651,8 @@ Read Reddit subreddits reliably via RSS feeds — bypasses API rate limits and b
 - `similar` → `research/tech-trend-discovery`
 - `similar` → `research/deep-research`
 - `used_by` → `content-production/iaf-newsletter-pipeline`
+- `used_by` → `research/deep-research`
+- `used_by` → `research/augmentation-process-design`
 
 ## Research
 
@@ -649,6 +685,8 @@ Design, research and curadoria de soluções de augmentação de processos com I
 **Relações:**
 - `similar` → `research/augmentacao-query`
 - `uses` → `software-development/process-augmentation-pipeline`
+- `parent` → `research/augmentacao-query`
+- `similar` → `research/deep-research`
 
 ### Deep Research Skill
 
@@ -665,6 +703,9 @@ Multi-agent deep research pipeline: decompose topics, dispatch parallel agents, 
 - `similar` → `research/tech-trend-discovery`
 - `uses` → `research/tech-trend-discovery`
 - `uses` → `research/user-interview`
+- `uses` → `read-reddit`
+- `similar` → `research/augmentacao-query`
+- `uses` → `productivity/html-report-hermes`
 
 ### Digital Clone Persona
 
@@ -680,6 +721,8 @@ Create digital clone personas through deep web research — discover, extract, a
 **Relações:**
 - `uses` → `research/deep-research`
 - `uses` → `research/user-interview`
+- `similar` → `research/tech-trend-discovery`
+- `similar` → `creative/brand-studio-forge`
 
 ### Model Benchmark Frontier
 
@@ -695,6 +738,8 @@ Compare AI models — intelligence vs parameters, convex hull analysis, local ha
 **Relações:**
 - `similar` → `research/deep-research`
 - `similar` → `research/tech-trend-discovery`
+- `similar` → `software-development/spike`
+- `used_by` → `software-development/plan`
 
 ### Tech Trend Discovery
 
@@ -711,6 +756,8 @@ Discover what the tech/AI community is discussing right now — trending topics,
 - `similar` → `research/deep-research`
 - `used_by` → `research/deep-research`
 - `uses` → `read-reddit`
+- `used_by` → `content-production/iaf-newsletter-pipeline`
+- `similar` → `read-reddit`
 
 ### User Interview
 
@@ -727,6 +774,8 @@ Structured user/proxy interview protocol for product research — plan, frame, l
 - `used_by` → `software-development/ideation-drilling`
 - `used_by` → `software-development/backlog-and-sprint`
 - `used_by` → `research/deep-research`
+- `uses` → `research/digital-clone-persona`
+- `similar` → `research/deep-research`
 
 ## Social Media
 
@@ -744,6 +793,8 @@ Content for IA que Funciona community — brand constants, voice, tone, template
 **Relações:**
 - `used_by` → `content-production/iaf-newsletter-pipeline`
 - `similar` → `creative/copywriting`
+- `similar` → `creative/style-guide-consultation`
+- `uses` → `software-development/agy`
 
 ## Software Development
 
@@ -762,6 +813,9 @@ Load this skill for strategic design tasks — visual HTML output, brand present
 - `used_by` → `software-development/backlog-and-sprint`
 - `used_by` → `productivity/relatorio-de-custos`
 - `similar` → `creative/ai-creative-assets`
+- `used_by` → `software-development/process-augmentation-pipeline`
+- `uses` → `software-development/threejs-rendering-debug`
+- `similar` → `autonomous-ai-agents/pi-agent-coordination`
 
 ### Backlog & Sprint
 
@@ -781,6 +835,10 @@ Backlog management and Sprint execution for product iteration (Fase 5). Mantém 
 - `similar` → `productivity/taskflow-mcp`
 - `uses` → `software-development/ideation-drilling`
 - `uses` → `software-development/plan`
+- `uses` → `software-development/test-driven-development`
+- `uses` → `autonomous-ai-agents/pi-session-audit`
+- `uses` → `software-development/simplify-code`
+- `similar` → `software-development/dedalo-squad`
 
 ### BPMN Diagram Renderer
 
@@ -796,6 +854,9 @@ Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js + Chromium headless — id
 **Relações:**
 - `similar` → `software-development/dedalo-squad`
 - `uses` → `productivity/html-to-pdf-chromium`
+- `used_by` → `software-development/dedalo-squad`
+- `used_by` → `software-development/process-augmentation-pipeline`
+- `similar` → `software-development/threejs-rendering-debug`
 
 ### Dédalo Squad
 
@@ -811,6 +872,9 @@ Pipeline Dédalo Squad — mapeamento de processos com POPs e diagramas BPMN 2.0
 **Relações:**
 - `similar` → `software-development/bpmn-diagram-renderer`
 - `uses` → `productivity/html-to-pdf-chromium`
+- `uses` → `software-development/bpmn-diagram-renderer`
+- `uses` → `infrastructure/gemini-rate-limit-backoff`
+- `uses` → `research/user-interview`
 
 ### Authoring Hermes-Agent Skills (in-repo)
 
@@ -826,6 +890,7 @@ Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structu
 **Relações:**
 - `uses` → `software-development/plan`
 - `used_by` → `software-development/skills-repo-curator`
+- `similar` → `software-development/skills-repo-curator`
 
 ### Ideation Drilling (Hermes — Orchestrator)
 
@@ -842,6 +907,8 @@ Product ideation (Fase 1): refine raw ideas through structured drilling. Covers 
 - `uses` → `research/user-interview`
 - `parent` → `software-development/backlog-and-sprint`
 - `similar` → `software-development/spike`
+- `uses` → `research/deep-research`
+- `uses` → `software-development/spike`
 
 ### Improve Codebase Architecture
 
@@ -858,6 +925,8 @@ Scan a codebase for deepening opportunities, present them as a structured report
 - `similar` → `github/codebase-inspection`
 - `similar` → `software-development/systematic-debugging`
 - `uses` → `software-development/spike`
+- `similar` → `software-development/test-driven-development`
+- `used_by` → `software-development/plan`
 
 ### Plan Mode
 
@@ -877,6 +946,9 @@ Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bi
 - `used_by` → `software-development/systematic-debugging`
 - `used_by` → `software-development/backlog-and-sprint`
 - `similar` → `software-development/spike`
+- `used_by` → `software-development/ideation-drilling`
+- `used_by` → `software-development/improve-codebase-architecture`
+- `used_by` → `software-development/process-augmentation-pipeline`
 
 ### Pipeline ID Consultoria — Process Augmentation
 
@@ -894,6 +966,10 @@ Load this skill when the user requests the ID Consultoria process augmentation p
 - `uses` → `creative/style-guide-consultation`
 - `uses` → `software-development/agy`
 - `uses` → `research/augmentacao-query`
+- `uses` → `infrastructure/vercel-deploy`
+- `uses` → `software-development/backlog-and-sprint`
+- `uses` → `software-development/bpmn-diagram-renderer`
+- `uses` → `software-development/threejs-rendering-debug`
 
 ### Simplify Code
 
@@ -911,6 +987,8 @@ Load this skill after making code changes that need cleanup. Three parallel agen
 **Relações:**
 - `similar` → `software-development/systematic-debugging`
 - `similar` → `software-development/improve-codebase-architecture`
+- `uses` → `software-development/test-driven-development`
+- `similar` → `software-development/test-driven-development`
 
 ### Skills Repository Curator
 
@@ -926,6 +1004,8 @@ Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, 
 **Relações:**
 - `uses` → `software-development/hermes-agent-skill-authoring`
 - `uses` → `software-development/plan`
+- `similar` → `software-development/backlog-and-sprint`
+- `uses` → `infrastructure/data-pipeline-patterns`
 
 ### Spike
 
@@ -943,6 +1023,8 @@ Throwaway experiments to validate an idea before building — fast, focused.
 - `similar` → `software-development/plan`
 - `similar` → `software-development/ideation-drilling`
 - `uses` → `software-development/test-driven-development`
+- `similar` → `research/model-benchmark-frontier`
+- `used_by` → `software-development/improve-codebase-architecture`
 
 ### Systematic Debugging
 
@@ -959,6 +1041,7 @@ Throwaway experiments to validate an idea before building — fast, focused.
 - `uses` → `software-development/test-driven-development`
 - `uses` → `software-development/plan`
 - `similar` → `software-development/spike`
+- `parent` → `software-development/threejs-rendering-debug`
 
 ### Test-Driven Development (TDD)
 
@@ -976,6 +1059,8 @@ TDD: enforce RED-GREEN-REFACTOR, tests before code.
 - `used_by` → `software-development/plan`
 - `used_by` → `software-development/systematic-debugging`
 - `uses` → `software-development/spike`
+- `used_by` → `software-development/backlog-and-sprint`
+- `used_by` → `software-development/simplify-code`
 
 ### Three.js Rendering Debug
 
@@ -991,3 +1076,5 @@ Load this skill when a Three.js scene is rendering (triangles > 0) but appears i
 **Relações:**
 - `uses` → `software-development/agy`
 - `similar` → `productivity/html-report-hermes`
+- `uses` → `software-development/systematic-debugging`
+- `used_by` → `software-development/process-augmentation-pipeline`

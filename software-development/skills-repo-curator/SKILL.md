@@ -120,6 +120,7 @@ skills/
 - Usuário diz "gerencie suas skills", "limpe as skills", "rode evolve", "consolide skills", "alinhar com OKF", "adicionar type", "criar index.md por categoria"
 - Usuário pede para revisar, fundir, deletar ou organizar skills
 - Usuário pergunta sobre OKF, progressive disclosure, ou formato de conhecimento agent-ready
+- Usuário pede para adicionar/resumir/corrigir descrições de skills (summary >85 chars, trigger ausente, blank line separator faltando)
 - Ao final de uma sessão com múltiplas correções de workflow
 - Execução automática via cron diário
 
@@ -149,9 +150,32 @@ Sincroniza o index.md com o estado atual das skills.
    - **Parágrafo de resumo:** explica gatilhos de ativação ("Load this skill when...") e expande a descrição com capacidades específicas, ferramentas utilizadas e o que produz.
    - **`type:` presente e válido (OKF-aligned):** verifica se o campo `type` existe no frontmatter com um dos valores (Orchestrator, ToolIntegration, Reference, Template, Research, Media, Creative, Health). Skills sem `type` ou com type inválido devem ser corrigidas.
    - **`timestamp:` presente:** verifica se o campo `timestamp` ISO 8601 existe. Se ausente, extrair do git log.
+   - **Gatilho de ativação presente (multi-idioma):** verifica se o parágrafo contém "Load this skill when" (EN) ou "Carregue esta skill quando" (PT-BR). Skills em português são válidas com trigger em PT-BR. Skills sem trigger em nenhum dos dois idiomas devem ser corrigidas.
+   - **Separação sumário/corpo com linha em branco:** verifica se há `\n\n` entre o sumário e o parágrafo de descrição. Descrições sem linha em branco quebram o parser do generate_graph.py e audit-descriptions.py.
    - **Verifica duplicatas pós-aspas:** descrições que terminam com `"` mas têm texto idêntico repetido depois da aspa de fechamento são um bug comum. Detectar com `grep -A1 'description: "' SKILL.md | grep -v '^--$'` e inspecionar visualmente.
    - Lista **todas as skills fora do formato** com o problema específico, edita a SKILL.md original, depois atualiza o index.md.
    - **Sem exceção** — faz para todas as skills fora do formato.
+
+### Como corrigir descrições com sumário >85 chars
+
+Quando o audit apontar "Summary too long", o sumário (primeira linha da description) precisa ser truncado em ≤85 chars mantendo coerência:
+
+**Técnica de truncamento inteligente:**
+1. Encontre o último ponto de quebra natural antes da posição 85: prioridade `. ` (ponto+espaço) > ` — ` (em-dash) > `:` > `, ` > último espaço
+2. Remova trailing punctuation (`,` `;` `:` `—` `-`)
+3. O sumário NUNCA deve terminar com `...` — truncamento é sempre a um break point natural
+
+**Separação sumário/corpo:** se o sumário e o parágrafo estiverem consecutivos sem linha em branco, adicione `\n\n` entre eles. Ex: `description: "Summary.\n\nBody."` ✓ vs `description: "Summary.\nBody."` ✗
+
+**Multi-idioma:** Skills pt-BR usam "Carregue esta skill quando" em vez de "Load this skill when". O audit script aceita ambos.
+
+**Pós-correção:** verificar com `grep -rn 'description:' SKILL.md` se descrições não foram truncadas. Se corrompeu, restaurar com `git checkout HEAD -- <file>` e re-fixar.
+
+### Como sincronizar Resumo drift
+
+Após corrigir SKILL.md, rode `audit-descriptions.py --drift`. Para cada DRIFT:
+1. Index.md Resumo pode ser MAIS completo que o SKILL.md summary — aceitável
+2. Se o Resumo estiver desatualizado (menos info que o SKILL.md summary), substitua no index.md pelo texto da SKILL.md
    - **Verifica Resumo drift no index.md** — após corrigir as SKILL.md, verifique se os campos `Resumo:` no index.md correspondem à primeira linha (sumário) do `description:` da SKILL.md. O index.md pode ter resumos truncados, desatualizados ou corrompidos — especialmente em skills cujo SKILL.md foi editado mas o index.md não foi sincronizado. Use um script para comparar:
      ```python
      # Extrai sumário de cada SKILL.md e compara com Resumo do index.md
@@ -475,6 +499,7 @@ SKILLS_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.
 - Palavras extras ou faltando (ex: `project pipeline` vs só `pipeline`)
 - Whitespace invisível no final da linha
 - Acentos ou caracteres especiais (ex: `Hephaistos` com acento vs sem)
+- Descrições multi-linha sem blank line separator (o parser de FM simples não captura o valor completo)
 
 Procedimento:
 1. `read_file` no SKILL.md problemático — veja o texto **exato** da linha `description:`

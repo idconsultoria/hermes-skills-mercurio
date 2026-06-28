@@ -98,3 +98,5 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 ## [2026-06-28] evolve | 0 merges, 0 deletes, 0 orphans. 49 similar pairs analyzed — all distinct workflows. Graph regenerated (98 nodes, 115 edges). Reports saved.
 
 ## [2026-06-28] offload | No memory to offload — cron session has memory disabled (skip_memory=true). No procedural facts in memory for this profile.
+
+## [2026-06-28] evolve | Depth-1 inference: 87 new relations across 46 skills. 261 total (95 similar, 95 uses, 54 used_by, 17 parent). 0 merges, 0 deletes, 0 orphans. 3 parallel subagents analyzed all 60 skills. Graph regenerated (98 nodes, 184 edges).
