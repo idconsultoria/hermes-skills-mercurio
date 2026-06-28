@@ -52,6 +52,8 @@ def parse_skills(relations):
     """Walk SKILLS_DIR and extract metadata from every SKILL.md."""
     skills = []
     for root, dirs, files in os.walk(SKILLS_DIR):
+        # Skip .archive directories
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
         if 'SKILL.md' in files:
             path = os.path.join(root, 'SKILL.md')
             name = os.path.relpath(path, SKILLS_DIR).replace('/SKILL.md', '')

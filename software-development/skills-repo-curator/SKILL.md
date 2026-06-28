@@ -268,11 +268,23 @@ Duas skills conectadas (similar/uses) só devem permanecer separadas se descreve
 2. Cada subagente analisa ~28 skills
 3. **Cada subagente lê a skill principal E cada skill candidata a relação (profundidade 1)** — lê o SKILL.md de ambos os lados, confirma a conexão semântica antes de declará-la
 4. **Cada subagente produz um RELATÓRIO de saída** (ex: `relations-batch1.md`) — NUNCA edita o index.md diretamente (evita conflito de escrita concorrente)
-5. Um único agente central lê os relatórios e aplica **todos os patches sequencialmente** no index.md. Com 180+ arestas, use transformação em lote via Python (veja `references/batch-apply-relations.md`) — parseia os relatórios e gera o index.md atualizado em uma operação.
+5. Um único agente central lê os relatórios e aplica **todos os patches sequencialmente** no index.md. Com 180+ arestas, use transformação em lote via Python (veja `references/batch-apply-relations.md`) — parseia relatórios e gera o index.md atualizado em uma operação.
 
 Resultado esperado: ~140+ arestas em 75+ skills com precisão validada nos dois sentidos.
 
-**NÃO** parar no primeiro merge óbvio. Se um merge parece evidente (ex: 3 coding agents), isso não é desculpa para encerrar a análise. O ciclo evolve deve analisar **todas as skills**.
+**NÃO** parar no primeiro merge óbvio. Se um merge parece evidente (ex: 3 coding agents), isso não é desculpa para encerrar a análise. O ciclo evolve deve analisar **todas** as skills.
+
+### Consolidação de relações pós-depth-1
+
+Após os subagentes retornarem (tipicamente 80-120 proposições), o agente central deve:
+
+1. **Deduplicar pares simétricos:** `similar` é bidirecional — se A→similar→B e B→similar→A foram propostos em batches diferentes, manter apenas um (o grafo deduplica na renderização, mas o index.md fica poluído com linhas duplicadas).
+2. **Resolver inversões direcionais:** `uses`/`used_by` são opostos. Se batch-1 propôs A→uses→B e batch-2 propôs B→used_by→A, escolher a direção semanticamente correta (quem depende de quem).
+3. **Remover auto-relações:** nenhuma skill deve ter relação consigo mesma.
+4. **Verificar existentes:** cruzar cada proposta contra as relações já no index.md usando regex com `re.MULTILINE` (sem a flag, `re.findall` retorna 0 matches com o caractere → (U+2192) no padrão).
+5. **Aplicar em lote:** com 50-90 novas relações, usar um script Python que percorre as linhas do index.md, identifica cada bloco `**Relações:**`, e injeta as novas após as existentes. Escrever o resultado com `write_file` (ferramenta LLM, respeitando a regra do index.md).
+
+⚠️ **Regex pitfall:** Ao parsear relações com Python, SEMPRE use `re.MULTILINE`. O padrão `r'^- `(\w+)` → `(.+)`'` com o caractere Unicode → (U+2192) requer a flag para matches multi-linha. Sem ela, `re.findall` retorna lista vazia silenciosamente.
 
 ### Formato `|-` Quebra o Grafo
 
@@ -431,6 +443,21 @@ grep -rn 'description:' SKILL.md | grep -v 'description: "' | head -5 && echo 'W
 
 # Check for Resumo drift — index.md Resumo vs actual SKILL.md summary
 python3 software-development/skills-repo-curator/scripts/audit-descriptions.py --drift
+
+# Verify type + timestamp presence in every active SKILL.md
+python3 -c "
+import os, re
+for root, dirs, files in os.walk('.'):
+    if '.archive' in root or '.git' in root: continue
+    if 'SKILL.md' in files:
+        with open(os.path.join(root, 'SKILL.md')) as f: c = f.read()
+        fm = re.search(r'^---\n(.*?)\n---', c, re.DOTALL)
+        if not fm: print(f'MISSING FM: {root}')
+        else:
+            f = fm.group(1)
+            if not re.search(r'^type:', f, re.MULTILINE): print(f'MISSING type: {root}')
+            if not re.search(r'^timestamp:', f, re.MULTILINE): print(f'MISSING timestamp: {root}')
+"
 ```
 
 ## Pitfalls
@@ -486,6 +513,8 @@ python3 software-development/skills-repo-curator/scripts/audit-descriptions.py -
 ⚠️ **Diretório read-only impede patches/write_file.** Quando `patch` ou `write_file` falha com "Permission denied" ao criar arquivo temp (`.hermes-tmp.*`), o diretório da skill pode estar read-only (modo `dr-xr-xr-x` / 555). Verificar com `stat <dir> | grep Access`. Corrigir com `chmod u+w <dir>`. Arquivos 444 individuais usam `chmod 664 <file>`.
 
 ⚠️ **`.curator_backups/` não deve ser versionado.** O diretório `.curator_backups/` na raiz contém backups automáticos de skills. Adicionar ao `.gitignore`: `echo '.curator_backups/' >> .gitignore && git add .gitignore`.
+
+⚠️ **Regex `re.MULTILINE` silencioso.** Ao parsear relações do index.md com `re.findall`, o padrão `r'^- `(\w+)` → `(.+)`'` (com Unicode → U+2192) REQUER `re.MULTILINE`. Sem a flag, `re.findall` retorna 0 matches sem erro ou aviso — o agente conclui erroneamente que não há relações no arquivo. **Sempre** incluir `re.MULTILINE` ao buscar relations multi-linha.
 
 ⚠️ **`audit-descriptions.py` precisa do SKILLS_DIR correto.** O script em `skills-repo-curator/scripts/audit-descriptions.py` precisa de SKILLS_DIR = 4 níveis acima do script (scripts → skills-repo-curator → software-development → skills/), não 3. Se só escaneia poucos arquivos, o path está errado. Corrigir com:
 
