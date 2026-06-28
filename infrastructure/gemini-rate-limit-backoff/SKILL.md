@@ -1,6 +1,6 @@
 ---
 name: gemini-rate-limit-backoff
-description: "Exponential backoff for Google Gemini API rate limits (HTTP 429) — monkey-patching the genai SDK with jitter.
+description: "Exponential backoff for Google Gemini API rate limits — monkey-patching the genai
 
 Load this skill when Gemini returns 429 ResourceExhausted, you need to handle rate limits at scale, or you're building a multi-agent pipeline that calls Gemini from multiple agents simultaneously. Covers monkey-patching the genai SDK, extracting retry_delay from error messages, exponential backoff with jitter, and transparent retry for cron jobs."
 trigger: Gemini API rate limit errors (HTTP 429, ResourceExhausted, quota exceeded), multi-agent Gemini pipelines, or setting up resilient Gemini API clients in Python.

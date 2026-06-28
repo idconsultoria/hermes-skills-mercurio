@@ -1,6 +1,6 @@
 ---
 name: simplify-code
-description: "Simplify recent code changes — 3 parallel agents review logic, formatting, and dead code independently.
+description: "Simplify recent code changes — 3 parallel agents review logic, formatting, and dead
 
 Load this skill after making code changes that need cleanup. Three parallel agents review for logic issues, formatting problems, and dead code, then aggregate findings for selective application."
 version: 1.0.0

@@ -2,6 +2,8 @@
 name: augmentacao-query
 description: "Busca semântica nas 97 soluções de Aumentação de Processos com IA via Vulcano MCP.
 
+Carregue esta skill quando precisar buscar soluções de aumento de processos — consulta semântica via Vulcano MCP sobre as 97 soluções catalogadas.
+
 Use esta skill quando quiser encontrar soluções relevantes por significado, ler documentos completos, ou navegar por setor."
 category: research
 metadata:

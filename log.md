@@ -4,6 +4,8 @@ Diário cronológico de operações no repositório de skills.
 
 ---
 
+## [2026-06-28] update | Descriptions audited: 21 summaries shortened to ≤85 chars, 1 pt-BR trigger added (augmentacao-query), 3 missing blank-line separators fixed. Audit script updated to accept pt-BR trigger. 17 Resumo drifts synced. 60/100% compliant. Type + timestamp verified across all active skills.
+
 ## [2026-06-14] update | Index synced with working tree — 7 sizes updated, 1 new skill (digital-clone-persona), 2 resumos fixed. Descriptions audited: 6 YAML formats fixed (4 `|`→`"..."`, 5 `\n\n`→real newlines), 2 summaries shortened (product-pipeline, digital-clone-persona). ideation-drilling corrupted description replaced.
 
 ## [2026-06-14] evolve | Description cleanup cycle: 12 Resumo truncations fixed, 3 duplicate paragraphs removed. 0 merges, 0 orphans. 47 skills MECE. Graph regenerated (47 nodes).

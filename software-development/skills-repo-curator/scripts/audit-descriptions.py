@@ -73,7 +73,7 @@ def parse_description(content):
         issues.append('Literal \\\\n escapes — must use real newlines')
     if not has_real_nl:
         issues.append('Single-line description — missing paragraph')
-    elif 'load this skill' not in description.lower():
+    elif 'load this skill' not in description.lower() and 'carregue esta skill' not in description.lower():
         issues.append('Missing "Load this skill when..." trigger')
 
     return description, summary, has_real_nl, has_literal_nn, issues

@@ -1,7 +1,8 @@
 ---
 name: sound-design
 category: content-production
-description: "Umbrella skill for AI sound effects (SFX) and audio production — prompt engineering, UI sound design, audio post-processing, format delivery.
+description: "Umbrella skill for AI sound effects and audio production — prompt engineering and
+
 Load this skill for any sound design task: generating UI SFX with AI tools (ElevenLabs, Noiz AI), creating ambient/drone music, designing sonic identities for brands/interfaces, post-processing audio (normalization, format conversion, loudness), and integrating audio into web/desktop projects."
 metadata:
   hermes:

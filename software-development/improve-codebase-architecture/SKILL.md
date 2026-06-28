@@ -1,6 +1,6 @@
 ---
 name: improve-codebase-architecture
-description: "Scan a codebase for deepening opportunities and present them as a structured HTML report with prioritized recommendations.
+description: "Scan a codebase for deepening opportunities and present them as a structured report
 
 Load this skill when you need to identify architectural friction and deepening opportunities in a codebase. Covers design vocabulary, domain modeling, ADR workflows, and grilling through selected opportunities — all self-contained with zero external skill dependencies."
 category: software-development

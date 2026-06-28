@@ -1,6 +1,6 @@
 ---
 name: threejs-rendering-debug
-description: "Debug invisible 3D WebGL/Three.js scenes — shaders, fog, visibility, and asset loading issues.
+description: "Debug invisible 3D WebGL/Three.js scenes — shaders, fog, visibility, and asset
 
 Load this skill when a Three.js scene is rendering (triangles > 0) but appears invisible. Provides a diagnostic protocol covering renderer setup, fog, lighting, material visibility, shader compilation, and asset loading verification."
 version: 1.0.0

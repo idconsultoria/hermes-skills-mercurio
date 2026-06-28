@@ -1,7 +1,8 @@
 ---
 name: ai-creative-assets
 category: creative
-description: "Research AI tools for generating visual creative assets (textures, 3D models, sprites, vector icons) and craft optimized prompts + post-processing workflows for production-ready outputs.
+description: "Research AI tools for generating visual creative assets and craft optimized
+
 Load this skill when the user asks which AI tool to use for a specific asset type (texture, 3D model, sprite, icon), needs optimized prompts for visual asset generation (Nano Banana 2, Meshy AI, Recraft AI, GenPBR, Scenario), or needs to plan a multi-asset pipeline across different AI tools."
 metadata:
   hermes:

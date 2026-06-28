@@ -1,6 +1,6 @@
 ---
 name: hephaistos
-description: "Hephaistos meta-framework — orquestra pipelines de projeto com Hermes, OpenCode e agy.
+description: "Hephaistos meta-framework — orquestra pipelines de projeto com Hermes, OpenCode e agy
 
 Load this skill when starting a new software or branding project. Cobre 6 modos de pipeline (INCEPTION a DEPLOY), orquestração via delegate_task, subagentes OpenCode para código TDD, agy (Antigravity CLI) para design visual, vault cognitivo com 237+ engramas, e pipeline de design em 3 fases com entregáveis HTML auto-contidos."
 version: 1.10.0

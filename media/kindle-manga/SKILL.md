@@ -1,6 +1,6 @@
 ---
 name: kindle-manga
-description: "Prepare and transfer manga to Kindle — quality-gated conversion with resolution check, contrast correction, and grayscale EPUB generation.
+description: "Prepare and transfer manga to Kindle — quality-gated conversion with EPUB generation
 
 Load this skill when putting manga or comics on a Kindle, converting CBR/CBZ/PDF to Kindle format, or using KCC (Kindle Comic Converter) and Calibre for MOBI/AZW3 conversion."
 

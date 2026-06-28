@@ -1,6 +1,6 @@
 ---
 name: messaging-platforms
-description: "Reference for Hermes cross-platform messaging — platform quirks, ID formats, bridge processes, and latency diagnostics.
+description: "Reference for Hermes cross-platform messaging — platform quirks, ID formats, and
 
 Load this skill when troubleshooting message delivery across platforms, or when the user reports inconsistent response lag between platforms. Covers Telegram MEDIA file delivery rules, WhatsApp JID/group ID formats, bridge processes, known file-type limitations, platform-specific workarounds, and per-platform API latency diagnostics."
 metadata:

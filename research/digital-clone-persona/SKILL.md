@@ -1,6 +1,6 @@
 ---
 name: digital-clone-persona
-description: "Create digital clone personas through deep web research — discover, extract, and embody a person's identity and expertise.
+description: "Create digital clone personas through deep web research — discover, extract, and
 
 Load this skill when the user asks you to create an AI persona or \"clone digital\" of a real person through research. Combines deep-web reconnaissance with persona-crafting to produce a roleplayable character that can act as consultant, mentor, critic, or strategist in that person's voice."
 triggers:

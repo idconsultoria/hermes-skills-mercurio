@@ -27,7 +27,7 @@ Load this skill when you need to delegate coding tasks to autonomous AI coding a
 - **Nome:** `autonomous-ai-agents/hephaistos`
 - **Arquivo:** `autonomous-ai-agents/hephaistos/SKILL.md`
 - **Tamanho:** 66,923 chars
-- **Resumo:** Hephaistos meta-framework — Hermes-orchestrated project pipeline using delegate_task + OpenCode + Antigravity CLI
+- **Resumo:** Hephaistos meta-framework — orquestra pipelines de projeto com Hermes, OpenCode e agy
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-19T19:47:50Z
 
@@ -63,7 +63,7 @@ Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, an
 - **Nome:** `autonomous-ai-agents/messaging-platforms`
 - **Arquivo:** `autonomous-ai-agents/messaging-platforms/SKILL.md`
 - **Tamanho:** 23,813 chars
-- **Resumo:** Reference for Hermes cross-platform messaging — platform quirks, ID formats, bridge processes, and latency diagnostics
+- **Resumo:** Reference for Hermes cross-platform messaging — platform quirks, ID formats, and
 - **Type:** Reference
 - **Timestamp:** 2026-06-28T05:11:55Z
 
@@ -96,7 +96,7 @@ Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — n
 - **Nome:** `autonomous-ai-agents/pi-session-audit`
 - **Arquivo:** `autonomous-ai-agents/pi-session-audit/SKILL.md`
 - **Tamanho:** 18,869 chars
-- **Resumo:** Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl) and agy (protobuf SQLite DBs)
+- **Resumo:** Audit agent sessions — tokens, costs, models from Pi Agent and agy databases
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T05:11:55Z
 
@@ -134,7 +134,7 @@ Load this skill when building a product from scratch through the full pipeline �
 - **Nome:** `content-production/ai-sound-design`
 - **Arquivo:** `content-production/ai-sound-design/SKILL.md`
 - **Tamanho:** 5,891 chars
-- **Resumo:** Generate, process, and optimize sound effects and ambient audio using AI tools (ElevenLabs) and ffmpeg
+- **Resumo:** Generate, process, and optimize sound effects and ambient audio using AI tools and
 - **Type:** Media
 - **Timestamp:** 2026-06-21T05:11:49Z
 
@@ -149,7 +149,7 @@ Load this skill when you need to create sound effects, ambient audio, or UI soun
 - **Nome:** `content-production/iaf-newsletter-pipeline`
 - **Arquivo:** `content-production/iaf-newsletter-pipeline/SKILL.md`
 - **Tamanho:** 28,995 chars
-- **Resumo:** Umbrella skill for newsletters and digests — cron scheduling, multi-source curation
+- **Resumo:** Umbrella skill for newsletters and digests — cron scheduling and multi-source
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-19T19:47:50Z
 
@@ -167,7 +167,7 @@ Load this skill to set up, modify, run, or troubleshoot any daily newsletter, br
 - **Nome:** `content-production/sound-design`
 - **Arquivo:** `content-production/sound-design/SKILL.md`
 - **Tamanho:** 10,147 chars
-- **Resumo:** Umbrella skill for AI sound effects (SFX) and audio production — prompt engineering, UI sound design, audio post-processing
+- **Resumo:** Umbrella skill for AI sound effects and audio production — prompt engineering and
 - **Type:** Media
 - **Timestamp:** 2026-06-21T05:11:49Z
 
@@ -574,7 +574,7 @@ Notion API + ntn CLI: pages, databases, markdown import, Workers integration.
 - **Nome:** `productivity/relatorio-de-custos`
 - **Arquivo:** `productivity/relatorio-de-custos/SKILL.md`
 - **Tamanho:** 10,307 chars
-- **Resumo:** Generate cost reports for multi-agent projects with real token data from Hermes and Pi Agent
+- **Resumo:** Generate cost reports for multi-agent projects with real token data from Hermes and
 - **Type:** Template
 - **Timestamp:** 2026-06-19T19:47:50Z
 
@@ -671,7 +671,7 @@ Multi-agent deep research pipeline: decompose topics, dispatch parallel agents, 
 - **Nome:** `research/digital-clone-persona`
 - **Arquivo:** `research/digital-clone-persona/SKILL.md`
 - **Tamanho:** 10,076 chars
-- **Resumo:** Create digital clone personas through deep web research — discover, extract, and embody identity
+- **Resumo:** Create digital clone personas through deep web research — discover, extract, and
 - **Type:** Research
 - **Timestamp:** 2026-06-14T05:15:09Z
 
@@ -717,7 +717,7 @@ Discover what the tech/AI community is discussing right now — trending topics,
 - **Nome:** `research/user-interview`
 - **Arquivo:** `research/user-interview/SKILL.md`
 - **Tamanho:** 9,511 chars
-- **Resumo:** Structured user/proxy interview protocol for product research — plan, frame, listen, synthesize
+- **Resumo:** Structured user/proxy interview protocol for product research — plan, frame
 - **Type:** Research
 - **Timestamp:** 2026-06-12T02:23:22Z
 
@@ -752,7 +752,7 @@ Content for IA que Funciona community — brand constants, voice, tone, template
 - **Nome:** `software-development/agy`
 - **Arquivo:** `software-development/agy/SKILL.md`
 - **Tamanho:** 22,986 chars
-- **Resumo:** Versatile skill for coordinating Google Antigravity CLI for any design project that needs visual output
+- **Resumo:** Versatile skill for coordinating Google Antigravity CLI for any design project type.
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-21T05:11:49Z
 
@@ -768,7 +768,7 @@ Load this skill for strategic design tasks — visual HTML output, brand present
 - **Nome:** `software-development/backlog-and-sprint`
 - **Arquivo:** `software-development/backlog-and-sprint/SKILL.md`
 - **Tamanho:** 79,776 chars
-- **Resumo:** Backlog management and Sprint execution for product iteration (Fase 5) — mantém backlog e orquestra Sprints
+- **Resumo:** Backlog management and Sprint execution for product iteration (Fase 5) —
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-12T02:23:22Z
 
@@ -787,7 +787,7 @@ Backlog management and Sprint execution for product iteration (Fase 5). Mantém 
 - **Nome:** `software-development/bpmn-diagram-renderer`
 - **Arquivo:** `software-development/bpmn-diagram-renderer/SKILL.md`
 - **Tamanho:** 10,960 chars
-- **Resumo:** Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js + Chromium headless
+- **Resumo:** Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js and Chromium headless
 - **Type:** Template
 - **Timestamp:** 2026-06-28T05:11:55Z
 
@@ -802,7 +802,7 @@ Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js + Chromium headless — id
 - **Nome:** `software-development/dedalo-squad`
 - **Arquivo:** `software-development/dedalo-squad/SKILL.md`
 - **Tamanho:** 18,793 chars
-- **Resumo:** Pipeline Dédalo Squad — mapeamento de processos com POPs e diagramas BPMN 2.0 automatizados
+- **Resumo:** Pipeline Dédalo Squad — mapeamento de processos com POPs e diagramas BPMN 2.0
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-19T19:47:50Z
 
@@ -817,7 +817,7 @@ Pipeline Dédalo Squad — mapeamento de processos com POPs e diagramas BPMN 2.0
 - **Nome:** `software-development/hermes-agent-skill-authoring`
 - **Arquivo:** `software-development/hermes-agent-skill-authoring/SKILL.md`
 - **Tamanho:** 12,249 chars
-- **Resumo:** Author SKILL.md and DESIGN.md token specs in-repo — frontmatter, validator, structure
+- **Resumo:** Author SKILL.md and DESIGN.md token specs in-repo — frontmatter, validator
 - **Type:** Reference
 - **Timestamp:** 2026-06-12T02:23:22Z
 
@@ -848,7 +848,7 @@ Product ideation (Fase 1): refine raw ideas through structured drilling. Covers 
 - **Nome:** `software-development/improve-codebase-architecture`
 - **Arquivo:** `software-development/improve-codebase-architecture/SKILL.md`
 - **Tamanho:** 16,634 chars
-- **Resumo:** Scan a codebase for deepening opportunities, present them as a visual HTML report
+- **Resumo:** Scan a codebase for deepening opportunities and present them as a structured report
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z
 
@@ -900,7 +900,7 @@ Load this skill when the user requests the ID Consultoria process augmentation p
 - **Nome:** `software-development/simplify-code`
 - **Arquivo:** `software-development/simplify-code/SKILL.md`
 - **Tamanho:** 11,179 chars
-- **Resumo:** Simplify recent code changes — 3 parallel agents review logic, formatting, and dead code independently
+- **Resumo:** Simplify recent code changes — 3 parallel agents review logic, formatting, and dead
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z
 
@@ -982,7 +982,7 @@ TDD: enforce RED-GREEN-REFACTOR, tests before code.
 - **Nome:** `software-development/threejs-rendering-debug`
 - **Arquivo:** `software-development/threejs-rendering-debug/SKILL.md`
 - **Tamanho:** 5,200 chars
-- **Resumo:** Debug invisible 3D WebGL/Three.js scenes — shaders, fog, visibility, and asset loading issues
+- **Resumo:** Debug invisible 3D WebGL/Three.js scenes — shaders, fog, visibility, and asset
 - **Type:** Reference
 - **Timestamp:** 2026-06-28T05:11:55Z
 

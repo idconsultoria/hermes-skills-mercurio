@@ -1,6 +1,6 @@
 ---
 name: bpmn-diagram-renderer
-description: "Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js + Chromium headless — identical output to Camunda Modeler.
+description: "Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js and Chromium headless
 
 Load this skill when a user asks to render a BPMN diagram, export BPMN to image, or visualize a .bpmn file. Covers setup, HTML template, and batch processing."
 trigger: User asks to render a BPMN diagram, export BPMN to image, or visualize a .bpmn file.

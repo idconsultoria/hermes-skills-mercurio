@@ -1,6 +1,6 @@
 ---
 name: dedalo-squad
-description: "Pipeline Dédalo Squad — mapeamento de processos com POPs e diagramas BPMN 2.0 a partir de áudios no Google Drive.
+description: "Pipeline Dédalo Squad — mapeamento de processos com POPs e diagramas BPMN 2.0
 
 Load this skill when the user wants to process organizational interviews into structured documentation: discover audio files in ANY Google Drive folder structure, create a tracking spreadsheet, transcribe interviews, generate POPs (Procedimentos Operacionais Padrão), create BPMN 2.0 diagrams (XML + PNG), and track everything in Google Sheets. Covers the full lifecycle: discovery, bootstrap, execution, monitoring, retry, and troubleshooting."
 category: software-development

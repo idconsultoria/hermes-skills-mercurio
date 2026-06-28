@@ -1,6 +1,6 @@
 ---
 name: manga-anime-data
-description: "Research manga and anime data via AniList GraphQL API — rankings, scores, metadata, completion status, and genre filtering.
+description: "Research manga and anime data via AniList GraphQL API — rankings, scores, and
 
 Load this skill instead of web search when you need authoritative community ratings, detailed metadata, or status verification for anime/manga. Returns structured JSON data via direct GraphQL queries."
 category: media

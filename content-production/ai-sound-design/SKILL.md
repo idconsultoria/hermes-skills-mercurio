@@ -1,7 +1,7 @@
 ---
 name: ai-sound-design
 title: AI Sound Design — SFX & Ambient Audio
-description: "Generate, process, and optimize sound effects and ambient audio using AI tools (ElevenLabs) and ffmpeg.
+description: "Generate, process, and optimize sound effects and ambient audio using AI tools and
 
 Load this skill when you need to create sound effects, ambient audio, or UI sounds for web/game/film projects. Covers prompt engineering for ElevenLabs SFX V2, settings optimization (Prompt Influence, duration, reverb), audio post-processing with ffmpeg (normalization, format conversion), and seamless loop creation for ambient drones."
 category: content-production
