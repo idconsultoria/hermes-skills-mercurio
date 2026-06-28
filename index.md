@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 57 skills*
+*Total: 60 skills*
 
 ---
 
@@ -56,10 +56,10 @@ Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, an
 
 - **Nome:** `autonomous-ai-agents/messaging-platforms`
 - **Arquivo:** `autonomous-ai-agents/messaging-platforms/SKILL.md`
-- **Tamanho:** 16,795 chars
-- **Resumo:** Reference for Hermes cross-platform messaging — platform quirks, ID formats, and bridge workarounds
+- **Tamanho:** 23,813 chars
+- **Resumo:** Reference for Hermes cross-platform messaging — platform quirks, ID formats, bridge processes, and latency diagnostics
 
-Load this skill when troubleshooting message delivery across platforms. Covers Telegram MEDIA file delivery rules, WhatsApp JID/group ID formats, bridge processes for WhatsApp and Telegram, known file-type limitations, and platform-specific workarounds for reliable cross-platform messaging.
+Load this skill when troubleshooting message delivery across platforms, or when the user reports inconsistent response lag between platforms. Covers Telegram MEDIA file delivery rules, WhatsApp JID/group ID formats, bridge processes, known file-type limitations, platform-specific workarounds, and per-platform API latency diagnostics.
 
 **Relações:**
 - `used_by` → `autonomous-ai-agents/product-pipeline`
@@ -85,7 +85,7 @@ Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — n
 
 - **Nome:** `autonomous-ai-agents/pi-session-audit`
 - **Arquivo:** `autonomous-ai-agents/pi-session-audit/SKILL.md`
-- **Tamanho:** 18,663 chars
+- **Tamanho:** 18,869 chars
 - **Resumo:** Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl) and agy (protobuf SQLite DBs)
 
 Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl) and agy (protobuf SQLite DBs). Load this skill to analyze Pi Agent session logs and calculate costs per provider. Extracts real usage metrics from session JSONL files, computes costs based on model pricing, and produces audit reports for tracking agent usage and spending.
@@ -249,8 +249,8 @@ Humanize text: strip AI-isms and add real voice.
 
 - **Nome:** `creative/style-guide-consultation`
 - **Arquivo:** `creative/style-guide-consultation/SKILL.md`
-- **Tamanho:** 7,464 chars
-- **Resumo:** Catalog of style guides — load the correct design system for any visual task. Load this skill for any visual output
+- **Tamanho:** 8,041 chars
+- **Resumo:** Catalog of style guides — load the correct design system for any visual task.
 
 Catalog and consultation of style guides — load the correct design system for any visual task. Load this skill when you need to apply a brand or design system to any visual output. Covers loading the correct style guide (Hermes Agent, ID Consultoria, IAF Comunidade, IAF Newsletter) for brand-consistent HTML, diagrams, and presentations.
 
@@ -342,8 +342,8 @@ Load this skill when tracking body recomposition metrics — weight, body fat, a
 
 - **Nome:** `infrastructure/data-pipeline-patterns`
 - **Arquivo:** `infrastructure/data-pipeline-patterns/SKILL.md`
-- **Tamanho:** 5,181 chars
-- **Resumo:** Reliability patterns for batch data pipelines: exponential backoff, API safeguards, error handling
+- **Tamanho:** 5,373 chars
+- **Resumo:** Reliability patterns for batch data pipelines — exponential backoff, API safeguards, cell-size truncation, and parallel execution guardrails
 
 Reliability patterns for batch data pipelines: exponential backoff, API call safeguards, error handling strategies for cron-driven automation.
 
@@ -369,8 +369,8 @@ CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr.io → SSH deploy 
 
 - **Nome:** `infrastructure/gemini-rate-limit-backoff`
 - **Arquivo:** `infrastructure/gemini-rate-limit-backoff/SKILL.md`
-- **Tamanho:** 4,339 chars
-- **Resumo:** Exponential backoff for Google Gemini API rate limits (HTTP 429) — monkey-patching SDK with jitter
+- **Tamanho:** 4,375 chars
+- **Resumo:** Exponential backoff for Google Gemini API rate limits (HTTP 429) — monkey-patching the genai SDK with jitter
 
 Exponential backoff for Google Gemini API rate limits (HTTP 429). Covers monkey-patching the genai SDK, extracting retry_delay from error messages, exponential backoff with jitter, and transparent retry for cron jobs.
 
@@ -382,7 +382,7 @@ Exponential backoff for Google Gemini API rate limits (HTTP 429). Covers monkey-
 
 - **Nome:** `infrastructure/oracle-host-access`
 - **Arquivo:** `infrastructure/oracle-host-access/SKILL.md`
-- **Tamanho:** 30,667 chars
+- **Tamanho:** 30,866 chars
 - **Resumo:** SSH from Hermes Docker container to Oracle Linux host — key setup and diagnostics
 
 SSH from Hermes Docker container to Oracle Linux host — key setup and diagnostics.
@@ -395,7 +395,7 @@ SSH from Hermes Docker container to Oracle Linux host — key setup and diagnost
 
 - **Nome:** `infrastructure/vercel-deploy`
 - **Arquivo:** `infrastructure/vercel-deploy/SKILL.md`
-- **Tamanho:** 20,351 chars
+- **Tamanho:** 20,694 chars
 - **Resumo:** Deploy static sites and frontend apps to Vercel — from zero to production
 
 Deploy static sites and frontend apps to Vercel — from zero to production. Covers CLI install, device-flow authentication, project creation, deploy, custom domains, env vars, and common pitfalls. Works in restricted environments.
@@ -420,13 +420,37 @@ Produce deterministic MP4 videos using HyperFrames (HTML→video engine). Genera
 - `uses` → `creative/brand-studio-forge`
 - `uses` → `creative/style-guide-consultation`
 
+### Kindle Manga — Quality-Gated Manga to EPUB/MOBI
+
+- **Nome:** `media/kindle-manga`
+- **Arquivo:** `media/kindle-manga/SKILL.md`
+- **Tamanho:** 57,282 chars
+- **Resumo:** Prepare and transfer manga to Kindle — quality-gated conversion with resolution check, contrast correction, and grayscale EPUB generation
+
+Load this skill when putting manga or comics on a Kindle, converting CBR/CBZ/PDF to Kindle format, or using KCC and Calibre for MOBI/AZW3 conversion. Covers source acquisition (Archive.org, Nyaa torrents, MangaDex API), quality gate with resolution and contrast checks, grayscale EPUB generation with PW11-native resize, and USB or Drive delivery.
+
+**Relações:**
+- `similar` → `media/manga-anime-data`
+
+### Manga & Anime Data Research via AniList API
+
+- **Nome:** `media/manga-anime-data`
+- **Arquivo:** `media/manga-anime-data/SKILL.md`
+- **Tamanho:** 4,717 chars
+- **Resumo:** Research manga and anime data via AniList GraphQL API — rankings, scores, metadata, completion status, and genre filtering
+
+Load this skill instead of web search when you need authoritative community ratings, detailed metadata, or status verification for anime/manga. Returns structured JSON data via direct GraphQL queries to the AniList public API.
+
+**Relações:**
+- `similar` → `media/kindle-manga`
+
 ## Productivity
 
 ### Google Workspace
 
 - **Nome:** `productivity/google-workspace`
 - **Arquivo:** `productivity/google-workspace/SKILL.md`
-- **Tamanho:** 19,958 chars
+- **Tamanho:** 21,326 chars
 - **Resumo:** Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation
 
 Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation.
@@ -510,7 +534,7 @@ TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Co
 
 - **Nome:** `read-reddit`
 - **Arquivo:** `read-reddit/SKILL.md`
-- **Tamanho:** 7,591 chars
+- **Tamanho:** 7,445 chars
 - **Resumo:** Read Reddit subreddits via RSS feeds — bypasses API rate limits and bot detection
 
 Read Reddit subreddits reliably via RSS feeds — bypasses API rate limits and bot detection. For research, curation, or news gathering.
@@ -526,7 +550,7 @@ Read Reddit subreddits reliably via RSS feeds — bypasses API rate limits and b
 
 - **Nome:** `research/augmentacao-query`
 - **Arquivo:** `research/augmentacao-query/SKILL.md`
-- **Tamanho:** 4,387 chars
+- **Tamanho:** 4,388 chars
 - **Resumo:** Busca semântica nas 97 soluções de Aumentação de Processos com IA via Vulcano MCP
 
 Busca semântica nas 97 soluções de Aumentação de Processos com IA via Vulcano MCP.
@@ -539,7 +563,7 @@ Busca semântica nas 97 soluções de Aumentação de Processos com IA via Vulca
 
 - **Nome:** `research/augmentation-process-design`
 - **Arquivo:** `research/augmentation-process-design/SKILL.md`
-- **Tamanho:** 9,715 chars
+- **Tamanho:** 9,644 chars
 - **Resumo:** Design, research and curadoria de soluções de augmentação de processos com IA
 
 Design, research and curadoria de soluções de augmentação de processos com IA — taxonomia A/B × I/II/III.
@@ -668,7 +692,7 @@ Backlog management and Sprint execution for product iteration (Fase 5). Mantém 
 
 - **Nome:** `software-development/bpmn-diagram-renderer`
 - **Arquivo:** `software-development/bpmn-diagram-renderer/SKILL.md`
-- **Tamanho:** 10,800 chars
+- **Tamanho:** 10,960 chars
 - **Resumo:** Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js + Chromium headless
 
 Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js + Chromium headless — identify business process flows from process mapping.
@@ -721,7 +745,7 @@ Product ideation (Fase 1): refine raw ideas through structured drilling. Covers 
 
 - **Nome:** `software-development/improve-codebase-architecture`
 - **Arquivo:** `software-development/improve-codebase-architecture/SKILL.md`
-- **Tamanho:** 16,476 chars
+- **Tamanho:** 16,634 chars
 - **Resumo:** Scan a codebase for deepening opportunities, present them as a visual HTML report
 
 Scan a codebase for deepening opportunities, present them as a structured report with prioritized recommendations for refactoring and improvement.
@@ -752,7 +776,7 @@ Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bi
 
 - **Nome:** `software-development/process-augmentation-pipeline`
 - **Arquivo:** `software-development/process-augmentation-pipeline/SKILL.md`
-- **Tamanho:** 44,528 chars
+- **Tamanho:** 50,965 chars
 - **Resumo:** Pipeline ID Consultoria: análise de processos, brainstorming de soluções e site 3D
 
 Load this skill when the user requests the ID Consultoria process augmentation pipeline — pain/opportunity/bottleneck mapping, causal loop diagrams, solution brainstorming, multi-criteria evaluation, and packaging into an interactive 3D site. Covers 4 pipeline stages with parallel subagent orchestration.
@@ -767,10 +791,12 @@ Load this skill when the user requests the ID Consultoria process augmentation p
 
 - **Nome:** `software-development/simplify-code`
 - **Arquivo:** `software-development/simplify-code/SKILL.md`
-- **Tamanho:** 8,505 chars
-- **Resumo:** Parallel 3-agent cleanup of recent code changes
+- **Tamanho:** 11,179 chars
+- **Resumo:** Simplify recent code changes — 3 parallel agents review logic, formatting, and dead code independently
 
-Parallel 3-agent cleanup of recent code changes — each agent handles a separate aspect (logic, formatting, dead code), reviewed independently.
+Simplify recent code changes — 3 parallel agents review logic, formatting, and dead code independently.
+
+Load this skill after making code changes that need cleanup. Three parallel agents review for logic issues, formatting problems, and dead code, then aggregate findings for selective application.
 
 **Relações:**
 - `similar` → `software-development/systematic-debugging`
@@ -780,7 +806,7 @@ Parallel 3-agent cleanup of recent code changes — each agent handles a separat
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 28,083 chars
+- **Tamanho:** 28,889 chars
 - **Resumo:** Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph
 
 Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph generation.
@@ -832,3 +858,16 @@ TDD: enforce RED-GREEN-REFACTOR, tests before code.
 - `used_by` → `software-development/plan`
 - `used_by` → `software-development/systematic-debugging`
 - `uses` → `software-development/spike`
+
+### Three.js Rendering Debug
+
+- **Nome:** `software-development/threejs-rendering-debug`
+- **Arquivo:** `software-development/threejs-rendering-debug/SKILL.md`
+- **Tamanho:** 5,200 chars
+- **Resumo:** Debug invisible 3D WebGL/Three.js scenes — shaders, fog, visibility, and asset loading issues
+
+Load this skill when a Three.js scene is rendering (triangles > 0) but appears invisible. Provides a diagnostic protocol covering renderer setup, fog, lighting, material visibility, shader compilation, and asset loading verification.
+
+**Relações:**
+- `uses` → `software-development/agy`
+- `similar` → `productivity/html-report-hermes`

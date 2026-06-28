@@ -1,6 +1,8 @@
 ---
 name: messaging-platforms
-description: "Reference for Hermes cross-platform messaging — platform quirks, ID formats, bridge processes, and platform-specific workarounds. Load this skill when troubleshooting message delivery across platforms. Covers Telegram MEDIA file delivery rules, WhatsApp JID/group ID formats, bridge processes for WhatsApp and Telegram, known file-type limitations, and platform-specific workarounds."
+description: "Reference for Hermes cross-platform messaging — platform quirks, ID formats, bridge processes, and latency diagnostics.
+
+Load this skill when troubleshooting message delivery across platforms, or when the user reports inconsistent response lag between platforms. Covers Telegram MEDIA file delivery rules, WhatsApp JID/group ID formats, bridge processes, known file-type limitations, platform-specific workarounds, and per-platform API latency diagnostics."
 metadata:
   hermes:
     tags: [messaging, platforms, telegram, whatsapp, signal, matrix, discord, slack, bridge]
@@ -121,16 +123,43 @@ display:
 **Requires:** Gateway `/restart` or `hermes gateway restart` to take effect.
 **CLI unaffected:** These settings only change gateway behavior; CLI sessions remain unchanged.
 
-### Different UX for Yourself vs Other Users (Two-Bot Pattern)
+### Different UX for Yourself vs Other Users (Multi-Bot Pattern)
 
-Display settings are **per-platform, not per-user** — all Telegram users see the same display. To have different experiences (verbose for you, clean for others), run two Telegram bots on separate Hermes profiles:
+Display settings are **per-platform, not per-user** — all Telegram users see the same display. To have different experiences (verbose for you, clean for others), run multiple Telegram bots each on its own Hermes profile.
+
+#### Approach A: Multiplexing Gateway (Recommended — Single Process)
+
+With `gateway.multiplex_profiles: true`, **one** gateway process serves all profiles. Each profile keeps its own bot token, config, skills, SOUL, and memory. Sessions are namespaced per profile (`agent:<profile>:...`).
+
+```yaml
+# default profile's config.yaml
+gateway:
+  multiplex_profiles: true
+```
+
+Steps:
+
+1. Create a second Telegram bot via [@BotFather](https://t.me/botfather)
+2. Create a Hermes profile: `hermes profile create public`
+3. Configure the public profile's Telegram token and set `display.tool_progress: none` in its config.yaml
+4. Start **just** the default gateway: `hermes gateway start`
 
 | Profile | Bot Token | Config | Audience |
 |---------|-----------|--------|----------|
 | `default` | Bot A (private) | `tool_progress: all` | You see everything |
 | `public` | Bot B (public) | `tool_progress: none` | Public sees clean responses |
 
-Each profile runs its own gateway process. Steps:
+Rules when multiplexing is on:
+- Secondary profiles **must not** start their own gateway (`hermes -p public gateway start` fails with a clear error)
+- Each profile needs its **own** bot token — two profiles sharing the same token crashes startup
+- HTTP-inbound platforms use `/p/<profile>/` URL prefix on the default listener
+- Sessions are namespaced, existing default-profile history is untouched
+
+See [docs: Running Many Gateways at Once](https://hermes-agent.nousresearch.com/docs/user-guide/running-many-gateways) for full details.
+
+#### Approach B: Separate Gateway Per Profile (Multiple Processes)
+
+The classic approach — each profile runs its own gateway process:
 
 1. Create a second Telegram bot via [@BotFather](https://t.me/botfather)
 2. Create a Hermes profile: `hermes profile create public`
@@ -138,7 +167,59 @@ Each profile runs its own gateway process. Steps:
 4. In the public profile's config.yaml, set `display.tool_progress: none`
 5. Start the second gateway: `hermes -p public gateway`
 
-This also lets you set different permitted features per profile (e.g., restrict terminal access on the public one).
+Use this when you want hard process-level isolation (separate crash domains, restart one without touching others).
+
+Both approaches let you set different permitted features per profile (e.g., restrict terminal access on the public one).
+
+## Telegram — DM Topics & Multi-Session Mode
+
+Two features let you run multiple isolated workspaces within a **single** Telegram bot DM:
+
+### Config-Driven DM Topics
+
+Declare fixed topics in config.yaml — each topic gets its own session, history, and optional auto-loaded skill:
+
+```yaml
+platforms:
+  telegram:
+    extra:
+      dm_topics:
+      - chat_id: SEU_USER_ID
+        topics:
+        - name: Dev
+          icon_color: 9367192
+          skill: github-pr-workflow
+        - name: Pesquisa
+          icon_color: 16766590
+          skill: deep-research
+```
+
+- Each topic maps to an isolated session key: `agent:<profile>:telegram:dm:{chat_id}:{thread_id}`
+- Topics with a `skill` field auto-load that skill on session reset (/reset, idle timeout)
+- Set `ignore_root_dm: true` to turn the root DM into a system-commands-only lobby for users with topics
+
+Prerequisite: user must enable Topics mode in the bot DM (tap bot name → enable Topics).
+
+### User-Driven Multi-Session Mode (`/topic`)
+
+End-user types `/topic` in the DM to enable ChatGPT-style multi-session mode — no config, no pre-declared names:
+
+- `/topic` — enable mode, create pinned System topic
+- `/topic <session-id>` — restore a previous Telegram session into a topic
+- `/topic off` — disable mode, clear bindings
+
+Each topic created via Telegram's "All Messages → send any message" becomes a standalone session with full isolation (history, context window, model state). Topics are auto-renamed to match the session title unless `disable_topic_auto_rename: true` is set.
+
+Prerequisite: @BotFather → Bot Settings → Threads Settings → enable Threaded Mode, keep "users can create topics" on.
+
+### When to Use Each
+
+| Feature | Who activates | Topic names | Best for |
+|---------|-------------|-------------|----------|
+| `dm_topics` | Operator (config) | Fixed, chosen by operator | Permanent workspaces with skill binding |
+| `/topic` | End user | Free, user-chosen | Ad-hoc parallel conversations |
+
+Both can coexist: `dm_topics` manages operator-declared workspaces, `/topic` lets the user create ad-hoc sessions.
 
 ## WhatsApp Bridge (Baileys)
 
@@ -266,51 +347,6 @@ Note: `send_message` cannot resolve group JIDs through the channel directory. Gr
 
 Verificar nome: `curl -s http://localhost:3000/chat/JID | python3 -c "import sys,json; print(json.load(sys.stdin).get('name'))"`
 
-### Discovering Group IDs Without /groups Endpoint
-
-The bridge has no built-in endpoint to list groups. Add one:
-
-1. **Add `GET /groups` to `bridge.js`** (after the `/chat/:id` route):
-
-```javascript
-// List all groups
-app.get('/groups', async (req, res) => {
-  if (!sock || connectionState !== 'connected') {
-    return res.status(503).json({ error: 'Not connected' });
-  }
-  try {
-    const groups = await sock.groupFetchAllParticipating();
-    const result = Object.entries(groups).map(([id, meta]) => ({
-      id,
-      subject: meta.subject,
-      size: meta.participants?.length || 0,
-    }));
-    res.json({ groups: result });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-```
-
-2. **Restart the bridge**: kill the process—the gateway's reconnection watcher restarts it automatically within ~30s.
-
-3. **Query groups**:
-```bash
-curl -s http://127.0.0.1:3000/groups | jq '.groups[] | select(.subject | test("GROUP NAME"; "i"))'
-```
-
-### Sending to Groups
-
-Once you have the group JID, bypass `send_message` and hit the bridge directly:
-
-```bash
-curl -s -X POST http://127.0.0.1:3000/send \
-  -H "Content-Type: application/json" \
-  -d '{"chatId":"120363XXXXX@g.us","message":"Your message"}'
-```
-
-The bridge returns `{"success":true,"messageId":"..."}` on success.
-
 ### Cron Jobs → Group Delivery (Two-Tier Pattern)
 
 When a **cron job** needs to send a message to a WhatsApp group while keeping status/confirmation private:
@@ -373,27 +409,6 @@ Parameters:
 
 In self-chat mode, `formatOutgoingMessage()` prepends `⚕ *Hermes Agent*\n────────────\n` to EVERY outgoing message before sending. This is defined as `DEFAULT_REPLY_PREFIX`. When sending to groups, this prefix appears as part of the message text from the user's own number. The prefix is controlled by `WHATSAPP_REPLY_PREFIX` env var — set to empty string to disable.
 
-### Discovering Group IDs Without /groups Endpoint
-
-If the `GET /groups` endpoint hasn't been added to bridge.js yet, group IDs can still be discovered from the session filesystem:
-
-**Known WhatsApp Groups (ID Consultoria):**
-- ID [Núcleo]: `120363170662612284@g.us`
-- IA que Funciona: `120363419131378682@g.us`
-
-```bash
-# List all groups the bot is participating in
-ls [whatsapp-session-dir]/ | grep "sender-key-" | sed 's/.*sender-key-//' | sed 's/--.*//' | sort -u
-
-# Find the most recently active group (likely where user just messaged)
-ls -lt [whatsapp-session-dir]/sender-key-*.json | head -5
-
-# Check bridge log for the most frequently active group
-grep -oP '"chatId":"[^"]+' [whatsapp-bridge-log] | sort | uniq -c | sort -rn | head -10
-```
-
-The bridge logs don't contain group names (only JIDs in self-chat mode), so the most recently modified sender-key file is the best heuristic for identifying the active group.
-
 ### Bridging Restart Pattern
 
 After editing `bridge.js`:
@@ -401,9 +416,117 @@ After editing `bridge.js`:
 2. Wait for the gateway's reconnection watcher (~30s, check with `curl http://localhost:3000/health`)
 3. The bridge starts with the modified code, session auth persists from saved creds
 
+### link-preview-js Missing Dependency
+
+The WhatsApp bridge depends on `link-preview-js` for generating link previews. If missing, every message with a URL logs `ERR_MODULE_NOT_FOUND: Cannot find package 'link-preview-js'` in `bridge.log` and link previews fail silently. Messages still deliver without previews.
+
+**Fix:**
+```bash
+cd /opt/data/scripts/whatsapp-bridge && npm install link-preview-js
+```
+
+Verify with `ls node_modules/link-preview-js/package.json`.
+
 ### Troubleshooting
 
 - **"Cannot destructure property 'user' of 'jidDecode(...)'"** — JID is malformed. Use `number@s.whatsapp.net`, not E.164.
 - **"Could not resolve '...' on whatsapp"** — Contact not in channel directory. Use direct bridge API.
 - **Bridge log** at `[bridge-log-path]` for connection status and errors.
 - **Check status**: `curl -s http://127.0.0.1:3000/health`
+
+#### Bridge fails to start after cleanup (node_modules deleted)
+
+System cleanups (Docker prune, disk reclaim) often remove `node_modules/` from the WhatsApp bridge directory. When the directory and its files are read-only (`0555`/`-r--r--r--`), the gateway adapter's `npm install` fails with `EACCES: permission denied` on `package-lock.json`.
+
+**Symptoms in gateway.log:**
+```
+Bridge found at /opt/data/scripts/whatsapp-bridge/bridge.js
+(no "Dependencies installed" message)
+~500ms later -> Reconnect whatsapp failed, next retry in 300s
+```
+
+**Fix:**
+```bash
+# 1. Make bridge files writable
+chmod u+w /opt/data/scripts/whatsapp-bridge/*.json
+chmod u+w /opt/data/scripts/whatsapp-bridge/*.js /opt/data/scripts/whatsapp-bridge/*.mjs
+
+# 2. Install dependencies
+cd /opt/data/scripts/whatsapp-bridge && npm ci
+
+# 3. Create the .hermes-pkg-hash stamp so the adapter skips npm install next time
+python3 -c "
+import hashlib
+h = hashlib.sha256(open('package.json','rb').read()).hexdigest()[:16]
+open('node_modules/.hermes-pkg-hash','w').write(h)
+"
+```
+
+**How the adapter decides to run npm install (deps_fresh check):**
+The adapter checks for `node_modules/.hermes-pkg-hash` and compares it against a SHA-256 of `package.json` (first 16 hex chars). If the file is missing or the hash does not match, it runs `npm install --silent` with a 300s timeout. After a clean install from scratch (no existing `node_modules`), the stamp file does not exist -- the adapter will trigger a fresh `npm install` on each reconnect, which may fail if files are read-only. Always create the stamp manually after `npm ci` to short-circuit this check.
+
+#### Session path resolution
+
+The adapter resolves the session path via `get_hermes_dir("platforms/whatsapp/session", "whatsapp/session")`:
+- Checks for legacy path `$HERMES_HOME/whatsapp/session` first (e.g. `/opt/data/whatsapp/session/`)
+- Falls back to `$HERMES_HOME/platforms/whatsapp/session`
+
+Two paths may coexist after cleanup or profile changes. The active session is the one with `creds.json`. If an empty session directory is created by a manual bridge test (e.g. at `/opt/data/home/.hermes/whatsapp/session/`), it is not the one the adapter uses -- it will be ignored as long as the legacy path exists with valid creds.
+
+To verify which session path the adapter is using:
+```bash
+curl -s http://localhost:3000/health | python3 -c "import sys,json; print(json.load(sys.stdin))"
+```
+
+## Platform Latency Diagnostics
+
+When the user reports inconsistent response speed between platforms (e.g., Telegram slow but WhatsApp fast), the cause may be network geography, but it can also be **session context size** or a **shared provider bottleneck**.
+
+### Quick Differential Diagnosis
+
+Run this before diving into tools:
+
+1. **Are ALL platforms slow?** Check gateway logs for both platforms:
+   ```
+   grep "response ready" /opt/data/logs/gateway.log | tail -10
+   ```
+   If both Telegram AND WhatsApp show high response times (e.g., `time=60.0s api_calls=14`), the bottleneck is in the **shared LLM provider/model path**, not in platform latency.
+
+2. **What's the pattern within a single turn?** If the first response per user message is slow but subsequent tool calls in the same turn are fast, it's **prompt cache invalidation** between turns — each user message forces the provider to reprocess the full session context from scratch (30-70s for a 291K-token session), while cached responses within a turn are fast (2-5s).
+
+3. **Is one platform consistently slower?** Then measure raw API latency from the host (see below) — likely network geography.
+
+### Measuring Raw API Latency
+
+```bash
+# Telegram
+curl -s -o /dev/null -w "connect=%{time_connect}s total=%{time_total}s\n" \
+  --max-time 10 "https://api.telegram.org/bot${TOKEN}/getMe"
+
+# WhatsApp (Graph API)
+curl -s -o /dev/null -w "connect=%{time_connect}s total=%{time_total}s\n" \
+  --max-time 10 https://graph.facebook.com/v22.0/
+```
+
+### Session Context Size — Prompt Cache Pattern
+
+**Signal:** First response per user turn takes 30-120s, but subsequent calls in the same turn are 2-10s.
+
+**Cause:** Each user message triggers a new API call that processes the ENTIRE session context. Prompt caching only helps within a single turn. A 291K-token session means every user question pays 291K tokens of reprocessing.
+
+**Fix:**
+1. Enable `compression.in_place: true` in `config.yaml` (the real config path, see `get_config_path()`)
+2. Restart the gateway
+3. Run `/compress` on the slow platform — this compacts the session in-place, dropping token count without rotating the session ID
+
+**Verify:** After compression, check `response ready` times drop to normal levels.
+
+Full methodology, per-platform baselines, and interpretation guide: `references/platform-latency-diagnostics.md`.
+
+## Related Files
+
+| File | Purpose |
+|------|---------|
+| `references/whatsapp-baileys-bridge.md` | WhatsApp bridge API reference (absorbed from former `whatsapp-bridge-baileys` skill) |
+| `references/json-payload-newlines.md` | JSON newline handling for multi-line text |
+| `references/platform-latency-diagnostics.md` | Per-platform API latency measurement and troubleshooting |

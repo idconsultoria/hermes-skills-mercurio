@@ -1,187 +1,144 @@
 #!/usr/bin/env python3
-"""
-Audit all SKILL.md descriptions for format compliance + Resumo drift in index.md.
+"""Audit description format compliance across all SKILL.md files.
 
 Usage:
-    python3 scripts/audit-descriptions.py                # scan all SKILL.md in repo
-    python3 scripts/audit-descriptions.py --fix          # fix \n\n escapes in index Resumo
-    python3 scripts/audit-descriptions.py --drift-report  # compare index Resumo vs actual summaries
+    cd /opt/data/skills && python3 software-development/skills-repo-curator/scripts/audit-descriptions.py
+    cd /opt/data/skills && python3 software-development/skills-repo-curator/scripts/audit-descriptions.py --drift
 
 Checks:
-1. Format: description uses quoted string ("..."), not block scalar (|, |-, >, >-)
-2. Summary length: ≤85 chars, no ... truncation
-3. Trigger phrase: has "Load this skill when" or variant
-4. Resumo drift: index.md Resumo matches actual SKILL.md summary
+- Quoted string format (no block scalars |, |-, >, >-)
+- Summary ≤85 chars and no "..." truncation
+- Paragraph with "Load this skill when" activation trigger
+- No literal \\n escapes (must use real newlines in quoted strings)
+- Resumo drift between index.md and actual SKILL.md summary (--drift only)
 """
 
-import os, re, sys, json
-from pathlib import Path
+import os
+import re
+import sys
 
-REPO = Path(__file__).resolve().parent.parent
+SKILLS_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+INDEX_MD = os.path.join(SKILLS_DIR, 'index.md')
 
-def get_skill_descriptions():
-    """Walk all SKILL.md files and extract their description frontmatter."""
-    skills = {}
-    for path in sorted(REPO.rglob('SKILL.md')):
-        rel = str(path.relative_to(REPO))
-        content = path.read_text()
 
-        # Check format
-        fmt_match = re.search(r'^description:\s*([|>-])', content, re.MULTILINE)
-        fmt = fmt_match.group(1) if fmt_match else None
-        extra = ''
-        if fmt_match:
-            extra = fmt_match.group(0).strip().split(None, 1)[1] if len(fmt_match.group(0).split(None, 1)) > 1 else ''
-
-        # Extract quoted string content
-        idx = content.find('description: "')
-        if idx < 0:
-            skills[rel] = {'error': 'no description: "..." found', 'format': fmt, 'format_detail': extra}
+def get_skills():
+    for root, dirs, files in os.walk(SKILLS_DIR):
+        if '.archive' in root or '.git' in root:
             continue
+        if 'SKILL.md' in files:
+            path = os.path.join(root, 'SKILL.md')
+            rel = os.path.relpath(root, SKILLS_DIR)
+            with open(path) as f:
+                yield rel, f.read()
 
-        start = idx + len('description: "')
-        end = start
-        while end < len(content):
-            if content[end] == '"' and (end == 0 or content[end-1] != '\\'):
-                break
-            end += 1
 
-        desc = content[start:end]
-        if not desc.strip():
-            skills[rel] = {'error': 'empty description', 'format': fmt}
-            continue
+def parse_description(content):
+    issues = []
+    fm = re.search(r'^---\s*\n(.*?)\n---', content, re.DOTALL)
+    if not fm:
+        return None, '', False, False, ['No frontmatter']
+    front = fm.group(1)
 
-        # Detect \n\n literal vs real newlines
-        has_literal_nl = '\\n\\n' in desc
-        has_real_nl = '\n\n' in desc
+    if re.search(r'^description:\s*[|>]', front, re.MULTILINE):
+        return None, '', False, False, ['Block scalar format (| or >) — must use quoted string']
 
-        # Get summary (first segment)
-        if has_real_nl:
-            summary = desc.split('\n\n', 1)[0].strip()
-        elif has_literal_nl:
-            summary = desc.split('\\n\\n', 1)[0].strip()
+    m = re.search(r'^description:\s*(\S)', front, re.MULTILINE)
+    if m and m.group(1) != '"':
+        return None, '', False, False, [f'Unquoted description (starts with "{m.group(1)}")']
+
+    desc_raw = re.search(r'^description:\s*"(.*)', front, re.MULTILINE)
+    if not desc_raw:
+        return None, '', False, False, ['No description field found']
+
+    start = desc_raw.start(1)
+    idx = start
+    while idx < len(front):
+        if front[idx] == '"' and (idx == 0 or front[idx-1] != '\\'):
+            break
+        idx += 1
+    description = front[start:idx]
+
+    has_literal_nn = '\\n' in description
+    has_real_nl = '\n' in description
+    parts = re.split(r'\n\n', description, maxsplit=1)
+    summary = parts[0].strip() if parts else description[:80]
+
+    if not summary:
+        issues.append('Empty summary')
+    if len(summary) > 85:
+        issues.append(f'Summary too long ({len(summary)} chars)')
+    if '...' in summary:
+        issues.append(f'Summary truncated with "..."')
+    if has_literal_nn:
+        issues.append('Literal \\\\n escapes — must use real newlines')
+    if not has_real_nl:
+        issues.append('Single-line description — missing paragraph')
+    elif 'load this skill' not in description.lower():
+        issues.append('Missing "Load this skill when..." trigger')
+
+    return description, summary, has_real_nl, has_literal_nn, issues
+
+
+def audit():
+    all_issues = []
+    ok_count = 0
+    for rel, content in get_skills():
+        desc, summary, has_nl, has_nn, issues = parse_description(content)
+        if issues:
+            all_issues.append((rel, issues))
         else:
-            summary = desc.strip()
+            ok_count += 1
 
-        # Detect trigger phrase
-        trigger = any(t in desc for t in [
-            'Load this skill when', 'Load this skill to', 'Load this skill for',
-            'Use this skill when', 'Use when the user', 'Activates when',
-            'Load this skill during'
-        ])
+    print(f'SKILL.md files: {ok_count + len(all_issues)}')
+    print(f'Compliant: {ok_count}')
+    print(f'With issues: {len(all_issues)}')
+    for rel, issues in sorted(all_issues):
+        print(f'\n  {rel}:')
+        for issue in issues:
+            print(f'    ❌ {issue}')
 
-        # Classify issues
-        issues = []
-        if fmt:
-            issues.append(f'YAML {fmt}{"-" if fmt in ">|" and fmt_match and fmt_match.group(0).rstrip().endswith("-") else ""} format')
-        if has_literal_nl:
-            issues.append('\\n\\n literal escapes (use real newlines)')
-        if len(summary) > 85:
-            issues.append(f'Summary {len(summary)} chars > 85')
-        if summary.rstrip().endswith('...'):
-            issues.append('Summary ends with ... (truncation)')
-        if not trigger:
-            issues.append('Missing trigger phrase')
-
-        skills[rel] = {
-            'summary': summary,
-            'summary_len': len(summary),
-            'trigger': trigger,
-            'format': fmt,
-            'has_literal_nl': has_literal_nl,
-            'has_real_nl': has_real_nl,
-            'issues': issues,
-            'desc_preview': desc[:80] + '...' if len(desc) > 80 else desc,
-        }
-
-    return skills
+    if all_issues:
+        sys.exit(1)
 
 
-def check_resumo_drift(index_path, skills):
-    """Compare index.md Resumo entries against actual SKILL.md summaries."""
-    with open(index_path) as f:
-        lines = f.readlines()
+def check_drift():
+    if not os.path.exists(INDEX_MD):
+        print(f'ERROR: index.md not found')
+        sys.exit(1)
+    with open(INDEX_MD) as f:
+        idx = f.read()
 
-    resumo_map = {}
-    current_skill = None
-    for line in lines:
-        if line.startswith('### '):
-            current_skill = line.strip('### ').strip()
-        if line.strip().startswith('- **Resumo:**'):
-            if current_skill:
-                resumo = line.split(':**', 1)[1].strip()
-                resumo_map[current_skill] = resumo
+    index_resumos = {}
+    for block in re.split(r'\n(?=### )', idx):
+        m = re.search(r'- \*\*Nome:\*\* `(.+?)`', block)
+        r = re.search(r'- \*\*Resumo:\*\* (.+)', block)
+        if m and r:
+            index_resumos[m.group(1)] = r.group(1).strip()
 
-    drift = []
-    for name, index_resumo in resumo_map.items():
-        # Find matching skill by path tail
-        for sk_path, sk_data in skills.items():
-            if sk_path.endswith(name.split('/')[-1] + '/SKILL.md'):
-                actual = sk_data.get('summary', '')
-                if not actual:
-                    continue
-                # Check for severe mismatch
-                if index_resumo.rstrip().endswith('...'):
-                    drift.append((name, index_resumo, actual, 'truncated'))
-                elif actual[:len(index_resumo.rstrip())] != index_resumo.rstrip():
-                    drift.append((name, index_resumo, actual, 'mismatch'))
-                break
+    drift_count = 0
+    for rel, content in get_skills():
+        desc, summary, _, _, issues = parse_description(content)
+        if not summary:
+            continue
+        actual = summary[:85] if len(summary) > 85 else summary
+        idx_val = index_resumos.get(rel)
+        if idx_val and idx_val.rstrip('.') != actual.rstrip('.'):
+            print(f'  DRIFT: {rel}')
+            print(f'    SKILL.md: "{actual}"')
+            print(f'    index.md: "{idx_val}"')
+            drift_count += 1
 
-    return drift
+    print(f'\nResumo drift count: {drift_count}')
+    if drift_count:
+        sys.exit(1)
 
 
 def main():
-    print(f'Scanning SKILL.md files in {REPO}...')
-    skills = get_skill_descriptions()
-    print(f'  Found {len(skills)} files\n')
-
-    # Section 1: Format & content issues
-    with_issues = {k: v for k, v in skills.items() if v.get('issues') and not v.get('error')}
-    errors = {k: v for k, v in skills.items() if v.get('error')}
-
-    if errors:
-        print(f'=== PARSE ERRORS ({len(errors)}) ===')
-        for path, data in errors.items():
-            print(f'  {path}: {data["error"]}')
-        print()
-
-    if with_issues:
-        print(f'=== CONTENT ISSUES ({len(with_issues)} skills) ===')
-        for path, data in sorted(with_issues.items()):
-            print(f'  {path}')
-            for issue in data['issues']:
-                print(f'    - {issue}')
-            if data['format']:
-                print(f'    Format: {data["format"]}')
-            if data.get('has_literal_nl'):
-                print(f'    Literal \\\\n')
-            print(f'    Summary: {data["summary"][:75]}...' if len(data['summary']) > 75 else f'    Summary: {data["summary"]}')
-        print()
-
-    # Section 2: Resumo drift
-    index_path = REPO / 'index.md'
-    if index_path.exists():
-        drift = check_resumo_drift(index_path, skills)
-        if drift:
-            print(f'=== RESUMO DRIFT ({len(drift)} entries) ===')
-            for name, index_r, actual_r, kind in drift:
-                print(f'  {name}')
-                print(f'    Index:  {index_r}')
-                print(f'    Actual: {actual_r}')
-                print(f'    Kind:   {kind}')
-            print()
-
-    # Summary
-    clean = len(skills) - len(errors) - len(with_issues)
-    print(f'=== SUMMARY ===')
-    print(f'  Total SKILL.md: {len(skills)}')
-    print(f'  Parse errors:   {len(errors)}')
-    print(f'  Issues:         {len(with_issues)}')
-    print(f'  Clean:          {clean}')
-    print(f'  Resumo drifts:  {len(drift) if index_path.exists() else "N/A (no index.md)"}')
-
-    return 1 if with_issues or errors else 0
+    if '--drift' in sys.argv:
+        check_drift()
+    else:
+        audit()
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    main()

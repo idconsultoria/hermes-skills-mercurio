@@ -20,6 +20,7 @@ User offers SSH access to the host machine, or you need to inspect/control the D
 - User has sudo on the host (`sudo -n true 2>&1` to verify)
 
 > **Reference:** See `references/oracle-vm-infrastructure.md` for a concrete example of a discovered Oracle VM setup (containers, network, compose config).
+> **Reference:** See `references/docker-maintenance.md` for Docker storage analysis, image size investigation (layer-by-layer), update checking via `buildx imagetools inspect`, and cleanup patterns.
 > **Reference:** See `references/npm-database-schema.md` for Nginx Proxy Manager SQLite schema and proxy host CRUD operations.
 > **Reference:** See `deployment-pipeline` skill → `references/selfhost-initial-setup.md` for the pattern to set up a new selfhost service (Dockerfile, compose, SSH tunnel).
 > **Reference:** See `ai-voice-selfhost` skill for patterns specific to AI/ML services on ARM64 — PyTorch CPU build, model cache volumes, Hermes TTS command provider integration, voice steering, network setup (ai_mesh), and test workflow.

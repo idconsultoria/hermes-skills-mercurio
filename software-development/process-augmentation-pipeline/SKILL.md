@@ -505,21 +505,102 @@ npx vercel --prod --yes
 ```
 
 **Requisitos:**
+**Requisitos:**
 - `vercel` CLI instalado e autenticado (`npx vercel login`)
 - Projeto configurado como static site (sem build step — o agy já entrega HTML final)
 - Domínio customizado se disponível; caso contrário, usar o domínio `.vercel.app` padrão
 
 O deploy é a etapa final — só executar quando todas as 4 telas estiverem completas, testadas e commitadas.
 
----
+## Etapa 5 — Verificação de Entregáveis vs. Contrato (QA Gate)
 
+### 5.1 Propósito
+
+Antes de entregar ao cliente, verificar se todos os entregáveis previstos no **contrato/escopo do projeto** estão cobertos pelo output real do pipeline. Esta etapa é um **quality gate** que audita e documenta gaps.
+
+**Após auditar, ofereça-se para preencher os gaps encontrados** — se o cliente autorizar (ou se houver instrução explícita no pedido), crie os entregáveis faltantes como etapa adicional no repositório do projeto, não como modificação das etapas existentes (ex.: `etapa-5-nome-do-entregavel/`).
+
+**⚠️ Proprietary frameworks (EAI Score, metodologias proprietárias do cliente) pertencem ao projeto, não à skill.** Se um contrato especifica um framework proprietário da consultoria (ex.: EAI Score), ele deve ser aplicado como uma etapa específica do projeto (`etapa-N/`) e NUNCA incorporado a esta skill genérica. A skill deve permanecer metodologia-agnóstica — ela descreve *como executar o pipeline*, não *qual framework de avaliação usar*. O framework específico vive no repositório do cliente.
+
+**Quando executar:** após Etapa 4 (site deployed), antes da reunião de entrega.
+
+**Tooling:** usar a skill `google-workspace` (comando `GAPI`) para acessar Google Drive e Docs. **Nunca** usar scripts Python ad-hoc com service account.
+
+### 5.2 Método
+
+1. **Encontrar o contrato no Drive:**
+   - Tentativa 1 — busca específica: `GAPI drive search "<projeto> contrato"` ou `GAPI drive search "Diagnóstico <projeto>"`
+   - Tentativa 2 — busca ampla: `GAPI drive search "contrato"` e filtrar manualmente os resultados por nome que contenha o projeto
+   - Contratos podem estar em formato **Google Docs** (`.vnd.google-apps.document`) ou **PDF**. Verificar ambos.
+   - Extrair conteúdo com `GAPI docs get <DOC_ID>` (para Google Docs) ou `GAPI drive download <FILE_ID> --export-mime text/plain` (para PDF)
+2. Extrair a lista de entregáveis do contrato (Objeto, Anexo I, seção de Entregáveis).
+   - **Contratos frequentemente têm Anexos separados** — verificar pasta inteira do Drive, não apenas o documento principal.
+   - Entregáveis não-documentais (ex.: reuniões, treinamentos) marcar como 🟡 e documentar o que existe como apoio.
+3. Mapear artefatos do repo: para cada entregável, procurar o arquivo correspondente.
+4. Classificar: 🟢 completo, 🟡 parcial (existe mas sem conteúdo específico do contrato), 🔴 não existe.
+5. Documentar gaps com explicação do que falta e onde deveria estar.
+6. Se o usuário autorizou o preenchimento de gaps, criar os entregáveis faltantes como `etapa-<N>-<nome>/` (a próxima etapa disponível), com documentação completa. Não modificar etapas existentes.
+7. Tabela de compliance vira sumário executivo da reunião de entrega.
+
+### 5.3 Template
+
+```markdown
+| # | Entregável (contrato) | Artefato no repo | Status | Observação |
+|---|----------------------|------------------|:------:|------------|
+| 1 | Entregável X | `path/para/arquivo` | 🟢 | OK |
+| 2 | Entregável Y | — | 🟡 | Classificação existe, sem o framework formal |
+```
+
+### 5.4 Pitfalls
+
+- ⚠️ **Usar google-workspace skill** (GAPI CLI) para Drive/Docs — não scripts Python com service account.
+- ⚠️ **Contratos podem ter anexos separados** (Anexo I, Termo de Referência). Verificar toda a pasta do Drive.
+- ⚠️ **Entregáveis não-documentais** (Sessão Executiva) marcar como 🟡 — site/deck existe mas reunião não é reproduzível no repo.
+- ⚠️ **Pipeline entrega MAIS que o contrato** — destacar isso como valor agregado.
+- ⚠️ **Contrato pode ser Google Docs (não PDF)** — `GAPI drive search` retorna ambos. Para Google Docs use `docs get <ID>`; para PDF use `drive download <ID> --export-mime text/plain`.
+- ⚠️ **Busca genérica por "contrato" retorna muitos resultados** — refinar com nome do projeto + "contrato" ou "diagnóstico". Ex.: `drive search "Diagnóstico de IA"` antes de cair para `"contrato"`.
+- ⚠️ **Frameworks proprietários do cliente NÃO pertencem à skill.** Se a Etapa 5 detectar que um entregável contratual exige um framework específico (EAI Score, métrica proprietária, questionário exclusivo), implemente-o como etapa separada no repositório do projeto. A skill descreve o pipeline genérico — o framework específico é conteúdo do projeto.
+
+### 5.5 Handoff — Entrega ao Cliente
+
+Após QA Gate aprovado e eventuais gaps preenchidos, realizar o handoff em 3 passos:
+
+**Passo 1 — Empacotar entregáveis por item contratual:**
+Para cada entregável do contrato, criar um ZIP nomeado `<N> - <Nome do Entregável>.zip` contendo exclusivamente os artefatos daquele item. Os ZIPs devem ser auto-contidos e numerados de 1 a N conforme a ordem do contrato.
+
+```bash
+# Padrão: usar ZIP via Python (zipfile module) para evitar dependência de zip CLI
+python3 -c "
+import zipfile, os
+with zipfile.ZipFile('1 - Relatorio de Gargalos.zip', 'w', zipfile.ZIP_DEFLATED) as zf:
+    for root, dirs, files in os.walk('etapa-1-analise'):
+        for f in files:
+            zf.write(os.path.join(root, f))
+"
+```
+
+**Passo 2 — Organizar no Drive do cliente:**
+- Copiar POPs, diagramas e documentos de suporte para uma subpasta `Entregáveis/` na raiz do projeto no Google Drive
+- Nomear arquivos copiados com prefixo do processo (ex.: `ASP-001 - POP Detalhado`) para identificação independente da estrutura de pastas original
+- Usar a API do Google Drive via service account ou GAPI para copiar, não mover — manter originais intactos
+
+**Passo 3 — Comunicar entrega:**
+Redigir email à diretoria do cliente em tom consultivo:
+- Listar entregáveis contratuais versus o que foi entregue
+- Destacar valor agregado (itens extras não contratados)
+- Incluir link para a pasta do Drive
+- Manter tom direto, sem jargão técnico, mas também sem enrolação
+- Enviar rascunho para revisão do consultor antes do envio final
+
+---
 ## Orquestração Geral
 
 ### Sequência de Execução
 
 ```
-Etapa 1 ──→ Etapa 2 ──→ Etapa 3 ──→ Etapa 4
-  │            │            │            │
+Etapa 1 ──→ Etapa 2 ──→ Etapa 3 ──→ Etapa 4 ──→ Etapa 5 (Verificação Contratual)
+  │            │            │            │               │
+  │            │            │            │               └── Hermes (auditoria, 1 etapa)
   │            │            │            └── agy (iterativo) + humanizer + copywriting
   │            │            └── Hermes (sequencial, 1 etapa)
   │            └── Hermes (iterativo, grupos de nós)
@@ -631,4 +712,4 @@ git log --oneline -5
 | 2026-06-19 | Hermes (validação Vulcano) | Etapa 2: protocolo Vulcano tornado **obrigatório** (1 vulcano_context por cluster), adicionada Ficha de Engrama (4 campos: arquitetura, métricas, armadilhas, contraindicações), citação de engrama obrigatória em cada solução. Novo pitfall: subutilização do Vulcano (2 chamadas = nota 1.2/10; 7+ chamadas = nota 7.2/10). Adicionado `references/vulcano-brainstorming-protocol.md` com protocolo completo e verificação de qualidade. |
 | 2026-06-19 | Hermes (revisão de efetividade) | Adicionado `references/relatorio-efetividade-template.md` com estrutura de relatório de efetividade de ferramenta (Sumário Executivo intrínseco + Considerações Finais extrínsecas). Novo pitfall: separar limitações da ferramenta das limitações do contexto/projeto. |
 | 2026-06-19 | Hermes (revisão Etapa 3) | Metodologia alterada: de top 10 global para top 3 por setor (ASP, Jurídico, Inovação, CVT) + top 3 intersetorial. Adicionado compliance check obrigatório contra restrições extraídas das transcrições (ex.: lista física do CVT, fluxo físico do Jurídico). Novo pitfall: preferir modelos multimodais a OCR para leitura de artefatos físicos (S-009). Seção 3.0 com princípio; 3.2 com seleção setorial; 3.4 com visão consolidada. |
-| 2026-06-19 | Hermes (terminologia cliente) | Adicionado pitfall de terminologia palatável para tomadores de decisão leigos: "state machine" → "motor inteligente de processos", "OCR" → "leitura inteligente de documentos". Aplicar em todas as seções voltadas ao cliente. |
+| 2026-06-22 | Hermes (Sergipetec QA Gate) | Etapa 5: propósito atualizado — após auditar gaps, o agente deve oferecer-se para preenchê-los (não apenas reportar). Adicionado pitfall: frameworks proprietários (EAI Score) pertencem ao projeto, não à skill. Adicionada seção 5.5 Handoff com 3 passos (pack ZIPs → Drive → email). Método refinado: busca por "contrato" é muito genérica — tentar termos específicos com nome do projeto primeiro. Adicionados pitfalls: Google Docs vs PDF, busca refinada. Histórico adicionado ao final da seção. |

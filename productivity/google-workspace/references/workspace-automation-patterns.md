@@ -96,6 +96,111 @@ sheets.spreadsheets().values().clear(
 ).execute()
 ```
 
+### Creating a formatted sheet from structured data
+
+For 50+ rows with formatting (frozen header, column widths, alternating colors, conditional highlighting), the pattern is:
+
+```python
+# 1. Create the sheet
+sheet_meta = sheets.spreadsheets().create(
+    body={"properties": {"title": "My Sheet"}, "sheets": [{"properties": {"title": "Data"}}]},
+    fields="spreadsheetId"
+).execute()
+sheet_id = sheet_meta["spreadsheetId"]
+
+# 2. Move to a target Drive folder
+drive.files().update(
+    fileId=sheet_id,
+    addParents="TARGET_FOLDER_ID",
+    removeParents="root",
+    fields="id, parents"
+).execute()
+
+# 3. Get the actual sheet ID (NOT always 0 — must query metadata)
+meta = sheets.spreadsheets().get(spreadsheetId=sheet_id, fields='sheets.properties').execute()
+sheet_id_num = meta['sheets'][0]['properties']['sheetId']
+
+# 4. Write headers + data rows
+body = {"values": headers + data_rows}
+sheets.spreadsheets().values().update(
+    spreadsheetId=sheet_id,
+    range="Data!A1:Z1000",
+    valueInputOption="USER_ENTERED",
+    body=body
+).execute()
+
+# 5. Build formatting requests (single batchUpdate call)
+requests = []
+
+# Header formatting
+requests.append({
+    "repeatCell": {
+        "range": {"sheetId": sheet_id_num, "startRowIndex": 0, "endRowIndex": 1},
+        "cell": {
+            "userEnteredFormat": {
+                "backgroundColor": {"red": 0.02, "green": 0.24, "blue": 0.27},
+                "textFormat": {"bold": True, "foregroundColor": {"red": 0.29, "green": 0.78, "blue": 0.83},
+                               "fontSize": 10, "fontFamily": "IBM Plex Mono"},
+                "horizontalAlignment": "CENTER", "verticalAlignment": "MIDDLE"
+            }
+        },
+        "fields": "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)"
+    }
+})
+
+# Freeze header row
+requests.append({
+    "updateSheetProperties": {
+        "properties": {"sheetId": sheet_id_num, "gridProperties": {"frozenRowCount": 1}},
+        "fields": "gridProperties.frozenRowCount"
+    }
+})
+
+# Column widths
+col_widths = [50, 300, 180, 60, 60, 220, 400]  # per column
+for i, w in enumerate(col_widths):
+    requests.append({
+        "updateDimensionProperties": {
+            "range": {"sheetId": sheet_id_num, "dimension": "COLUMNS", "startIndex": i, "endIndex": i+1},
+            "properties": {"pixelSize": w},
+            "fields": "pixelSize"
+        }
+    })
+
+# Alternating row colors
+for i in range(1, len(data_rows) + 1):
+    bg = {"red": 0.03, "green": 0.06, "blue": 0.08} if i % 2 == 0 else {"red": 0.02, "green": 0.04, "blue": 0.05}
+    requests.append({
+        "repeatCell": {
+            "range": {"sheetId": sheet_id_num, "startRowIndex": i, "endRowIndex": i+1},
+            "cell": {"userEnteredFormat": {"backgroundColor": bg, "textFormat": {"fontSize": 9},
+                                           "verticalAlignment": "MIDDLE"}},
+            "fields": "userEnteredFormat(backgroundColor,textFormat,verticalAlignment)"
+        }
+    })
+
+# Conditional highlight for specific rows
+row_indices = [5, 12, 25]  # example: rows to highlight
+for row_idx in row_indices:
+    requests.append({
+        "repeatCell": {
+            "range": {"sheetId": sheet_id_num, "startRowIndex": row_idx, "endRowIndex": row_idx+1},
+            "cell": {"userEnteredFormat": {"backgroundColor": {"red": 0.05, "green": 0.2, "blue": 0.22}}},
+            "fields": "userEnteredFormat.backgroundColor"
+        }
+    })
+
+# Apply all at once
+sheets.spreadsheets().batchUpdate(
+    spreadsheetId=sheet_id,
+    body={"requests": requests}
+).execute()
+```
+
+**⚠️ Pitfall: sheetId is NOT 0 by default.** Google Sheets assigns a numeric ID that varies per sheet. Always query it via `sheets.get().execute()` before referencing it in batchUpdate. Using hardcoded `sheetId: 0` fails with "No grid with id: 0" on newly created sheets.
+
+**⚠️ Pitfall: batchUpdate request limits.** A single batchUpdate can hold ~100-200 requests. For 130+ rows with individual formatting, you may approach the limit. The alternating-rows pattern above issues 1 request per row, so 130 rows = 130 requests — stays under the limit. For larger sheets, group rows by parity range instead of issuing one per row.
+
 ---
 
 ## Drive patterns

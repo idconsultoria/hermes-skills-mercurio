@@ -521,6 +521,7 @@ TOKEN="$(python3 -c "import json; print(json.load(open('/opt/data/home/.local/sh
 - `references/iframe-reader-ux.md` — full pattern for static archive sites with iframe edition reader, postMessage parent-child communication, smooth close transitions, and CSS grid cards that prevent badge/title overlap. Consult this when building any "landing page + content viewer" static site on Vercel.
 - `references/custom-domain-alias-pitfall.md` — explains why manually-assigned aliases survive --prod deploys and how to reassign them.
 - `references/interactive-frontend-pitfalls.md` — debugging guide for Lenis smooth scroll + GSAP ScrollTrigger + Three.js integration issues. Covers `height: 100%` scroll lock, ScrollTrigger animation interference, and refresh timing. Consult when building interactive 3D/animation sites for Vercel.
+- `references/threejs-invisible-scene-debugging.md` — diagnosing Three.js scenes that render correctly (triangles drawn, no errors) but appear invisible. Covers fog density masking, ShaderMaterial GLSL version mismatch in WebGL2, canvas-CSS background contrast, GLTFLoader MeshPhysicalMaterial envMap, and pixel-reading diagnostic workflow.
 
 ## Quick Reference
 

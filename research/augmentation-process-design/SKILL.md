@@ -1,6 +1,8 @@
 ---
 name: augmentation-process-design
-description: "Design, research and curadoria de soluções de augmentação de processos com IA — aumento de capacidade humana, não automação. Load this skill when the user wants to research, catalog or design solutions that augment (not automate) human work with AI — for building a methodology, training material, or reference library. Covers the granular solution concept, the A/B × I/II/III taxonomy, the PME-friendly bias, the operational analytics niche, and the delivery format (index + solucoes/ folder with YAML frontmatter)."
+description: "Design, research and curadoria de soluções de augmentação de processos com IA — aumento de capacidade humana, não automação.
+
+Load this skill when the user wants to research, catalog or design solutions that augment (not automate) human work with AI. Covers the granular solution concept, the A/B × I/II/III taxonomy, the PME-friendly bias, the operational analytics niche, and the delivery format (index + solucoes/ folder with YAML frontmatter)."
 category: research
 ---
 

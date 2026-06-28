@@ -29,6 +29,10 @@ Delivered inside ```text block in Cron #3 response.
 6. Zero sign-offs, no "—" metadata, no extra text
 7. Zero anglicisms in the body
 
+### Regra de editorial no WhatsApp (3 frases máx)
+
+O parágrafo do editorial na mensagem de WhatsApp deve ter **no máximo 3 frases**. Nem muito extensas (evitar frases com mais de 30 palavras) nem muito curtas (evitar frases de menos de 6 palavras). O ideal é 2 frases curtas e diretas, ou 3 quando houver necessidade de conectivo narrativo. A primeira frase SEMPRE em negrito. O objetivo é dar contexto e gancho para o leitor abrir o PDF — não reproduzir o editorial inteiro.
+
 ## Example
 
 ```text

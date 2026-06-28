@@ -1,6 +1,8 @@
 ---
 name: pi-session-audit
-description: "Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl) and agy (protobuf SQLite DBs). Export as CSV."
+description: "Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl) and agy (protobuf SQLite DBs). Export as CSV.
+
+Load this skill to analyze Pi Agent or agy session logs and calculate costs per provider. Extracts real usage metrics from session files, computes costs based on model pricing, and produces audit reports."
 category: autonomous-ai-agents
 metadata:
   hermes:

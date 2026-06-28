@@ -1,6 +1,8 @@
 ---
 name: data-pipeline-patterns
-description: "Reliability patterns for batch data pipelines: exponential backoff, API safeguards, cell-size truncation, and parallel execution guardrails."
+description: "Reliability patterns for batch data pipelines — exponential backoff, API safeguards, cell-size truncation, and parallel execution guardrails.
+
+Load this skill when building or debugging a batch pipeline that calls external APIs (Gemini, Google Sheets, Google Drive), or hits rate limits, cell-size errors, or empty-input failures."
 trigger: User is building or debugging a batch pipeline that calls external APIs (Gemini, Google Sheets, Google Drive), or hits rate limits / cell-size errors / empty-input failures.
 ---
 

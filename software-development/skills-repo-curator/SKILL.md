@@ -144,6 +144,7 @@ Sincroniza o index.md com o estado atual das skills.
 4. **Audita conformidade de descrições** — varre TODAS as SKILL.md, não apenas as modificadas:
    - **Sumário de uma linha (≤85 chars, SEM `...`):** descrição concisa e auto-contida. Quem lê entende na hora se deve carregar a skill.
    - **Parágrafo de resumo:** explica gatilhos de ativação ("Load this skill when...") e expande a descrição com capacidades específicas, ferramentas utilizadas e o que produz.
+   - **Verifica duplicatas pós-aspas:** descrições que terminam com `"` mas têm texto idêntico repetido depois da aspa de fechamento são um bug comum. Detectar com `grep -A1 'description: "' SKILL.md | grep -v '^--$'` e inspecionar visualmente.
    - Lista **todas as skills fora do formato** com o problema específico, edita a SKILL.md original, depois atualiza o index.md.
    - **Sem exceção** — faz para todas as skills fora do formato.
    - **Verifica Resumo drift no index.md** — após corrigir as SKILL.md, verifique se os campos `Resumo:` no index.md correspondem à primeira linha (sumário) do `description:` da SKILL.md. O index.md pode ter resumos truncados, desatualizados ou corrompidos — especialmente em skills cujo SKILL.md foi editado mas o index.md não foi sincronizado. Use um script para comparar:
@@ -318,8 +319,8 @@ Dependências: Python 3 stdlib. Nenhum pacote externo.
 
 ```bash
 cd /opt/data/skills
-python3 scripts/audit-descriptions.py           # escaneia todas as SKILL.md
-python3 scripts/audit-descriptions.py --drift   # compara Resumo index.md vs summary real
+python3 software-development/skills-repo-curator/scripts/audit-descriptions.py           # escaneia todas as SKILL.md
+python3 software-development/skills-repo-curator/scripts/audit-descriptions.py --drift   # compara Resumo index.md vs summary real
 ```
 
 Verifica conformidade de descrições em todas as SKILL.md: formatação (quoted string vs block scalar), tamanho do sumário (≤85 chars, sem `...`), presença de gatilho ("Load this skill when..."), e detecção de `\n\n` escapes literais. Também detecta drift entre o Resumo no index.md e o sumário real da SKILL.md.
@@ -365,7 +366,7 @@ with open('index.md') as f:
 grep -rn 'description:' SKILL.md | grep -v 'description: "' | head -5 && echo 'WARNING: descriptions without opening quote found'
 
 # Check for Resumo drift — index.md Resumo vs actual SKILL.md summary
-python3 scripts/audit-descriptions.py | grep 'RESUMO DRIFT' -A 10
+python3 software-development/skills-repo-curator/scripts/audit-descriptions.py --drift
 ```
 
 ## Pitfalls
@@ -410,3 +411,5 @@ python3 scripts/audit-descriptions.py | grep 'RESUMO DRIFT' -A 10
 ⚠️ **Limpeza de scripts temporários.** Scripts de análise auxiliar (ex: `_analyze.py`, `_count_relations.py`) criados durante o ciclo DEVEM ser removidos antes do commit final. Eles poluem o repositório e não têm valor após o ciclo. Use `rm -f _analyze.py _*.py` como passo de limpeza antes do stage final.
 
 ⚠️ **Leaked commentary de subagentes no index.md.** Subagentes podem incluir notas informais como `(reason: ...)` em suas propostas de relação. Quando o agente central aplica as relações manualmente via patch, é fácil copiar acidentalmente o comentário junto com a relação. Isso quebra o formato limpo do index.md. **Sempre verificar** com `grep -n '(reason:' index.md` e `grep -n 'Reason:' index.md` depois de aplicar patches de relação, e remover qualquer linha contaminada.
+
+⚠️ **Verificar index.md contra disco após regeneração.** Ao regenerar o index.md via `write_file` (>30% mudança), é fácil incluir skills que existiam no index antigo mas não têm SKILL.md no disco. Sempre cruzar a saída final contra `find . -name SKILL.md -not -path './.archive/*'` para garantir que cada entrada no index.md corresponde a um arquivo real. Skills sem SKILL.md no disco geram erros no gráfico e confundem agentes futuros.

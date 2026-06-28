@@ -1,6 +1,8 @@
 ---
 name: google-workspace
-description: "Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation. Load this skill when you need to automate Google Workspace. Covers gws CLI installation and OAuth2 setup from Google Cloud Console credentials, then using it for Gmail operations, Calendar management, Drive file operations, Docs editing, and Sheets data manipulation."
+description: "Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation.
+
+Load this skill when you need to automate Google Workspace. Covers gws CLI installation and OAuth2 setup from Google Cloud Console credentials, then using it for Gmail operations, Calendar management, Drive file operations, Docs editing, and Sheets data manipulation."
 version: 1.1.0
 author: Nous Research
 license: MIT
@@ -45,12 +47,15 @@ $GSETUP --check
 - `references/clone-spreadsheet.md` — Clonar planilha via Drive API, mover entre pastas, limpar dados por aba preservando headers
 - `references/sheets-column-padding.md` — Fix for "N columns passed, passed data had M columns" when reading Sheets into pandas (API trims trailing empty cells per row)
 - `references/service-account-sharing.md` — Cross-account Drive access: service account vs user OAuth visibility (404 on valid IDs, sharing patterns)
+- `references/gmail-large-file-delivery.md` — Gmail 25 MB attachment limit and Drive sharing workaround for larger files
+- `references/drive-file-organization.md` — Moving files to folders and deduplicating after batch uploads (uses `scripts/drive-move-to-folder.py`)
 
 ## Scripts
 
 - `scripts/setup.py` — OAuth2 setup (run once to authorize)
 - `scripts/google_api.py` — compatibility wrapper CLI
 - `scripts/gws_bridge.py` — bridge for gws CLI backend
+- `scripts/drive-move-to-folder.py` — batch-move Drive files to a folder, deduplicating (see `references/drive-file-organization.md`)
 
 ## First-Time Setup
 
@@ -293,6 +298,10 @@ $GAPI drive share FILE_ID --type domain --domain example.com --role reader
 # Delete — defaults to trash (reversible). Use --permanent to skip the trash.
 $GAPI drive delete FILE_ID
 $GAPI drive delete FILE_ID --permanent
+
+# Batch move to folder — see scripts/drive-move-to-folder.py
+# Example: move all matching files to a folder, deduplicate
+python3 scripts/drive-move-to-folder.py FOLDER_ID "Berserk_Vol16_Q85"
 ```
 
 **Batch download pattern:** for structured folder trees (e.g., project folders with subfolders per process), see `references/drive-batch-download-pattern.md` — covers listing, mapping, per-type download, parallelism, and case-sensitivity pitfalls.
@@ -390,6 +399,8 @@ For programmatic Google Drive and Sheets patterns (folder trees, batch populatio
 | Service account can't access a user-owned folder/spreadsheet | Use user OAuth (`GAPI` or `drive share`) to share the resource with the service account email (Editor role). Then retry with service account credentials. See `references/service-account-sharing.md`. |
 | `HttpError 400: Invalid Value` on `drive search "'ID' in parents"` | Missing `--raw-query` flag. Without it, the CLI interprets the `'ID' in parents` string as a `fullText contains` search. Always use `--raw-query` for Drive parent-child queries. Also: Drive IDs are **case-sensitive** — verify with `drive get` before searching children. |
 | Google Docs downloaded as `.pdf` instead of text | Add `--export-mime text/plain` to download Docs as readable text. Without it, the default export is PDF. |
+| `Gmail send` fails for attachments >25 MB | Gmail API/SMTP has a ~25 MB total message limit (base64 overhead). Files >25 MB cannot be attached — upload to Drive instead and share the link. See `references/gmail-large-file-delivery.md`. |
+| `$GAPI gmail send` has no `--attach` flag | The CLI wrapper `gmail send` does not support file attachments. For sending emails with attachments (e.g. EPUB manga files), use the Python Gmail API directly with MIMEBase — see kindle-manga's `references/gmail-kindle-delivery.md` for the complete script. |
 
 ## Revoking Access
 
@@ -401,4 +412,5 @@ $GSETUP --revoke
 
 | Data | Mudança |
 |------|---------|
+| 2026-06-21 | Adicionado `references/gmail-large-file-delivery.md` — Gmail 25 MB attachment limit, Drive sharing workaround, and Kindle manga delivery edge case. Added pitfall and reference pointer in SKILL.md. |
 | 2026-06-19 | Adicionados pitfalls: `drive search` parent queries exigem `--raw-query` (400 Invalid Value sem ele); Drive IDs case-sensitive; Docs precisam de `--export-mime text/plain` para download como texto. |

@@ -1,6 +1,8 @@
 ---
 name: style-guide-consultation
-description: "Catalog of style guides — load the correct design system for any visual task. Load this skill when you need to apply a brand or design system to any visual task. Covers loading the correct style guide (Hermes Agent, ID Consultoria, IAF Comunidade, IAF Newsletter) for visual output, ensuring brand-consistent HTML, diagrams, and presentations."
+description: "Catalog of style guides — load the correct design system for any visual task.
+
+Load this skill when you need to apply a brand or design system to any visual output. Covers loading the correct style guide (Hermes Agent, ID Consultoria, IAF Comunidade, IAF Newsletter) for brand-consistent HTML, diagrams, and presentations."
 version: 1.0.0
 tags: [design, style-guide, brand, visual-identity]
 ---
@@ -142,6 +144,8 @@ O Hermes Agent usa os tokens CSS acima. Para consultar um componente específico
 ⚠️ **Carregue o guia ANTES de escrever qualquer CSS/HTML.** Não comece a construir com design tokens genéricos e depois tentar corrigir. Quando o usuário menciona uma marca (ID, IAF, etc.), esta skill deve ser a PRIMEIRA coisa carregada — antes de agy, antes de escrever style.css, antes de qualquer output visual. O usuário teve que corrigir o agente duas vezes em uma sessão porque o CSS foi escrito com tokens inventados em vez do guia real da marca.
 
 ⚠️ **Gold (#C9A227 / --kintsugi-gold) foi REMOVIDO da paleta ID Consultoria.** Era temporário para um evento já encerrado. NÃO use em nenhum output da ID. A paleta agora é teal-only: #050A0F, #003B46, #4AC6D3, #66E8F1. Indigo (#6366F1) também removido.
+
+⚠️ **Cenas 3D (Three.js) no dark theme ID ficam invisíveis se não ajustadas.** O fundo CSS `#050A0F` é quase idêntico a cores renderizadas escuras. Três causas comuns: (1) Fog exponencial > 0.03 dissolve a cena a 7+ unidades de distância — reduza para 0.01–0.015; (2) ShaderMaterial com sintaxe GLSL 1.00 falha silenciosamente em WebGL2 — adicione `glslVersion: 1`; (3) Cor base do terreno/tema muito escura — use no mínimo `#0C2A40` para contraste visível. Veja `vercel-deploy` skill → `references/threejs-invisible-scene-debugging.md` para o guia completo de diagnóstico.
 
 ⚠️ **Não confundir guias.** O Hermes Agent tem azul royal #0000F2, Cormorant Garamond serif, Space Mono corpo; outras marcas têm paletas distintas. Misturar os dois quebra a identidade visual.
 ⚠️ **Guias HTML precisam de parsing.** Extraia os tokens CSS do bloco `<style>` — não tente renderizar o HTML inteiro.

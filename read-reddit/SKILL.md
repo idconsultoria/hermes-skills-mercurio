@@ -2,9 +2,7 @@
 name: read-reddit
 description: "Read Reddit subreddits via RSS feeds — bypasses API rate limits and bot detection.
 
-Load this skill when you need to read Reddit content without API limits. Uses RSS feeds to bypass Reddit API rate limiting and bot detection. Covers finding subreddit RSS feed URLs, filtering by post type, extracting content from feed items, and formatting for research or content curation."
-
-Load this skill when you need to read Reddit content without API limits. Uses RSS feeds to bypass Reddit API rate limiting and bot detection. Covers finding subreddit RSS feed URLs, filtering by post type, extracting content from feed items, and formatting for research or content curation."
+Load this skill when you need to read Reddit content without API limits. For research, curation, or news gathering."
 version: 1.1.0
 author: Created for IAF pipeline
 platforms: [linux, macos]
@@ -172,5 +170,6 @@ When using this skill to collect data that will be consumed by a downstream proc
 3. **Empty results** → Some subreddits or sorts may return nothing. Always handle empty results gracefully.
 4. **Multi-reddit limit** → Multi-reddit feeds can be slow with many subreddits. Prefer individual requests delegated in parallel.
 5. **Content with HTML** → Post bodies contain HTML. Always strip tags before using as plain text.
-6. **Old Reddit format** → `old.reddit.com` uses the same block rules. Stick with `www.reddit.com/.../.rss`.
-7. **Link verification** → When using this skill inside a `delegate_task` subagent, the subagent may link to wrong sources if `web_search` returns empty results. Verify key links independently: check that (a) the URL resolves, (b) the URL content matches the story, and (c) version-specific URLs (e.g. Claude Opus 4.8 → not 4.7) point to the exact right page. This is especially important when the RSS content is later used in a newsletter or report.
+8. **Old Reddit format** → `old.reddit.com` uses the same block rules. Stick with `www.reddit.com/.../.rss`.
+9. **Host-level blocking** → Some hosts (e.g. Oracle Cloud IPs) are blocked by Reddit's CDN (Fastly/Cloudflare) even with a browser User-Agent. If RSS feeds return "Blocked" HTML, try the JSON API as fallback or switch to an alternative source (Nyaa for manga, Archive.org for ebooks, Google/Bing for general content).
+10. **Link verification** → When using this skill inside a `delegate_task` subagent, the subagent may link to wrong sources if `web_search` returns empty results. Verify key links independently: check that (a) the URL resolves, (b) the URL content matches the story, and (c) version-specific URLs (e.g. Claude Opus 4.8 → not 4.7) point to the exact right page. This is especially important when the RSS content is later used in a newsletter or report.
