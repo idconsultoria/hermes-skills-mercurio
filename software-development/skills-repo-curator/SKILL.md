@@ -117,8 +117,9 @@ skills/
 
 ## Trigger
 
-- Usuário diz "gerencie suas skills", "limpe as skills", "rode evolve", "consolide skills"
+- Usuário diz "gerencie suas skills", "limpe as skills", "rode evolve", "consolide skills", "alinhar com OKF", "adicionar type", "criar index.md por categoria"
 - Usuário pede para revisar, fundir, deletar ou organizar skills
+- Usuário pergunta sobre OKF, progressive disclosure, ou formato de conhecimento agent-ready
 - Ao final de uma sessão com múltiplas correções de workflow
 - Execução automática via cron diário
 
@@ -346,11 +347,27 @@ python3 software-development/skills-repo-curator/scripts/audit-descriptions.py  
 python3 software-development/skills-repo-curator/scripts/audit-descriptions.py --drift   # compara Resumo index.md vs summary real
 ```
 
-Verifica conformidade de descrições em todas as SKILL.md: formatação (quoted string vs block scalar), tamanho do sumário (≤85 chars, sem `...`), presença de gatilho ("Load this skill when..."), e detecção de `\n\n` escapes literais. Também detecta drift entre o Resumo no index.md e o sumário real da SKILL.md.
+Verifica conformidade de descrições em todas as SKILL.md: formatação (quoted string vs block scalar), tamanho do sumário (≤85 chars, sem `...`), presença de gatilho ("Load this skill when..."), e detecção de `\\n\\n` escapes literais. Também detecta drift entre o Resumo no index.md e o sumário real da SKILL.md.
 
 Use este script **antes** da auditoria manual (passo 4 do update) para identificar rapidamente quais skills precisam de correção. O output informa o agente LLM, que aplica as correções nas SKILL.md e index.md via ferramentas LLM.
 
 Dependências: Python 3 stdlib. Nenhum pacote externo.
+
+### OKF Alignment
+
+The skills repo is aligned with Google's Open Knowledge Format (OKF) v0.1.
+See `references/okf-format-reference.md` for the full spec reference, 8-type
+taxonomy, progressive disclosure structure, and comparison matrix.
+
+Operations that reference OKF:
+- **Add type to all skills** — batch-edit every SKILL.md frontmatter to add
+  `type:` with the correct value from the 8-type taxonomy.
+- **Add timestamp to all skills** — extract last commit date via `git log -1
+  --format=%cI -- <skill>/SKILL.md` and insert as `timestamp:`.
+- **Create category index.md** — generate `index.md` per category directory so
+  OKF consumption agents can discover skills progressively.
+- **Regenerate graph** — `generate_graph.py` now reads `type` and displays it
+  in node modals.
 
 ---
 

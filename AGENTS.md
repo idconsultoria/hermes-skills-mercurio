@@ -13,16 +13,25 @@ Este repositório gerencia o catálogo de skills do Hermes Agent via Git.
 ```
 skills/
 ├── AGENTS.md          ← Este arquivo — regras do repositório
-├── index.md           ← Catálogo orientado a conteúdo (sempre atualizado)
+├── index.md           ← Catálogo consolidado de todas as skills (sempre atualizado)
 ├── log.md             ← Diário cronológico append-only de operações
 ├── reports/           ← Planos e relatórios gerados pela etapa evolve
 │   ├── evolve-<YYYY-MM-DD-HHMM>.md        ← plano (pré-execução do evolve)
 │   └── evolve-<YYYY-MM-DD>-report.md      ← relatório (pós-execução do evolve)
-└── <category>/
-    └── <skill-name>/
-        ├── SKILL.md
-        └── references/
+├── scripts/           ← Scripts de apoio (generate_graph.py, etc.)
+├── skills_graph.html  ← Grafo D3 interativo (regenerado a cada evolve)
+├── graph_data.json    ← Dados estruturados do grafo
+├── <category>/        ← Categoria (ex: autonomous-ai-agents, software-development)
+│   ├── index.md       ← Progressive disclosure — skills desta categoria (OKF-aligned)
+│   └── <skill-name>/
+│       ├── SKILL.md
+│       └── references/
+└── <root-skill>/      ← Skills na raiz da categoria (ex: dogfood, read-reddit)
+    ├── SKILL.md
+    └── (sem subpasta)
 ```
+
+> O `index.md` em cada subdiretório de categoria segue o padrão [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) §6 (Progressive Disclosure) — consumption agents começam pelo index.md raiz e navegam até a categoria desejada, ou acessam direto o `categoria/index.md` se já sabem onde procurar.
 
 ---
 
