@@ -5,6 +5,8 @@ description: "Catalog of style guides — load the correct design system for any
 Load this skill when you need to apply a brand or design system to any visual output. Covers loading the correct style guide (Hermes Agent, ID Consultoria, IAF Comunidade, IAF Newsletter) for brand-consistent HTML, diagrams, and presentations."
 version: 1.0.0
 tags: [design, style-guide, brand, visual-identity]
+type: Reference
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Style Guide Consultation

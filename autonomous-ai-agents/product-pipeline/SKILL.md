@@ -4,6 +4,8 @@ description: "Multi-agent product pipeline — idea to MVP via sprints. Hermes o
 
 Load this skill when building a product from scratch through the full pipeline — ideation, research, design, sprints, and delivery. Covers orchestrating a multi-agent team with Hermes as coordinator, Pi Agent for execution, and Antigravity for visual design review."
 category: autonomous-ai-agents
+type: Orchestrator
+timestamp: 2026-06-14T05:19:11Z
 ---
 
 # Product Development Pipeline

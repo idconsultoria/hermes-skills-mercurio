@@ -20,6 +20,8 @@ triggers:
   - landing page
   - dashboard design
   - website styled like
+type: Reference
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Popular Web Designs

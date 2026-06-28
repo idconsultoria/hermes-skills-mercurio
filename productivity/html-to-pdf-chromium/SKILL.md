@@ -7,6 +7,8 @@ Load this skill when weasyprint or other tools lose CSS features like gradients,
 Load this skill when weasyprint or other tools lose CSS features like gradients, webkit-background-clip, grid, and glow effects. Covers Chromium headless installation via Debian .deb extraction without root or Playwright, PDF generation with full CSS support, and common rendering fixes."
 trigger: User asks to generate PDF from HTML with browser-quality rendering, or when weasyprint output lacks CSS features like -webkit-background-clip or gradients.
 related_skills: [html-report-hermes, iaf-newsletter-pipeline]
+type: Template
+timestamp: 2026-06-19T19:47:50Z
 ---
 
 # HTML → PDF com Chromium Headless

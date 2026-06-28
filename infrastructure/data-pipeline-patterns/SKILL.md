@@ -4,6 +4,8 @@ description: "Reliability patterns for batch data pipelines — exponential back
 
 Load this skill when building or debugging a batch pipeline that calls external APIs (Gemini, Google Sheets, Google Drive), or hits rate limits, cell-size errors, or empty-input failures."
 trigger: User is building or debugging a batch pipeline that calls external APIs (Gemini, Google Sheets, Google Drive), or hits rate limits / cell-size errors / empty-input failures.
+type: Reference
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Data Pipeline Reliability Patterns

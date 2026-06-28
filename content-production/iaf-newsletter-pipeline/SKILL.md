@@ -7,6 +7,8 @@ metadata:
   hermes:
     tags: [newsletter, pipeline, cron, iaf, briefing, digest, curation]
     related_skills: [brand-iaf-conteudo]
+type: Orchestrator
+timestamp: 2026-06-19T19:47:50Z
 ---
 
 # IAF Newsletter Pipeline — Manhã Aumentada

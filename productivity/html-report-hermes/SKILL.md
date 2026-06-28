@@ -9,6 +9,8 @@ version: 1.0.0
 author: Gustavo
 tags: [html, design-system, hermes, crt, report, visualization, frontend]
 trigger_phrases: ["gere um html", "visualmente", "relatório html", "dashboard", "landing page", "interface", "report html", "make it look good", "html bonito", "apresentação visual", "estilo hermes", "design system", "crie uma página", "faz um html", "monta um visual", "como seria visualmente", "explicação visual", "guia visual", "página explicativa", "página visual", "crie um html", "monte um html", "entregue como html", "visual facilitado", "explicando de forma visual", "refaça esse html", "interface visual", "compile ranked list", "lista ranqueada", "guia de recursos", "pesquisa fontes", "recursos de aprendizagem", "fontes para aprender"]
+type: Template
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # HTML Report — Hermes Design System

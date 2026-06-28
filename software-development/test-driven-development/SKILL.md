@@ -13,6 +13,8 @@ metadata:
   hermes:
     tags: [testing, tdd, development, quality, red-green-refactor]
     related_skills: [systematic-debugging, plan, subagent-driven-development]
+type: Reference
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Test-Driven Development (TDD)

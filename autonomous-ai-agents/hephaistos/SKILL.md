@@ -1,6 +1,8 @@
 ---
 name: hephaistos
-description: "Hephaistos meta-framework — Hermes-orchestrated project pipeline using delegate_task + OpenCode + Antigravity CLI (agy)."
+description: "Hephaistos meta-framework — orquestra pipelines de projeto com Hermes, OpenCode e agy.
+
+Load this skill when starting a new software or branding project. Cobre 6 modos de pipeline (INCEPTION a DEPLOY), orquestração via delegate_task, subagentes OpenCode para código TDD, agy (Antigravity CLI) para design visual, vault cognitivo com 237+ engramas, e pipeline de design em 3 fases com entregáveis HTML auto-contidos."
 version: 1.10.0
 author: Tácio Brito
 license: MIT
@@ -10,6 +12,8 @@ metadata:
   hermes:
     tags: [meta-framework, pipeline, orchestration, delegation, opencode, antigravity]
     related_skills: [opencode, hermes-agent, antigravity-design, design-research-moodboard, daedalus-core, daedalus-geometry, daedalus-material, daedalus-motion, daedalus-render, local-code-agent, obsidian]
+type: Orchestrator
+timestamp: 2026-06-19T19:47:50Z
 ---
 
 # Hephaistos 🔥🔨

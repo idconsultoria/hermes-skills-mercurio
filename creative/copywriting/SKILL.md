@@ -8,6 +8,8 @@ author: coreyhaines31/marketingskills
 metadata:
   hermes:
     related_skills: [humanizer, brand-iaf-conteudo]
+type: Creative
+timestamp: 2026-06-21T05:11:49Z
 ---
 
 # Copywriting

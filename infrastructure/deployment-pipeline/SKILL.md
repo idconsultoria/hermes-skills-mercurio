@@ -13,6 +13,8 @@ metadata:
   hermes:
     tags: [CI/CD, GitHub-Actions, Docker, ghcr.io, Deploy, SSH, Infrastructure]
     related_skills: [github-pr-workflow, github-auth, oracle-host-access]
+type: Reference
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Deployment Pipeline — Docker + GitHub Actions + SSH Deploy

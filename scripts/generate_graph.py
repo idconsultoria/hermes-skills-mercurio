@@ -93,9 +93,13 @@ def parse_skills(relations):
                 sent = re.split(r'[.。!?\n]', desc)[0].strip()
                 summary = sent[:87] + '...' if len(sent) > 90 else sent
             
+            # Extract type from frontmatter
+            skill_type = fm.get('type', '')
+            
             skills.append({
                 'id': name, 'label': name.split('/')[-1], 'title': title,
-                'size': size, 'category': cat, 'summary': summary, 'description': desc
+                'size': size, 'category': cat, 'type': skill_type,
+                'summary': summary, 'description': desc
             })
     
     return skills

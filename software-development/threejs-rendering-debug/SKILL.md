@@ -6,6 +6,8 @@ Load this skill when a Three.js scene is rendering (triangles > 0) but appears i
 version: 1.0.0
 category: software-development
 related_skills: [agy, html-report-hermes]
+type: Reference
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Three.js Rendering Debug

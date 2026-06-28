@@ -7,6 +7,8 @@ category: autonomous-ai-agents
 metadata:
   hermes:
     related_skills: [autonomous-ai-agents/pi-session-audit]
+type: ToolIntegration
+timestamp: 2026-06-21T05:11:49Z
 ---
 
 # Pi Agent (Local)

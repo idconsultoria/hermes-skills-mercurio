@@ -7,6 +7,8 @@ category: infrastructure
 metadata:
   hermes:
     related_skills: [deployment-pipeline, ai-voice-selfhost]
+type: ToolIntegration
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Oracle VM — SSH Access from Hermes Container
@@ -429,6 +431,12 @@ If the branch is already checked out (e.g., `sprint1-v2`), read files directly w
 
 ⚠️ **Container restarts = lost session?** If you restart `hermes_agent`, your current conversation dies. Schedule restarts via cron or ask the user to do it.
 
+⚠️ **Container user (hermes) doesn't exist on the host — use numeric UID for chown.** When SSHing to the host and running `sudo chown hermes:hermes <path>`, it fails with `chown: invalid user: 'hermes:hermes'` because the hermes user only exists inside the Docker container. Use the numeric UID instead (typically 10000; check with `id -u hermes` inside the container):
+```bash
+sudo chown -R 10000:10000 /path/on/host
+```
+This also applies to other container-internal users (e.g. uid 1001 for Pi Coder Agent legacy data).
+
 ⚠️ **Accidental key deletion during cleanup (common!):** When removing old infrastructure (e.g., migrating Pi from Docker to local), `rm -f` on SSH keys can nuke unrelated keys. **Always check `ls -la ~/.ssh/` before bulk cleanup.** If you delete the oracle SSH key:
    - Do NOT panic or try SSH tricks — the host's authorized_keys entry still exists
    - Ask the user to paste the key file content into `clarify` (multi-line paste)
@@ -501,6 +509,26 @@ If the branch is already checked out (e.g., `sprint1-v2`), read files directly w
 
    See `references/ghcr-auth.md` for the complete setup.
 
+⚠️ **`HERMES_DISABLE_LAZY_INSTALLS=1` is baked into the Hermes Docker image** (set via `ENV` in the Dockerfile). This env var overrides `config.yaml`'s `security.allow_lazy_installs: true` — the `_allow_lazy_installs()` function in `lazy_deps.py` checks the env var FIRST before reading the config file. So even with `allow_lazy_installs: true`, lazy installs are blocked. **Implication:** if a lazy-dep package (firecrawl-py, exa-py, etc.) is missing from the venv, `ensure()` will raise `FeatureUnavailable` and the web tool will fail. The fix is either (a) remove the env var from the Dockerfile and rebuild, or (b) install the SDK manually using the `--target` workaround below.
+
+⚠️ **Hermes venv is root-owned — SDK installs need `--target`.** `/opt/hermes/.venv/` is owned by root, so `uv pip install` fails with Permission denied. Install packages in a user-writable path instead:
+```bash
+mkdir -p /opt/data/home/.local/lib/python3.13/site-packages
+uv pip install --target /opt/data/home/.local/lib/python3.13/site-packages 'package==version'
+```
+Then add `PYTHONPATH=/opt/data/home/.local/lib/python3.13/site-packages` to `/opt/data/.env` so Hermes picks it up on next start.
+
+⚠️ **Self-hosted Firecrawl has no search engine by default.** The open-source Firecrawl does not ship with a web search backend (Google/Bing API). `v1/search` returns empty results unless you configure `SEARCH_PROVIDER` env vars. Scrape and extract work fine without it. Test the API directly:
+```bash
+# Connectivity test (no /health endpoint exists — test the root):
+curl -s http://firecrawl_api:3002/   # expects {"message":"Firecrawl API"}
+
+# Quick scrape test:
+curl -s http://firecrawl_api:3002/v1/scrape -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://example.com"}'
+# success:true with markdown = all good
+
 ---
 
 ## Connecting New Services to the `ai_mesh` Network
@@ -519,12 +547,15 @@ Hermes, Firecrawl, and all Hermes-accessible services share the **external Docke
 
 Do NOT use the Docker gateway IP (`172.19.0.1`) for inter-container communication — it's unreliable (the gateway can become unreachable for published host ports after network state changes or container restarts). Use the DNS hostname on `ai_mesh` instead.
 
+> **Reference:** See `references/firecrawl-selfhosted.md` for Firecrawl self-hosted diagnostics, port confirmation (3002, not 8080), SDK install workaround, search engine architecture (SearXNG deployment, DuckDuckGo fallback), env var override pitfalls, and known limitations.
+
 **Examples of `ai_mesh` services:**
 
 | Service | Hostname | Port | Purpose |
 |---------|----------|------|---------|
 | Hermes Agent | `hermes_agent` | - | Agent itself |
-| Firecrawl API | `firecrawl_api` | 8080 | Web scraping |
+| Firecrawl API | `firecrawl_api` | 3002 | Web scraping (self-hosted; no `/health` endpoint — test via `/` or `POST /v1/scrape`) |
+| SearXNG | `searxng-core` | 8080 | Metasearch engine backing Firecrawl search (see `references/firecrawl-selfhosted.md` > SearXNG) |
 | Qwen3-TTS | `qwen3-api` | 8881 | TTS generation |
 
 ## Workflow Preferences (user)

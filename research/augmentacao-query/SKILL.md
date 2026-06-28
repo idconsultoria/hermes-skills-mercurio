@@ -7,6 +7,8 @@ category: research
 metadata:
   hermes:
     related_skills: [vulcano, aumentacao-referencias, hephaistos, deep-research]
+type: Research
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Aumentação — Consulta ao Vault de Soluções

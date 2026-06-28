@@ -4,6 +4,8 @@ description: "Versatile skill for coordinating Google Antigravity CLI for any de
 
 Load this skill when you need to generate any visual output via Antigravity CLI — from simple HTML reports and brand visuals to full interactive websites with Three.js, GSAP, and cinematic effects. Covers install, OAuth auth, and multiple design workflows: image generation, prototyping, parallel subagents, full site generation with iterative strategy, and HTML report generation. Always invoke agy as a background terminal process — never with timeout."
 category: software-development
+type: ToolIntegration
+timestamp: 2026-06-21T05:11:49Z
 ---
 
 # agy — Antigravity CLI (Consultor Externo)

@@ -225,6 +225,8 @@ Systematically inspect a product/brand's visual identity using browser tools and
 - **Different surfaces (marketing vs docs) may use different design systems** — check at least the main site + one sub-page
 - **Cross-skill handoff** — when the brand analysis feeds a downstream skill (video, social media, print), pass the asset manifest and style guide path in the downstream context. The harvest step's downloaded files are the raw material.
 
+type: Creative
+timestamp: 2026-06-19T19:47:50Z
 ---
 
 ## Pitfalls

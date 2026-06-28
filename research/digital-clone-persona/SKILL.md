@@ -12,6 +12,8 @@ triggers:
   - deep research persona
 metadata:
   related_skills: [deep-research, user-interview, product-pipeline]
+type: Research
+timestamp: 2026-06-14T05:15:09Z
 ---
 
 # Digital Clone Persona

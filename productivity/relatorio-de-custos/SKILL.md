@@ -7,6 +7,8 @@ Load this skill when the user asks for cost reports, spending breakdowns, or pro
 Load this skill when the user asks for cost reports, spending breakdowns, or project expense analysis. Extracts real data from Hermes state.db and Pi Agent JSONL session logs, calculates costs based on model pricing per provider, and produces styled HTML reports via Antigravity with Hermes Style Guide design."
 category: productivity
 related_skills: [html-report-hermes, product-pipeline]
+type: Template
+timestamp: 2026-06-19T19:47:50Z
 ---
 
 # Relatório de Custos — Skill de Geração

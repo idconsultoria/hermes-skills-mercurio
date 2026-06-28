@@ -6,6 +6,8 @@ Load this skill when deploying frontend applications to Vercel. Covers CLI insta
 version: 1.0.0
 author: Hermes Agent
 tags: [vercel, deploy, static-site, frontend, hosting, jamstack]
+type: ToolIntegration
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Vercel Deploy — Skill

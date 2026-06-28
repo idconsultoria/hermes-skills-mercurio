@@ -11,6 +11,8 @@ metadata:
   hermes:
     keywords: [GitHub, Pull-Requests, CI/CD, Git, Automation, Merge, PR-preview, Nginx-Proxy-Manager, ARM64, deployment]
     related_skills: [github-auth, github-code-review, deployment-pipeline, oracle-host-access]
+type: ToolIntegration
+timestamp: 2026-06-19T19:47:50Z
 ---
 
 # GitHub — Complete Workflow Umbrella

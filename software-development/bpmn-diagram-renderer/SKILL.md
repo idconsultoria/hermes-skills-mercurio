@@ -5,6 +5,8 @@ description: "Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js + Chromium h
 Load this skill when a user asks to render a BPMN diagram, export BPMN to image, or visualize a .bpmn file. Covers setup, HTML template, and batch processing."
 trigger: User asks to render a BPMN diagram, export BPMN to image, or visualize a .bpmn file.
 related_skills: [html-to-pdf-chromium]
+type: Template
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # BPMN Diagram Renderer

@@ -15,6 +15,8 @@ metadata:
     related_skills: [github-repo-management, github-code-review]
 prerequisites:
   commands: [pygount]
+type: ToolIntegration
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Codebase Inspection & Architecture Diagnostic

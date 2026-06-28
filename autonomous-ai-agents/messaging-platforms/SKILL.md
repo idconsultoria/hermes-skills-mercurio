@@ -7,6 +7,8 @@ metadata:
   hermes:
     tags: [messaging, platforms, telegram, whatsapp, signal, matrix, discord, slack, bridge]
     related_skills: [whatsapp-bridge-baileys]
+type: Reference
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Messaging Platforms

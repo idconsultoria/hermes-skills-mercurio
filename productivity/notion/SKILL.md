@@ -16,6 +16,8 @@ metadata:
     tags: [Notion, Productivity, Notes, Database, API, CLI, Workers]
     homepage: https://developers.notion.com
     related_skills: [airtable, taskflow-mcp]
+type: ToolIntegration
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Notion

@@ -9,6 +9,8 @@ triggers:
   - user asks for sound effects, SFX, UI sounds, ambient music, drone, audio loop
   - generate audio assets for web/game/film
   - ffmpeg audio processing
+type: Media
+timestamp: 2026-06-21T05:11:49Z
 ---
 
 # AI Sound Design — SFX & Ambient Audio

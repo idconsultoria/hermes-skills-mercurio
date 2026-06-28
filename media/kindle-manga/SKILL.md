@@ -9,6 +9,8 @@ version: 2.0.0
 author: Hermes
 license: MIT
 tags: [kindle, manga, comics, kcc, calibre, mobi, ereader, usb-transfer]
+type: Media
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Kindle Manga Transfer

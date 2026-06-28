@@ -38,10 +38,14 @@ Cada skill é registrada com:
 | **title** | Título do SKILL.md |
 | **file** | Caminho para o SKILL.md |
 | **size** | Tamanho em caracteres do SKILL.md |
+| **type** | Tipo OKF (Orchestrator, ToolIntegration, Reference, Template, Research, Media, Creative, Health) |
 | **summary** | Resumo de 1 linha (~80 chars) |
 | **description** | Parágrafo descritivo (extraído do SKILL.md) |
+| **timestamp** | ISO 8601 da última alteração (extraído do git) |
 | **category** | Categoria de diretório |
 | **relations** | Outras skills relacionadas (parent, child, similar, uses, used_by) |
+
+**Alinhamento OKF:** O campo `type` segue o padrão [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) v0.1 da Google — o único campo obrigatório no frontmatter de um conceito OKF. A taxonomia de tipos (Orchestrator, ToolIntegration, etc.) é específica do Hermes, mas o contrato `type:` no frontmatter é compatível com consumption agents OKF. O `timestamp` segue a recomendação OKF para tracking de frescor do conhecimento.
 
 **Quando atualizar:** a cada `update` ou `evolve` dentro do ciclo de consolidação. O index.md é a fonte da verdade para o ciclo de consolidação.
 
@@ -155,6 +159,8 @@ Sincronização do index.md com o estado atual das skills. Executado quando:
 4. **Audita conformidade de descrições** — varre todas as SKILL.md e verifica se cada uma está no formato esperado:
    - **Sumário de uma linha (~80 chars):** descrição concisa do que a skill faz, sem truncamentos (sem `...`). Deve ser auto-contido: quem lê entende na hora se deve carregar a skill ou não.
    - **Parágrafo de resumo:** explica os gatilhos de ativação ("Load this skill when...") e expande a descrição com capacidades específicas, ferramentas que utiliza e o que produz. Não é o corpo inteiro da skill — é um resumo informativo que alimenta o index.md.
+   - **`type:` presente e válido:** verifica se cada SKILL.md tem o campo `type` no frontmatter com um dos valores da taxonomia OKF (Orchestrator, ToolIntegration, Reference, Template, Research, Media, Creative, Health). Skills sem `type` ou com type inválido devem ser corrigidas.
+   - **`timestamp:` presente:** verifica se o campo `timestamp` ISO 8601 existe no frontmatter. Se ausente, extrair do git log.
    - Lista **todas as skills fora do formato** com o problema específico, edita a SKILL.md original para corrigir, depois atualiza o index.md com as descrições corrigidas.
    - Faz isso para **todas as skills fora do formato**, sem exceção.
 5. Registra no log.md com prefixo `update` incluindo o resumo de tudo que foi alterado

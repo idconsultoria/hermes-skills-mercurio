@@ -6,6 +6,8 @@ Load this skill during the execution phase (Fase 5) of the product pipeline. Cov
 
 Load this skill during the execution phase (Fase 5) of the product pipeline. Covers maintaining an unstructured backlog of improvement requests and orchestrating complete Sprints from PM and UX/UI through Engineering, Review, and Close."
 category: software-development
+type: Orchestrator
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Backlog & Sprint

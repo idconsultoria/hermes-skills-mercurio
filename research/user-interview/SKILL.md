@@ -6,6 +6,8 @@ Load this skill during the Research phase of the product pipeline to understand 
 
 Load this skill during the Research phase of the product pipeline to understand user needs. Covers interview planning, question framing, active listening techniques, synthesis of findings, and persona extraction. Can interview real humans or simulate interviews with AI agent profiles."
 category: research
+type: Research
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # User Interview

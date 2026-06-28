@@ -4,6 +4,8 @@ description: "GTD task management via MCP (Model Context Protocol) — connects 
 
 Load this skill when managing tasks via the TaskFlow MCP server. Covers connecting over SSE (StreamableHTTP POST does not work), creating and updating tasks, managing contexts and projects, processing inbox items, and running weekly GTD reviews."
 related_skills: [notion, apple-reminders]
+type: ToolIntegration
+timestamp: 2026-06-14T05:15:09Z
 ---
 
 # TaskFlow MCP — Ferramentas e Workflows

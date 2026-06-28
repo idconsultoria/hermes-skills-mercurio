@@ -13,6 +13,8 @@ metadata:
     category: creative
     homepage: https://github.com/blader/humanizer
     related_skills: [copywriting]
+type: Creative
+timestamp: 2026-06-14T05:15:09Z
 ---
 
 # Humanizer: Remove AI Writing Patterns

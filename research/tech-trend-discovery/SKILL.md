@@ -15,6 +15,8 @@ metadata:
   hermes:
     tags: [trends, tech, ai, reddit, hacker-news, firecrawl, discovery]
     related_skills: [blogwatcher, deep-research]
+type: Research
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Tech Trend Discovery

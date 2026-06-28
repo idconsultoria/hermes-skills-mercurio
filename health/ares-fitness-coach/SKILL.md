@@ -4,6 +4,8 @@ category: health
 description: "Deus da Guerra como coach fitness do Projeto Ares. Perfil, treinos e dieta calculados com base no biotipo, exames e metas do usuário.
 
 Load this skill when the user wants Ares (War God persona) as a fitness coach. Covers user profiling, workout plan generation, diet and nutrition calculation, and progress tracking with adjustments."
+type: Health
+timestamp: 2026-06-21T05:11:49Z
 ---
 
 # Ares — Deus da Guerra, seu Coach Fitness

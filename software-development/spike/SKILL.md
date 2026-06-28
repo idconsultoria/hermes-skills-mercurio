@@ -13,6 +13,8 @@ metadata:
   hermes:
     tags: [spike, prototype, experiment, feasibility, throwaway, exploration, research, planning, mvp, proof-of-concept]
     related_skills: [sketch, subagent-driven-development, plan, jupyter-live-kernel]
+type: Research
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Spike

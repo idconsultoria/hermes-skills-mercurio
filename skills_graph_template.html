@@ -130,6 +130,7 @@ button:hover { background: #252540; }
       <div>
         <span class="modal-category" id="modal-cat-badge"></span>
         <span style="font-size:10px;color:#505070" id="modal-size"></span>
+        <span style="font-size:10px;color:#505070;margin-left:8px" id="modal-type"></span>
       </div>
       <div class="modal-title" id="modal-title"></div>
     </div>
@@ -231,6 +232,7 @@ function openModal(d) {
   document.getElementById("modal-cat-badge").style.background = catColor + "30";
   document.getElementById("modal-cat-badge").style.color = catColor;
   document.getElementById("modal-size").textContent = (d.size/1024).toFixed(1) + " KB";
+  document.getElementById("modal-type").textContent = d.type ? "⏺ " + d.type : "";
   document.getElementById("modal-title").textContent = d.label;
   
   // Summary

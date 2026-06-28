@@ -10,6 +10,8 @@ metadata:
   hermes:
     tags: [tts, voice, gemini, fish-speech, audio, prompting, speech]
     related_skills: [hermes-agent]
+type: Media
+timestamp: 2026-06-19T19:47:50Z
 ---
 
 # Text-to-Speech (TTS)

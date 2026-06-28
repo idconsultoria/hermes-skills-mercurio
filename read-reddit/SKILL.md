@@ -6,6 +6,8 @@ Load this skill when you need to read Reddit content without API limits. For res
 version: 1.1.0
 author: Created for IAF pipeline
 platforms: [linux, macos]
+type: ToolIntegration
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Read Reddit via RSS

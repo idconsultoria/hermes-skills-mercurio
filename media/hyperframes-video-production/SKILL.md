@@ -6,6 +6,8 @@ Load this skill when creating programmatic video content. Covers HTML compositio
 
 Load this skill when creating programmatic video content. Covers HTML composition with GSAP animations, local rendering via npx hyperframes, Hermes Style Guide integration for explainer/demo videos, and deterministic output for consistent regeneration."
 category: media
+type: Media
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # HyperFrames Video Production

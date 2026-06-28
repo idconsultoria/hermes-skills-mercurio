@@ -13,6 +13,8 @@ metadata:
   hermes:
     tags: [planning, plan-mode, implementation, workflow, design, documentation]
     related_skills: [subagent-driven-development, test-driven-development, requesting-code-review]
+type: Reference
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Plan Mode

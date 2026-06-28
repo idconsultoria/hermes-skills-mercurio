@@ -12,6 +12,8 @@ metadata:
     tags: [hermes, setup, configuration, multi-agent, spawning, cli, gateway, development]
     homepage: https://github.com/NousResearch/hermes-agent
     related_skills: [claude-code, codex, opencode]
+type: Reference
+timestamp: 2026-06-21T05:11:49Z
 ---
 
 # Hermes Agent

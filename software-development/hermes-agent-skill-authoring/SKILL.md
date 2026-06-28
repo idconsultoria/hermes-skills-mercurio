@@ -13,6 +13,8 @@ metadata:
   hermes:
     tags: [skills, authoring, hermes-agent, conventions, skill-md]
     related_skills: [plan, requesting-code-review]
+type: Reference
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Authoring Hermes-Agent Skills (in-repo)

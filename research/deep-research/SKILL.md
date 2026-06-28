@@ -4,6 +4,8 @@ description: "Multi-agent deep research: decompose, dispatch agents, cross-valid
 
 Load this skill when you need thorough research on complex topics. Inspired by GPT-Researcher, this pipeline decomposes questions into sub-queries, dispatches parallel research agents across web, GitHub, news, and academic sources, runs independent reviewers, then cross-validates and synthesizes. Produces cited reports with confidence-graded findings across three depth levels."
 category: research
+type: Research
+timestamp: 2026-06-19T19:47:50Z
 ---
 
 # Deep Research Skill

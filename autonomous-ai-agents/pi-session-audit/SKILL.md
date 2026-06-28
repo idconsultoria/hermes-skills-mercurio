@@ -9,6 +9,8 @@ metadata:
     related_skills: [autonomous-ai-agents/pi-agent-coordination]
 references:
   - agy-protobuf-parsing.md: Field hierarchy and wire-format parser for agy conversation DBs
+type: ToolIntegration
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Agent Session Audit (Pi + agy)

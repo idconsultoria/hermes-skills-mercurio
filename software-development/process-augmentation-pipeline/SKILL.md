@@ -21,6 +21,8 @@ metadata:
       - html-report-hermes
       - vulcano
       - vercel-deploy
+type: Orchestrator
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Pipeline de Mapeamento e Aumentação de Processos

@@ -7,6 +7,8 @@ metadata:
   hermes:
     tags: [audio, sfx, sound-design, elevenlabs, ffmpeg, audio-post-processing]
     related_skills: [text-to-speech]
+type: Media
+timestamp: 2026-06-21T05:11:49Z
 ---
 
 # Sound Design — AI SFX & Audio Production

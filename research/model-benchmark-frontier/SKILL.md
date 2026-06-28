@@ -12,6 +12,8 @@ triggers:
   - "Fronteira de capacidade de LLMs"
   - "Análise custo-benefício de setups de inferência local"
   - "Comparar modelos abertos vs fechados"
+type: Research
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Model Benchmark Frontier — Pesquisa e Visualização

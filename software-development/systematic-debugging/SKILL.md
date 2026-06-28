@@ -13,6 +13,8 @@ metadata:
   hermes:
     tags: [debugging, troubleshooting, problem-solving, root-cause, investigation]
     related_skills: [test-driven-development, plan, subagent-driven-development]
+type: Reference
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Systematic Debugging

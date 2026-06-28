@@ -7,6 +7,8 @@ metadata:
   hermes:
     tags: [ai-tools, texture-generation, 3d-models, asset-pipeline, prompt-engineering, creative-production]
     related_skills: [sound-design, style-guide-consultation, agy]
+type: Creative
+timestamp: 2026-06-21T05:11:49Z
 ---
 
 # AI Creative Assets — Tool Research & Production Prompts

@@ -5,6 +5,8 @@ description: "Manage the Hermes skills repo — consolidation cycles, MECE analy
 Load this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, or installing community skills. Covers the full consolidation lifecycle: update, evolve, offload, commit, push, and interactive D3 graph generation."
 
 category: software-development
+type: Orchestrator
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Skills Repository Curator
@@ -144,6 +146,8 @@ Sincroniza o index.md com o estado atual das skills.
 4. **Audita conformidade de descrições** — varre TODAS as SKILL.md, não apenas as modificadas:
    - **Sumário de uma linha (≤85 chars, SEM `...`):** descrição concisa e auto-contida. Quem lê entende na hora se deve carregar a skill.
    - **Parágrafo de resumo:** explica gatilhos de ativação ("Load this skill when...") e expande a descrição com capacidades específicas, ferramentas utilizadas e o que produz.
+   - **`type:` presente e válido (OKF-aligned):** verifica se o campo `type` existe no frontmatter com um dos valores (Orchestrator, ToolIntegration, Reference, Template, Research, Media, Creative, Health). Skills sem `type` ou com type inválido devem ser corrigidas.
+   - **`timestamp:` presente:** verifica se o campo `timestamp` ISO 8601 existe. Se ausente, extrair do git log.
    - **Verifica duplicatas pós-aspas:** descrições que terminam com `"` mas têm texto idêntico repetido depois da aspa de fechamento são um bug comum. Detectar com `grep -A1 'description: "' SKILL.md | grep -v '^--$'` e inspecionar visualmente.
    - Lista **todas as skills fora do formato** com o problema específico, edita a SKILL.md original, depois atualiza o index.md.
    - **Sem exceção** — faz para todas as skills fora do formato.
@@ -181,6 +185,20 @@ description: "Summary line here (≤85 chars).
 
 Load this skill when [trigger]. Expanded capabilities paragraph."
 ```
+
+### Campos OKF no frontmatter
+
+Além de `name`, `description` e `category`, toda SKILL.md **deve** ter:
+
+```yaml
+type: Orchestrator          # Obrigatório (OKF v0.1). Valores: Orchestrator, ToolIntegration,
+                            # Reference, Template, Research, Media, Creative, Health
+timestamp: 2026-06-21T05:11:49Z  # Recomendado. ISO 8601 do último commit via git log
+```
+
+O campo `type` é o único campo obrigatório no padrão [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) v0.1 da Google Cloud. Alinhar o skills repo com OKF permite que consumption agents OKF-compatíveis descubram e classifiquem skills Hermes sem integração adicional.
+
+O `timestamp` permite avaliar frescor sem consultar git log — valioso em cron jobs e agents que priorizam informações atualizadas.
 
 Isso é YAML válido, mais legível, e parseia corretamente tanto por parsers YAML quanto por regex simples. O script `generate_graph.py` lê a primeira linha após `description: "` como sumário e o restante até o `"` de fechamento como parágrafo. **Não usar `\n` literal** — parsers simples não expandem escapes. Verificar: `grep -rn '^description:\s*[|>]' SKILL.md` (apanha `|`, `|-`, `>`, `>-`).
 
@@ -258,12 +276,17 @@ Remove entradas da memória persistente que estejam redundantes com skills.
 
 Memória guarda **preferências do usuário e fatos estáveis do ambiente**. Skills guardam **procedimentos, receitas e workflows**. Tudo que é procedural e está numa skill pode sair da memória.
 
+### Como ler a memória atual
+
+- **Sessão normal:** as seções `MEMORY` e `USER PROFILE` estão injetadas no prompt do agente. Leia diretamente dali — cada entrada é separada por `§`.
+- **Sessão cron (`skip_memory=true`):** a memória **não** é pré-injetada. O tool `memory` não tem action `list` — o agente não consegue ver as entradas atuais via tool call. **Soluções:** (a) incluir as entradas da memória explicitamente no texto do prompt do cron, ou (b) aceitar que o offload não roda em cron — executar manualmente quando necessário. O workaround de "adicionar dummy para forçar rejeição" é frágil e não recomendado.
+
 ### Passos
 
-1. Lista entradas da memória atual via `memory(action='list')`
-2. Para cada entrada, verifica se existe skill cobrindo o mesmo assunto
-3. Se sim, remove da memória com `memory(action='remove', old_text=...)`
-4. Registra no log.md com prefixo `offload`
+1. Leia as entradas da memória a partir do prompt (sessão normal) ou do prompt do cron (se explicitamente incluídas)
+2. Para cada entrada, verifique se existe skill em `/opt/data/skills/` cobrindo o mesmo assunto (conteúdo procedural, workflow, ou receita)
+3. Remova da memória usando **operações em lote** — uma única chamada `memory(operations=[{action:'remove', old_text:...}, ...])` com múltiplos removes — em vez de chamadas individuais. Economiza tool calls e evita escritas redundantes.
+4. Registre no log.md com prefixo `offload` listando as entradas removidas
 5. git add -A && git commit -m "offload: ..."
 6. **git push origin master** — sobe tudo para o GitHub
 
@@ -371,7 +394,10 @@ python3 software-development/skills-repo-curator/scripts/audit-descriptions.py -
 
 ## Pitfalls
 
-⚠️ **Depth-1 obrigatória para relações.** Scan automatizado (regex de frontmatter) produz ~12 arestas. Leitura bilateral (profundidade 1) produz ~140+. Sempre usar subagentes com leitura depth-1.
+⚠️ **Depth-1 inference não cabe no cron de 3 minutos.** O scheduler do cron tem hard interrupt de 3 min por run. A inferência depth-1 (disparar 3 subagentes paralelos, cada um lendo ~28 skills bilateralmente) exige mais tempo. **Workarounds:**
+   - (a) Separar depth-1 em seu próprio cron job com prompt focado só em relações, ou
+   - (b) Rodar `hermes chat -q '...'` via SSH no host com timeout de 10+ min, ou
+   - (c) Executar depth-1 manualmente quando necessário (fora do cron).
 
 ⚠️ **Formato `|- ` quebra o grafo.** Verificar SEMPRE antes de gerar o grafo.
 
@@ -397,7 +423,9 @@ python3 software-development/skills-repo-curator/scripts/audit-descriptions.py -
 
 ⚠️ **Batch-edit de SKILL.md requer verificação pós-aplicação.** Scripts que editam múltiplas SKILL.md em lote (ex: para corrigir descrições) podem corromper arquivos com formato de descrição diferente do esperado. Após qualquer batch-edit, verificar com `grep -rn 'description:' SKILL.md` se alguma descrição ficou truncada (linha termina sem aspas de fechamento ou sem `---` na linha seguinte). Restaurar com `git checkout HEAD -- <file>` e re-fixar manualmente.
 
-⚠️ **Ciclo pode morrer no meio e deixar working directory sujo.** O cron job tem timeout — se o ciclo não completa, SKILL.md ficam modificados mas sem commit, index.md desatualizado, log.md sem entrada. **Recuperação:**
+⚠️ **Offload em cron não funciona com skip_memory=true.** Cron jobs têm `skip_memory=true` por padrão — a seção `MEMORY` não é injetada no prompt do agente. O tool `memory` não tem action `list`. O agente não consegue ver quais entradas existem para decidir o que remover. **Soluções:** (a) incluir as entradas da memória explicitamente no prompt do cron job, ou (b) pular o offload em cron e executar manualmente quando necessário.
+
+⚠️ **Ciclo pode morrer no meio e deixar working directory sujo.** O cron job tem timeout — se o ciclo não completa, SKILL.md ficam modificados mas sem commit, index.md desatualizado, log.md sem entrada. **Recuperação:** **Recuperação:**
 
    1. **Diagnóstico** — `cronjob(action='list')` → ver `last_status: error`. O campo `last_error` no `jobs.json` (`/opt/data/cron/jobs.json`) tem a mensagem de erro completa. O output do cron está em `/opt/data/cron/output/<job_id>/<timestamp>.md` — contém o prompt completo + a seção `## Error` com o trace.
    2. **Avaliação** — `git status` + `git diff --stat` mostra quais skills foram tocadas. `git diff <file>` pra ver se as mudanças são válidas ou corrompidas.
@@ -413,3 +441,26 @@ python3 software-development/skills-repo-curator/scripts/audit-descriptions.py -
 ⚠️ **Leaked commentary de subagentes no index.md.** Subagentes podem incluir notas informais como `(reason: ...)` em suas propostas de relação. Quando o agente central aplica as relações manualmente via patch, é fácil copiar acidentalmente o comentário junto com a relação. Isso quebra o formato limpo do index.md. **Sempre verificar** com `grep -n '(reason:' index.md` e `grep -n 'Reason:' index.md` depois de aplicar patches de relação, e remover qualquer linha contaminada.
 
 ⚠️ **Verificar index.md contra disco após regeneração.** Ao regenerar o index.md via `write_file` (>30% mudança), é fácil incluir skills que existiam no index antigo mas não têm SKILL.md no disco. Sempre cruzar a saída final contra `find . -name SKILL.md -not -path './.archive/*'` para garantir que cada entrada no index.md corresponde a um arquivo real. Skills sem SKILL.md no disco geram erros no gráfico e confundem agentes futuros.
+
+⚠️ **Diretório read-only impede patches/write_file.** Quando `patch` ou `write_file` falha com "Permission denied" ao criar arquivo temp (`.hermes-tmp.*`), o diretório da skill pode estar read-only (modo `dr-xr-xr-x` / 555). Verificar com `stat <dir> | grep Access`. Corrigir com `chmod u+w <dir>`. Arquivos 444 individuais usam `chmod 664 <file>`.
+
+⚠️ **`.curator_backups/` não deve ser versionado.** O diretório `.curator_backups/` na raiz contém backups automáticos de skills. Adicionar ao `.gitignore`: `echo '.curator_backups/' >> .gitignore && git add .gitignore`.
+
+⚠️ **`audit-descriptions.py` precisa do SKILLS_DIR correto.** O script em `skills-repo-curator/scripts/audit-descriptions.py` precisa de SKILLS_DIR = 4 níveis acima do script (scripts → skills-repo-curator → software-development → skills/), não 3. Se só escaneia poucos arquivos, o path está errado. Corrigir com:
+
+```python
+SKILLS_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+```
+
+⚠️ **Patch falha na auditoria de descrições: diagnostique antes de re-aplicar.** Quando `patch` falha com "Could not find a match for old_string" durante o passo 4 do Update (auditoria de descrições), NÃO tente re-aplicar cegamente com um old_string diferente. Leia o SKILL.md atual (`read_file`), compare o texto real com o que você esperava — divergências comuns:
+
+- Em dash `—` (unicode U+2014) vs `--` vs `-` hífen simples
+- Palavras extras ou faltando (ex: `project pipeline` vs só `pipeline`)
+- Whitespace invisível no final da linha
+- Acentos ou caracteres especiais (ex: `Hephaistos` com acento vs sem)
+
+Procedimento:
+1. `read_file` no SKILL.md problemático — veja o texto **exato** da linha `description:`
+2. Copie o trecho real como `old_string` no patch
+3. **Explique o diagnóstico ao usuário** antes de aplicar a correção (ele prefere entender o problema primeiro)
+4. Só então aplique o `patch` com o old_string verificado

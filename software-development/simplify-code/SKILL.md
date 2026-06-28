@@ -11,6 +11,8 @@ metadata:
   hermes:
     tags: [code-review, cleanup, refactor, delegation, subagent, parallel, simplify]
     related_skills: [requesting-code-review, test-driven-development, plan]
+type: Orchestrator
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Simplify Code — Parallel Review & Cleanup

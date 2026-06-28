@@ -12,6 +12,8 @@ metadata:
   hermes:
     tags: [iaf, comunidade, brand, conteudo, newsletter, social-media]
     related_skills: [xurl, iaf-newsletter-pipeline, copywriting]
+type: Reference
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Brand IAF — Conteúdo

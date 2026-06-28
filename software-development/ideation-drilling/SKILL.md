@@ -4,6 +4,8 @@ description: "Product ideation (Fase 1): refine raw ideas through structured dri
 
 Load this skill at the start of the product pipeline (Fase 1) when the user has a raw idea for a product or feature. Covers structured ideation drilling, user interview integration, competitor analysis, and producing a refined product concept ready for further pipeline stages."
 category: software-development
+type: Orchestrator
+timestamp: 2026-06-12T02:23:22Z
 ---
 
 # Ideation Drilling (Hermes — Orchestrator)

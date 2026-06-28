@@ -4,6 +4,8 @@ description: "Scan a codebase for deepening opportunities and present them as a 
 
 Load this skill when you need to identify architectural friction and deepening opportunities in a codebase. Covers design vocabulary, domain modeling, ADR workflows, and grilling through selected opportunities — all self-contained with zero external skill dependencies."
 category: software-development
+type: Orchestrator
+timestamp: 2026-06-28T05:11:55Z
 ---
 
 # Improve Codebase Architecture
