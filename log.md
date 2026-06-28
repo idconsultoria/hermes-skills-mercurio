@@ -94,3 +94,5 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 ## [2026-06-28] update | Index synced 57→60 skills. 3 new skills added (kindle-manga, manga-anime-data, threejs-rendering-debug). 16 size entries updated... *hephaistos SKILL.md owned by different user (uid 1001), only index.md description updated.
 
 ## [2026-06-28] evolve | 0 merges, 0 deletes, 0 orphans. 49 similar pairs analyzed — all distinct workflows. Graph regenerated (98 nodes, 115 edges). Reports saved.
+
+## [2026-06-28] offload | No memory to offload — cron session has memory disabled (skip_memory=true). No procedural facts in memory for this profile.
