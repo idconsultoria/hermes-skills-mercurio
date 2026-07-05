@@ -6,6 +6,7 @@ Delivered inside ```text block in Cron #3 response.
 
 ```text
 📰 *IAF — Manhã Aumentada* · [DATA]
+🌐 https://iaf-newsletter.vercel.app/[SLUG_DATA]
 
 *[PRIMEIRA FRASE DO EDITORIAL EM NEGRITO]* [resto do parágrafo editorial em texto normal, sem negrito]
 
@@ -21,13 +22,14 @@ Delivered inside ```text block in Cron #3 response.
 ## Rules
 
 1. 📰 emoji before the title
-2. First sentence of editorial in **bold** + period, everything after in normal text (no bold)
-3. 🔥 *Destaques do dia* — italic, with fire emoji, followed by bullets
-4. 3 bullets = top 3 overall ranking scores (mix of news and discussions)
+2. 🌐 Link da newsletter SEMPRE na segunda linha, logo após o título, no formato `🌐 https://iaf-newsletter.vercel.app/[SLUG_DATA]`
+3. First sentence of editorial in **bold** + period, everything after in normal text (no bold)
+4. 🔥 *Destaques do dia* — italic, with fire emoji, followed by bullets
+5. 3 bullets = top 3 overall ranking scores (mix of news and discussions)
    - Selection by score, NOT by category. A discussion with score 8.5 beats a news with 8.0.
-5. 🎯 *Aplicação prática de hoje* as header line, description on next line in normal text
-6. Zero sign-offs, no "—" metadata, no extra text
-7. Zero anglicisms in the body
+6. 🎯 *Aplicação prática de hoje* as header line, description on next line in normal text
+7. Zero sign-offs, no "—" metadata, no extra text
+8. Zero anglicisms in the body
 
 ### Regra de editorial no WhatsApp (3 frases máx)
 
@@ -37,6 +39,7 @@ O parágrafo do editorial na mensagem de WhatsApp deve ter **no máximo 3 frases
 
 ```text
 📰 *IAF — Manhã Aumentada* · 06/06/2026
+🌐 https://iaf-newsletter.vercel.app/06062026
 
 *O S&P 500 barrou OpenAI, Anthropic e SpaceX.* As três maiores empresas de IA do mundo não atendem o critério mais básico de um índice de ações: dar lucro.
 

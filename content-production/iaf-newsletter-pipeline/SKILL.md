@@ -1,8 +1,8 @@
 ---
 name: iaf-newsletter-pipeline
-description: "Umbrella skill for newsletters and digests — cron scheduling and multi-source
+description: "Umbrella skill for newsletters — cron scheduling, curation, dedup, deploy.
 
-Load this skill to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline. Covers multi-source content collection, editorial ranking and dedup, HTML-to-PDF rendering, Telegram and WhatsApp delivery, and chained cron job architecture."
+Load this skill to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline. Covers multi-source content collection, editorial ranking and dedup, HTML generation, deploy no Vercel, e entrega via Telegram no formato WhatsApp-style."
 trigger: User asks to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline. Also when designing cron-based content aggregation patterns.
 metadata:
   hermes:
@@ -14,7 +14,7 @@ timestamp: 2026-06-19T19:47:50Z
 
 # IAF Newsletter Pipeline — Manhã Aumentada
 
-Full automated daily pipeline: coleta → ranqueamento → HTML → PDF → entrega no Telegram + WhatsApp.
+Full automated daily pipeline: coleta → ranqueamento → HTML → deploy → entrega.
 
 > This skill is the umbrella for all newsletter/briefing patterns. See sections below for:
 > - [Production pipeline](#pipeline-architecture) — current IAF cron setup
@@ -24,18 +24,19 @@ Full automated daily pipeline: coleta → ranqueamento → HTML → PDF → entr
 
 ## Pipeline Architecture
 
-Four chained cron jobs, scheduled in **GMT-3** (user's local time). Cron system runs in UTC (+3h).
+Três chained cron jobs, scheduled in **GMT-3** (user's local time). Cron system runs in UTC (+3h).
 
 ```
 GMT-3          UTC           Cron
 ─────────────────────────────────────────────────
 04:00      →  07:00    🔵  #1 Coleta de Fontes
 07:30      →  10:30    🟡  #2 Newsletters
-07:40      →  10:40    🔴  #3 Síntese + PDF (ranking é interno)
-07:50      →  10:50    🟢  #4 Deploy Web (Vercel)
+07:40      →  10:40    🔴  #3 Síntese + Deploy + Entrega (ranking é interno)
 ```
 
-Chaining: `#3 context_from: [#1, #2]` | `#4 context_from: [#3]`
+Chaining: `#3 context_from: [#1, #2]`
+
+**Delivery:** origin (Telegram), formato WhatsApp-style (texto curto, link no topo, sem PDF). Cron #3 faz tudo: síntese, deploy no site Vercel e entrega. Cron #4 foi abolido — incorporado no #3.
 
 ## Cron #1 — Coleta de Fontes (04:00 GMT-3)
 
@@ -69,17 +70,30 @@ Extracts from:
 
 Only runs later because these newsletters update around 7h local time.
 
-## Cron #3 — Síntese + PDF (07:40 GMT-3 / 10:40 UTC)
+## Cron #3 — Síntese + Deploy + Entrega (07:40 GMT-3 / 10:40 UTC)
 
-**Toolsets:** terminal, file  \\\
-**Deliver:** origin (Telegram)  \\\
-**Skills configuradas:** copywriting, humanizer, html-to-pdf-chromium, newsletter-curation, iaf-newsletter
+**Toolsets:** terminal, file  \\
+**Deliver:** origin (Telegram)  \\
+**Skills configuradas:** copywriting, humanizer, iaf-newsletter-pipeline
 
-> ⚠️ **Skills que podem não existir:** `newsletter-curation` e `iaf-newsletter` não existem em todas as instalações. Se estiverem faltando, o agente recebe um aviso no topo do contexto que polui o prompt e degrada a qualidade da síntese. Antes de uma execução crítica, verifique com `skills_list()` se as skills carregam sem erro. Se não existirem, remova-as do cron job com `cronjob(action='update', skills=[...])` e confie apenas em `copywriting + humanizer + html-to-pdf-chromium`.
+**Responsabilidades integradas:**
+- Ler dados dos Crons #1 e #2 (injetados via `context_from`)
+- Selecionar e ranquear 20 notícias com dedup em 4 camadas
+- Gerar HTML final para deploy (CSS responsivo, sem @page, sem PDF)
+- Fazer deploy no Vercel via `_deploy_new_edition.py`
+- Entregar mensagem no Telegram em formato WhatsApp-style (link no topo, conciso)
+
+> ⚠️⚠️⚠️ **REGRA ABSOLUTA — DEPLOY ANTES DA MENSAGEM.** O link precisa estar vivo (curl 200) antes de entregar. Não existe "link previsto" — só link confirmado.
+
+### Dedup — 4 Camadas Obrigatórias
+
+> ⚠️ **Três vezes seguidas** a newsletter saiu com notícias repetidas. As regras abaixo existem por este motivo. Não pule nenhuma camada.
 
 ### Pipeline Steps
 
 > ⚠️⚠️⚠️ **REGRA ABSOLUTA — VERIFIQUE DATAS ANTES DE SELECIONAR. STALE NEWS QUEIMAM CREDIBILIDADE.**
+
+ ⚠️ **ARMADILHA: roundups de agregadores.** Um agregador (AIToolly, TechCrunch, etc.) pode publicar no dia X uma matéria \"Empresa Y lança Z\" que na verdade é um **roundup de releases dos últimos meses**. A data do artigo NÃO é a data dos lançamentos. Para cada release mencionado no roundup, busque a fonte oficial da empresa e verifique a data real de publicação. Se o release tem semanas ou meses, descarte o item — não é notícia nova. Exemplo real (28/06/2026): AIToolly publicou roundup do Meituan; os releases eram de abril a junho de 2026, NÃO de 27/06.
 >
 > A coleta de fontes (Cron #1) **não filtra por data**. Itens de dias ou semanas atrás aparecem lado a lado com os de hoje. Cabe a você verificar a data de publicação de cada item antes de incluí-lo. Ver referência `references/news-verification-pitfalls.md` para o método completo.
 >
@@ -115,16 +129,34 @@ Only runs later because these newsletters update around 7h local time.
 
    ⚠️⚠️⚠️ **REGRAS REFORÇADAS (15/06/2026) — DEDUP SEMÂNTICO E LIMITE DE FREQUÊNCIA**
 
-   **Regra A — Dedup por entidade, não por título.** Um item é duplicata se QUALQUER das entidades centrais (empresa, modelo, pessoa, sigla de índice, evento) apareceu no mesmo papel temático em edições anteriores. Exemplos:
+      **⚠️⚠️⚠️ DEDUP — 4 CAMADAS OBRIGATÓRIAS**
+
+   **Camada 1 — FATO (todas as seções):** mesmo VERBO CENTRAL + mesma ENTIDADE = mesmo fato → REMOVA. Ex: "OpenAI limitou GPT-5.6" = "GPT-5.6 restrito pelo governo" (verbo: restringir, entidade: GPT-5.6).
+
+   **Camada 2 — ENTIDADE (todas as seções):** desenvolvimento NOVO sobre mesma entidade = VÁLIDO. Ex: "Anthropic protocola IPO" ≠ "Anthropic perde executivos". Entity frequency é INFORMATIVA. ⛔ EXAUSTO alerta, não exclui.
+
+   **Camada 3 — TESE EDITORIAL (hot-take APENAS):** LEIA o hot-take-box dos últimos 14 HTMLs em /opt/data/cron/history/. Se a mesma tese central já apareceu em 2+ edições, TROQUE. Ex real: "governo gatekeeper" foi editorial em 26/06 e 27/06.
+
+   **Camada 4 — EDIÇÕES ESPECIAIS:** se o tema do editorial tem edição especial em `/opt/data/iaf-edicoes-archive/edicoes/especial-*.html`, não reescreva. Limite a 1 artigo apontando para o link da especial.
+
+   ⚠️ **LOG obrigatório:** descartes por camada + "20 itens rigorosamente inéditos ✓". Sem log = dedup não feita. (empresa, modelo, pessoa, sigla de índice, evento) apareceu no mesmo papel temático em edições anteriores. Exemplos:
    - "S&P 500 rejeita entrada" ≈ "S&P 500 barra OpenAI" ≈ "S&P 500 bloqueia IPO" → **mesmo tópico** (S&P 500 + entrave regulatório a IPOs de IA)
    - "Fable 5 proibido" ≈ "Anthropic desliga Mythos" ≈ "Governo dos EUA vs Fable" → **mesmo tópico** (desligamento/debate regulatório do Fable 5)
    - "Nova onda de modelos abertos" ≈ "Enxurrada de modelos abertos" ≈ "Onda de lançamentos open-weight" → **mesmo tópico**
 
    **Como aplicar:** extraia as 2-3 entidades centrais de cada item selecionado (ex: "S&P 500", "rejeição", "OpenAI"). Se o mesmo trio de entidades aparecer em QUALQUER título de `titles_flat` nos últimos 14 dias, o item é duplicata — mesmo que as palavras sejam diferentes.
 
-   **Regra B — Limite de 3 aparições por tópico.** Nenhum tópico (definido pelo trio de entidades acima) pode aparecer em mais de **3 edições** dentro da janela de 14 dias. Após a 3ª aparição, o tópico é considerado exaurido. Para verificar, rode `python3 scripts/entity_frequency.py` (na raiz da skill) — ele parseia o manifesto e aponta quais entidades excederam o limite. O relatório inclui a lista de entidades por edição e agrupamento por cluster de tópicos.
+   ⚠️⚠️⚠️ **REGRA DE DEDUP — TRÊS CAMADAS**
 
-   **Regra C — Exceção de "desenvolvimento novo" prevalece sobre Regra B.** Se surgir um fato novo objetivo que MUDA o entendimento do tópico (ex: "Fable 5 bloqueado" → "Fable 5 liberado"), ele pode ser incluído mesmo que o tópico já tenha saturado pela Regra B. O critério é objetivo: o fato novo altera o estado anterior do tópico? Se sim, entra. Se for só um ângulo novo sobre o mesmo estado, não entra.
+   **1. FATO (radar/deep dive):** mesmo fato com ângulo diferente = duplicata. Verbo central + entidade = mesmo fato? Remove.
+   **2. ENTIDADE (todas as seções):** mesma entidade com desenvolvimento NOVO = válido. Não remova por frequência.
+   **3. TESE EDITORIAL (hot-take):** antes de definir o tema do editorial, VERIFIQUE a tese central nos últimos 14 DIAS de editoriais. Para isso:
+      - Leia os HTMLs em `/opt/data/cron/history/iaf_*-*/*.html` (últimos 14)
+      - Extraia o primeiro parágrafo do hot-take-box
+      - Identifique a TESE CENTRAL (ex: "governo gatekeeper", "custo da IA", "China vs EUA")
+      - Se a mesma tese central apareceu em 2+ edições anteriores → REMOVA. Escolha outra tese.
+   
+   **Por que isso existe:** o editorial de 26/06 usou "governo virou gatekeeper", o de 27/06 reforçou "governo é porteiro", e o de 29/06 (erro) repetiu "portão trancou". Três edições com a MESMA TESE. O leitor já absorveu esse argumento.
 
    ⚠️ **Estas regras existem porque a newsletter repetiu os mesmos tópicos 5-7 vezes em 11 edições. O leitor já se informou. Pare de recontar a mesma história.**
 
@@ -165,28 +197,27 @@ Only runs later because these newsletters update around 7h local time.
 
    A exceção de "desenvolvimento novo" (Regra C) se aplica, mas com critério MAIS RESTRITIVO no editorial: o fato novo deve ser tão relevante que justifique a repetição da entidade. Em dúvida, troque.
 8. **Generate HTML** from template `/opt/data/references/iaf_v3_reference.html` — keep exact CSS/layout
+   ⚠️ **Use APENAS as classes do template.** As classes oficiais são:
+   - `.hot-take-box` / `.hot-take-text` (editorial)
+   - `.deep-dive-card` / `.deep-dive-header` / `.deep-dive-title` / `.deep-dive-body` / `.deep-dive-link` + `.dd-tag.tag-analysis|tag-product|tag-community` (análise)
+   - `.news-grid` / `.news-item` / `.news-bullet` / `.news-text` + `.news-tag.tag-biz|tag-creative|tag-alert` (radar)
+   - `.community-grid` / `.community-item` / `.community-sentiment.sentiment-hot|mixed|negative` (comunidade)
+   - `.app-card` / `.app-header` / `.app-source` / `.app-title` / `.app-desc` / `.app-benefit` (aplicação prática)
+   - `.footer` / `.footer-left` / `.footer-center` / `.footer-right`
+   - NÃO invente classes. NUNCA use `footer-note`, `radar-item`, `radar-source`, `aplicacao-box` ou outras classes fora do template.
+   ⚠️ **Quantidade de itens por seção:**
+   - Radar: mínimo **10 itens** (ver edições anteriores: 11-14)
+   - Comunidade: **2 expandidos** (deep-dive-card) + **4 compactos** (community-grid) = 6 total
+   - Deep dive: exatamente **3 cards**
+   ⚠️ **Google Fonts:** inclua o link para Inter + Outfit + Fira Code (cabeçalho do template). O deep-dive-grid usa flex-direction:column com gap fixo — cards muito longos podem desbalancear a estrutura HTML do card seguinte (perda de divs de fechamento, formatação incorreta). Limite cada card de análise a **no máximo 3-4 parágrafos**. Se o conteúdo for extenso, condense: agrupe múltiplos lançamentos num só parágrafo (ex: lista compacta de bullet points inline em vez de um parágrafo por item) e mova detalhes para o link de referência. Verifique a estrutura HTML dos cards adjacentes após qualquer edição manual.
    ⚠️ **Verifique o header-metadata-box.** O template tem placeholders `Hora:`, `Data:`, `Edição Diária`. NUNCA substitua `Hora:` por metadata interna do pipeline (ex: `Dedup: 14 dias ✓`). Isso já vazou para o leitor — a linha deve mostrar o horário de publicação, não métricas de curadoria. Confira visualmente no HTML gerado antes de salvar.
-9. **Convert to PDF** with Chromium headless → output named `manhã_aumentada_DDMMYYYY.pdf`
-   ⚠️ **REGRRA ABSOLUTA: NUNCA use WeasyPrint ou bibliotecas Python para gerar o PDF.** WeasyPrint perde CSS features (gradientes, webkit-background-clip, grid, glow) e produz PDF de ~100KB em vez de 500KB+. Use SEMPRE o Chromium Headless:
-   ```bash
-   CHROMIUM=/tmp/chromium-extracted/usr/lib/chromium/chromium
-   LD_LIBRARY_PATH=/tmp/chromium-extracted/usr/lib/chromium \
-     timeout 120 $CHROMIUM \
-     --headless --no-sandbox --disable-gpu \
-     --disable-software-rasterizer --no-pdf-header-footer \
-     --deterministic-mode \
-     --print-to-pdf="$PDF" "file://$HTML"
-   ```
-   **Verificação:** `ls -lh "$PDF"` — mínimo **300KB**. Se menor, refaça com Chromium.
-10. **Save to history**: `iaf_YYYY-MM-DD.html` + `.pdf`
-11. **Update dedup manifest** (pós-escrita): `python3 /opt/data/cron/scripts/dedup_manifest.py` — adiciona a edição de hoje ao manifesto rolante
-12. **Deliver** — response starts with `MEDIA:/tmp/manha_aumentada_DDMMYYYY.pdf` (first line, nothing before)
+9. **Save to history**: `iaf_YYYY-MM-DD.html`
+10. **Update dedup manifest** (pós-escrita): `python3 /opt/data/cron/scripts/dedup_manifest.py` — adiciona a edição de hoje ao manifesto rolante
+11. **Deliver** — mensagem WhatsApp começando com o link da edição web (ver formato em WhatsApp Companion Format abaixo). PDF abolido.
 
-## Cron #4 — Deploy Web (07:50 GMT-3 / 10:50 UTC)
+Agora Cron #3 faz tudo: síntese, deploy e entrega. O deploy está no passo 10 do Pipeline Steps.
 
-**Toolsets:** file, terminal  \\\
-**Deliver:** origin (Telegram)  \\\
-Chain: context_from Cron #3
+(Abaixo, referência de deploy mantida para fallback manual — Cron #4 foi incorporado ao #3)
 
 Faz o deploy da edição do dia no site `https://iaf-newsletter.vercel.app`.
 
@@ -209,7 +240,7 @@ O `vercel deploy --prod` aliaseia automaticamente para o domínio original (`iaf
 2. O script detecta o HTML mais recente em `/opt/data/cron/history/`, registra no arquivo, roda transform para versão web responsiva
 3. Executa `vercel build --prod --yes` + `vercel deploy --prebuilt --prod --yes`
 4. **Verifica alias:** o deploy `--prod` pode não atualizar `iaf-newsletter.vercel.app` se o alias de produção do projeto divergiu. Execute `vercel alias set <deployment-url> iaf-newsletter.vercel.app` para garantir.
-5. Entrega o link no Telegram: `https://iaf-newsletter.vercel.app/{SLUG}`
+5. Entrega o link no WhatsApp: `https://iaf-newsletter.vercel.app/{SLUG}`
 
 Se o script retornar 'No new editions to deploy', verifique o MOTIVO:
    - Se é uma edição nova que falhou ao registrar: execute os passos manualmente (vercel build --prod --yes + vercel deploy --prebuilt --prod --yes)
@@ -337,6 +368,7 @@ Mais detalhes em `references/tool-backend-architecture.md`.
 
 - **Reddit bloqueado** — HTTP 403/429 do Cloudflare em `www.reddit.com`. **FIX:** o script `reddit_rss_parser.py` agora usa `old.reddit.com` com browser User-Agent + cache file-based + retry com backoff. Isso resolve o bloqueio Cloudflare na maioria dos casos. O script também faz fallback automático entre old.reddit e www.reddit. Se ainda falhar, use `web_search` como fallback na coleta.
 - **web_search retorna vazio** — aconteceu em 16/06. Tentar reformular a query ou usar web_extract.
+- **Arquivos de coleta desatualizados (stale).** Os arquivos `iaf_noticias_gerais.md`, `iaf_reddit.md` etc. REFLETEM a data/hora da ÚLTIMA execução do Cron #1, não necessariamente o dia atual. Se o Cron #1 falhar por vários dias, os arquivos ficam parados no tempo. **Sempre verificar a data de coleta no cabeçalho de cada arquivo** (ex: "Coleta: 2026-06-09 07:00 UTC"). Se a data de coleta for >24h atrás, NÃO confiar no conteúdo desses arquivos — executar `web_search` fresco para cada categoria antes de iniciar a pré-seleção. O marcador de data está no cabeçalho do arquivo (linha 2-3 do markdown). Ignorar este passo = notícias velhas na newsletter.
 - **Sessão não encontrada** — FTS5 pode não ter indexado sessões muito antigas. Buscar por prefixo.
 
 ## Daily AI Digest Patterns
@@ -363,8 +395,7 @@ Alternative format: branded magazine-style digest (more visual, less structured)
 ```
 Collector (cron #1, local, no agent=True script pattern)
   → Newsletter fetcher (cron #2, local)
-  → Synthesizer + PDF (cron #3, deliver to user, context_from: [#1, #2])
-  → Deploy Web (cron #4, deliver to user, context_from: [#3])
+  → Synthesizer + Deploy + WhatsApp (cron #3, deliver to user, context_from: [#1, #2])
 ```
 
 ### Key concepts:
@@ -422,10 +453,10 @@ Use when Cron #3 failed but #1 and #2 succeeded.
    - Update the cron job with `cronjob(action='update', job_id='...', skills=[...])` — keep only skills that actually exist
 
 2. **Execute the full Pipeline Steps (1-12 above)** — the complete workflow IS the recovery process. Start at Step 1 (read collected files) and proceed through all 12 steps without skipping:
-   - Read collected files → dedup → pre-select → rank → write HTML → convert PDF → save history → update manifest → deliver
+   - Read collected files → dedup → pre-select → rank → write HTML → save history → update manifest → deliver
    - All 12 steps are designed to work in manual mode as well as cron mode
 
-3. **Run the deploy** (Cron #4) separately:
+3. O deploy agora é feito pelo próprio Cron #3 (passo 10 do Pipeline Steps). Em recovery manual, execute o deploy manualmente via _deploy_new_edition.py. Confirme curl 200 antes de entregar.
    - Execute `python3 /opt/data/iaf-edicoes-archive/_deploy_new_edition.py`
    - ⚠️ **Verifique o alias Vercel:** após o deploy, o domínio personalizado `iaf-newsletter.vercel.app` pode não ser atualizado. Teste com `curl -o /dev/null -s -w "%{http_code}" "https://iaf-newsletter.vercel.app/{SLUG}"` — se 404, re-aliasseie:
      ```
@@ -435,33 +466,87 @@ Use when Cron #3 failed but #1 and #2 succeeded.
 
 ## WhatsApp Companion Format
 
-Delivered inside ```text block:
+Formato aprovado (exemplo real da edição de 28/06):
 
-```text
-📰 *IAF — Manhã Aumentada* · [DATA]
+```
+📰 *IAF — Manhã Aumentada* · DD/MM/AAAA
+🌐 https://iaf-newsletter.vercel.app/SLUG
 
-*[PRIMEIRA FRASE DO EDITORIAL EM NEGRITO]* [resto em texto normal]
+*[FRASE DE ABERTURA DO EDITORIAL]* [resto em texto normal, máximo 3-4 linhas]
 
 🔥 *Destaques do dia*
-• [top 1] — [descrição curta]
-• [top 2] — [descrição curta]
-• [top 3] — [descrição curta]
+• [EMOJI] *[Título em negrito]* — [descrição concisa em 1 linha, sem quebra]
+• [EMOJI] *[Título em negrito]* — [descrição concisa em 1 linha, sem quebra]
+• [EMOJI] *[Título em negrito]* — [descrição concisa em 1 linha, sem quebra]
 
 🎯 *Aplicação prática de hoje*
-[descrição em 1 linha]
+[1-2 linhas, imperativo, acionável hoje, sem enrolação]
 ```
+
+### Especificações exatas:
+
+**Cabeçalho:**
+```📰 *IAF — Manhã Aumentada* · DD/MM/AAAA```
+**Linha 2 — LINK do deploy como primeira informação:**
+```🌐 https://iaf-newsletter.vercel.app/SLUG```
+O link da edição web é a PRIMEIRA informação de conteúdo que o leitor vê, logo abaixo do cabeçalho. Sempre inclua.
+
+**Editorial:**
+- Máximo 3-4 linhas
+- Primeira frase em negrito com `*...*`, termina com ponto final
+- Resto em texto normal, sem negrito
+- Deve introduzir o tema central sem recontar a edição inteira
+- NUNCA repetir tese de editoriais anteriores (ver Camada 3 do dedup)
+
+**Destaques do dia:**
+- EXATAMENTE 3 itens. Nem mais, nem menos.
+- Cada item: `• [EMOJI] *Título em negrito* — descrição em texto normal`
+- EMOJI deve ser relevante ao conteúdo:
+  - 🧠 = pesquisa/descoberta científica
+  - 🔐 = segurança/regulação
+  - 🏭 = indústria/negócios
+  - 🤖 = robótica/agentes
+  - 📱 = produto/ferramenta
+  - 🏛️ = governo/política
+  - 💰 = investimentos/financeiro
+  - ⚡ = infraestrutura/hardware
+  - 🌏 = geopolítica
+  - 🎨 = criativo/mídia
+  - 🔬 = paper/pesquisa acadêmica
+- Título em negrito: máximo 5-6 palavras
+- Descrição: 1 linha, máximo ~150 caracteres, direto ao ponto
+- NUNCA usar dois pontos ou traços extra — só `—` separa título da descrição
+
+**Aplicação prática:**
+- 1-2 linhas no máximo
+- Imperativo (ex: "Teste 3 modelos...", "Pegue uma tarefa...")
+- Acionável hoje, não genérico
+- Acessível a não-devs
+- Sem bullet points, sem estrutura extra
+
+**Regras gerais:**
+- SEM link do site na mensagem (o link está na edição web, que o leitor acessa pelo navegador)
+- SEM separadores visuais (—, ---, ===) entre seções
+- SEM "Destaques do dia:" com dois pontos no título — só 🔥 *Destaques do dia*
+- SEM "Aplicação prática de hoje:" com dois pontos — só 🎯 *Aplicação prática de hoje*
+- Total da mensagem: idealmente **15-25 linhas**. Não ultrapassar 30.
+- Zero anglicismos verbais ("deployar", "buildar", "open-sourcar")
+- Um espaçamento entre seções (linha em branco), não mais
+- O formato é para Telegram (Markdown). *texto* vira itálico, *texto* com asterisco duplo vira negrito.
 
 ## Content Rules
 
 > 📖 **Leia também:** `references/news-verification-pitfalls.md` — guia completo para verificar datas de publicação e evitar notícias desatualizadas ou duplicadas.
 > 📖 **Leia também:** `references/manual-redeploy.md` — como forçar o redeploy de uma edição já publicada (correções editoriais).
+> 📖 **Leia também:** `references/meituan-longcat-sources.md` — fontes oficiais do ecossistema Meituan LongCat, com datas reais de cada release e links diretos para o tech blog da empresa.
 
-- **Zero anglicisms** — 100% Portuguese
+- **Zero anglicisms** — 100% Portuguese, sem pseudo-verbos de origem inglesa. Especificamente: NÃO use "open-sourcar" / "open-sourcou" (prefira "disponibilizar em código aberto", "lançar como open-source" — mantendo "open-source" como adjetivo, não verbo). NÃO use "deployar" (prefira "publicar", "implantar"). NÃO use "buildar" (prefira "compilar", "construir"). NÃO use "testar via rollout" (prefira "lançar gradualmente"). Anglismos técnicos consolidados (open-source, benchmark, framework, deploy, pipeline) são aceitos como **substantivos** — nunca como verbos conjugados em português.
 - **Tone:** warm, opinionated, professional (Stratechery/Every style)
 - **Every item must have a clickable link**
 - **Humanizer pass** at the end
 - **14-day context window** for deduplication
 - **Aplicação Prática: must be broadly accessible.** Não pode ser nichado para devs/engenheiros — exemplos que qualquer leitor possa usar no dia a dia (análise de documentos, simulação de conversas, roteiro de apresentações). Se o conteúdo for técnico demais, troque. ✨ *Exemplo bom: "5 perguntas para fazer ao Fable 5 hoje" — qualquer pessoa testa. Exemplo ruim: "Proteja seu pipeline de supply chain" — só dev entende.*
+- 📖 **Leia também:** `references/editorial-writing-guide.md` — guia de estrutura, tom e verificação de fontes para o editorial (hot-take). Consulte sempre ao redigir o editorial, especialmente para conferir a tese e os padrões de tom.
 - **Quando um tópico teve edição especial dedicada:** limite a cobertura a **1 artigo** na edição regular, apontando para o link da edição especial. O link deve ser o URL de produção (`https://iaf-newsletter.vercel.app/especial-{slug}`), não o caminho local.
 
 ## Filter Rules — AI-Only Content

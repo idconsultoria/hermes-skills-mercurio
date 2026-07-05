@@ -1,10 +1,24 @@
 # Skills Index — Hermes Agent
 
-*Total: 60 skills*
+*Total: 65 skills*
 
 ---
 
 ## Autonomous Ai Agents
+
+### Computer Use (Desktop Automation)
+
+- **Nome:** `computer-use`
+- **Arquivo:** `computer-use/SKILL.md`
+- **Tamanho:** 11,073 chars
+- **Resumo:** Drive the user's desktop in the background — clicking, typing, scrolling
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-06-28T00:00:00Z
+
+Load this skill whenever the `computer_use` tool is available. Cross-platform (macOS, Windows, Linux), works with any tool-capable model.
+
+**Relações:**
+- `similar` → `autonomous-ai-agents/hermes-agent`
 
 ### Autonomous AI Coding Agents
 
@@ -159,12 +173,12 @@ Load this skill when you need to create sound effects, ambient audio, or UI soun
 
 - **Nome:** `content-production/iaf-newsletter-pipeline`
 - **Arquivo:** `content-production/iaf-newsletter-pipeline/SKILL.md`
-- **Tamanho:** 28,995 chars
-- **Resumo:** Umbrella skill for newsletters and digests — cron scheduling and multi-source
+- **Tamanho:** 36,290 chars
+- **Resumo:** Umbrella skill for newsletters — cron scheduling, curation, dedup, deploy
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-19T19:47:50Z
 
-Load this skill to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline — IAF Manhã Aumentada, Daily AI Digest, or similar. Covers multi-source content collection, editorial ranking and dedup, HTML-to-PDF rendering, Telegram and WhatsApp delivery, and chained cron job architecture.
+Load this skill to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline. Covers multi-source content collection, editorial ranking and dedup, HTML generation, deploy no Vercel, e entrega via Telegram no formato WhatsApp-style.
 
 **Relações:**
 - `uses` → `creative/copywriting`
@@ -172,7 +186,6 @@ Load this skill to set up, modify, run, or troubleshoot any daily newsletter, br
 - `similar` → `autonomous-ai-agents/product-pipeline`
 - `similar` → `creative/style-guide-consultation`
 - `uses` → `social-media/brand-iaf-conteudo`
-- `uses` → `productivity/html-to-pdf-chromium`
 - `uses` → `infrastructure/data-pipeline-patterns`
 
 ### Sound Design — AI SFX & Audio Production
@@ -248,7 +261,7 @@ Use when the user wants to create, refine, or evolve a brand identity. Covers br
 
 - **Nome:** `creative/copywriting`
 - **Arquivo:** `creative/copywriting/SKILL.md`
-- **Tamanho:** 7,554 chars
+- **Tamanho:** 8,175 chars
 - **Resumo:** Expert conversion copywriting: write, rewrite, or improve marketing copy with
 - **Type:** Creative
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -311,6 +324,21 @@ Catalog and consultation of style guides — load the correct design system for 
 - `similar` → `creative/brand-studio-forge`
 - `used_by` → `infrastructure/vercel-deploy`
 - `uses` → `creative/popular-web-designs`
+
+### UI/UX Design Principles
+
+- **Nome:** `creative/ui-ux-design-principles`
+- **Arquivo:** `creative/ui-ux-design-principles/SKILL.md`
+- **Tamanho:** 7,697 chars
+- **Resumo:** Core UI/UX design principles — hierarchy, grids, typography, color, dark mode, icons
+- **Type:** Reference
+- **Timestamp:** 2026-06-28T18:35:00Z
+
+Load this skill when you need to apply professional UI/UX design fundamentals to any visual output. Covers visual hierarchy, color strategy, typography rules, grid systems, spacing with 4-point scale, dark mode design, icon sizing, button states, micro-interactions, and overlay techniques.
+
+**Relações:**
+- `similar` → `creative/style-guide-consultation`
+- `similar` → `creative/popular-web-designs`
 
 ## Dogfood
 
@@ -634,6 +662,20 @@ TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Co
 - `similar` → `software-development/backlog-and-sprint`
 - `used_by` → `autonomous-ai-agents/hermes-agent`
 
+### Petdex — Animated Mascot Pets
+
+- **Nome:** `productivity/petdex`
+- **Arquivo:** `productivity/petdex/SKILL.md`
+- **Tamanho:** 3,725 chars
+- **Resumo:** Install and select animated petdex mascots for Hermes
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-06-28T00:00:00Z
+
+Load this skill when you want to browse, install, or switch animated mascot pets that react to agent activity across the CLI and TUI.
+
+**Relações:**
+- `similar` → `autonomous-ai-agents/hermes-agent`
+
 ## Read Reddit
 
 ### Read Reddit via RSS
@@ -795,6 +837,36 @@ Content for IA que Funciona community — brand constants, voice, tone, template
 - `similar` → `creative/copywriting`
 - `similar` → `creative/style-guide-consultation`
 - `uses` → `software-development/agy`
+
+### Social Media Video Content Extraction
+
+- **Nome:** `social-media/social-media-video-content`
+- **Arquivo:** `social-media/social-media-video-content/SKILL.md`
+- **Tamanho:** 3,945 chars
+- **Resumo:** Extract subtitles, descriptions, and metadata from social media videos
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-06-28T19:30:00Z
+
+Load this skill when the user sends a TikTok, Instagram Reel, or YouTube Shorts URL and needs transcript, summary, or spoken content extraction — especially when the browser can't play the video.
+
+**Relações:**
+- `similar` → `social-media/brand-iaf-conteudo`
+
+## NSFW Content Discovery
+
+### NSFW Content Discovery
+
+- **Nome:** `nsfw-content-discovery`
+- **Arquivo:** `nsfw-content-discovery/SKILL.md`
+- **Tamanho:** 5,656 chars
+- **Resumo:** Find adult/NSFW content across platforms — creators, performers, search engines
+- **Type:** Reference
+- **Timestamp:** 2026-06-28T00:00:00Z
+
+Load this skill when searching for explicit content from a specific creator or performer. Covers the ecosystem of external search engines, agent skills landscape, and Hermes browser automation workflow for adult sites.
+
+**Relações:**
+- `similar` → `social-media/social-media-video-content`
 
 ## Software Development
 
@@ -994,7 +1066,7 @@ Load this skill after making code changes that need cleanup. Three parallel agen
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 28,889 chars
+- **Tamanho:** 40,277 chars
 - **Resumo:** Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z

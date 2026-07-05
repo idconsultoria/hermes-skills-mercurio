@@ -341,6 +341,8 @@ Isso garante atomicidade e evita corrupção do arquivo por escrita concorrente.
 
 Para aplicar grandes volumes de relações (180+ arestas), veja `references/batch-apply-relations.md` — abordagem de transformação em lote que parseia relatórios e gera o index.md atualizado.
 
+Para o workflow completo pós-inferência (dedup de pares simétricos, resolução de inversões direcionais, injeção no index.md e verificação), veja `references/consolidation-relation-injection.md` — método validado no ciclo de 28/06/2026 com 87 novas relações injetadas em 46 skills.
+
 ---
 
 ## Log Entries — Formato
@@ -514,7 +516,9 @@ for root, dirs, files in os.walk('.'):
 
 ⚠️ **`.curator_backups/` não deve ser versionado.** O diretório `.curator_backups/` na raiz contém backups automáticos de skills. Adicionar ao `.gitignore`: `echo '.curator_backups/' >> .gitignore && git add .gitignore`.
 
-⚠️ **Regex `re.MULTILINE` silencioso.** Ao parsear relações do index.md com `re.findall`, o padrão `r'^- `(\w+)` → `(.+)`'` (com Unicode → U+2192) REQUER `re.MULTILINE`. Sem a flag, `re.findall` retorna 0 matches sem erro ou aviso — o agente conclui erroneamente que não há relações no arquivo. **Sempre** incluir `re.MULTILINE` ao buscar relations multi-linha.
+⚠️ **Regex `re.MULTILINE` silencioso.** Ao parsear relações do index.md com `re.findall`, o padrão `r'^- `(\\w+)` → `(.+)'` (com Unicode → U+2192) **REQUER** `re.MULTILINE`. Sem a flag, `re.findall` retorna 0 matches sem erro ou aviso — o agente conclui erroneamente que não há relações no arquivo. **Sempre** incluir `re.MULTILINE` ao buscar relations multi-linha.
+
+⚠️ **Archived skills poluem o grafo como nós órfãos.** O `generate_graph.py` varre ALL subdiretórios em busca de SKILL.md, incluindo `.archive/`. Skills arquivadas não têm `type` nem relações no index.md, então aparecem como nós isolados (ilhas) no grafo. **Fix:** o script `scripts/generate_graph.py` deve pular dot-directories com `dirs[:] = [d for d in dirs if not d.startswith('.')]` no `os.walk`. Verificar sempre antes de regenerar o grafo se o número de nós corresponde ao de skills ativas, não ao total incluindo arquivadas.
 
 ⚠️ **`audit-descriptions.py` precisa do SKILLS_DIR correto.** O script em `skills-repo-curator/scripts/audit-descriptions.py` precisa de SKILLS_DIR = 4 níveis acima do script (scripts → skills-repo-curator → software-development → skills/), não 3. Se só escaneia poucos arquivos, o path está errado. Corrigir com:
 

@@ -82,6 +82,7 @@ When writing in **Portuguese**, replace English words with their Portuguese equi
 
 | Evite | Use |
 |-------|-----|
+| open-source (como verbo) | disponibilizar em código aberto / abrir o código de |
 | keynote | discurso principal / grandes palcos |
 | ship / shipar | entregar / lançar |
 | deadline | prazo |
@@ -92,8 +93,12 @@ When writing in **Portuguese**, replace English words with their Portuguese equi
 | upgrade | atualização / melhoria |
 | mindset | mentalidade / visão |
 | onboarding | integração / ambientação |
+| open-source (adj.) | código aberto / em código aberto |
+| open-sourcar / shippar / deployar (verb.) | disponibilizar em código aberto / lançar / implementar |
 
 If an English term is unavoidable (acronyms like IPO, proper nouns like SWE-bench), explain it clearly on first use: "IPO (oferta pública inicial de ações)". Exception: proper nouns (company names, product names, tool names) keep their original spelling.
+
+> ⚠️ **Verbificação de termos ingleses:** Não crie verbos em português a partir de palavras inglesas. "Open-sourcou", "shippou", "deployou", "parseou", "reviewou" não existem em português. Prefira construções equivalentes: "disponibilizou em código aberto", "lançou", "implementou", "interpretou", "revisou".
 
 ### Quick Quality Check
 
