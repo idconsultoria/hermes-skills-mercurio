@@ -103,6 +103,8 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 
 ## [2026-07-12] evolve | 12 orphans connected, 36 new relations added. 0 merges, 0 deletes. Graph regenerated (77 nodes). All education skills connected in cluster, production-deployment linked to deploy pipeline, grafico-progresso linked to fitness skills, Kindle skills linked, market-research linked to deep-research/user-interview, pipeline-educacional linked to product-pipeline + education.
 
+## [2026-07-12] offload | No memory to offload — cron session has skip_memory=true, memory tool confirms disabled. Offload requires manual execution outside cron.
+
 ## [2026-06-28] evolve | Depth-1 inference: 87 new relations across 46 skills. 261 total (95 similar, 95 uses, 54 used_by, 17 parent). 0 merges, 0 deletes, 0 orphans. 3 parallel subagents analyzed all 60 skills. Graph regenerated (98 nodes, 184 edges).
 
 ## [2026-06-28] offload | Memory cleaned: 2 duplicate user-preference entries removed (NUNCA responder vazio, User pref responder antes — both already in USER PROFILE). Kindle operational data preserved in memory (specific Drive IDs, manga sources, cron).
