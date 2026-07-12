@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 65 skills*
+*Total: 77 skills*
 
 ---
 
@@ -10,7 +10,7 @@
 
 - **Nome:** `computer-use`
 - **Arquivo:** `computer-use/SKILL.md`
-- **Tamanho:** 11,073 chars
+- **Tamanho:** 11,127 chars
 - **Resumo:** Drive the user's desktop in the background — clicking, typing, scrolling
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T00:00:00Z
@@ -60,7 +60,7 @@ Hephaistos meta-framework — Hermes-orchestrated project pipeline using delegat
 - **Nome:** `autonomous-ai-agents/hermes-agent`
 - **Arquivo:** `autonomous-ai-agents/hermes-agent/SKILL.md`
 - **Tamanho:** 46,977 chars
-- **Resumo:** Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, and
+- **Resumo:** Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, and multi-agent
 - **Type:** Reference
 - **Timestamp:** 2026-06-21T05:11:49Z
 
@@ -80,7 +80,7 @@ Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, an
 
 - **Nome:** `autonomous-ai-agents/messaging-platforms`
 - **Arquivo:** `autonomous-ai-agents/messaging-platforms/SKILL.md`
-- **Tamanho:** 23,813 chars
+- **Tamanho:** 24,182 chars
 - **Resumo:** Reference for Hermes cross-platform messaging — platform quirks, ID formats, and
 - **Type:** Reference
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -96,7 +96,7 @@ Load this skill when troubleshooting message delivery across platforms, or when 
 
 - **Nome:** `autonomous-ai-agents/pi-agent-coordination`
 - **Arquivo:** `autonomous-ai-agents/pi-agent-coordination/SKILL.md`
-- **Tamanho:** 40,489 chars
+- **Tamanho:** 49,531 chars
 - **Resumo:** Invoke Pi Agent locally from Hermes — provider/model hierarchy and session recovery
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -115,7 +115,7 @@ Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — n
 
 - **Nome:** `autonomous-ai-agents/pi-session-audit`
 - **Arquivo:** `autonomous-ai-agents/pi-session-audit/SKILL.md`
-- **Tamanho:** 18,869 chars
+- **Tamanho:** 20,673 chars
 - **Resumo:** Audit agent sessions — tokens, costs, models from Pi Agent and agy databases
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -132,7 +132,7 @@ Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl) and agy (p
 
 - **Nome:** `autonomous-ai-agents/product-pipeline`
 - **Arquivo:** `autonomous-ai-agents/product-pipeline/SKILL.md`
-- **Tamanho:** 48,987 chars
+- **Tamanho:** 59,840 chars
 - **Resumo:** Multi-agent product pipeline — idea to MVP via sprints. Hermes orchestration
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-14T05:19:11Z
@@ -173,7 +173,7 @@ Load this skill when you need to create sound effects, ambient audio, or UI soun
 
 - **Nome:** `content-production/iaf-newsletter-pipeline`
 - **Arquivo:** `content-production/iaf-newsletter-pipeline/SKILL.md`
-- **Tamanho:** 36,290 chars
+- **Tamanho:** 39,405 chars
 - **Resumo:** Umbrella skill for newsletters — cron scheduling, curation, dedup, deploy
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-19T19:47:50Z
@@ -261,7 +261,7 @@ Use when the user wants to create, refine, or evolve a brand identity. Covers br
 
 - **Nome:** `creative/copywriting`
 - **Arquivo:** `creative/copywriting/SKILL.md`
-- **Tamanho:** 8,175 chars
+- **Tamanho:** 9,288 chars
 - **Resumo:** Expert conversion copywriting: write, rewrite, or improve marketing copy with
 - **Type:** Creative
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -359,6 +359,91 @@ Load this skill when you need to test a web application for issues. Covers syste
 - `similar` → `software-development/systematic-debugging`
 - `similar` → `github/github-pr-workflow`
 
+## Education
+
+### Backwards Design Unit Planner
+
+- **Nome:** `education/backwards-design-unit-planner`
+- **Arquivo:** `education/backwards-design-unit-planner/SKILL.md`
+- **Tamanho:** 21,889 chars
+- **Resumo:** Plan a unit using backwards design — outcomes to assessment to activities.
+- **Type:** Template
+- **Timestamp:** 2026-07-12T00:00:00Z
+
+Load this skill when starting a new unit or redesigning an existing one from standards. Maps desired outcomes through assessment evidence to learning activities. Based on Wiggins & McTighe's Understanding by Design framework.
+
+**Relações:**
+
+
+### Competency Framework Translator
+
+- **Nome:** `education/competency-framework-translator`
+- **Arquivo:** `education/competency-framework-translator/SKILL.md`
+- **Tamanho:** 25,059 chars
+- **Resumo:** Translate competency frameworks (DigComp, GreenComp, ISTE) into classroom activities.
+- **Type:** Template
+- **Timestamp:** 2026-07-12T00:00:00Z
+
+Load this skill when implementing framework standards in specific teaching contexts. Maps external competency frameworks like DigComp, GreenComp, or ISTE to classroom-ready activities with clear learning objectives and assessment criteria.
+
+**Relações:**
+
+
+### Curriculum Knowledge Architecture Designer
+
+- **Nome:** `education/curriculum-knowledge-architecture-designer`
+- **Arquivo:** `education/curriculum-knowledge-architecture-designer/SKILL.md`
+- **Tamanho:** 47,694 chars
+- **Resumo:** Map epistemic structure of a subject — knowledge types for curriculum sequencing.
+- **Type:** Template
+- **Timestamp:** 2026-07-12T00:00:00Z
+
+Load this skill when designing courses, restructuring programmes, or analysing knowledge architecture. Distinguishes vertical vs horizontal knowledge structures, conceptual vs contextual coherence, and cumulative vs segmented learning using Bernstein, Maton, and Muller frameworks.
+
+**Relações:**
+
+
+### Leverage and Response Design
+
+- **Nome:** `education/leverage-and-response-design`
+- **Arquivo:** `education/leverage-and-response-design/SKILL.md`
+- **Tamanho:** 13,159 chars
+- **Resumo:** Design wise systems interventions — maps actions against Meadows' leverage points.
+- **Type:** Template
+- **Timestamp:** 2026-07-12T00:00:00Z
+
+Load this skill when you have a systems analysis and need to design an intervention. Maps proposed actions against Meadows' 12 leverage points, checks for unintended consequences, generates alternatives, and identifies feedback loops that could undermine the intervention.
+
+**Relações:**
+
+
+### Mental Model Mapper
+
+- **Nome:** `education/mental-model-mapper`
+- **Arquivo:** `education/mental-model-mapper/SKILL.md`
+- **Tamanho:** 9,307 chars
+- **Resumo:** Surface beliefs, assumptions, and values shaping a system.
+- **Type:** Template
+- **Timestamp:** 2026-07-12T00:00:00Z
+
+Load this skill when deeper mental models need examining with care and evidence. Elicits espoused theories vs theories-in-use, identifies paradigms as deep leverage points, and maps cultural mental models using Senge, Argyris & Schon, and Meadows frameworks.
+
+**Relações:**
+
+
+### Scope and Sequence Designer
+
+- **Nome:** `education/scope-and-sequence-designer`
+- **Arquivo:** `education/scope-and-sequence-designer/SKILL.md`
+- **Tamanho:** 57,467 chars
+- **Resumo:** Design scope and sequence — curriculum coherence across a programme or year.
+- **Type:** Template
+- **Timestamp:** 2026-07-12T00:00:00Z
+
+Load this skill when building new programmes, restructuring subjects, or ensuring progression. Shows vertical coherence (spiral curriculum, Bruner) and horizontal coherence (knowledge structures, Bernstein) across a programme or year, using Hattie's high-effect curriculum coherence variable.
+
+**Relações:**
+
 ## Github
 
 ### Codebase Inspection & Architecture Diagnostic
@@ -411,6 +496,19 @@ Load this skill when the user wants Ares (War God persona) as a fitness coach. C
 **Relações:**
 - `similar` → `health-fitness/body-recomposition`
 - `uses` → `health-fitness/body-recomposition`
+
+### Ares Progress Graph — Weight Tracking
+
+- **Nome:** `health/grafico-progresso-peso-ares`
+- **Arquivo:** `health/grafico-progresso-peso-ares/SKILL.md`
+- **Tamanho:** 7,496 chars
+- **Resumo:** Grafico de progresso de peso estilo Ares — matplotlib, vermelhos, claro.
+- **Type:** Health
+- **Timestamp:** 2026-07-12T00:00:00Z
+
+Carregue esta skill quando precisar gerar o grafico padrao de progresso de peso do Projeto Ares. Renderiza PNG via matplotlib com paleta cardinal/crimson sobre fundo off-white, proporcao 10x5.5, linha de tendencia, linha de meta e eixo Y a partir de 70 kg. Usa venv dedicado em /opt/data/.venv-chart/.
+
+**Relações:**
 
 ## Health & Fitness
 
@@ -485,7 +583,7 @@ Exponential backoff for Google Gemini API rate limits (HTTP 429). Covers monkey-
 
 - **Nome:** `infrastructure/oracle-host-access`
 - **Arquivo:** `infrastructure/oracle-host-access/SKILL.md`
-- **Tamanho:** 30,866 chars
+- **Tamanho:** 39,373 chars
 - **Resumo:** SSH from Hermes Docker container to Oracle Linux host — key setup and diagnostics
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -501,7 +599,7 @@ SSH from Hermes Docker container to Oracle Linux host — key setup and diagnost
 
 - **Nome:** `infrastructure/vercel-deploy`
 - **Arquivo:** `infrastructure/vercel-deploy/SKILL.md`
-- **Tamanho:** 20,694 chars
+- **Tamanho:** 27,451 chars
 - **Resumo:** Deploy static sites and frontend apps to Vercel — from zero to production
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -512,6 +610,19 @@ Deploy static sites and frontend apps to Vercel — from zero to production. Cov
 - `similar` → `infrastructure/deployment-pipeline`
 - `similar` → `github/github-pr-workflow`
 - `uses` → `productivity/html-report-hermes`
+
+### Production Deployment — Post-CI Operations
+
+- **Nome:** `infrastructure/production-deployment`
+- **Arquivo:** `infrastructure/production-deployment/SKILL.md`
+- **Tamanho:** 10,233 chars
+- **Resumo:** Post-CI deploy operations — Docker rollout, DB schema, ingress routing, DNS fallback.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-07-12T00:00:00Z
+
+Load this skill when deploying a built application to production: verifying DB migrations ran, diagnosing container startup failures, checking Nginx/NPM routing, or handling a domain that stopped resolving. Covers the gray zone between CI completing and the site being live — the step most pipelines leave unscripted.
+
+**Relações:**
 
 ## Media
 
@@ -561,6 +672,32 @@ Load this skill instead of web search when you need authoritative community rati
 
 **Relações:**
 - `similar` → `media/kindle-manga`
+
+### arXiv LaTeX to Kindle EPUB
+
+- **Nome:** `media/arxiv-latex-to-kindle`
+- **Arquivo:** `media/arxiv-latex-to-kindle/SKILL.md`
+- **Tamanho:** 18,727 chars
+- **Resumo:** Convert arXiv LaTeX to Kindle EPUB — tables, figures, Gmail delivery.
+- **Type:** Media
+- **Timestamp:** 2026-07-08T10:30:00Z
+
+Load this skill when the user wants to download an arXiv paper, convert its LaTeX source to EPUB, and deliver it to a Kindle device. Handles the full pipeline: arXiv source download, Pandoc conversion, post-processing for tabularx->HTML table conversion, precise figure extraction from the PDF, EPUB rebuild, and Gmail API delivery.
+
+**Relações:**
+
+### Kindle Articles — Text Content to EPUB3
+
+- **Nome:** `media/kindle-articles`
+- **Arquivo:** `media/kindle-articles/SKILL.md`
+- **Tamanho:** 18,756 chars
+- **Resumo:** Prepare text content for Kindle — markdown to reflowable EPUB3.
+- **Type:** Media
+- **Timestamp:** 2026-07-07
+
+Load this skill when putting research papers, long-form articles, blog posts, or any text-heavy documents on a Kindle. Covers markdown parsing, EPUB3 assembly, TOC generation, and delivery.
+
+**Relações:**
 
 ## Productivity
 
@@ -650,7 +787,7 @@ Generate cost reports for multi-agent projects with real token data from Hermes 
 
 - **Nome:** `productivity/taskflow-mcp`
 - **Arquivo:** `productivity/taskflow-mcp/SKILL.md`
-- **Tamanho:** 7,698 chars
+- **Tamanho:** 9,294 chars
 - **Resumo:** GTD task management via MCP (Model Context Protocol) — connects over SSE
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-14T05:15:09Z
@@ -819,6 +956,19 @@ Structured user/proxy interview protocol for product research — plan, frame, l
 - `uses` → `research/digital-clone-persona`
 - `similar` → `research/deep-research`
 
+### Market Research Synthesis
+
+- **Nome:** `research/market-research-synthesis`
+- **Arquivo:** `research/market-research-synthesis/SKILL.md`
+- **Tamanho:** 6,269 chars
+- **Resumo:** Produce market analysis reports — personas, journeys, expectations, behavior.
+- **Type:** Research
+- **Timestamp:** 2026-07-12T00:00:00Z
+
+Load this skill when conducting market research for Brazilian/LATAM markets where web research tools face comprehensive blocking. Produces structured reports covering buyer personas, customer journeys, expectations hierarchies, purchasing behavior, and retention/fidelization. Pivots to domain-knowledge synthesis with transparent caveats when web tools fail.
+
+**Relações:**
+
 ## Social Media
 
 ### Brand IAF — Conteúdo
@@ -874,7 +1024,7 @@ Load this skill when searching for explicit content from a specific creator or p
 
 - **Nome:** `software-development/agy`
 - **Arquivo:** `software-development/agy/SKILL.md`
-- **Tamanho:** 22,986 chars
+- **Tamanho:** 27,267 chars
 - **Resumo:** Versatile skill for coordinating Google Antigravity CLI for any design project type.
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -893,7 +1043,7 @@ Load this skill for strategic design tasks — visual HTML output, brand present
 
 - **Nome:** `software-development/backlog-and-sprint`
 - **Arquivo:** `software-development/backlog-and-sprint/SKILL.md`
-- **Tamanho:** 79,776 chars
+- **Tamanho:** 79,774 chars
 - **Resumo:** Backlog management and Sprint execution for product iteration (Fase 5) —
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1026,7 +1176,7 @@ Plan mode: write an actionable markdown plan to .hermes/plans/, no execution. Bi
 
 - **Nome:** `software-development/process-augmentation-pipeline`
 - **Arquivo:** `software-development/process-augmentation-pipeline/SKILL.md`
-- **Tamanho:** 50,965 chars
+- **Tamanho:** 51,393 chars
 - **Resumo:** Pipeline ID Consultoria: análise de processos, brainstorming de soluções e site 3D
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1066,7 +1216,7 @@ Load this skill after making code changes that need cleanup. Three parallel agen
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 40,277 chars
+- **Tamanho:** 43,850 chars
 - **Resumo:** Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1078,6 +1228,19 @@ Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, 
 - `uses` → `software-development/plan`
 - `similar` → `software-development/backlog-and-sprint`
 - `uses` → `infrastructure/data-pipeline-patterns`
+
+### Educational Product Pipeline
+
+- **Nome:** `software-development/pipeline-educacional`
+- **Arquivo:** `software-development/pipeline-educacional/SKILL.md`
+- **Tamanho:** 24,010 chars
+- **Resumo:** Pipeline de produto educacional — da concepcao pedagogica ao lancamento.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-07-12T00:00:00Z
+
+Carregue esta skill quando for projetar um curso, treinamento, bootcamp ou jornada de aprendizado. Cobre a pipeline completa do design instrucional: analise de publico, definicao de objetivos, design de conteudo, producao, lancamento e iteracao continua. Base de referencia em IA e design instrucional (ADDIE, Backward Design, SAM, Kirkpatrick).
+
+**Relações:**
 
 ### Spike
 

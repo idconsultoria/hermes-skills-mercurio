@@ -394,6 +394,42 @@ python3 script.py > /opt/data/agent-sessions.csv
   "provider":"opencode-go","model":"minimax-m3"}}
 ```
 
+## Verificar se Pi Leu Arquivos Específicos (Design Audit)
+
+Após Pi gerar frontend, é comum verificar se ele efetivamente leu os arquivos de design HTML ou só recebeu tokens copiados no prompt. A sessão JSONL registra cada comando executado como `toolCall` com o comando exato.
+
+**Técnica — distinguir `cat`/`read_file` (leu conteúdo) de `ls` (só viu nome):**
+
+```python
+import json, glob, os
+
+def verify_pi_read_files(project_glob: str = "delfos", target_files: list[str] | None = None):
+    """Check if Pi actually read design files vs just saw them in directory listings."""
+    if target_files is None:
+        target_files = ["design-system.html", "design-system.md", "index.html", "wireframes.html"]
+    
+    sessions_dir = os.path.expanduser("~/.pi/agent/sessions")
+    all_files = sorted(glob.glob(os.path.join(sessions_dir, f"--*{project_glob}*--", "*.jsonl")))
+    
+    for sf in all_files:
+        name = os.path.basename(sf)[:30]
+        text = open(sf, errors="replace").read()
+        for kw in target_files:
+            if kw not in text:
+                continue
+            lines = text.split("\n")
+            was_read = any(kw in l and ("cat " in l.lower() or "read_file" in l.lower()) for l in lines)
+            was_ls = any(kw in l and ("ls " in l.lower() or "find " in l.lower()) for l in lines)
+            if was_read:
+                print(f"  ✅ {name}: {kw} — lido como conteúdo")
+            elif was_ls:
+                print(f"  ⚠️  {name}: {kw} — só visto em ls, NÃO lido")
+            else:
+                print(f"  ?  {name}: {kw} — mencionado")
+```
+
+Use após Pi gerar frontend. Se os arquivos de design só aparecerem em `ls`, o Pi não viu o layout renderizado — tokens copiados no prompt não substituem contexto visual.
+
 ## ⚠️ Tool_Use Analysis — Pi JSONL nunca tem tool_use
 
 Pi **nunca** usa o tool `write_file` no JSONL. Em vez disso, escreve arquivos executando `cat >` heredocs dentro de chamadas `bash`:

@@ -145,6 +145,61 @@ A task vai para **inbox** por padrão. Use `process_inbox` depois para triar.
 4. **Execução**: filtre `get_next_actions` por contexto
 5. **Revisão semanal**: use `weekly_review` + resource `taskflow://stats/weekly`
 
+## Diagnóstico — Production vs Preview
+
+Quando o MCP retorna erros (502, 404, dados errados), verifique qual ambiente está ativo:
+
+### 1. Host header no config.yaml
+
+```bash
+grep -A5 'taskflow:' ~/.hermes/config.yaml
+# ou
+grep -A5 'taskflow:' /opt/data/config.yaml
+```
+
+O `Host` header determina qual container o NPM roteia:
+- `Host: 4.praxis.129.146.163.107.sslip.io` → preview da PR #4 (banco `taskflow_pr_4`)
+- `Host: praxis.129.146.163.107.sslip.io` (sem número) → produção (banco `taskflow`)
+- Sem Host header → rota padrão do NPM (pode ser 404)
+
+### 2. DATABASE_URL no .env
+
+```bash
+grep DATABASE_URL /opt/data/taskflow-pr/.env
+```
+
+- `taskflow` → produção
+- `taskflow_pr_N` → preview da PR N
+
+**⚠️ Cuidado com mismatch:** o Host header pode apontar para preview enquanto o .env aponta para produção (ou vice-versa). Confira ambos.
+
+### 3. Testar conectividade
+
+```bash
+# Com Host header (simula o que o Hermes faz)
+curl -s -m 5 -H "Host: 4.praxis.129.146.163.107.sslip.io" http://172.19.0.1/mcp/sse
+
+# Respostas:
+# 200 + text/event-stream → MCP vivo e funcionando
+# 502 Bad Gateway → container do backend não está rodando
+# 404 → Host header não bate com nenhum proxy host no NPM
+```
+
+### 4. Status dos containers
+
+```bash
+docker ps --format "table {{.Names}}\t{{.Status}}" | grep taskflow
+```
+
+Se nenhum container aparece, o compose não foi iniciado. Para subir:
+```bash
+cd /opt/data/taskflow-pr
+PR_NUMBER=4 docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.preview.yml \
+  up -d
+```
+
 ## Pitfalls
 
 - `context`/`project` em `create_task` **aceita nomes** (ex: "celular", "casa") — resolve automaticamente pra UUID

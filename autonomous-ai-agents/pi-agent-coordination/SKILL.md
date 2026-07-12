@@ -25,7 +25,7 @@ CARO/ESCASSO     agy ─── Consultor externo especialista (design, UX, estra
                      │   Usar em momentos estratégicos. Pouco e certeiro.
                      │   Prompt complexo, leitura de arquivos.
                      │
-ESCASSO          Pi best ── Eng. sênior interno (MiniMax M3 via Go)
+ESCASSO          Pi best ── Eng. sênior interno (DeepSeek V4 Pro via Go)
                      │   Planejamento, user stories, docs conceituais.
                      │   Tempo precioso, qualidade acima de velocidade.
                      │
@@ -39,7 +39,7 @@ BARATO/ABUNDANTE Pi cost ─ Dev júnior (DeepSeek V4 Flash)
 | Tipo de tarefa | Quem |
 |----------------|------|
 | Design, UX, estratégia, pesquisa | **agy** (SSH host) |
-| Planejamento, user stories, docs conceituais | **Pi best** (`opencode-go/minimax-m3`) |
+|| Planejamento, user stories, docs conceituais | **Pi best** (`opencode-go/deepseek-v4-pro`) |
 | Code tasks, fixes, testes, revisões | **Pi cost** (`deepseek/deepseek-v4-flash`) |
 | Tarefa muito simples (< 3 linhas) | Qualquer, preferir Pi cost |
 
@@ -61,8 +61,8 @@ Dotfiles: gh:[username]/pi-dotfiles
 | `opencode` (Zen) | `opencode/deepseek-v4-flash-free` | `OPENCODE_API_KEY` | **Gratuito** | **Pi cost** 🥇 |
 | `opencode-go` (Go) | `deepseek-v4-flash` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi cost** 🥈 |
 | `deepseek` (API direta) | `deepseek-v4-flash` | `DEEPSEEK_API_KEY` | $0.14/M input | **Pi cost** 🥉 |
-| `opencode-go` (Go) | `minimax-m3` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** 🥇 |
-| `opencode-go` (Go) | `deepseek-v4-pro` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** fallback 1 🥈 |
+| `opencode-go` (Go) | `deepseek-v4-pro` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** 🥇 |
+| `opencode-go` (Go) | `minimax-m3` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** fallback 1 🥈 |
 | `opencode-go` (Go) | `glm-5.2` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** alt — criativo, sites, design |
 | `opencode-go` (Go) | `kimi-k2.6` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** alt — raciocínio longo |
 | `opencode-go` (Go) | `qwen3.7-max` | `OPENCODE_API_KEY` | Cota ~$30/sem | **Pi best** alt — contextos extensos |
@@ -100,7 +100,7 @@ de **5 horas de uso**. Quando estoura, retorna:
 
 **Ação imediata — fallback automático:**
 
-1. **Se Pi best (`opencode-go/minimax-m3`) estourou cota:**
+1. **Se Pi best (`opencode-go/deepseek-v4-pro`) estourou cota:**
    ```bash
    # Fallback via deepseek direto (V4 Pro é mais caro mas melhor que nada)
    pi --session ~/caminho/da/sessao.jsonl --provider deepseek --model deepseek-v4-pro
@@ -117,7 +117,7 @@ de **5 horas de uso**. Quando estoura, retorna:
 **Regra de fallback na tabela de providers:**
 | Provider principal | Quando falha | Fallback |
 |-------------------|--------------|----------|
-| `opencode-go/minimax-m3` (Pi best 🥇) | Quota 5h/mês | `opencode-go/deepseek-v4-pro` (🥈, via Go) → `deepseek/deepseek-v4-pro` (🥉, API direta) |
+| `opencode-go/deepseek-v4-pro` (Pi best 🥇) | Quota 5h/mês | `opencode-go/minimax-m3` (🥈, via Go) → `deepseek/deepseek-v4-pro` (🥉, API direta) |
 | `opencode-go/deepseek-v4-flash` (Pi cost 🥈) | Quota 5h/mês | `deepseek/deepseek-v4-flash` (🥉) ou `opencode/deepseek-v4-flash-free` (🥇) |
 
 **NUNCA relance o prompt do zero** quando o erro for só de cota — a sessão
@@ -137,7 +137,7 @@ existente tem contexto valioso. Use `pi --session ...` com o fallback provider.
 original pode ser retomada. Relançar do zero = perder 5-10 min de leitura +
 centenas de milhares de tokens já gastos.
 
-Pi best (MiniMax M3) leva 5-10+ min só lendo arquivos antes de começar a
+Pi best (DeepSeek V4 Pro) leva 5-10+ min só lendo arquivos antes de começar a
 escrever. Se o processo morrer (timeout Hermes, kill, crash), **NÃO reinicie
 do zero** — a sessão morta tem todo o contexto acumulado queimado.
 
@@ -159,7 +159,7 @@ print(f'Ultimo tipo: {last.get(\"type\",\"?\")}')
 
 # 3. RETOMAR (Pi carrega o histórico e continua)
 pi --session ~/.pi/agent/sessions/--<dir>--/<timestamp>_<uuid>.jsonl \
-  --provider opencode-go --model minimax-m3
+  --provider opencode-go --model deepseek-v4-pro
 ```
 
 **Identificação correta:** entre sessões com o mesmo `--name`, o arquivo com
@@ -173,7 +173,7 @@ sem precisar editar o JSONL manualmente. Exemplo real funcionou com Pi v0.78.1.
 
 ## OpenCode Go — Cota Mensal de 5h
 
-O provider `opencode-go` (MiniMax M3 e DeepSeek V4 Flash) tem **limite de
+O provider `opencode-go` (DeepSeek V4 Pro e DeepSeek V4 Flash) tem **limite de
 5 horas mensais de uso** por workspace. Quando estoura:
 
 ```
@@ -274,6 +274,26 @@ Features são paralelizáveis quando não compartilham os mesmos arquivos de out
 
 **⚠️ Zen gratuito é lento demais para execução paralela.** O provider `opencode/deepseek-v4-flash-free` tem rate-limit — 4 Pi paralelos com esse provider demoraram >10 min. Para paralelismo real, usar `deepseek/deepseek-v4-flash` (API direta, ~2-4 min cada) ou agrupar em 1-2 batches por vez com o Zen.
 
+### ⚠️ Provider Fallback Chain — Erros Observados na Prática
+
+Quando Zen rate-limita, o Pi morre IMEDIATAMENTE (exit code 1, sem output). Não é stall — é rejeição. Cadeia de fallback observada no Delfos F4b:
+
+| Provider | Erro HTTP | Causa | Próximo provider |
+|----------|-----------|-------|------------------|
+| `opencode/deepseek-v4-flash-free` | **429** Rate limit exceeded | Zen free tier excedido | opencode-go |
+| `deepseek/deepseek-v4-flash` | **402** Insufficient Balance | API key sem crédito | opencode-go |
+| `opencode-go/deepseek-v4-flash` | ✅ funciona | Cota semanal $30 ativa | — |
+
+**Regra:** Se o primeiro provider falhar com 429/402, pular IMEDIATAMENTE para o próximo — não retry no mesmo provider. O Pi morre silenciosamente com exit code 1 em erros 429.
+
+### Paralelismo confirmado (Delfos F4b)
+
+Dois Pi cost rodaram simultâneos com sucesso:
+- `delfos-frontend` — Layer 3+4 (15 arquivos, ~3.5K linhas)
+- `delfos-mcp` — Layer 5 (2 arquivos, ~600 linhas)
+
+Cada um com `--name` para rastreamento, `terminal(background=true, notify_on_complete=true)`. Ambos completaram sem interferência — escreveram em diretórios diferentes.
+
 **Regra prática para paralelismo:**
 | Cenário | Provider | Pi calls paralelas |
 |---------|----------|-------------------|
@@ -282,10 +302,19 @@ Features são paralelizáveis quando não compartilham os mesmos arquivos de out
 | Qualquer tarefa com Zen free | `opencode/deepseek-v4-flash-free` | 1-2 (sequencial é mais rápido) |
 
 ### Padrão C — agy (design, UX, pesquisa estratégica)
+
+agy roda no **Oracle host**, não no container Hermes. Prompt files precisam ser copiados primeiro:
+
 ```bash
+# 1. Copiar prompt para o host
+cat prompts/review.md | ssh oracle-host 'cat > /tmp/review.md'
+
+# 2. Executar agy no host (referencia o arquivo copiado)
 ssh oracle-host 'cd /home/ubuntu/selfhost/shared/code/workstation/PROJETO && \
-  /home/ubuntu/.local/bin/agy -p "prompt complexo"'
+  /home/ubuntu/.local/bin/agy --print "$(cat /tmp/review.md)"'
 ```
+
+⚠️ **agy não lê arquivos do container Hermes.** O `cat prompts/review.md` dentro do `ssh` tenta ler do host Oracle — se o arquivo só existe no container, o comando falha. SEMPRE copiar via pipe `cat | ssh oracle-host 'cat > /tmp/...'` antes de invocar.
 
 ### Padrão D — Pi via tmux (tarefas longas, preferido do usuário)
 Para tarefas que podem levar minutos (code tasks, geração de docs), usar tmux em vez de `terminal(background=true)`. Dá visibilidade em tempo real e evita stall silencioso sem diagnóstico:
@@ -394,7 +423,7 @@ with open(session_path, 'w') as f:
         f.write(json.dumps(e) + '\n')
 ```
 
-Depois relance com `--session` e o mesmo modelo (ou MiniMax M3 se preferir).
+Depois relance com `--session` e o mesmo modelo (ou DeepSeek V4 Pro se preferir).
 
 ### ⚠️ Prevenção
 
@@ -402,9 +431,9 @@ Ao dar prompts que mencionam Playwright ou screenshots, INSTRUA o Pi:
 > "Do NOT use Playwright, Chromium, or read any image/screenshot files.
 > This provider does NOT support image inputs. Use only text-based verification."
 
-### ⚠️ Pi best (MiniMax M3) é LENTO — não confunda com stall
+### ⚠️ Pi best (DeepSeek V4 Pro) é LENTO — não confunda com stall
 
-Pi best (`opencode-go/minimax-m3`) rotineiramente leva **5-10+ minutos só lendo**
+Pi best (`opencode-go/deepseek-v4-pro`) rotineiramente leva **5-10+ minutos só lendo**
 arquivos antes de gerar o primeiro output. Numa sessão real de 181 entradas,
 Pi passou 100+ entradas (~7 min) lendo código, docs, git diffs e schemas
 antes de começar a escrever. **Não é stall — é o modelo montando contexto.**
@@ -447,16 +476,31 @@ Isso mostra entradas crescendo, último arquivo lido, e se já começou a escrev
 **Sinal de leitura normal:** entradas crescendo, custo acumulando, última
 entrada contendo snippets de código, diffs, ou schemas.
 
-### Execução de Pi best sem timeout
+### ⚠️ Hermes `process(action='wait')` Clamp de 60s
 
-Pi best (MiniMax M3) NUNCA deve rodar em foreground do Hermes — o timeout
+O Hermes impõe um limite máximo de 60s no parâmetro `timeout` de `process(action='wait')`. Mesmo que você passe `timeout=300`, a espera efetiva é de ~60s e o retorno é `"status": "timeout"`. **Isso não significa que o processo morreu** — ele continua rodando em background.
+
+Para esperas longas (Pi Agent leva 5-15+ min), use o padrão:
+
+```python
+# Múltiplos waits consecutivos
+process(action='wait', session_id='...', timeout=60)  # ~60s real
+process(action='wait', session_id='...', timeout=60)  # outro ~60s
+process(action='wait', session_id='...', timeout=60)  # mais um
+```
+
+Ou melhor: use `process(action='poll')` periódico entre waits para monitorar progresso sem bloquear.
+
+### ⚠️ Execução de Pi best sem timeout
+
+Pi best (DeepSeek V4 Pro) NUNCA deve rodar em foreground do Hermes — o timeout
 padrão de 180s mata a sessão antes de Pi começar a escrever, mesmo que Pi
 esteja progredindo normalmente na fase de leitura.
 
 **Sempre usar background para Pi best:**
 ```bash
 terminal(
-  command="cd /opt/data/code/workstation/PROJETO && pi -p \"$(cat prompts/tarefa.md)\" --provider opencode-go --model minimax-m3 --name \"sprint-N-tarefa\"",
+  command="cd /opt/data/code/workstation/PROJETO && pi -p \"$(cat prompts/tarefa.md)\" --provider opencode-go --model deepseek-v4-pro --name \"sprint-N-tarefa\"",
   background=true,
   notify_on_complete=true
 )
@@ -655,7 +699,12 @@ cd ~/.pi-dotfiles && bash scripts/sync.sh push   # local → repo
 
 ## Auditoria Pós-Execução
 
-Após Pi completar uma tarefa, extrair métricas de uso da sessão `.jsonl`:
+Após Pi completar uma tarefa, verificar:
+
+1. **Se leu os arquivos que deveria** — `references/session-file-audit-verify-reads.md`
+   (especialmente design HTMLs, specs, protótipos — Pi pode ver o nome num `ls` sem ler o conteúdo)
+
+2. **Métricas de uso** — extrair tokens, custo, duração da sessão `.jsonl`:
 
 ```bash
 # Auditar última sessão
@@ -703,6 +752,76 @@ Use only text-based verification.
 
 **Recuperação:** editar o JSONL para remover as entradas problemáticas. Ver
 `### ⚠️ Cirurgia de JSONL — Remover Entradas Problemáticas` abaixo.
+
+### ⚠️ Diagnóstico de Stall: JSONL, NÃO CPU ou Terminal
+
+NUNCA mate um Pi Agent baseado em 0% de CPU ou ausência de output no terminal. O Pi não executa localmente — ele é um cliente HTTP que espera resposta da API. **CPU = 0% é o estado normal** durante todo o ciclo de vida (leitura, planejamento, escrita). O terminal do Hermes só mostra o primeiro output do processo bash wrapper, não o progresso contínuo do Pi.
+
+**Único sinal confiável de progresso:** entradas no arquivo JSONL da sessão.
+
+```bash
+# ✅ CERTO: verificar entries crescendo
+python3 -c "
+import json, time
+fp = '/caminho/da/sessao.jsonl'
+with open(fp) as f:
+    entries = [json.loads(l) for l in f if l.strip()]
+print(f'{len(entries)} entries')
+last = entries[-1]
+for c in last.get('message',{}).get('content',[]):
+    if isinstance(c, dict) and c.get('type') == 'toolCall':
+        print(f'Ultima acao: {c.get(\"name\")}')
+    elif isinstance(c, dict) and c.get('type') == 'text':
+        print(f'Ultimo texto: {c.get(\"text\",\"\")[:100]}')
+"
+```
+
+**Regras de decisão:**
+
+| Cenário | Ação |
+|---------|------|
+| Entradas crescendo a cada <120s | ✅ Progresso normal — aguarde |
+| Última toolCall é `read` ou `bash` | ✅ Fase de leitura — normal, mesmo que demore 5-10+ min |
+| Última toolCall tem texto truncado no meio | ✅ Thinking em andamento — aguarde mais 60s |
+| >120s sem entrada NOVA no JSONL | ⚠️ Possível stall — verificar PID com `ps aux` |
+| >240s sem entrada nova, PID vivo | ⚠️ Stall provável — retomar com `--session` + prompt curto |
+| Exit code != 0 | ❌ Falhou — verificar mensagem de erro, tentar fallback provider |
+
+**Histórico real (Delfos F4f, Jul 2026):** Matei o Pi com SIGKILL após 4min sem output no terminal e 0% CPU. O JSONL mostrava 33 entries com a última sendo um thinking truncado — progresso real. Se tivesse esperado ou retomado com `--session`, o Pi teria terminado sozinho. Após retomar com `--session` + prompt direto, Pi completou o trabalho em ~12min totais (933 linhas de timeline.js + CSS cirúrgico).
+
+### ⚠️ GLM 5.2 — Extrema Lentidão na Fase de Planejamento
+
+GLM 5.2 via `opencode-go` (backend Fireworks.ai) é significativamente **mais lento** que DeepSeek V4 Pro na fase de leitura/planejamento. Numa sessão real:
+
+- **6+ minutos** só lendo arquivos antes de escrever a primeira linha
+- **33 entradas** de leitura (read/bash) antes de começar a planejar o output
+- O modelo entra numa fase de **thinking muito longo** (pode parecer stall) antes de produzir tool calls de escrita
+- O processo fica com 0% de CPU (apenas aguardando resposta HTTP da API) — **NÃO é stall**
+- A última entrada da sessão pode ficar truncada (texto cortado no meio de uma frase) — isso é normal, é o modelo pensando
+
+**Sinal de stall real:** >120s sem que a contagem de **entradas no JSONL** cresça. Não confie em CPU ou tempo decorrido desde o último output visível no terminal.
+
+**Se o modelo parou de produzir novas entradas por <120s:** não mate o processo. Aguarde.
+
+**Se o modelo parou por >120s com a última entrada sendo um thinking truncado:** pode estar genuinamente travado. Nesse caso:
+
+```bash
+# 1. Verificar se ainda está vivo
+ps aux | grep " pi " | grep -v grep
+
+# 2. Se vivo mas parado >120s: retomar com --session + prompt de continuação
+pi --session /caminho/da/sessao.jsonl \
+  -p "Continue de onde parou. PARE de planejar e COMECE a escrever código agora. Execute bash e write tools imediatamente." \
+  --provider opencode-go --model glm-5.2
+```
+
+**Exemplo real que funcionou (Delfos F4f, Jul 2026):**
+- Sessão original: 33 entries, 6min de leitura, última entrada com thinking truncado
+- Retomada com `--session` + prompt de continuação curto e direto
+- Após retomar: produziu 933 linhas de `timeline.js` + editou CSS cirurgicamente
+- Total: ~12 minutos de execução, 83 entries, 2 writes (1 JS + 1 CSS via bash/python)
+
+**⚠️ GLM 5.2 via opencode-go é caro e lento.** Cada sessão queima ~$0.07 só na fase de leitura. Use apenas quando o resultado justificar o custo (design criativo, sites completos, refactors grandes). Para code tasks comuns, prefira DeepSeek V4 Flash.
 
 ## ⚠️ GLM-5.2 é Texto Puro (Modelo de Visão é GLM-5V-Turbo)
 
@@ -754,7 +873,7 @@ print(f'Cortado: {len(entries)} -> {len(safe)} entries')
 "
 
 # 3. Relançar com --session
-pi --session session.jsonl --provider opencode-go --model minimax-m3
+pi --session session.jsonl --provider opencode-go --model deepseek-v4-pro
 ```
 
 **Cenário típico:** Pi construiu todo o código (24 arquivos, site completo),
@@ -763,9 +882,9 @@ tentar processar a imagem. Solução: cortar as últimas 5-8 entradas (Playwrigh
 screenshot + resposta travada) e relançar. O trabalho NÃO é perdido — os
 arquivos já estão no disco.
 
-## ⚠️ Model Drift — Pi Best (MiniMax M3) Refatora Sem Aviso
+## ⚠️ Model Drift — Pi Best (DeepSeek V4 Pro) Refatora Sem Aviso
 
-Pi best (`opencode-go/minimax-m3`) tem **alta propensão a drift**: pode refatorar
+Pi best (`opencode-go/deepseek-v4-pro`) tem **alta propensão a drift**: pode refatorar
 APIs de serviços existentes, renomear arquivos e deletar arquivos não relacionados
 sem instrução explícita. É um efeito da capacidade do modelo — ele "melhora" o que vê.
 
@@ -916,7 +1035,55 @@ relatar no formato:
 ```
 
 Se o Pi terminar (exit code != null no processo), relatar o resultado final
-## ⚠️ Pre-Flight Verification de Sites Estáticos
+## ⚠️ Verificação de Sanidade Pós-Restauração
+
+Quando arquivos são restaurados do git (após zero-byte corruption), **sempre verificar se os paths de API estão corretos**. Versões antigas do código podem ter endpoints desatualizados:
+
+```bash
+# Verificar todos os paths de API usados nos views
+grep -rn "api\.get\|api\.post\|api\.put\|api\.delete\|api\.patch" js/views/
+```
+
+**Problemas comuns em versões antigas:**
+- `api.get('/weekly')` → deve ser `api.get('/dashboard/weekly')`
+- `api.get('/projects', { limit: 5 })` → deve ser `api.get('/dashboard/recent-projects')`
+- `stats.completed_this_week` → API retorna `stats.completed`
+- Mapeamento de `weekday` → `dayName` faltando (API retorna `weekday: "Segunda"`, Components.dayCard espera `dayName`)
+
+Sempre testar cada view no browser após restauração de git.
+
+## ⚠️ Verificação Pós-Pi: Arquivos Zerados (0 bytes)
+
+Após Pi escrever arquivos, **sempre verificar se os arquivos não estão vazios**. Durante problemas de permissão (UID mismatch entre container e host), Pi pode:
+- Gravar 0 bytes (arquivo truncado)
+- Sobrescrever arquivos existentes com conteúdo vazio
+- Isso afeta particularmente JS/CSS/HTML que o Hermes ou Vercel deploy vai servir depois
+
+**Sintoma:** `ls -la <arquivo>` mostra 0 bytes. A view correspondente (Dashboard, Weekly, etc.) não carrega no browser — erro silencioso porque o JS está vazio.
+
+**Prevenção — verificar todos os arquivos pós-Pi:**
+```bash
+for f in js/utils.js js/components.js js/app.js js/views/*.js css/views.css index.html; do
+  size=$(wc -c < "$f" 2>/dev/null || echo 0)
+  [ "$size" -eq 0 ] && echo "ZERADO: $f"
+done
+```
+
+**Recuperação (arquivo zerado no git):**
+```bash
+# Se o último commit salvou o arquivo zerado, restaurar de um commit anterior
+git show <commit-hash-antigo>:<path> > <path>
+
+# Encontrar o commit que tinha o arquivo íntegro:
+git log --oneline -- <path>
+git show <hash>:<path> > <path>
+```
+
+**Causa raiz:** Pi escreve como uid 10000 (container), mas o diretório pode estar owned por uid 1001 (host). Quando `chmod -R a+w` não foi aplicado ou foi revertido (por exemplo, por outro processo que recriou os arquivos), a escrita é parcial ou nula. Solução permanente:
+
+```bash
+ssh oracle-host 'sudo chown -R ubuntu:ubuntu /caminho/do/projeto/frontend && sudo chmod -R a+w /caminho/do/projeto/frontend'
+```
 
 Após Pi gerar um site, fazer verificação antes do deploy:
 
@@ -946,4 +1113,5 @@ que elementos 3D renderizam e textos aparecem.
 
 ## Referências
 
-- `references/fastmcp-testability-pattern.md` — Como testar MCP tools com FastMCP (impl/wrapper pattern para contornar `'FunctionTool' object is not callable`)
+- `references/fastmcp-testability-pattern.md` — Como testar MCP tools com FastMCP
+- `references/zero-byte-recovery.md` — Recuperação de arquivos JS/CSS zerados (0 bytes) após Pi Agent + verificação de sanidade pós-restauração

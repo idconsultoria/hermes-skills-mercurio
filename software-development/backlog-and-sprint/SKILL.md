@@ -150,7 +150,7 @@ Pi e agy rodam sem timeout artificial. Estratégia varia por tipo de tarefa.
 
 ```
 CARO/ESCASSO     agy ─── Consultor externo especialista (design, UX, estratégia)
-ESCASSO          Pi best ── Eng. sênior interno (MiniMax M3 via Go)
+ESCASSO          Pi best ── Eng. sênior interno (DeepSeek V4 Pro via Go)
 BARATO/ABUNDANTE Pi cost ─ Dev júnior (DeepSeek V4 Flash Free)
 GRATUITO         Pi cost ── Free tier Zen
 ```
@@ -166,8 +166,8 @@ Sempre escreva: `pi ... --provider <nome> --model <id>`
 
 | Papel | Provider | Model ID | Custo |
 |-------|----------|----------|-------|
-| **Pi best** 🥇 | `opencode-go` | `minimax-m3` | Cota semanal $30 |
-| **Pi best (fallback)** 🥈 | `opencode-go` | `deepseek-v4-pro` | Cota semanal $30 |
+| **Pi best** 🥇 | `opencode-go` | `deepseek-v4-pro` | Cota semanal $30 |
+| **Pi best (fallback)** 🥈 | `opencode-go` | `minimax-m3` | Cota semanal $30 |
 | **Pi best (último recurso)** 🥉 | `deepseek` | `deepseek-v4-pro` | $0.14/M input, $0.42/M output |
 | **Pi cost** 🥇 | `opencode` (Zen) | `opencode/deepseek-v4-flash-free` | **Gratuito** |
 | **Pi cost** 🥈 | `opencode-go` (Go) | `deepseek-v4-flash` | Cota semanal $30 |
@@ -176,7 +176,7 @@ Sempre escreva: `pi ... --provider <nome> --model <id>`
 
 > ✅ OpenCode API key ativa (atualizada 2026-06-08). Todos os 4 providers funcionam:
 > `opencode/deepseek-v4-flash-free` (gratuito, Zen), `opencode-go/*` (Go, cota $30/semana), `deepseek/*` (direto, pago).
-> Prioridade: **cost → free primeiro**, best → MiniMax M3 via Go.
+> Prioridade: **cost → free primeiro**, best → DeepSeek V4 Pro via Go.
 
 Testar conectividade (Pi é local — invocação direta, sem SSH):
 ```bash
@@ -188,14 +188,14 @@ pi -p "echo test" --provider opencode-go --model deepseek-v4-flash
 pi -p "echo test" --provider deepseek --model deepseek-v4-flash
 ```
 
-Para **Pi best** (planejamento, design, docs complexos) usar MiniMax M3 via OpenCode Go:
-```bash
---provider opencode-go --model minimax-m3
-```
-
-Fallback se cota Go do minimax-m3 esgotar: DeepSeek V4 Pro também via Go:
+Para **Pi best** (planejamento, design, docs complexos) usar DeepSeek V4 Pro via OpenCode Go:
 ```bash
 --provider opencode-go --model deepseek-v4-pro
+```
+
+Fallback se cota Go do deepseek-v4-pro esgotar: MiniMax M3 também via Go:
+```bash
+--provider opencode-go --model minimax-m3
 ```
 
 Último recurso: DeepSeek V4 Pro via API direta:
@@ -205,7 +205,7 @@ Fallback se cota Go do minimax-m3 esgotar: DeepSeek V4 Pro também via Go:
 
 ### Pi — Tarefas longas (Sprint Planning, Design, Engineering docs)
 
-Provider: **Pi best** (`opencode-go/minimax-m3`). Tarefas longas exigem qualidade de raciocínio — Pi cost (Zen free) é lento e produz output raso para docs complexos.
+Provider: **Pi best** (`opencode-go/deepseek-v4-pro`). Tarefas longas exigem qualidade de raciocínio — Pi cost (Zen free) é lento e produz output raso para docs complexos.
 
 ```bash
 PROJETO="<projeto>"
@@ -214,15 +214,15 @@ cat > /opt/data/code/workstation/$PROJETO/prompts/pi-prompt.md << 'PROMPT'
 Seu prompt longo aqui...
 PROMPT
 
-# Pi best — MiniMax M3 via Go (cota semanal $30)
+# Pi best — DeepSeek V4 Pro via Go (cota semanal $30)
 PATH="/opt/data/pi-global/bin:$PATH" \
   pi -p "$(cat /opt/data/code/workstation/$PROJETO/prompts/pi-prompt.md)" \
-  --provider opencode-go --model minimax-m3 \
+  --provider opencode-go --model deepseek-v4-pro \
   --name "sprint-N-tarefa"
 
-# Fallback se cota Go esgotar: DeepSeek V4 Pro (API direta, pago)
+# Fallback se cota Go esgotar: MiniMax M3 (mesmo provider)
 # PATH="/opt/data/pi-global/bin:$PATH" \
-#   pi -p "$(cat ...)" --provider deepseek --model deepseek-v4-pro \
+#   pi -p "$(cat ...)" --provider opencode-go --model minimax-m3 \
 #   --name "sprint-N-tarefa"
 ```
 
@@ -232,7 +232,7 @@ PATH="/opt/data/pi-global/bin:$PATH" \
 
 Provider priority (tarefas curtas — NUNCA para tarefas longas): free Zen → Go → DeepSeek API direta.
 
-> ⚠️ **Não confundir com tarefas longas.** A seção "Pi — Tarefas longas" acima é quem dita o provider para tarefas de planejamento, design, docs e engenharia complexa — essas vão para **Pi best** (`opencode-go/minimax-m3`). A prioridade abaixo (Zen free → Go → API direta) é **exclusivamente para tarefas curtas (< 15 linhas de prompt)**.
+> ⚠️ **Não confundir com tarefas longas.** A seção "Pi — Tarefas longas" acima é quem dita o provider para tarefas de planejamento, design, docs e engenharia complexa — essas vão para **Pi best** (`opencode-go/deepseek-v4-pro`). A prioridade abaixo (Zen free → Go → API direta) é **exclusivamente para tarefas curtas (< 15 linhas de prompt)**.
 
 ```bash
 # 1° Gratuito (tentar primeiro)
@@ -515,7 +515,7 @@ cd /home/ubuntu/selfhost/shared/code/workstation/PROJETO
 LC_DIR=code/workstation/PROJETO \
   nohup pi-agent 'pi --name "sprint-N-planning" \
   -p "$(cat prompts/pi-sprint-planning.md)" \
-  --provider opencode-go --model minimax-m3' \
+  --provider opencode-go --model deepseek-v4-pro' \
   > /tmp/pi-sprint-N-planning.log 2>&1 &
 echo "Pi PID: $!"
 ENDSCRIPT
@@ -556,7 +556,7 @@ Escreva as stories em product/sprint_N/user-stories.md.
 Considere: dependências, esforço estimado, valor para o usuário."
 
 ssh oracle-host "LC_DIR=code/workstation/PROJETO pi-agent \
-  'pi -p \"$CONTEXT\" --provider opencode-go --model minimax-m3'"
+  'pi -p \"$CONTEXT\" --provider opencode-go --model deepseek-v4-pro'"
 ```
 
 **Saída esperada:**
@@ -596,7 +596,7 @@ cd /home/ubuntu/selfhost/shared/code/workstation/PROJETO
 LC_DIR=code/workstation/PROJETO \
   nohup pi-agent 'pi --name "sprint-N-design" \
   -p "$(cat prompts/pi-sprint-design.md)" \
-  --provider opencode-go --model minimax-m3' \
+  --provider opencode-go --model deepseek-v4-pro' \
   > /tmp/pi-sprint-N-design.log 2>&1 &
 ENDSCRIPT
 
@@ -884,7 +884,7 @@ Após a execução das code-tasks (Pi cost), um ciclo de QA de 3-5 camadas:
 ```
 Layer 1 — Pi cost: executa code tasks (47 tasks, ~20min)
 Layer 2 — Agy review: diagnóstico inicial (via tmux, ~5min)
-Layer 3 — Pi best: corrige bugs (sessão dedicada, MiniMax M3, $~0.60)
+Layer 3 — Pi best: corrige bugs (sessão dedicada, DeepSeek V4 Pro, $~0.60)
 Layer 4 — Agy final: corrige bugs restantes, valida suite
 Layer 5 — Hermes verify: roda suite no container, confirma
 ```
@@ -1043,7 +1043,7 @@ Formato preferido:
 | Recurso | Custo |
 |---------|-------|
 | Pi cost (Zen gratis) | $0.00 |
-| Pi best (MiniMax M3) | $0.62 |
+| Pi best (DeepSeek V4 Pro) | $0.62 |
 | **Total** | **$0.62** |
 
 ### Para testar
@@ -1098,12 +1098,12 @@ Use o tool patch para editar o arquivo. Verifique cada patch com read_file depoi
 
 #### Estratégia de PR Creation
 
-**Pi best para PR creation:** Pi best (MiniMax M3) é lento e tem cota limitada (5h/mês no OpenCode Go). Para PR creation, Pi precisa:
+**Pi best para PR creation:** Pi best (DeepSeek V4 Pro) é lento e tem cota limitada (5h/mês no OpenCode Go). Para PR creation, Pi precisa:
 1. Ler todo o diff da Sprint (centenas de arquivos) — 5-10 min só de leitura
 2. Escrever 6-7 commits convencionais
 3. Fazer git push + gh pr create
 
-⚠️ **Cada execução de Pi best consome 5-10 min de cota que poderiam ser usados em tarefas mais complexas.** PR creation é puramente mecânico (git add → commit → push → gh pr create) e não requer a inteligência do MiniMax M3.
+⚠️ **Cada execução de Pi best consome 5-10 min de cota que poderiam ser usados em tarefas mais complexas.** PR creation é puramente mecânico (git add → commit → push → gh pr create) e não requer a inteligência do DeepSeek V4 Pro.
 
 **Alternativa recomendada: execução manual (Hermes em vez de Pi).** Quando possível, o agente Hermes deve:
 1. Criar a branch
@@ -1114,7 +1114,7 @@ Isso é mais rápido (2-3 min vs 30 min) e não gasta cota do Pi.
 
 #### ⚠️ Pi best timeout — OpenCode Go tem cota mensal de 5h
 
-O provider `opencode-go` (MiniMax M3) tem limite de **5 horas mensais de uso**. Quando excede, retorna `GoUsageLimitError`:
+O provider `opencode-go` (DeepSeek V4 Pro) tem limite de **5 horas mensais de uso**. Quando excede, retorna `GoUsageLimitError`:
 ```
 429 GoUsageLimitError: "5-hour usage limit reached. Resets in 3hr 22min."
 ```
@@ -1239,7 +1239,7 @@ ls -d /opt/data/code/workstation/<projeto>/product/sprint_*/ 2>/dev/null
 
 ### 3.3 Criar Nova Sprint (Clean Branch)
 
-⚠️ **NUNCA continuar na branch da Sprint anterior.** Após o MVP ou após uma Sprint concluída, criar uma **branch limpa a partir da master**. A branch antiga mantém o histórico de engenharia; a nova branch carrega só a documentação e a infraestrutura de CI/CD.
+⚠️ **NUNCA continuar na branch da Sprint anterior.** Após o MVP ou após uma Sprint concluída, criar uma **branch limpa a partir da master**.
 
 > **Nomenclatura por propósito:**
 > - Nova Sprint com features adicionais: `sprintN.5` ou `feat/sprint-N-v2` (ex: sprint 1, depois sprint 1.5)
@@ -1400,7 +1400,7 @@ Carregar junto com:
 
 ## Pitfalls
 
-⚠️ **NÃO assuma alucinação do Pi best nos docs — o escopo da Sprint evolui durante a execução.** Pi best (MiniMax M3) frequentemente atualiza `product/engineering/` com features que foram implementadas mas você não reconhece do planejamento original. Ao ver um release-notes.md com "7-state GTD model" ou "Morning Report" que você não planejou explicitamente:
+⚠️ **NÃO assuma alucinação do Pi best nos docs — o escopo da Sprint evolui durante a execução.** Pi best (DeepSeek V4 Pro) frequentemente atualiza `product/engineering/` com features que foram implementadas mas você não reconhece do planejamento original. Ao ver um release-notes.md com "7-state GTD model" ou "Morning Report" que você não planejou explicitamente:
    1. **VERIFIQUE no código real primeiro:** `grep -rn "feature_name" backend/taskflow/models/*.py`, `grep -rn "endpoint" backend/taskflow/api/routes/`
    2. **VERIFIQUE no git diff** quais arquivos foram modificados e por qual sessão Pi
    3. Só reverta se a feature realmente não existir no código

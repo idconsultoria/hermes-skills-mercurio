@@ -35,6 +35,25 @@ Delivered inside ```text block in Cron #3 response.
 
 O parágrafo do editorial na mensagem de WhatsApp deve ter **no máximo 3 frases**. Nem muito extensas (evitar frases com mais de 30 palavras) nem muito curtas (evitar frases de menos de 6 palavras). O ideal é 2 frases curtas e diretas, ou 3 quando houver necessidade de conectivo narrativo. A primeira frase SEMPRE em negrito. O objetivo é dar contexto e gancho para o leitor abrir o PDF — não reproduzir o editorial inteiro.
 
+## Delivery Mechanism
+
+A mensagem é enviada ao grupo WhatsApp via bridge API HTTP:
+
+- **Endpoint:** `POST http://127.0.0.1:3000/send`
+- **Payload:** JSON com `chatId` e `message`
+- **Chat ID do grupo:** `120363419131378682@g.us` (IA que Funciona)
+- **Ferramenta:** Python `urllib.request` (jq NÃO está disponível neste sistema — não tente usar `jq` para construir o JSON)
+
+```python
+import json, urllib.request
+with open('/tmp/iaf_whatsapp_{SLUG}.txt') as f:
+    msg = f.read()
+payload = json.dumps({'chatId': '120363419131378682@g.us', 'message': msg}).encode()
+req = urllib.request.Request('http://127.0.0.1:3000/send', data=payload, headers={'Content-Type': 'application/json'})
+resp = urllib.request.urlopen(req, timeout=10)
+# Verificar: resp.status == 200, JSON retorna {'success': true, 'messageId': '...'}
+```
+
 ## Example
 
 ```text

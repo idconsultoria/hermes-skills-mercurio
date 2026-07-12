@@ -464,6 +464,10 @@ for root, dirs, files in os.walk('.'):
 
 ## Pitfalls
 
+⚠️ **`execute_code` blocked em cron jobs.** O tool `execute_code` roda Python arbitrário com subprocess — cron jobs bloqueiam porque não há usuário para aprovar. Use `terminal(command='python3 -c \"...\"')` em vez de `execute_code` quando estiver rodando o ciclo via cron. Funciona em sessão normal.
+
+⚠️ **`audit-descriptions.py` não verifica `type`/`timestamp`.** O script só valida formatação de descrição (quoted string, tamanho do sumário, gatilho). Skills novas podem ser commitadas sem `type` no frontmatter sem erro do audit. **Sempre rodar** o snippet de verificação da seção Verification (passo `python3 -c "import os, re; ..."`) após o update para capturar `type` e `timestamp` faltantes.
+
 ⚠️ **Depth-1 inference não cabe no cron de 3 minutos.** O scheduler do cron tem hard interrupt de 3 min por run. A inferência depth-1 (disparar 3 subagentes paralelos, cada um lendo ~28 skills bilateralmente) exige mais tempo. **Workarounds:**
    - (a) Separar depth-1 em seu próprio cron job com prompt focado só em relações, ou
    - (b) Rodar `hermes chat -q '...'` via SSH no host com timeout de 10+ min, ou
@@ -525,6 +529,36 @@ for root, dirs, files in os.walk('.'):
 ```python
 SKILLS_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 ```
+
+⚠️ **Patch fuzzy-matching pode aplicar no local ERRADO quando o texto existe em seções diferentes.** O `patch` tool usa fuzzy matching (9 estratégias). Se o `old_string` aparecer em mais de um lugar no arquivo — mesmo com contexto extra — o match pode cair na seção errada, corrompendo outras partes do documento. Isso é especialmente perigoso quando:
+- Um patch anterior já criou uma cópia duplicada do trecho que você quer editar no local errado
+- O arquivo tem seções similares (ex: dois blocos de configuração de modelo)
+- Você está editando um arquivo grande (+500 linhas)
+
+**Sinais de que o patch aplicou no lugar errado:**
+- O diff mostra linhas sendo removidas de uma seção que você não pretendia tocar
+- O número de linhas removidas/adicionadas não corresponde ao esperado
+- A seção que você queria editar continua inalterada no arquivo
+
+**Procedimento de recuperação:**
+1. `read_file` na área afetada — veja o estrago exato
+2. **NÃO tente desfazer com outro patch** — patches encadeados sobre corrupção só pioram
+3. Identifique o texto original que foi removido (use `session_search` ou diff do git se necessário)
+4. Use um `old_string` longo o suficiente para ser **garantidamente único** — inclua linhas de contexto que só existam na seção correta (ex: linhas anteriores e posteriores inteiras)
+5. Depois de restaurar a seção corrompida, volte e edite a seção que você queria originalmente — agora com contexto extra no old_string para garantir unicidade
+6. **SEMPRE** leia o diff output após cada patch — não prossiga sem verificar que a alteração caiu no local certo
+
+⚠️ **Patch pode duplicar escapes em strings com `\"` e backslashes em code blocks.** Quando o `old_string` ou `new_string` contém sequências de escape como `\"` (dentro de code blocks bash que simulam chamadas Python com `command=\"... \\\"...\\\"\"`), o patch tool pode interpretar e re-interpretar os escapes durante o fuzzy matching. Resultado: `\"` vira `\\\"`, e correções subsequentes escalam para `\\\\\\\"`.
+
+**Sinais:** após aplicar patch em uma linha que contém escapes aninhados (bash code block com `command=\"...\"` e inner escaped quotes `\\\"`), o diff mostra escapes extras — `\"` → `\\\"` ou pior.
+
+**Correção:**
+1. `read_file` no trecho corrompido — veja o texto **exato** atual
+2. Use o texto corrompido como `old_string` (incluindo os escapes duplicados)
+3. Passe o `new_string` com a contagem correta de escapes (sem a duplicação)
+4. Verifique o diff — deve mostrar apenas remoção dos escapes extras
+
+**Prevenção:** para patches em code blocks com `\"` e `$()`, SEMPRE verificar o resultado com `read_file` imediatamente após aplicar. Não confie no diff do patch tool para esses casos — ele mostra a versão interpretada, não a literal do arquivo.
 
 ⚠️ **Patch falha na auditoria de descrições: diagnostique antes de re-aplicar.** Quando `patch` falha com "Could not find a match for old_string" durante o passo 4 do Update (auditoria de descrições), NÃO tente re-aplicar cegamente com um old_string diferente. Leia o SKILL.md atual (`read_file`), compare o texto real com o que você esperava — divergências comuns:
 

@@ -4,6 +4,8 @@ description: "Drive the user's desktop in the background — clicking, typing, s
 
 Load this skill whenever the `computer_use` tool is available. Cross-platform (macOS, Windows, Linux), works with any tool-capable model."
 version: 2.0.0
+type: ToolIntegration
+timestamp: 2026-06-28T00:00:00Z
 platforms: [macos, windows, linux]
 metadata:
   hermes:

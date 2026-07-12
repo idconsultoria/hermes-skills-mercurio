@@ -213,7 +213,32 @@ Only runs later because these newsletters update around 7h local time.
    ⚠️ **Verifique o header-metadata-box.** O template tem placeholders `Hora:`, `Data:`, `Edição Diária`. NUNCA substitua `Hora:` por metadata interna do pipeline (ex: `Dedup: 14 dias ✓`). Isso já vazou para o leitor — a linha deve mostrar o horário de publicação, não métricas de curadoria. Confira visualmente no HTML gerado antes de salvar.
 9. **Save to history**: `iaf_YYYY-MM-DD.html`
 10. **Update dedup manifest** (pós-escrita): `python3 /opt/data/cron/scripts/dedup_manifest.py` — adiciona a edição de hoje ao manifesto rolante
-11. **Deliver** — mensagem WhatsApp começando com o link da edição web (ver formato em WhatsApp Companion Format abaixo). PDF abolido.
+11. **Deliver — WHATSAPP VIA BRIDGE (NÃO PULE — SEPARADO DA ENTREGA TELEGRAM)**
+
+    ⚠️⚠️⚠️ **REGRA ABSOLUTA — ENTREGAR WHATSAPP É OBRIGATÓRIO E DISTINTO DA ENTREGA TELEGRAM.**
+    A entrega WhatsApp (via bridge API) e a entrega Telegram (via `deliver: origin` da resposta final) são DUAS AÇÕES SEPARADAS. A primeira NÃO substitui a segunda, e vice-versa. O agente PULA o WhatsApp consistentemente por confundir as duas — não cometa este erro.
+
+    > **ARMADILHA CONFIRMADA (08/07/2026):** O agente chega até aqui, gera a mensagem, e em vez de chamar a bridge, coloca o conteúdo na resposta final como se fosse a "entrega Telegram". A resposta final vai para Telegram SIM, mas o WhatsApp fica sem enviar. A instrução "Resposta final" no fim do prompt confunde o agente, que trata a resposta como substituta do curl.
+
+    **Para evitar, siga esta ORDEM:**
+
+    a) **Primeiro — WhatsApp:** Formate a mensagem curta (15-25 linhas) no padrão WhatsApp Companion Format. Salve em `/tmp/iaf_whatsapp_{SLUG}.txt` **usando terminal com heredoc** (`cat > /tmp/iaf_whatsapp_{SLUG}.txt << 'HERMES_EOF'`). **⚠️ NUNCA use `write_file` para escrever em `/tmp/` — ele bloqueia caminhos em `/tmp/` por segurança, e o agente alucina sucesso mesmo com o write negado.** Só depois de receber `messageId` você pode passar ao próximo passo.
+
+    b) **Depois — Resposta final:** Escreva a confirmação curta (formato abaixo) que vai para o Telegram via `deliver: origin`.
+
+    **Método de envio (use TERMINAL, não Python urllib):**
+
+    ```bash
+    curl -s -X POST http://127.0.0.1:3000/send \
+      -H "Content-Type: application/json" \
+      -d "$(python3 -c "import json; print(json.dumps({'chatId':'120363419131378682@g.us','message':open('/tmp/iaf_whatsapp_{SLUG}.txt').read()}))")"
+    ```
+
+    **Verificação obrigatória:** o JSON de resposta deve conter `"success":true` e um `"messageId"` não vazio. Sem isso, a mensagem não chegou ao grupo.
+
+    **Confirmação visual de que você NÃO pulou o WhatsApp:** se sua resposta final não contém um messageId, você pulou a entrega WhatsApp. Refaça.
+
+> 📖 **Leia também:** `references/whatsapp-telegram-conflation.md` — histórico completo do bug, causa raiz e verificação.
 
 Agora Cron #3 faz tudo: síntese, deploy e entrega. O deploy está no passo 10 do Pipeline Steps.
 
@@ -255,7 +280,15 @@ Verificar deploy: `curl -o /dev/null -s -w "%{http_code}" "https://iaf-newslette
 ### ⚠️ Pitfalls do deploy
 
 **Regex do excerpt editorial quebrado:**
-A função `extract_editorial_first_paragraph()` em `_deploy_new_edition.py` busca no HTML do template pelo texto do editorial para gerar o preview no index. O padrão original `class="hot-take"` não casa com `class="hot-take-box"` — o `"` literal no fim da regex exige que a classe termine exatamente em "hot-take". Use `class="hot-take[^"]*"` para casar qualquer classe que comece com "hot-take" (hot-take-box, hot-take-text, etc.). Se o regex falha, o fallback pega CSS bruto do `<style>` e o preview da edição no index mostra lixo. Verifique sempre o excerpt no index.html depois do deploy.
+A função `extract_editorial_first_paragraph()` em `_deploy_new_edition.py` busca no HTML do template pelo texto do editorial para gerar o preview no index. O padrão original `class="hot-take"` não casa com `class="hot-take-box"` — o literal no fim da regex exige que a classe termine exatamente em "hot-take". Use `class="hot-take[^"]*"` para casar qualquer classe que comece com "hot-take" (hot-take-box, hot-take-text, etc.). Se o regex falha, o fallback pega CSS bruto do `<style>` e o preview da edição no index mostra lixo. Verifique sempre o excerpt no index.html depois do deploy.
+
+**Context compaction manda o passo WhatsApp pro espaço:**
+Quando o agente sofre context compaction (especialmente com erro 402 de sumarização), ele perde as instruções de entrega WhatsApp e entra em modo "relatório verboso" — produz um sumário longo em vez de formatar a mensagem curta e chamar a bridge. Para mitigar:
+- O passo de entrega WhatsApp (step 11) está marcado como REGRA ABSOLUTA. Leia-o com atenção após qualquer recuperação de contexto.
+- A formatação NÃO é opcional: gere exatamente 15-25 linhas no formato WhatsApp Companion Format.
+- NÃO substitua a mensagem curta por um relatório de execução. A resposta final deve conter APENAS: URL do deploy + HTTP status + messageId.
+- Se sentir que seu contexto está truncado ou que você "pulou" alguma etapa, volte ao Pipeline Steps e verifique cada passo antes de finalizar.
+- Confirmação visual: se sua resposta final tem mais de 30 linhas, provavelmente você está no modo "relatório" — recomece.
 
 ## Diagnóstico & Auditoria de Cron Runs
 

@@ -48,6 +48,13 @@ ssh oracle-host 'base64 /path/to/config.json'
 echo '<base64_string>' | base64 -d > /path/to/config.json
 ```
 
+### VM Specs (Free Tier — Limitado)
+
+> **⚠️ Oracle Cloud free tier VMs foram limitadas a 2 vCPUs e 12 GiB RAM.**
+> Antes eram 4 OCPUs + 24 GB (Ampere A1). Agora: **2 cores ARM + ~11.65 GiB**.
+> Ajuste expectativas de deploy: com 20 containers rodando, já consome ~25% da RAM.
+> Monitore com `docker stats --no-stream` e `free -h` regularmente.
+
 ### 2. Discover the Docker Host
 The host is the gateway of the Docker network. Find it via:
 
@@ -177,6 +184,11 @@ ssh oracle-host 'docker pull nousresearch/hermes-agent:latest && docker stop her
 > **Tip:** If the container was deployed via docker-compose (check `com.docker.compose.project` labels via `docker inspect`), use compose commands instead of raw docker:
 > ```bash
 > ssh oracle-host 'cd /path/to/compose && docker compose pull <service> && docker compose up -d <service>'
+> ```
+
+> **Finding compose path for unknown containers:** Use the `com.docker.compose.project.config_files` label:
+> ```bash
+> ssh oracle-host 'docker inspect <container> --format "{{index .Config.Labels \"com.docker.compose.project.config_files\"}}"'
 > ```
 
 ### 7. Auto-Update (Cron)
@@ -365,6 +377,102 @@ mcp_servers:
 
 Then the Hermes session picks up the MCP's tools automatically on next start. Test with `hermes tools list` to verify registration. Use `/reload-mcp` in-session to refresh without full restart.
 
+## Deploy a persistent MCP server to a production Docker stack
+
+When an app has an MCP entry point in its Docker image (e.g. `taskflow-mcp` command) but the production compose doesn't include it:
+
+### 1. Find the production compose on the host
+
+```bash
+ssh oracle 'find /home/ubuntu -name "docker-compose.yml" 2>/dev/null'
+```
+
+Check if the stack uses docker-compose v1 or `docker compose` (v2 plugin):
+
+```bash
+ssh oracle 'cd /path/to/compose && docker compose ps 2>/dev/null'
+```
+
+### 2. Add the MCP service via Python heredoc (safer than sed for YAML)
+
+```bash
+ssh oracle "python3 << 'PYEOF'
+import yaml
+
+with open('/home/ubuntu/selfhost/taskflow/docker-compose.yml') as f:
+    compose = yaml.safe_load(f)
+
+compose['services']['mcp'] = {
+    'image': 'ghcr.io/org/repo/backend:latest',
+    'container_name': 'app-mcp',
+    'command': 'taskflow-mcp',
+    'ports': ['8100:8100'],
+    'env_file': ['.env'],
+    'environment': {
+        'DATABASE_URL': 'postgresql+asyncpg://user:pass@db:5432/production_db',
+        'MCP_PORT': '8100',
+        'MCP_USER_EMAIL': 'mcp@app.local',
+        'MCP_USER_NAME': 'MCP Production',
+    },
+    'depends_on': {
+        'db': {'condition': 'service_healthy'},
+    },
+    'restart': 'unless-stopped',
+    'networks': ['app-net'],
+}
+
+with open('/home/ubuntu/selfhost/taskflow/docker-compose.yml', 'w') as f:
+    yaml.dump(compose, f, default_flow_style=False, sort_keys=False)
+print('MCP service added')
+PYEOF"
+```
+
+**⚠️ Avoid sed/awk for YAML.** YAML has significant indentation and multiline blocks — a bad sed regex corrupts the file silently. Python's `yaml.dump` with `default_flow_style=False` preserves block-scalar formatting.
+
+### 3. Pull the image and start
+
+```bash
+ssh oracle 'cd /path/to/compose && docker compose pull mcp && docker compose up -d mcp'
+```
+
+### 4. Update Hermes MCP config to point directly to the server
+
+If the MCP exposes port 8100 to the host, add it directly (no Host header needed):
+
+```bash
+/opt/hermes/bin/hermes config set mcp_servers.<name>.url http://172.19.0.1:8100/sse
+/opt/hermes/bin/hermes config set mcp_servers.<name>.timeout 180
+/opt/hermes/bin/hermes config set mcp_servers.<name>.transport sse
+```
+
+Remove the old preview Host header if switching from a proxy-routed preview:
+
+```bash
+ssh oracle "sudo sed -i '/<name>:/,/^  [a-z]/{/headers:/d}' /home/ubuntu/selfhost/hermes/data/config.yaml"
+```
+
+### 5. Verify the MCP is reachable and tools are registered
+
+```bash
+# Quick connectivity check
+curl -s -m 3 http://172.19.0.1:8100/sse -H "Accept: text/event-stream" -o /dev/null -w "%{http_code}"
+# Expect 200
+
+# Full discovery + tool count via Hermes CLI
+/opt/hermes/bin/hermes mcp test <name>
+# Output: ✓ Connected (XXXms) ✓ Tools discovered: N
+```
+
+**⚠️ `hermes mcp test` is better than curl for verification** — it performs the full JSON-RPC initialize + tools/list handshake and reports tool count and signatures, not just HTTP connectivity.
+
+### 6. Apply in-session
+
+```bash
+# New session picks it up automatically
+# Existing session: use /reload-mcp slash command
+```
+
+
 ## Pitfalls
 
 ⚠️ **Always check for local repo checkout before using GitHub API.** When you need to read source files from a repo deployed on the host (e.g., TaskFlow, Firecrawl), first check if it's cloned locally:
@@ -431,6 +539,8 @@ If the branch is already checked out (e.g., `sprint1-v2`), read files directly w
 
 ⚠️ **Container restarts = lost session?** If you restart `hermes_agent`, your current conversation dies. Schedule restarts via cron or ask the user to do it.
 
+⚠️ **`docker stop` não é permanente com `restart: unless-stopped`.** Containers com `restart: unless-stopped` voltam automaticamente se o Docker daemon reiniciar (ex: reboot do host). Para desligar permanentemente: (1) `docker stop <container>` para parar imediatamente, e (2) alterar o compose para `restart: no` + `docker compose up -d` para recriar com a nova policy. Sempasso 2, o container volta no próximo reboot.
+
 ⚠️ **Container user (hermes) doesn't exist on the host — use numeric UID for chown.** When SSHing to the host and running `sudo chown hermes:hermes <path>`, it fails with `chown: invalid user: 'hermes:hermes'` because the hermes user only exists inside the Docker container. Use the numeric UID instead (typically 10000; check with `id -u hermes` inside the container):
 ```bash
 sudo chown -R 10000:10000 /path/on/host
@@ -443,8 +553,30 @@ This also applies to other container-internal users (e.g. uid 1001 for Pi Coder 
    - Save with `write_file(path='/opt/data/home/.ssh/id_rsa_oracle', content='...')`
    - Run `chmod 600 /opt/data/home/.ssh/id_rsa_oracle` and test
 
+⚠️ **Arquivos de projeto zerados (0 bytes) após Pi escrever.** Quando o container (uid 10000) e o host (uid 1001) compartilham arquivos via bind mount, e os arquivos são recriados por um processo com UID diferente, o `chmod -R a+w` pode não persistir. Sintoma: `ls -la` mostra 0 bytes para JS/CSS/HTML. Corrigir com:
+
+```bash
+ssh oracle-host 'sudo chown -R ubuntu:ubuntu /caminho/do/projeto/frontend && sudo chmod -R a+w /caminho/do/projeto/frontend'
+```
+
+Depois restaurar os arquivos zerados de um commit anterior do git.
+
 ⚠️ **`hermes mcp add` POSTs to the SSE URL, getting 405.** The CLI sends a POST request to the SSE endpoint, but SSE only accepts GET. This fails with "405 Method Not Allowed".
 **Fix:** Add the MCP server directly to config.yaml via Python yaml dump or manual edit. See `references/vulcano-mcp-deploy.md` for the exact pattern.
+
+⚠️ **Healthcheck em endpoints SSE/streaming trava curl.** FastMCP e serviços SSE expõem `/sse` que retorna 200 e inicia stream — o `curl -f` da healthcheck fica preso esperando dados, e o container fica `unhealthy` mesmo funcionando. Além disso, `nc` (netcat) geralmente **não existe** em imagens mínimas (python:slim, alpine, etc.). Solução universal — bash builtin `/dev/tcp`:
+
+```yaml
+# NO COMPOSE — funciona em qualquer imagem com bash
+healthcheck:
+  test: ["CMD-SHELL", "bash -c \"echo > /dev/tcp/localhost/8100\""]
+  interval: 30s
+  timeout: 5s
+  retries: 3
+  start_period: 15s
+```
+
+⚠️ **Healthcheck herdada da imagem pode testar porta errada.** Se o compose não define `healthcheck:`, Docker usa a da imagem. Imagens base (ex: taskflow backend) podem ter healthcheck em `localhost:8000`, mas o serviço MCP roda na `8100`. **Sempre definir healthcheck explicitamente no compose** para serviços com portas diferentes da padrão.
 
 ⚠️ **`batch_indexer.py` ignores ADAPTER env var.** When deploying Vulcano with a custom adapter, the batch_indexer creates `VulcanoEngine` without passing `adapter=`. It reports 0 engrams because it defaults to scanning `engramas/` dirs. **Patch the script** to read `ADAPTER` and pass the correct adapter. See `references/vulcano-mcp-deploy.md` Step 5.
 

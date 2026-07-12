@@ -99,6 +99,8 @@ Kept: GitHub auth, WhatsApp groups, permission rule, git conventions, OpenCode G
 
 ## [2026-06-28] offload | No memory to offload — cron session has memory disabled (skip_memory=true). No procedural facts in memory for this profile.
 
+## [2026-07-12] update | Index synced 65→77 skills. 12 new skills added (education/*6, grafico-progresso-peso-ares, production-deployment, arxiv-latex-to-kindle, kindle-articles, market-research-synthesis, pipeline-educacional). All 77 SKILL.md descriptions audited and compliant: 12 descriptions reformatted (summary + paragraph + trigger), 12 types added (6 Template, 1 Health, 1 ToolIntegration, 1 Media, 1 Research, 1 Orchestrator, 1 ToolIntegration fix), 9 timestamps added. computer-use got type+timestamp. 13 sizes updated for modified skills. hermes-agent truncated summary fixed.
+
 ## [2026-06-28] evolve | Depth-1 inference: 87 new relations across 46 skills. 261 total (95 similar, 95 uses, 54 used_by, 17 parent). 0 merges, 0 deletes, 0 orphans. 3 parallel subagents analyzed all 60 skills. Graph regenerated (98 nodes, 184 edges).
 
 ## [2026-06-28] offload | Memory cleaned: 2 duplicate user-preference entries removed (NUNCA responder vazio, User pref responder antes — both already in USER PROFILE). Kindle operational data preserved in memory (specific Drive IDs, manga sources, cron).

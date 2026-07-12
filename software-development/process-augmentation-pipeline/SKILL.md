@@ -702,6 +702,7 @@ git log --oneline -5
 
 | Data | Autor | Mudança |
 |------|-------|---------|
+| 2026-07-10 | Hermes | Adicionado `references/brazilian-tech-ed-market-2026.md` — benchmarks de precificação de cursos tech, métricas de community-led growth e estratégias de posicionamento (LinkedIn/Instagram) para o mercado brasileiro de educação em tecnologia. Dados compilados de 10+ fontes (Digitale, DataAds, Impero, TechNergia, Forrester, Gartner, McKinsey). |
 | 2026-06-19 | Hermes (Gustavo Mello) | Criação da skill — pipeline completo de 4 etapas para mapeamento e aumentação de processos da ID Consultoria. |
 | 2026-06-19 | Hermes (Gustavo Mello) | Etapa 1: Pi Agents obrigatoriamente como terminal background, nunca delegate_task. |
 | 2026-06-19 | Hermes (Gustavo Mello) | Etapa 4: agy reposicionado como ferramenta PRIMÁRIA (estratégia iterativa), removida limitação de 75KB. |

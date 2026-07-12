@@ -19,6 +19,8 @@ Hermes sends messages through platform-specific bridge processes (Node.js for Wh
 
 **Critical rule: MEDIA: must be the very first line of the message.** Any content before it (text, formatting, other MEDIA lines) prevents the file from ever arriving. The platform silently drops it.
 
+> ⚠️ **MEDIA: only works from gateway sessions.** When running in TUI (terminal UI), MEDIA: delivers locally — the file never reaches Telegram. Use direct Bot API instead: see `references/telegram-bot-api-file-delivery.md`.
+
 Example — WORKS:
 ```
 MEDIA:/tmp/report.pdf
@@ -530,5 +532,6 @@ Full methodology, per-platform baselines, and interpretation guide: `references/
 | File | Purpose |
 |------|---------|
 | `references/whatsapp-baileys-bridge.md` | WhatsApp bridge API reference (absorbed from former `whatsapp-bridge-baileys` skill) |
+| `references/telegram-bot-api-file-delivery.md` | Direct Bot API file delivery from TUI (when MEDIA: can't route to Telegram) |
 | `references/json-payload-newlines.md` | JSON newline handling for multi-line text |
 | `references/platform-latency-diagnostics.md` | Per-platform API latency measurement and troubleshooting |

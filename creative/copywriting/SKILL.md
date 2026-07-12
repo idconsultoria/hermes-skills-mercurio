@@ -191,6 +191,20 @@ Examples:
 
 ---
 
+### Portuguese Online Course Copywriting (Reference)
+
+For course sales pages in Portuguese (Brazilian market), load `references/copywriting-cursos-online-pt.md`. It covers:
+- **Page structures:** PAS, AIDA, BAB with worked examples for AI/tech courses
+- **Headline formulas:** 6 types with Portuguese examples for course niches
+- **CTA patterns:** First-person language (+90% click uplift, Unbounce), micro-commitment CTAs
+- **Syllabus writing:** Transformative module naming, measurable skill bullets, visual hierarchy
+- **Storytelling:** Hero's journey adapted for student case studies (Miller's StoryBrand: course = guide, not hero)
+- **Instagram/LinkedIn content strategy:** 50-20-20-10 ratio, weekly calendar, format-lead matrix
+- **Cialdini's 7 (+1) principles:** Reciprocity, Scarcity, Urgency, Authority, Social Proof, Commitment, Liking, Unity — all with course-specific applications
+- **AI niche caveats:** Technical audience is more skeptical; scarcity must be real; authority proven with code/results
+
+Load that reference when writing course sales pages, especially in the AI/tech education niche.
+
 ## Page-Specific Guidance
 
 ### Homepage

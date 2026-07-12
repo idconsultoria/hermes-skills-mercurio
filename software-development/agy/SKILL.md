@@ -252,6 +252,12 @@ O `/goal` gera: `implementation_plan.md` + estrutura de diretórios + arquivos i
 
 **Regra:** nunca abandone o agy por causa de tamanho. Adapte o workflow — quebre em iterações, use `/goal` para multi-arquivo, monte com script. O agy entrega altíssima qualidade visual; o trabalho de montagem compensa.
 
+### 8. Humanizing Design Documents (de-AI-ing voice)
+
+Use agy com `--add-dir` para passar skills de referência (`humanizer`, `brand-studio-forge`) como contexto, editando múltiplos arquivos de design in-place — removendo vocabulário inflado, tom de press release, e gerúndio de falsa profundidade sem tocar em CSS tokens ou dados factuais.
+
+> **Reference:** See `references/humanize-design-docs.md` for the complete workflow — file sync, `--add-dir` usage, prompt patterns for preserving CSS while editing text, and verification.
+
 ## Hermes Style Guide (for agy prompts)
 
 Default to this design system for visual outputs. **Sempre carregar o guia completo** (`/opt/data/referencias/hermes-agent/hermes-agent-style-guide.html`) como contexto no prompt do agy — não apenas os tokens resumidos abaixo. O guia HTML contém 15 componentes com previews visuais que servem como referência de layout.
@@ -356,7 +362,7 @@ Veja `references/session-audit-proto.md` para o script completo de extração de
 
 ⚠️ **No emojis em outputs visuais.** Substitua por SVGs inline (stroke, viewBox="0 0 24 24").
 
-⚠️ **agy CAN read files from host filesystem** via its own tools. Put files on host first (SCP).
+⚠️ **agy CAN read AND write files from the host filesystem** via its own tools (not just stdout). When told to edit existing files, agy may write changes directly to disk instead of outputting the diff to stdout — check the target files after execution rather than relying solely on captured output. Put files on host first (SCP or ensure they exist on the target path).
 
 ⚠️ **`DOMContentLoaded` timing** em slides HTML interativos. Usar padrão `readyState === 'loading'` para init.
 
@@ -366,7 +372,13 @@ Veja `references/session-audit-proto.md` para o script completo de extração de
 
 ⚠️ **First-run color scheme picker.** Cached after first use.
 
-⚠️ **Telegram aceita .html.** Enviar direto com `MEDIA:/path/arquivo.html`. Se o usuário reportar que não recebeu, tentar com `.txt`.\n\n⚠️ **Quota exhaustion.** agy compartilha quota do Google Cloud. Fallback para HTML manual com os mesmos tokens visuais.
+⚠️ **Telegram NÃO aceita .html — descartado silenciosamente pelo servidor.** Enviar .html com MEDIA: resulta em 200 OK mas o arquivo nunca chega. ZIPAR primeiro.\n\n⚠️ **Quota exhaustion — fallback estruturado.** agy compartilha quota do Google Cloud (Gemini API). Sintoma: `agy --print` retorna imediatamente sem output (exit 0, nada em stdout) ou o processo fica vivo 3-5 min com 0% CPU e depois morre sem produzir nada. Nao confunda com lentidao normal -- agy leva 2-3 min em prompts complexos MAS o stdout cresce. Se stdout estiver vazio apos 30s, e cota exaurida.
+
+**Fallback quando agy esta sem cota (3 opcoes em ordem de preferencia):**
+
+1. **Prompt fracionado** — Se o prompt original tem ~6KB+, tente fatiar: esqueleto (800B) + conteudo interativo (2-3KB) + complementos. Cada chamada individual tem mais chance de passar.
+2. **HTML manual com os tokens visuais do agy** — Use os mesmos tokens de design (cores, tipografia, glassmorphism) para gerar HTML/CSS/JS manualmente. O agy skill documenta todos os tokens; replique o estilo sem a ferramenta.
+3. **Pi best (GLM 5.2) para geracao de HTML/CSS** — `pi -p "prompt" --provider opencode-go --model glm-5.2`. Limitado: GLM 5.2 tende a entrar em loop de pensamento infinito em prompts >3KB ou com multiplos arquivos. Prefira prompts muito focados (1 arquivo, 1 secao por vez). Ver pitfalls do `pi-agent-coordination` para diagnostico de stall vs pensamento lento.
 
 ⚠️ **Prompt grande com expansão de shell pode travar o agy.** Na execução real do pipeline Sergipetec (Etapa 4), um prompt de ~6.6KB passado via `$(cat /tmp/prompt.txt)` no SSH fez o agy travar por >3 min sem produzir output — o processo ficou vivo no host (PID, RAM alocada) mas sem stdout. A solução foi fatiar: (1) gerar esqueleto HTML+CSS com prompt curto (~800 bytes), (2) editar o arquivo existente para adicionar conteúdo com segundo prompt (~4.7KB). Se um prompt full-site travar, **não insista** — mate o processo e reduza o escopo para esqueleto primeiro, conteúdo depois.
 
@@ -374,7 +386,11 @@ Veja `references/session-audit-proto.md` para o script completo de extração de
 
 ⚠️ **Gráfico de pizza/donut = rejeição imediata do usuário.** Explicitamente proibir no prompt. Sempre pedir "barras horizontais".
 
-⚠️ **Texto prolixo é corrigido.** Manter descrições em 1 frase. Se o agy gerar texto longo (descriptions, parágrafos de recomendação), encurtar com patch. O usuário prefere conciso.
+⚠️ **Verificar diff após humanização de design docs.** agy pode editar texto editorial corretamente mas às vezes toca em CSS ou formatação estrutural. Sempre rode `git diff --stat` e uma inspeção visual nos tokens CSS após uma execução de humanização multi-arquivo.
+
+⚠️ **Verificar CSS após edições JS multi-file.** agy pode gerar JS que referencia classes CSS, IDs de elementos DOM, ou seletores que ele mesmo não criou no CSS — por exemplo, adicionar `element.classList.add('timeline-popover')` no JS sem o correspondente `.timeline-popover {}` no CSS. O JS roda sem erro mas o componente fica invisível/sem estilo. **Após cada execução do agy que edita múltiplos arquivos:** (1) capture o stdout ou inspecione os arquivos alterados, (2) extraia classes/IDs novos do JS com `grep -oP "(?<=className|classList\.add\(['\"])[^'\"]+" js/`, (3) verifique se cada um tem estilos correspondentes no CSS. Se faltarem, injete manualmente.
+
+⚠️ **`background-clip: text` + `-webkit-text-fill-color: transparent` = Chromium render bug.** Esse padrão CSS para texto gradiente faz o texto desaparecer (torna-se invisível) após re-render de layout no Chromium — especialmente quando um elemento pai tem `display` togglado via JS (ex: `sidebar.style.display = ''` ao navegar entre rotas SPA). O bug é conhecido e não tem previsão de conserto no Chrome/Edge. **Soluções testadas (em ordem de confiabilidade):** (1) Substitua por `color: <solid>` + `text-shadow` glow — a perda do gradiente é menor que o bug de invisibilidade. (2) Use `will-change: background; transform: translateZ(0)` no elemento — funciona para casos leves mas falha em toggles repetidos. (3) Force repaint via `requestAnimationFrame()` no handler de rota — safety net, não cura a causa. **Preferir (1) sempre que o gradiente não for requisito de contrato.** Verificado em Chromium 128+.
 
 
 
@@ -387,6 +403,7 @@ For cost-comparison charts specifically, see `references/cost-comparison-chart-p
 ### Preferências do usuário (Gustavo Mello)
 
 - **Foco em melhorias de processos e fluxos de trabalho, não em showcase de software** (validado em sessão 18/jun/2026). Quando o conteúdo do relatório é sobre uma ferramenta, enquadre como **case de augmentação aplicado em um processo real** — a ferramenta é meio, o processo é o fim. Se o user pedir explicitamente um relatório sobre uma categoria de ferramenta, aí software-por-software vale.
+- **100% PT-BR na interface.** Zero inglês em qualquer string visível ao usuário — botões, labels, placeholders, badges, tooltips, empty states, mensagens de erro, nomes de dias/meses. Campos de status/prioridade/tipo vindos do backend em inglês devem ser traduzidos via mapa (Utils.translate() ou equivalente). Revisão manual após cada geração de UI.
 - **SEM Chart.js, SEM CDN** — gráficos em CSS puro (divs com width percentual, `@keyframes slideIn`)
 - **SEM pizza/donut/rosca** — só barras horizontais
 - **Texto CONCISO** — descrições de uma frase no máximo
@@ -476,4 +493,5 @@ agy doctor           # → "All checks passed" (requires auth)
 
 | Data | Autor | Mudança |
 |------|-------|---------|
-| 2026-06-19 | Hermes (Sergipetec Etapa 4) | Adicionado pitfall sobre prompt grande travando agy via expansão de shell. Solução: fatiar em esqueleto primeiro (~800B), conteúdo depois (~4.7KB). Padrão validado: gerar skeleton HTML+CSS com agy, depois editar o mesmo arquivo com segundo agy para preencher conteúdo. |
+| 2026-07-09 | Hermes (Delfos F4) | Adicionado workflow 8 (Humanizing Design Docs) com `--add-dir` para passar skills como contexto. Referência `humanize-design-docs.md` com padrões de prompt, file sync, e verificação pós-edição. |
+| 2026-07-10 | Hermes (Delfos F4b hotfix) | Adicionado pitfall de verificação CSS após edições JS multi-file. Adicionado user preference "100% PT-BR na interface" — zero inglês visível. Atualizada descrição de file I/O (agy lê E escreve). |

@@ -33,7 +33,7 @@ Este bloco codifica o estilo de trabalho das pessoas que usam este pipeline.
 
 ### Preferências técnicas
 - **Responsividade mobile é requisito, não opcional:** HTML sem responsivo testado = não entregue.
-- **Pi Agent em background:** Pi com MiniMax M3 gera output silencioso por minutos. Monitorar via `ls -la` nos arquivos de saída, não via stdout.
+- **Pi Agent em background:** Pi com DeepSeek V4 Pro gera output silencioso por minutos. Monitorar via `ls -la` nos arquivos de saída, não via stdout.
 - **Pre-flight check antes de cada fase:** Usuário não quer gastar tokens debugando permissão.
 
 ### Preferências de documento
@@ -68,7 +68,7 @@ Este bloco codifica o estilo de trabalho das pessoas que usam este pipeline.
 
 ```
 CARO/ESCASSO     agy --- Consultor externo especialista (design, UX, estrategia)
-ESCASSO          Pi best -- Eng. senior interno (MiniMax M3 via Go)
+ESCASSO          Pi best -- Eng. senior interno (DeepSeek V4 Pro via Go)
 BARATO/ABUNDANTE Pi cost -- Dev junior (DeepSeek V4 Flash Free)
 GRATUITO         Pi cost -- Free tier Zen
 ```
@@ -94,12 +94,12 @@ Ver skill pi-agent-coordination para detalhes completos.
 
 #### Pi Best (planejamento, design, docs complexos)
 
-Priorizar MiniMax M3 via Go:
+Priorizar DeepSeek V4 Pro via Go:
 
 | Opção | Provider | Model ID | Custo | Notas |
 |-------|----------|----------|-------|-------|
-| **Pi best** | `opencode-go` | `minimax-m3` | $10/mês, cota semanal $30 | Preferido. Chave ativa |
-| **Fallback 1 (via Go)** | `opencode-go` | `deepseek-v4-pro` | Cota semanal $30 | Mesmo provider, modelo diferente |
+| **Pi best** | `opencode-go` | `deepseek-v4-pro` | Cota semanal $30 | Preferido. Chave ativa |
+| **Fallback 1 (via Go)** | `opencode-go` | `minimax-m3` | Cota semanal $30 | Mesmo provider, modelo diferente |
 | **Fallback 2 (API direta)** | `deepseek` | `deepseek-v4-pro` | $0.14/M input, $0.42/M output | Último recurso |
 
 #### Pi Cost (execução de code-tasks, fixes, docs)
@@ -118,7 +118,7 @@ pi -p "echo test" --provider opencode-go --model deepseek-v4-flash
 pi -p "echo test" --provider deepseek --model deepseek-v4-flash
 
 # Pi Best
-pi -p "echo test" --provider opencode-go --model minimax-m3
+pi -p "echo test" --provider opencode-go --model deepseek-v4-pro
 ```
 
 ---
@@ -232,7 +232,7 @@ Se qualquer check falhar, **corrigir antes de prosseguir** — não invocar Pi a
    Inclua <!-- PHASE_COMPLETE: ideation --> ao final.
    PROMPT
 
-   pi --name "PROJETO-ideation" -p "$(cat prompts/pi-ideation.md)" --provider opencode-go --model minimax-m3
+   pi --name "PROJETO-ideation" -p "$(cat prompts/pi-ideation.md)" --provider opencode-go --model deepseek-v4-pro
    ```
 
 3. **Pi carrega `ideation-drilling`** e faz sequência longa de perguntas:
@@ -339,6 +339,11 @@ não aceitar timeout por parâmetro, assegure que:
 > (ver `skill_view(name='product-pipeline', file_path='references/subagent-session-recovery.md')`),
 > mas o conteúdo mais valioso está nos relatórios produzidos pela pesquisa direta.
 
+> 📊 **Pesquisa de mercado / GTM:** Para pesquisas de go-to-market, cursos online, edtech ou 
+> benchmarks de conversão, ver `skill_view(name='product-pipeline', file_path='references/market-gtm-research-sources.md')` 
+> — contém recomendações de fontes, padrão de rate-limit do web_search, e lista de URLs verificadas 
+> com dados persistentes (Jul 2026).
+
 ### Fluxo
 
 1. Criar subpasta:
@@ -414,7 +419,7 @@ product/research/
    [contexto completo com path dos arquivos, skills a carregar, docs a produzir]
    PROMPT
 
-   pi --name "PROJETO-pm" -p "$(cat prompts/pi-pm-docs.md)" --provider opencode-go --model minimax-m3
+   pi --name "PROJETO-pm" -p "$(cat prompts/pi-pm-docs.md)" --provider opencode-go --model deepseek-v4-pro
    ```
 
 3. **Monitorar progresso — verificar arquivos de saída, NÃO o stdout do processo:**
@@ -423,7 +428,7 @@ product/research/
    ls -la /opt/data/code/workstation/PROJETO/product/management/*.md
    # Ou polling periódico com process(action='poll')
    ```
-   Pi com MiniMax M3 leva ~4-5 min por documento e não streama stdout intermediário.
+   Pi com DeepSeek V4 Pro leva ~4-5 min por documento e não streama stdout intermediário.
    Não matar o processo achando que travou — verificar os arquivos primeiro.
 
 4. Pi carrega skills instaladas e elabora:
@@ -723,11 +728,62 @@ product/design/
    - Hermes verifica e commita
    - Avança para o próximo layer (continua mesma sessão Pi com `-c`)
 
-5. **Build final — Pi modelo best faz revisão final**
+> ⚠️ **CRÍTICO — Frontend layers DEVEM ler design HTMLs como contexto visual:**
+> Quando o lote incluir frontend (Layer 3-4), o prompt do Pi **DEVE instruí-lo a ler**
+> os arquivos de design diretamente do disco antes de escrever código — não basta
+> copiar tokens hex no prompt. Incluir no prompt do Pi:
+> ```
+> Before writing any frontend code, read these files for visual context:
+> - `cat product/design/design-system.html` — design system renderizado (glassmorphism, cores reais, spacing)
+> - `cat index.html` (ou `product/design/prototype.html`) — protótipo de alta fidelidade com layout aprovado
+> - `cat product/design/design-system.md` — tokens, tipografia, componentes
+> Use the EXACT same CSS custom properties (--bg-primary, --accent-gold, etc.), spacing, and glassmorphism.
+> Do NOT invent new tokens or deviate from the visual design system.
+> ```
+> Após o Pi finalizar, auditar a sessão JSONL para confirmar que os arquivos foram lidos
+> (ver `pi-session-audit` e referência abaixo).
 
-6. **Antigravity revisa código e testes**
+5. **Antigravity revisa código e testes → produz `review-report.md`**
 
-7. Feedbacks trocados via `product/engineering/feedbacks.md`
+   ```bash
+   ssh oracle-host 'cd /home/ubuntu/selfhost/shared/code/workstation/PROJETO && cat /tmp/prompt.md | /home/ubuntu/.local/bin/agy --print "$(cat /tmp/prompt.md)"'
+   ```
+   agy escreve o relatório em `product/engineering/review-report.md`.
+
+6. **Pi modelo best implementa correções baseado na revisão do agy**
+
+   Após agy gerar o `review-report.md`, Pi best (não Hermes) deve implementar as correções:
+
+   ```bash
+   pi --name "PROJETO-fixes" -p "$(cat prompts/pi-fixes.md)" --provider opencode-go --model deepseek-v4-pro
+   ```
+
+   O prompt do Pi best DEVE incluir:
+   - `cat product/engineering/review-report.md` — issues encontradas
+   - `cat product/design/design-system.html` — contexto visual do design system
+   - `cat product/design/design-system.md` — tokens e especificações
+   - `cat index.html` — protótipo aprovado
+
+   ⚠️ **Não fazer os fixes manualmente no Hermes.** O Pi best precisa ver o contexto visual dos HTMLs de design para acertar cores, glassmorphism, tipografia e layout. Fixes manuais sem o contexto visual produzem código funcional mas com drift visual.
+
+8. **Verificação pós-Pi — auditar sessão JSONL para confirmar acesso aos design files:**
+   ```bash
+   python3 -c "
+   import json, glob
+   session_dir = sorted(glob.glob('/opt/data/home/.pi/agent/sessions/--*delfos*--/*.jsonl'))[-1]
+   text = open(session_dir).read()
+   for kw in ['design-system.html', 'prototype.html', 'index.html']:
+       if kw in text:
+           # Check if it was a READ (cat/read_file) not just ls output
+           for line in text.split(chr(10)):
+               if kw in line and ('cat ' in line.lower() or 'read_file' in line.lower()):
+                   print(f'✅ DESIGN FILE READ: {kw}')
+                   break
+           else:
+               print(f'⚠️  DESIGN FILE MENTIONED but NOT READ (likely ls output): {kw}')
+   "
+   ```
+   Se os arquivos de design não foram lidos (apenas mencionados em `ls`), **recriar o prompt explicitamente instruindo o Pi a ler os HTMLs** antes de gerar frontend. Não aceitar tokens copiados — o Pi precisa ver o layout renderizado.
 
 8. Quando código e testes forem aprovados → avançar para **4d. Docker Build & Deploy**
 
@@ -831,21 +887,63 @@ A Oracle Cloud Application Firewall só expõe as portas 80 e 443. Usar Nginx Pr
 0. **Dogfood QA** — teste exploratório sistemático
 1. **Hermes coleta evidências** via browser (7 screenshots padrão)
 2. **Entrega prints ao usuário** via MEDIA
-3. **Salva prompt do agy** como `.md` em `product/engineering/dogfood/prompt-para-antigravity.md`
-4. **Invocar agy via tmux interativo** (não `agy -p`)
+3. **Salva prompt do agy** como `.md` em `product/engineering/dogfood/prompt-para-antigravity.md`\
+   (Se o diretório não puder ser criado por permissão, salvar em `prompts/` e referenciar de lá)
+4. **Invocar agy via SSH com `--print`** (ou tmux interativo para prompts longos)
 5. **Verificar o veredito** no `feedbacks.md`
 6. Se aprovado → Deploy
 7. Se rejeitado → Loop de correção
 
 > **Hermes NÃO diagnóstica bugs.** Apenas coleta evidência. A análise é do Antigravity.
+>
+> **Na prática, agy também corrige rotas frontend-backend durante a validação final.**
 
-#### Decisão final
+### Decisão final
 
 | Resultado | Próximo passo |
 |-----------|---------------|
-| **APROVADO** | MVP concluído. Avançar para F5 |
-| **REJEITADO** | Loop de correção (Pi best → rebuild → re-valida) |
+| **APROVADO** | MVP concluído. Avançar para F5 ou **deploy frontend separado** (ex: Vercel) |
 
+#### Deploy Frontend Separado (Vercel / Netlify)
+
+Quando o frontend SPA é hospedado separadamente do backend (ex: Vercel + Oracle host):
+
+1. **Criar `frontend/js/config.js`** com `API_BASE` apontando para o backend público:
+   ```js
+   const API_BASE = 'http://<IP_PUBLICO>:<PORTA>/api/v1';
+   ```
+
+2. **Incluir `<script src="js/config.js"></script>` antes dos outros scripts no `<head>`** — config.js deve ser o primeiro script (api.js, auth.js, app.js dependem de `API_BASE`).
+
+3. **Atualizar `api.js` e `auth.js`** para usar `API_BASE` de `config.js` em vez de prefixo relativo:
+   - `api.js`: `credentials: 'include'` (não `'same-origin'`)
+   - `auth.js`: `fetch(\`${API_BASE}/auth/login\`)` em vez de `fetch('/api/v1/auth/login')`
+
+4. **Atualizar CORS no backend** para incluir o domínio do Vercel na lista de origins.
+
+4. **Criar `vercel.json`** no projeto raiz:
+   ```json
+   {
+     \"version\": 2,
+     \"buildCommand\": null,
+     \"outputDirectory\": \".\",
+     \"rewrites\": [
+       { \"source\": \"/(.*)\", \"destination\": \"/index.html\" }
+     ]
+   }
+   ```
+
+5. **Deploy prebuilt** (confiável, evita cache de conteúdo antigo):
+   ```bash
+   vercel build --prod --yes
+   vercel deploy --prebuilt --prod --yes
+   ```
+
+6. **Verificar** com `curl -s -o /dev/null -w \"%{http_code}\" https://<projeto>.vercel.app/`
+
+> **Pitfall:** API QA via `execute_code()` não alcança containers no Oracle host via localhost. Usar `ssh oracle-host` + curl diretamente.
+
+---
 ---
 
 ## Fase 5: Iteração e Melhoria
@@ -919,7 +1017,7 @@ Itens a verificar:
 
 ⚠️ **Stitch MCP — usar HTTP direto, não stdio proxy** — A API key funciona no header `X-Goog-Api-Key` quando usada via HTTP MCP direto (`url:` + `headers:`). O `@_davideast/stitch-mcp` package tem um subcomando `tool` que NÃO funciona com API key. Usar `transport: http` com headers no config do Hermes. Ver `skill_view(name='product-pipeline', file_path='references/google-stitch-mcp.md')`.
 
-⚠️ **Pi best não streama stdout intermediário** — Com MiniMax M3, Pi pode levar 4-5 min por documento sem produzir stdout. Monitorar pelos arquivos de saída, não pelo output do processo. Usar `terminal(background=true)` + `ls -la` periódico.
+⚠️ **Pi best não streama stdout intermediário** — Com DeepSeek V4 Pro, Pi pode levar alguns minutos por documento sem produzir stdout. Monitorar pelos arquivos de saída, não pelo output do processo. Usar `terminal(background=true)` + `ls -la` periódico.
 
 ⚠️ **Pi PATH pode não estar definido** — Pi está em `/opt/data/pi-global/bin/pi`. Se `which pi` falhar, exportar PATH ou usar caminho absoluto.
 
@@ -927,7 +1025,37 @@ Itens a verificar:
 
 ⚠️ **Pi parece travado mas output já está completo** — Verificar arquivos no shared volume antes de matar.
 
-⚠️ **Async Pi execution** — Executar em background, monitorar via shared volume, não via SSH.
+⚠️ **Pi cost frontend sem contexto visual dos design HTMLs** — O prompt pode ter os tokens hex copiados, mas Pi NÃO vê o layout renderizado (glassmorphism, posicionamento, protótipo). Isso produz frontend com tokens corretos mas layout genérico. **Sempre incluir `cat design-system.html` e `cat index.html` (protótipo) no prompt do Pi cost** quando o layer for frontend. Verificar pós-execução com auditoria de sessão (passo 8 do F4b).
+
+⚠️ **Prompt file ausente mata Pi silenciosamente** — Se o prompt file não existe (ex: `cat prompts/pi-layer6-polish.md`), Pi morre imediatamente com exit code 1. Verificar `ls prompts/` antes de invocar. Se um layer não tem prompt, criar antes de disparar Pi.
+
+⚠️ **agy SSH: prompt file deve ser copiado para o host** — agy roda no Oracle host, não no container Hermes. O prompt file precisa ser copiado via `cat prompts/file.md | ssh oracle-host 'cat > /tmp/file.md'` antes de invocar. Referenciar com `agy --print "$(cat /tmp/file.md)"` no host. Não é possível ler arquivos do container diretamente do host via agy.
+
+⚠️ **Seed script requer tabelas criadas** — `app/seed.py` assume que as tabelas existem (SELECT antes de INSERT). No container com PostgreSQL, as tabelas são criadas por Alembic. Para testar localmente com SQLite, primeiro criar tabelas: `Base.metadata.create_all(engine)` antes de rodar seed. Seed é idempotente — segunda execução mostra ⏭️ para todas as entradas.
+
+⚠️ **Dockerfile: permissão 600 no host vira arquivo de 0 bytes na imagem** — Quando um arquivo tem permissão `-rw-------` (600) e o dono é o usuário do container (hermes, uid 10000), o Docker daemon não consegue ler o conteúdo durante COPY, resultando em arquivo de 0 bytes na imagem. **Solução:** `chmod 644` em todos os novos arquivos antes de `docker compose build`.
+
+⚠️ **Alembic env.py não deve substituir asyncpg por psycopg2** — O env.py gerado pode conter `configuration["sqlalchemy.url"].replace("postgresql+asyncpg://", "postgresql+psycopg2://")`. `psycopg2` não está instalado na imagem slim. Remover a substituição — `async_engine_from_config()` funciona com asyncpg para DDL. Se migrations não existirem, gerar com `alembic revision --autogenerate -m "initial_schema"` dentro do container.
+
+⚠️ **Portas ocupadas no host Oracle** — Portas comuns (5432, 8000, 80, 8080, 6379) podem estar ocupadas por outros projetos. Verificar com `ss -tlnp | grep -E ":{port} "`. Para db, usar `expose:` em vez de `ports:`. Para backend, usar `expose:` e deixar nginx como única porta externa. Escolher porta alternativa (>8080) e atualizar CORS origins.
+
+⚠️ **Verificação de leitura de design files pelo Pi — auditoria JSONL** — Após Pi gerar frontend, verificar se ele realmente leu os arquivos de design ou só os mencionou em `ls`. Técnica:
+```python
+import json, glob
+for sf in sorted(glob.glob(os.path.expanduser('~/.pi/agent/sessions/--*projeto*--/*.jsonl')))[-5:]:
+    text = open(sf).read()
+    for kw in ['design-system.html', 'index.html']:
+        if kw in text:
+            found = any(kw in line and ('cat ' in line.lower() or 'read_file' in line.lower()) for line in text.split(chr(10)))
+            print(f'  {"✅" if found else "⚠️"} {kw}: {"lido" if found else "mencionado mas não lido"}')
+```
+Se não foram lidos, recriar o prompt instruindo explicitamente `cat product/design/design-system.html` antes de escrever frontend.
+
+⚠️ **Frontend pode usar endpoints que não existem no backend** — Pi cost gera frontend e backend separadamente, e o frontend pode referenciar rotas que o backend não implementou (ex: `/actions` em vez de `/tasks`). Verificar todas as URLs no frontend JS contra os routers registrados em main.py. Padrão: `api.get('/actions')` → `api.get('/tasks')`, `api.patch('/actions/${id}')` → `api.patch('/tasks/${id}')`.
+
+⚠️ **Dashboard/Weekly/Timeline routes não existem por padrão** — Pi cost gera apenas CRUD básico (tasks, projects, contexts, auth, search). Endpoints agregados **não são criados** a menos que o prompt os peça explicitamente. Incluir seção de rotas agregadas obrigatórias no prompt.
+
+⚠️ **CORS + credentials + wildcard é inválido** — `allow_origins=["*"] + allow_credentials=True` é rejeitado por navegadores. Usar `allow_origins=settings.CORS_ORIGINS` com lista explícita.
 
 ⚠️ **Commit + tag ANTES de invocar Pi para fixes** — Criar checkpoint antes de Pi modificar código.
 
@@ -941,7 +1069,9 @@ Itens a verificar:
 
 ⚠️ **v4-flash para docs de engenharia** — Suficiente. v4-pro reservado para decisões arquiteturais.
 
-⚠️ **`agy -p` stallou em Docker commands** — Usar tmux interativo.
+⚠️ **API QA via execute_code não alcança containers Docker** — `execute_code()` roda dentro do container Hermes e não consegue alcançar containers no Oracle host via localhost. Para API QA, usar `ssh oracle-host` + curl diretamente no terminal, ou apontar para o IP do gateway Docker (`172.19.0.1`).
+
+⚠️ **`agy -p` stallou em Docker commands**
 
 ⚠️ **`agy design` NÃO valida código existente** — Gera novo design hipotético. Usar browser tools.
 
@@ -961,7 +1091,7 @@ Itens a verificar:
 
 ⚠️ **Pi skills não existem por padrão** — Instalar manualmente.
 
-⚠️ **MiniMax M3 free encerrado** — Usar `opencode-go/minimax-m3`.
+⚠️ **MiniMax M3 free encerrado** — Usar `opencode-go/deepseek-v4-pro`.
 
 ⚠️ **DeepSeek v4-Pro timeout** — Usar v4-flash ou `/compact preserve:context`.
 
@@ -980,6 +1110,10 @@ Itens a verificar:
 ⚠️ **Pi best overshoot em conftest** — Não aceitar mudança no `event_loop` sem testar.
 
 ⚠️ **Prompt files no shared volume** — UID mismatch bloqueia leitura do Pi.
+
+⚠️ **web_search rate-limit por sessão** — Primeiras 1-2 chamadas paralelas de `web_search` funcionam, mas chamadas subsequentes na mesma sessão retornam `{"data": {"web": []}}`. Isso NÃO é "backend quebrado" — é exaustão de cota por sessão. **Workaround:** front-load TODAS as queries críticas na primeira chamada paralela (até 5 queries em um batch). Se queries subsequentes falharem, ir direto para `web_extract` em URLs de alta autoridade conhecidas. Não retentar `web_search` com phrasing diferente — não vai recuperar. Ver `references/market-gtm-research-sources.md`.
+
+⚠️ **Blogs de plataformas edtech reestruturados** — Thinkific, Kajabi, LearnWorlds, Teachfloor, Mighty Networks e similares reestruturaram blogs em 2024-2025. URLs de artigos 2022-2024 retornam 404 generalizado. Para pesquisa de mercado de cursos/edtech, usar sites de research/CRO (acceleroi.com, firstpagesage.com, digitalapplied.com) e market research firms (gminsights.com) — essas fontes têm dados de benchmark persistentes. Ver `references/market-gtm-research-sources.md`.
 
 ⚠️ **bcrypt pin** — `bcrypt==4.0.1` no Dockerfile.
 

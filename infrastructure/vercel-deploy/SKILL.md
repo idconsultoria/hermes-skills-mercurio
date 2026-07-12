@@ -7,7 +7,7 @@ version: 1.0.0
 author: Hermes Agent
 tags: [vercel, deploy, static-site, frontend, hosting, jamstack]
 type: ToolIntegration
-timestamp: 2026-06-28T05:11:55Z
+timestamp: 2026-07-10T02:00:00Z
 ---
 
 # Vercel Deploy — Skill
@@ -384,7 +384,7 @@ When a project is created under a team/org account, Vercel enables SSO Protectio
 ```bash
 PROJECT_ID="prj_xxxx"
 TEAM_ID="team_xxxx"
-TOKEN="$(python3 -c "import json; print(json.load(open('/opt/data/home/.local/share/com.vercel.cli/auth.json'))['token'])")"
+TOKEN="$(python3 -c "import json; print(json.load(open('/opt/data/home/.local/share/com.vercel.cli/auth.json'))['token'])")\"
 
 curl -s -X PATCH "https://api.vercel.com/v9/projects/$PROJECT_ID?teamId=$TEAM_ID" \
   -H "Authorization: Bearer $TOKEN" \
@@ -508,13 +508,172 @@ The `name` property in vercel.json is deprecated
 
 **Fix:** Remove the `"name"` key from `vercel.json`. Project name is managed via `vercel project rename` or at initial deploy time.
 
+### Pitfall: Deploy stays BLOCKED with no error — wrong login account
+
+**Symptom:** `vercel deploy --prod --yes` succeeds with "Building..." but the deployment never becomes READY. API shows `state=BLOCKED`, `readyState=BLOCKED`, `errorCode=null`, `aliasAssigned=false`. No error message in CLI output. The project's SSO protection shows `null` when checked via API.
+
+**Root cause:** The Vercel CLI is authenticated with an email that is NOT a member of the team the project belongs to. When the user logs in with email A (e.g., personal account), but the project/team belongs to email B (e.g., work account), the deploy API accepts the request but the Vercel platform blocks the deployment from ever becoming READY — silently. There's no CLI error, no email notification to the wrong-email user (the notification goes to the team owner), and the only symptom is `state=BLOCKED` in the API response.
+
+**Diagnosis:**
+
+```bash
+# Check deployment state
+curl -s "https://api.vercel.com/v13/deployments/$DEPLOYMENT_UID?teamId=$TEAM_ID" \
+  -H "Authorization: Bearer $TOKEN" | python3 -c "import sys, json; d=json.load(sys.stdin); print('state:', d.get('state'), 'readyState:', d.get('readyState'), 'errorCode:', d.get('errorCode'))"
+```
+
+If `state=BLOCKED` with no error code, suspect account mismatch.
+
+**Fix:** Switch to the correct Vercel account:
+
+```bash
+# 1. Find where Vercel stored credentials
+ls -la ~/.vercel/auth.json   # Common location
+ls -la ~/.local/share/com.vercel.cli/auth.json  # Alternative location
+
+# 2. Check which account is logged in
+vercel whoami
+
+# 3. Remove credentials
+rm -f ~/.vercel/auth.json ~/.local/share/com.vercel.cli/auth.json
+
+# 4. Re-login with the CORRECT email
+vercel login --no-color
+# -> Send user the device URL: https://vercel.com/oauth/device?user_code=XXXX-XXXX
+# -> User MUST log in with the email that is a member of the target team
+
+# 5. Redeploy
+vercel deploy --prod --yes
+```
+
+**Prevention:** Before starting a deploy, verify auth:
+```bash
+vercel whoami  # Shows current email
+```
+
+If the email doesn't match the expected team member, clean and re-login.
+
+**Tip — locate auth token for API calls:**
+
+The Vercel CLI stores credentials in `~/.local/share/com.vercel.cli/auth.json` on some Linux setups, not `~/.vercel/auth.json`. Always check both:
+
+```bash
+cat ~/.vercel/auth.json 2>/dev/null || cat ~/.local/share/com.vercel.cli/auth.json 2>/dev/null
+```
+
 ### Pitfall: Auth token location varies
 
 The Vercel CLI stores auth credentials at `~/.local/share/com.vercel.cli/auth.json` on some Linux setups (not `~/.vercel/auth.json` as sometimes documented). When automating API calls, locate the token dynamically:
 
 ```bash
-TOKEN="$(python3 -c "import json; print(json.load(open('/opt/data/home/.local/share/com.vercel.cli/auth.json'))['token'])")"
+TOKEN="$(python3 -c "import json; print(json.load(open('/opt/data/home/.local/share/com.vercel.cli/auth.json'))['token'])")\"
 ```
+
+### Pitfall: NPM custom config directory must exist before writing
+
+When adding a custom `location` directive into Nginx Proxy Manager's container at `/data/nginx/custom/server_proxy.conf`, the parent directory may not exist on a fresh or restarted container.
+
+**Symptom:** `docker exec ... sh -c 'cat > /data/nginx/custom/server_proxy.conf'` fails with: `cannot create /data/nginx/custom/server_proxy.conf: Directory nonexistent`.
+
+**Fix:** Create the directory first:
+
+```bash
+docker exec nginx_proxy_manager mkdir -p /data/nginx/custom
+```
+
+Always write custom configs via base64 to avoid shell escaping issues with nginx `$variables`:
+
+```bash
+CONFIG_B64="$(printf '%s' 'location /delfos/ {
+    proxy_pass http://backend-nginx:80/;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}' | base64 -w0)"
+echo "$CONFIG_B64" | base64 -d | docker exec -i nginx_proxy_manager sh -c 'cat > /data/nginx/custom/server_proxy.conf'
+```
+
+**Verify** the file after writing — shell heredocs inside `docker exec` often expand `$host`, `$remote_addr`, etc. to empty strings:
+
+```bash
+docker exec nginx_proxy_manager cat /data/nginx/custom/server_proxy.conf
+# If Host: line ends with empty value, re-write using the base64 method above
+```
+
+### Pitfall: Multi-line CSP header causes 502 from openresty
+
+**Symptom:** Proxied requests return `502 Bad Gateway` from openresty. NPM error log shows:
+```
+upstream sent invalid header: "\x20..." while reading response header from upstream
+```
+
+**Root cause:** The backend nginx sends a `Content-Security-Policy` header with a multi-line value (HTTP folded header). Nginx Proxy Manager uses openresty, which rejects folded headers as invalid. The `\x20` is a space at the start of a continuation line.
+
+**Fix:** Collapse the CSP to a single line:
+
+```nginx
+# Broken - multi-line (triggers 502)
+add_header Content-Security-Policy "
+    default-src 'self';
+    script-src 'self';
+" always;
+
+# Fixed - single-line
+add_header Content-Security-Policy "default-src 'self'; script-src 'self';" always;
+```
+
+After fixing, reload or restart the affected container.
+
+### Pitfall: Docker network isolation blocks NPM custom location upstream
+
+When a custom `location` proxies to a container in a different Docker Compose project (different network), NPM cannot resolve the target hostname:
+
+```
+nginx: [emerg] host not found in upstream "container-name" in /data/nginx/custom/server_proxy.conf
+```
+
+**Fix:** Connect the NPM container to the target container's network:
+
+```bash
+# Find the target network
+docker network ls | grep <project-name>
+
+# Connect NPM to it (enables Docker DNS resolution)
+docker network connect <project_network> nginx_proxy_manager
+
+# Alternative: use the container's static IP
+docker inspect <container-name> --format '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+```
+
+Always restart NPM after network changes:
+
+```bash
+docker restart nginx_proxy_manager
+```
+
+### Pitfall: Vercel deploy only uploads vercel.json when project files sit in a subdirectory
+
+**Symptom:** After deploying from within a subdirectory (e.g., `cd frontend && vercel --prod --yes`), the upload only shows a few hundred bytes even though the static files are several KB. The deployed site serves stale content or throws 404 on assets.
+
+**Root cause:** Vercel CLI uses the current working directory as the project root. When deploying from a subdirectory that contains only `vercel.json`, only that file is uploaded. The actual source files (html, js, css) are outside the deploy root and never reach Vercel's build system.
+
+**Fix:** Either:
+1. Deploy from the project root (where all files live), not from the subdirectory:
+   ```bash
+   cd /project/root
+   vercel build --prod --yes
+   vercel deploy --prebuilt --prod --yes
+   ```
+2. Or set `outputDirectory` in `vercel.json` to point to the subdirectory when deploying from the root:
+   ```json
+   {
+     "outputDirectory": "frontend",
+     "rewrites": [...]
+   }
+   ```
+   BUT verify the build output includes all files by checking `.vercel/output/static/` after running `vercel build`.
 
 ---
 
@@ -524,45 +683,46 @@ TOKEN="$(python3 -c "import json; print(json.load(open('/opt/data/home/.local/sh
 - `references/custom-domain-alias-pitfall.md` — explains why manually-assigned aliases survive --prod deploys and how to reassign them.
 - `references/interactive-frontend-pitfalls.md` — debugging guide for Lenis smooth scroll + GSAP ScrollTrigger + Three.js integration issues. Covers `height: 100%` scroll lock, ScrollTrigger animation interference, and refresh timing. Consult when building interactive 3D/animation sites for Vercel.
 - `references/threejs-invisible-scene-debugging.md` — diagnosing Three.js scenes that render correctly (triangles drawn, no errors) but appear invisible. Covers fog density masking, ShaderMaterial GLSL version mismatch in WebGL2, canvas-CSS background contrast, GLTFLoader MeshPhysicalMaterial envMap, and pixel-reading diagnostic workflow.
+- `references/spa-remote-backend.md` — SPA on Vercel + backend on remote host (CORS, config.js, credentials mode, API QA via SSH).
 
 ## Quick Reference
 
 ```bash
-# ── Install ──
+# -- Install --
 npm config set prefix /opt/data/.npm-global
 npm install -g vercel
 export PATH="/opt/data/.npm-global/bin:$PATH"
 
-# ── Login (first time) ──
+# -- Login (first time) --
 vercel login --no-color
-# → Send user the https://vercel.com/oauth/device?user_code=XXXX-XXXX URL
+# -> Send user the https://vercel.com/oauth/device?user_code=XXXX-XXXX URL
 
-# ── Deploy (reliable prebuilt flow) ──
+# -- Deploy (reliable prebuilt flow) --
 cd /path/to/project
 vercel build --prod --yes          # Generate .vercel/output/
 vercel deploy --prebuilt --prod --yes  # Deploy prebuilt output
 
-# ── Verify ──
+# -- Verify --
 curl -s -o /dev/null -w "%{http_code}" https://<project>.vercel.app/
 
-# ── Custom domain ──
+# -- Custom domain --
 vercel domains add mydomain.com
 
-# ── Unattended deploy ──
+# -- Unattended deploy --
 VERCEL_TOKEN=*** vercel build --prod --yes && vercel deploy --prebuilt --prod --yes
 
-# ── Analytics (enable once per project) ──
+# -- Analytics (enable once per project) --
 vercel project web-analytics <project-name>
 
-# ── Analytics dashboard ──
+# -- Analytics dashboard --
 # https://vercel.com/<team>/<project-name>/analytics
 # Metrics: Visitors, Page Views, Countries, Referrers, Devices
 # Hobby limits: 1M events/month, 30-day retention, no custom events
 
-# ── Static HTML analytics snippet (inject before </body>) ──
+# -- Static HTML analytics snippet (inject before </body>) --
 # <script>window.va = window.va || function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 # <script defer src="/_vercel/insights/script.js"></script>
 
-# ── Clean up auth ──
+# -- Clean up auth --
 rm -f ~/.vercel/auth.json
 ```
