@@ -373,6 +373,9 @@ Load this skill when you need to test a web application for issues. Covers syste
 Load this skill when starting a new unit or redesigning an existing one from standards. Maps desired outcomes through assessment evidence to learning activities. Based on Wiggins & McTighe's Understanding by Design framework.
 
 **Relações:**
+- `similar` → `education/scope-and-sequence-designer`
+- `similar` → `education/competency-framework-translator`
+- `similar` → `software-development/pipeline-educacional`
 
 
 ### Competency Framework Translator
@@ -387,6 +390,9 @@ Load this skill when starting a new unit or redesigning an existing one from sta
 Load this skill when implementing framework standards in specific teaching contexts. Maps external competency frameworks like DigComp, GreenComp, or ISTE to classroom-ready activities with clear learning objectives and assessment criteria.
 
 **Relações:**
+- `similar` → `education/backwards-design-unit-planner`
+- `similar` → `education/curriculum-knowledge-architecture-designer`
+- `similar` → `software-development/pipeline-educacional`
 
 
 ### Curriculum Knowledge Architecture Designer
@@ -401,6 +407,9 @@ Load this skill when implementing framework standards in specific teaching conte
 Load this skill when designing courses, restructuring programmes, or analysing knowledge architecture. Distinguishes vertical vs horizontal knowledge structures, conceptual vs contextual coherence, and cumulative vs segmented learning using Bernstein, Maton, and Muller frameworks.
 
 **Relações:**
+- `similar` → `education/scope-and-sequence-designer`
+- `similar` → `education/competency-framework-translator`
+- `similar` → `software-development/pipeline-educacional`
 
 
 ### Leverage and Response Design
@@ -415,6 +424,8 @@ Load this skill when designing courses, restructuring programmes, or analysing k
 Load this skill when you have a systems analysis and need to design an intervention. Maps proposed actions against Meadows' 12 leverage points, checks for unintended consequences, generates alternatives, and identifies feedback loops that could undermine the intervention.
 
 **Relações:**
+- `similar` → `education/mental-model-mapper`
+- `similar` → `education/scope-and-sequence-designer`
 
 
 ### Mental Model Mapper
@@ -429,6 +440,8 @@ Load this skill when you have a systems analysis and need to design an intervent
 Load this skill when deeper mental models need examining with care and evidence. Elicits espoused theories vs theories-in-use, identifies paradigms as deep leverage points, and maps cultural mental models using Senge, Argyris & Schon, and Meadows frameworks.
 
 **Relações:**
+- `similar` → `education/leverage-and-response-design`
+- `similar` → `education/scope-and-sequence-designer`
 
 
 ### Scope and Sequence Designer
@@ -443,6 +456,9 @@ Load this skill when deeper mental models need examining with care and evidence.
 Load this skill when building new programmes, restructuring subjects, or ensuring progression. Shows vertical coherence (spiral curriculum, Bruner) and horizontal coherence (knowledge structures, Bernstein) across a programme or year, using Hattie's high-effect curriculum coherence variable.
 
 **Relações:**
+- `similar` → `education/backwards-design-unit-planner`
+- `similar` → `education/curriculum-knowledge-architecture-designer`
+- `similar` → `education/leverage-and-response-design`
 
 ## Github
 
@@ -509,6 +525,9 @@ Load this skill when the user wants Ares (War God persona) as a fitness coach. C
 Carregue esta skill quando precisar gerar o grafico padrao de progresso de peso do Projeto Ares. Renderiza PNG via matplotlib com paleta cardinal/crimson sobre fundo off-white, proporcao 10x5.5, linha de tendencia, linha de meta e eixo Y a partir de 70 kg. Usa venv dedicado em /opt/data/.venv-chart/.
 
 **Relações:**
+- `similar` → `health/ares-fitness-coach`
+- `similar` → `health-fitness/body-recomposition`
+- `uses` → `health-fitness/body-recomposition`
 
 ## Health & Fitness
 
@@ -623,6 +642,9 @@ Deploy static sites and frontend apps to Vercel — from zero to production. Cov
 Load this skill when deploying a built application to production: verifying DB migrations ran, diagnosing container startup failures, checking Nginx/NPM routing, or handling a domain that stopped resolving. Covers the gray zone between CI completing and the site being live — the step most pipelines leave unscripted.
 
 **Relações:**
+- `similar` → `infrastructure/deployment-pipeline`
+- `similar` → `infrastructure/vercel-deploy`
+- `uses` → `infrastructure/oracle-host-access`
 
 ## Media
 
@@ -685,6 +707,9 @@ Load this skill instead of web search when you need authoritative community rati
 Load this skill when the user wants to download an arXiv paper, convert its LaTeX source to EPUB, and deliver it to a Kindle device. Handles the full pipeline: arXiv source download, Pandoc conversion, post-processing for tabularx->HTML table conversion, precise figure extraction from the PDF, EPUB rebuild, and Gmail API delivery.
 
 **Relações:**
+- `similar` → `media/kindle-articles`
+- `similar` → `media/kindle-manga`
+- `uses` → `productivity/google-workspace`
 
 ### Kindle Articles — Text Content to EPUB3
 
@@ -698,6 +723,9 @@ Load this skill when the user wants to download an arXiv paper, convert its LaTe
 Load this skill when putting research papers, long-form articles, blog posts, or any text-heavy documents on a Kindle. Covers markdown parsing, EPUB3 assembly, TOC generation, and delivery.
 
 **Relações:**
+- `similar` → `media/arxiv-latex-to-kindle`
+- `similar` → `media/kindle-manga`
+- `uses` → `productivity/google-workspace`
 
 ## Productivity
 
@@ -968,6 +996,9 @@ Structured user/proxy interview protocol for product research — plan, frame, l
 Load this skill when conducting market research for Brazilian/LATAM markets where web research tools face comprehensive blocking. Produces structured reports covering buyer personas, customer journeys, expectations hierarchies, purchasing behavior, and retention/fidelization. Pivots to domain-knowledge synthesis with transparent caveats when web tools fail.
 
 **Relações:**
+- `similar` → `research/deep-research`
+- `similar` → `research/user-interview`
+- `similar` → `software-development/ideation-drilling`
 
 ## Social Media
 
@@ -1241,6 +1272,11 @@ Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, 
 Carregue esta skill quando for projetar um curso, treinamento, bootcamp ou jornada de aprendizado. Cobre a pipeline completa do design instrucional: analise de publico, definicao de objetivos, design de conteudo, producao, lancamento e iteracao continua. Base de referencia em IA e design instrucional (ADDIE, Backward Design, SAM, Kirkpatrick).
 
 **Relações:**
+- `similar` → `autonomous-ai-agents/product-pipeline`
+- `parent` → `education/backwards-design-unit-planner`
+- `similar` → `education/scope-and-sequence-designer`
+- `uses` → `creative/copywriting`
+- `uses` → `software-development/ideation-drilling`
 
 ### Spike
 
