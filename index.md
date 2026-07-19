@@ -640,6 +640,10 @@ Exponential backoff for Google Gemini API rate limits (HTTP 429). Covers monkey-
 Load this skill when setting up continuous integration on GCP: connecting GitHub repos to Cloud Build, creating push-to-deploy triggers, debugging connection/authentication issues, and wiring builds to Cloud Run jobs.
 
 **Relações:**
+- `similar` → `infrastructure/deployment-pipeline`
+- `similar` → `infrastructure/vercel-deploy`
+- `similar` → `github/github-pr-workflow`
+
 ### Oracle VM — SSH Access from Hermes Container
 
 - **Nome:** `infrastructure/oracle-host-access`
