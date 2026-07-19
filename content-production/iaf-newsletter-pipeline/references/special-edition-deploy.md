@@ -1,5 +1,7 @@
 # Special Edition Deploy — Vercel Archive Site
 
+> 📖 **HTML template reference:** `references/special-edition-template.md` — CSS classes, page structure, cover page anatomy, and WhatsApp companion format.
+
 ## Overview
 
 When a special edition is published, it needs to appear in the IAF newsletter archive site

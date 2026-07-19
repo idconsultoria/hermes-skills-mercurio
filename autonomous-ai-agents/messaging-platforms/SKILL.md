@@ -334,8 +334,11 @@ In self-chat mode the bridge **ignores ALL group messages** — both your own (`
 
 | Entity | JID Format | Example |
 |---|---|---|
-| Individual contact | `number@s.whatsapp.net` | `5511999999999@s.whatsapp.net` |
+| Individual contact (standard) | `number@s.whatsapp.net` | `5511999999999@s.whatsapp.net` |
+| Individual contact (alternate) | `number@c.us` | `5516981959112@c.us` |
 | Group | `group_id@g.us` | `120363XXXXX@g.us` |
+
+> Both `@s.whatsapp.net` and `@c.us` work for individual contacts on the Baileys bridge. `@c.us` was confirmed working 2026-07-16 with file send via `/send-media` to a Brazilian number (+55).
 
 Note: `send_message` cannot resolve group JIDs through the channel directory. Group delivery must go through the bridge API directly.
 
@@ -386,9 +389,9 @@ REGRAS:
 
 Used for: reminder crons, automated broadcasts, scheduled notifications to external groups where the user wants confirmation without contaminating the group feed.
 
-### Sending Media to Groups
+### Sending Media (Groups & Individuals)
 
-The bridge has a `/send-media` endpoint for native file delivery (image, video, document, audio):
+The bridge has a `/send-media` endpoint for native file delivery (image, video, document, audio). Works for both group JIDs (`@g.us`) and individual JIDs (`@s.whatsapp.net` or `@c.us`):
 
 ```bash
 curl -s -X POST http://127.0.0.1:3000/send-media \
@@ -532,6 +535,7 @@ Full methodology, per-platform baselines, and interpretation guide: `references/
 | File | Purpose |
 |------|---------|
 | `references/whatsapp-baileys-bridge.md` | WhatsApp bridge API reference (absorbed from former `whatsapp-bridge-baileys` skill) |
+| `references/baileys-standalone-zapi-replacement.md` | Standalone Baileys REST bridge as Z-API replacement for external projects |
 | `references/telegram-bot-api-file-delivery.md` | Direct Bot API file delivery from TUI (when MEDIA: can't route to Telegram) |
 | `references/json-payload-newlines.md` | JSON newline handling for multi-line text |
 | `references/platform-latency-diagnostics.md` | Per-platform API latency measurement and troubleshooting |

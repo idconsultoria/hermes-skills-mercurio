@@ -1,16 +1,17 @@
 ---
 name: pi-session-audit
-description: "Audit agent sessions — tokens, costs, models from Pi Agent and agy databases
+description: "Audit agent sessions — tokens, costs, models from Pi Agent, agy, and Hermes databases
 
-Load this skill to analyze Pi Agent or agy session logs and calculate costs per provider. Extracts real usage metrics from session files, computes costs based on model pricing, and produces audit reports."
+Load this skill to analyze Pi Agent or agy session logs and calculate costs per provider. For Hermes sessions, extracts real token usage from state.db, computes costs based on model pricing with cache-hit/miss differentiation, and produces audit reports. Works across all three agent runtimes."
 category: autonomous-ai-agents
 metadata:
   hermes:
     related_skills: [autonomous-ai-agents/pi-agent-coordination]
 references:
   - agy-protobuf-parsing.md: Field hierarchy and wire-format parser for agy conversation DBs
+  - hermes-state-db-cost.md: Hermes state.db schema, query patterns, cost methodology, and current pricing
 type: ToolIntegration
-timestamp: 2026-06-28T05:11:55Z
+timestamp: 2026-07-16T11:30:00Z
 ---
 
 # Agent Session Audit (Pi + agy)

@@ -7,7 +7,7 @@ version: 2.0.0
 author: coreyhaines31/marketingskills
 metadata:
   hermes:
-    related_skills: [humanizer, brand-iaf-conteudo]
+    related_skills: [humanizer, brand-iaf-conteudo, oferta-hormozi]
 type: Creative
 timestamp: 2026-06-21T05:11:49Z
 ---

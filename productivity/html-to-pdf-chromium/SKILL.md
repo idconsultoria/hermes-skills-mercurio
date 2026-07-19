@@ -1,28 +1,54 @@
 ---
 name: html-to-pdf-chromium
-description: "Convert HTML to high-fidelity PDF using Chromium headless via .deb extraction.
-
-Load this skill when weasyprint or other tools lose CSS features like gradients, webkit-background-clip, grid, and glow effects. Covers Chromium headless installation via Debian .deb extraction without root or Playwright, PDF generation with full CSS support, and common rendering fixes."
-
-Load this skill when weasyprint or other tools lose CSS features like gradients, webkit-background-clip, grid, and glow effects. Covers Chromium headless installation via Debian .deb extraction without root or Playwright, PDF generation with full CSS support, and common rendering fixes."
+description: "Convert HTML to high-fidelity PDF using Chromium headless via .deb extraction. Fallback to WeasyPrint on ARM64 when Chromium binaries are unavailable."
 trigger: User asks to generate PDF from HTML with browser-quality rendering, or when weasyprint output lacks CSS features like -webkit-background-clip or gradients.
 related_skills: [html-report-hermes, iaf-newsletter-pipeline]
 type: Template
-timestamp: 2026-06-19T19:47:50Z
+timestamp: 2026-07-16T22:30:00Z
 ---
 
 # HTML → PDF com Chromium Headless
 
-## Pré-requisitos
+## ⚠️ ARM64 — Leia Antes do Setup
+
+**Chromium para ARM64 é frequentemente indisponível.** Antes de investir tempo no setup abaixo, saiba:
+
+- **Debian `.deb` são rotacionados rapidamente.** `apt-get download chromium` frequentemente retorna 404 — a versão listada no cache do `apt-cache` já foi removida do repositório. Não há garantia de disponibilidade.
+- **Google Chrome for Testing NÃO publica `linux-arm64`.** A API `known-good-versions-with-downloads.json` lista apenas `linux64` (x86_64). Não há build ARM64 para Linux.
+- **Puppeteer/Playwright `install chromium`** no ARM64 tipicamente baixa diretórios vazios (`linux_arm-*/` sem binários) ou instala binários x86_64 que falham com `Exec format error`.
+
+**✅ Fallback: WeasyPrint.** Instale com `uv pip install weasyprint` e gere PDF com:
+
+```bash
+uv run python3 -c "
+import weasyprint
+doc = weasyprint.HTML(filename='/tmp/input.html')
+doc.write_pdf('/tmp/output.pdf')
+"
+```
+
+**Preparação para WeasyPrint:** remova `<link href="fonts.googleapis.com">` do HTML e substitua `font-family` por fontes de sistema (`'DejaVu Sans'`, `'DejaVu Serif'`, `'DejaVu Sans Mono'`).
+
+**Tradeoffs WeasyPrint vs Chromium:**
+
+| Aspecto | Chromium | WeasyPrint |
+|---------|----------|------------|
+| Gradientes CSS, glow | ✅ | ❌ Perdidos |
+| `-webkit-background-clip: text` | ✅ | ❌ Ignorado |
+| Tamanho típico PDF | 500-700 KB | 100-150 KB |
+| Disponibilidade ARM64 | ❌ Binários frequentemente offline | ✅ Sempre funciona |
+
+## Pré-requisitos (Chromium — tente, mas use o fallback se falhar)
 
 Chromium headless compilado para o Debian 13 (trixie) arm64, extraído dos pacotes `.deb` oficiais. Não precisa de root, nem de Playwright, nem de Puppeteer.
-
-## Setup (uma vez)
+## Setup (se os .deb estiverem disponíveis — tente, mas use WeasyPrint se falhar)
 
 ```bash
 # 1. Baixar os pacotes .deb
 cd /tmp
 apt-get download chromium chromium-common
+# ⚠️ Se falhar com 404: os pacotes foram removidos do repositório.
+# Use o fallback WeasyPrint. Não perca tempo caçando versões alternativas.
 
 # 2. Extrair para uma pasta local
 mkdir -p /tmp/chromium-extracted
@@ -86,6 +112,8 @@ ls -lh "$OUTPUT"
 
 ## Pitfalls
 
+- **Debian `.deb` 404 — pacote removido do repositório.** `apt-cache show chromium` lista versões, mas `apt-get download` retorna 404. Isso acontece porque os pacotes são rotacionados rapidamente no repositório Debian. **Não insista.** Use o fallback WeasyPrint documentado no topo desta skill.
+- **Chrome for Testing sem `linux-arm64`.** Se tentar baixar via `@puppeteer/browsers`, vai receber diretório vazio. O Google não publica builds ARM64 para Linux.
 - **libXNVCtrl.so.0 not found:** Chromium precisa da lib `libxnvctrl0` (NVIDIA control). Já incluída no `apt-get download` do setup, mas se estiver reutilizando uma extração antiga, baixe e extraia separadamente. Verifique todas as faltas com `ldd /caminho/chromium 2>&1 | grep "not found"`.
 - **DBus errors:** `Failed to connect to the bus` — normais em servidor sem desktop, ignorar
 - **glibc mismatch:** builds oficiais do Google exigem glibc >= 2.42. Usar SEMPRE o pacote Debian (compilado pro glibc 2.41 da máquina)

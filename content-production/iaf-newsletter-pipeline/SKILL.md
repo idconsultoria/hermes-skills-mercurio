@@ -204,6 +204,8 @@ Only runs later because these newsletters update around 7h local time.
    - `.community-grid` / `.community-item` / `.community-sentiment.sentiment-hot|mixed|negative` (comunidade)
    - `.app-card` / `.app-header` / `.app-source` / `.app-title` / `.app-desc` / `.app-benefit` (aplicação prática)
    - `.footer` / `.footer-left` / `.footer-center` / `.footer-right`
+   - `.promo-teaser` / `.promo-card` / `.promo-card-label` / `.promo-card-title` / `.promo-card-desc` / `.promo-card-features` / `.promo-card-feature` / `.promo-card-link` (anúncio fixo Jornada de IA — ver seção Anúncio Fixo abaixo)
+   - `.promo-teaser` / `.promo-card` / `.promo-card-label` / `.promo-card-title` / `.promo-card-desc` / `.promo-card-features` / `.promo-card-feature` / `.promo-card-link` / `.feat-dot` (anúncio fixo Jornada de IA — **NÃO REMOVER**, ver seção Anúncio Fixo abaixo)
    - NÃO invente classes. NUNCA use `footer-note`, `radar-item`, `radar-source`, `aplicacao-box` ou outras classes fora do template.
    ⚠️ **Quantidade de itens por seção:**
    - Radar: mínimo **10 itens** (ver edições anteriores: 11-14)
@@ -514,6 +516,8 @@ Formato aprovado (exemplo real da edição de 28/06):
 
 🎯 *Aplicação prática de hoje*
 [1-2 linhas, imperativo, acionável hoje, sem enrolação]
+
+🎓 *Jornada de IA:* idconsultoria.ai/jornada-ia
 ```
 
 ### Especificações exatas:
@@ -567,6 +571,81 @@ O link da edição web é a PRIMEIRA informação de conteúdo que o leitor vê,
 - Um espaçamento entre seções (linha em branco), não mais
 - O formato é para Telegram (Markdown). *texto* vira itálico, *texto* com asterisco duplo vira negrito.
 
+## Anúncio Fixo — Jornada de IA (Template)
+
+> 📖 **CSS + HTML completos em:** `references/jornada-ia-anuncio.md`
+
+Bloco de anúncio persistente da Jornada de IA da ID Consultoria (idconsultoria.ai/jornada-ia). Inserido **no template** (`/opt/data/references/iaf_v3_reference.html`) e **nunca removido** pelo agente durante a geração.
+
+### Posição no HTML
+
+| Elemento | Posição | Âncora |
+|----------|---------|--------|
+| **Teaser** (`.promo-teaser`) | Entre o `</header>` e o `<!-- HOT TAKE -->` | `href="#anuncio-jornada"` — clica e rola até o card |
+| **Card** (`.promo-card`) | Entre o `</section>` da Análise e o `<!-- RADAR -->` | `id="anuncio-jornada"` — destino da âncora |
+
+```html
+<!-- Estrutura resumida — ver referência para HTML/CSS completo -->
+<a href="#anuncio-jornada" class="promo-teaser">...</a>   <!-- antes do Editorial -->
+<section class="section" id="anuncio-jornada">            <!-- entre Análise e Radar -->
+  <div class="promo-card">...</div>
+</section>
+```
+
+### Regras
+
+- ⚠️ **NÃO REMOVER.** O bloco tem comentário `<!-- ⚠️ ANÚNCIO FIXO — NÃO REMOVER -->`. Se aparecer no template, mantenha no HTML final exatamente como está.
+- As classes `.promo-teaser` e `.promo-card*` usam cores âmbar/dourado (`--accent-amber`) para se diferenciar visualmente do teal editorial.
+- O CSS deve ser incluído no `<style>` de toda edição gerada. Ver referência para o bloco completo.
+- O teaser e o card são **estáticos** — não altere o texto, preços ou link. A copy só muda quando o usuário solicitar explicitamente.
+
+### Conteúdo do card
+
+- **Label:** "Jornada de IA · ID Consultoria"
+- **Título:** "Do zero ao agente autônomo em 3 cursos práticos"
+- **Descrição:** Lives semanais + comunidade + zero assinatura + inscrições abertas
+- **Features:** C1 R$597, C2 R$1.497, C3 R$2.497, 30 dias de garantia
+- **Link:** `https://idconsultoria.ai/jornada-ia`
+
+### Preview
+
+Exemplo funcional em `/opt/data/cron/history/iaf_2026-07-17_preview_anuncio.html`.
+
+## Anúncio Fixo — Jornada de IA · ID Consultoria
+
+> ⚠️⚠️⚠️ **REGRA ABSOLUTA — O ANÚNCIO NÃO PODE SER REMOVIDO.**
+
+O template `/opt/data/references/iaf_v3_reference.html` contém dois blocos de anúncio da Jornada de IA que **devem ser preservados exatamente como estão** em toda edição gerada:
+
+### Elementos no template
+
+| Elemento | Posição | Classes |
+|----------|---------|---------|
+| **Teaser** | Após `</header>`, antes do `<!-- HOT TAKE -->` | `.promo-teaser` |
+| **Card** | Após `</section>` da Análise, antes do `<!-- RADAR -->` | `.promo-card`, `.promo-card-label`, `.promo-card-title`, `.promo-card-desc`, `.promo-card-features`, `.promo-card-feature`, `.feat-dot`, `.promo-card-link` |
+
+### Comportamento esperado
+
+- O teaser tem `href="#anuncio-jornada"` — ao clicar, rola a página até o card (que tem `id="anuncio-jornada"`)
+- Ambos os blocos têm comentário `<!-- ⚠️ ANÚNCIO FIXO — NÃO REMOVER -->`
+- **NÃO altere o texto, preços ou link.** A copy é fixa: C1 R$597, C2 R$1.497, C3 R$2.497, garantia 30 dias, link `https://idconsultoria.ai/jornada-ia`
+- O CSS das classes `.promo-teaser` e `.promo-card*` já está no template — **não o remova do `<style>`**
+- Cores: âmbar/dourado (`--accent-amber`) para diferenciar do teal editorial
+
+### Preview
+
+Arquivo de referência: `/opt/data/cron/history/iaf_2026-07-17_preview_anuncio.html`
+
+### Na mensagem WhatsApp
+
+Adicione **1 linha extra** após a Aplicação Prática:
+
+```
+🎓 *Jornada de IA:* idconsultoria.ai/jornada-ia
+```
+
+Esta linha é fixa e deve ser incluída em toda mensagem de entrega (Telegram e WhatsApp).
+
 ## Content Rules
 
 > 📖 **Leia também:** `references/news-verification-pitfalls.md` — guia completo para verificar datas de publicação e evitar notícias desatualizadas ou duplicadas.
@@ -580,6 +659,7 @@ O link da edição web é a PRIMEIRA informação de conteúdo que o leitor vê,
 - **14-day context window** for deduplication
 - **Aplicação Prática: must be broadly accessible.** Não pode ser nichado para devs/engenheiros — exemplos que qualquer leitor possa usar no dia a dia (análise de documentos, simulação de conversas, roteiro de apresentações). Se o conteúdo for técnico demais, troque. ✨ *Exemplo bom: "5 perguntas para fazer ao Fable 5 hoje" — qualquer pessoa testa. Exemplo ruim: "Proteja seu pipeline de supply chain" — só dev entende.*
 - 📖 **Leia também:** `references/editorial-writing-guide.md` — guia de estrutura, tom e verificação de fontes para o editorial (hot-take). Consulte sempre ao redigir o editorial, especialmente para conferir a tese e os padrões de tom.
+- 📖 **Leia também:** `references/special-edition-template.md` — template HTML completo para edições especiais: CSS, estrutura de páginas, anatomia da capa, e formato WhatsApp. Use ao criar edições extraordinárias sobre lançamentos de modelos ou eventos regulatórios.
 - **Quando um tópico teve edição especial dedicada:** limite a cobertura a **1 artigo** na edição regular, apontando para o link da edição especial. O link deve ser o URL de produção (`https://iaf-newsletter.vercel.app/especial-{slug}`), não o caminho local.
 
 ## Filter Rules — AI-Only Content

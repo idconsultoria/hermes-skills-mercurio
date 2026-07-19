@@ -16,6 +16,9 @@ ou debugar pipelines que orquestram múltiplas chamadas a APIs externas.
 **Support files:**
 - `references/google-api-pitfalls.md` — error transcripts + reproduction recipes
 - `references/backoff-monkey-patch.md` — monkey-patch pattern + Gemini free tier limits
+- `references/supabase-management-api.md` — remote SQL via Management REST API
+- `references/erp-sync-pattern.md` — GraphQL → JSON → Supabase batch pipeline architecture
+- `references/supabase-dashboard-optimization.md` — materialized views + Edge Functions for fast dashboards
 
 ## 1. Exponential Backoff (padrão do repositório)
 
@@ -144,3 +147,27 @@ tem 15 RPM — usar `xargs -P 5` com o backoff ativo é seguro.
 printf '%s\n' PROC-001 PROC-002 ... | xargs -P 5 -I {} \
   sh -c 'python3 run_one.py "{}" && echo "OK: {}" || echo "FAIL: {}"'
 ```
+
+## 7. Supabase Remote Operations
+
+Quando o Supabase CLI não está disponível, use a Management REST API para SQL
+e inspeção de schema. Veja `references/supabase-management-api.md`.
+
+**Quick pattern:**
+```bash
+# Verificar tabelas existentes
+curl -s -X POST 'https://api.supabase.com/v1/projects/{REF}/database/query' \
+  -H "Authorization: Bearer {TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "SELECT table_name FROM information_schema.tables WHERE table_schema='\''public'\'';"}'
+```
+
+## 8. ERP Sync Architecture (GraphQL → JSON → Supabase)
+
+Padrão extraído do projeto ATLAS Ravello. Veja `references/erp-sync-pattern.md`.
+
+**Arquitetura:**
+- **Coleta:** API GraphQL paginada (500 registros/página, 400ms entre páginas)
+- **Enriquecimento:** Regras de negócio aplicadas no ETL (não no browser)
+- **Persistência dual:** JSON local (dev/fallback) + Supabase upsert (produção)
+- **Resiliência:** 5 retries com backoff exponencial, rate limiting entre páginas

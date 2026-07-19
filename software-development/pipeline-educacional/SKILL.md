@@ -3,7 +3,7 @@ name: pipeline-educacional
 description: "Pipeline de produto educacional — da concepção pedagógica ao lançamento.
 
 Carregue esta skill quando for projetar um curso, treinamento, bootcamp ou jornada de aprendizado. Cobre a pipeline completa do design instrucional: análise de público, definição de objetivos, design de conteúdo, produção, lançamento e iteração contínua. Base de referência em IA e design instrucional (ADDIE, Backward Design, SAM, Kirkpatrick)."
-version: 2.0.2
+version: 2.2.0
 author: Gustavo Mello (via Hermes)
 tags: [educação, curso, treinamento, pipeline, produto-educacional, design-instrucional]
 related_skills: [copywriting, ideation-drilling, product-pipeline, backwards-design-unit-planner, scope-and-sequence-designer, curriculum-knowledge-architecture-designer, competency-framework-translator, leverage-and-response-design, mental-model-mapper]
@@ -27,6 +27,9 @@ Este bloco codifica preferências de estilo de trabalho de quem usa este pipelin
 - **Zero anglicismos:** Usar equivalente em português sempre que possível. Exceção: nomes próprios de ferramentas e plataformas.
 - **Documentos enxutos:** Sem poluição de fontes inline. Sem metadados de pesquisa no corpo.
 - **Entregar arquivos, não descrições:** Salvar em disco e referenciar o path.
+- **Conteúdo inline quando solicitado:** Se o usuário pedir "mande no chat" / "quero ver aqui", entregar o conteúdo COMPLETO formatado inline na conversa. Não enviar só um path de arquivo — ele quer ler ali mesmo.
+- **Pacing controlado pelo usuário:** Só avançar de fase com aprovação explícita. Se perguntar "quais os próximos passos" / "onde paramos", só responder — não executar. Usuário não quer que o agente tome iniciativa entre etapas.
+- **"Só diga, não execute":** Quando o usuário pedir status, próximos passos, ou resumo do estado atual, responder com informação apenas. Não tomar ação não solicitada.
 
 ### Substituições obrigatórias (PT-BR)
 
@@ -51,6 +54,7 @@ Este pipeline integra 4 frameworks de design instrucional. Nenhum é obrigatóri
 > **Referência expandida:** `references/design-instrucional-benchmarks.md` — dados completos de benchmarks, frameworks e criadores de curso.
 > **Ecossistema de skills:** `references/external-skills-ecosystem.md` — como buscar e instalar skills de Claude Code, OpenCode, Codex.
 > **Entrega cross-platform:** `references/cross-platform-delivery.md` — padrão de entrega de arquivos do TUI para canais de mensageria.
+> **Especificação de site:** `references/especificacao-site-exemplo.md` — exemplo completo de especificação de site para produto educacional (Jornada de IA, 3 cursos, venda direta).
 
 ### ADDIE — Estrutura completa (1975, Florida State University)
 
@@ -412,16 +416,50 @@ Estrutura de copy:
 
 #### 5.4 Fluxo de Matrícula
 
+Dois modelos possíveis. Escolha conforme o ticket médio e a estrutura da equipe:
+
+**Modelo A — Checkout automatizado (tickets até ~R$1.000)**
 ```
 Aluno → página de vendas → CTA → checkout/pagamento → confirmação → acesso ao conteúdo
 ```
+
+**Modelo B — Venda direta via cadastro (tickets acima de R$1.000 ou venda consultiva)**
+```
+Visitante → página → formulário de cadastro → equipe contata em até 24h → acerta pagamento → libera acesso
+```
+
+> Ver exemplo completo em `references/especificacao-site-exemplo.md`.
+
+#### 5.5 Especificação de Site para Designer/Dev
+
+Quando o site é produzido por um designer/desenvolvedor (e não apenas uma página de vendas), crie um **documento de especificação de conteúdo** que cubra:
+
+**Conteúdo obrigatório do documento:**
+- Visão geral do produto: propósito, tom de voz, preços, formato, diferenciais
+- Estrutura de navegação e hierarquia da página
+- Cada seção com texto completo especificado (headline, subheadline, corpo, CTAs)
+- Formulário de cadastro: campos, validações, fluxo pós-envio, stack sugerida
+- User flow diagramado (visitante → cadastro → confirmação)
+- FAQ com perguntas reais e respostas completas
+- Observações técnicas: SEO, analytics, acessibilidade, variações de estado (pré-venda, carrinho aberto, turma lotada)
+- Tabela de conteúdo pronto vs. pendente (para o designer saber o que está finalizado)
+
+**Quando fazer site spec vs. apenas sales page:**
+| Cenário | Formato |
+|---|---|
+| Curso único, ticket baixo-médio | Sales page (pagina-vendas.md) |
+| Múltiplos cursos (escadinha), ticket alto, designer externo | Site spec completo (site/especificacao-site.md) |
+| Site com várias páginas, blog, área de membros | Site spec + arquitetura de informação |
+
+**Regra:** Se o site vai ser construído por outra pessoa (designer/dev externo), o documento de especificação é obrigatório. Nunca entregue descrições vagas — cada seção deve ter o texto final escrito.
 
 ### Saída
 ```
 produto/lancamento/
 ├── cronograma-turmas.md
 ├── precificacao.md
-└── pagina-vendas.md
+├── pagina-vendas.md          # Copy de conversão (curso único ou site simples)
+└── site.md                   # Especificação completa para designer/dev (múltiplos cursos, site completo)
 ```
 
 ### Marcador
@@ -596,6 +634,10 @@ Skills do ecossistema `education-agent-skills` (GarethManning, CC BY-SA 4.0) ins
 ⚠️ **Comunidade sem moderação morre.** Designar alguém para puxar discussões, responder dúvidas, manter o espaço vivo.
 
 ⚠️ **Garantia de reembolso é sinal de confiança, não de fraqueza.** Write of Passage (David Perell) oferece 14 dias sem perguntas. Isso AUMENTA conversão.
+
+⚠️ **Página de vendas não substitui especificação de site.** Quando um designer/dev vai construir o site, entregar apenas uma "página de vendas" é insuficiente. Crie um documento de especificação completo com: texto de cada seção, campos de formulário, user flow, observações técnicas e tabela de conteúdo pendente. Ver exemplo em `references/especificacao-site-exemplo.md`.
+
+⚠️ **Venda direta via cadastro não é o mesmo que checkout automatizado.** No modelo de venda direta (indicado para tickets >R$1.000), o formulário substitui o checkout. A equipe entra em contato para finalizar. Isso muda o fluxo de matrícula, o onboarding e a expectativa do aluno. Documente qual modelo está sendo usado — não misture os dois.
 
 ⚠️ **Busque skills em todo o ecossistema de agentes, não só no hub Hermes.** Skills compatíveis com o padrão Agent Skills 1.0 existem em repositórios de Claude Code, OpenCode, Codex e Cursor. Antes de criar uma skill, pesquise na web com `"agent-skills" <domínio> github` e `"SKILL.md" <domínio>`. Ex: `education-agent-skills` (GarethManning, 395★) tem 165 skills pedagógicas compatíveis com Hermes, encontrado via ecossistema Claude Code.
 

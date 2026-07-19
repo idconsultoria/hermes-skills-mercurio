@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 77 skills*
+*Total: 82 skills*
 
 ---
 
@@ -115,12 +115,12 @@ Load this skill for running Pi Coder Agent (v0.78.1) as a local npm binary — n
 
 - **Nome:** `autonomous-ai-agents/pi-session-audit`
 - **Arquivo:** `autonomous-ai-agents/pi-session-audit/SKILL.md`
-- **Tamanho:** 20,673 chars
-- **Resumo:** Audit agent sessions — tokens, costs, models from Pi Agent and agy databases
+- **Tamanho:** 20,878 chars
+- **Resumo:** Audit agent sessions — tokens, costs, models from Pi Agent, agy, and Hermes databases
 - **Type:** ToolIntegration
-- **Timestamp:** 2026-06-28T05:11:55Z
+- **Timestamp:** 2026-07-16T11:30:00Z
 
-Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl) and agy (protobuf SQLite DBs). Load this skill to analyze Pi Agent session logs and calculate costs per provider. Extracts real usage metrics from session JSONL files, computes costs based on model pricing, and produces audit reports for tracking agent usage and spending.
+Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl), agy (protobuf SQLite DBs), and Hermes (state.db). Load this skill to analyze Pi Agent or agy session logs and calculate costs per provider. For Hermes sessions, extracts real token usage from state.db, computes costs based on model pricing with cache-hit/miss differentiation, and produces audit reports. Works across all three agent runtimes.
 
 **Relações:**
 - `used_by` → `autonomous-ai-agents/pi-agent-coordination`
@@ -128,6 +128,19 @@ Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl) and agy (p
 - `similar` → `autonomous-ai-agents/autonomous-ai-agents`
 - `similar` → `productivity/relatorio-de-custos`
 
+### Hermes Diagnostics
+
+- **Nome:** `autonomous-ai-agents/hermes-diagnostics`
+- **Arquivo:** `autonomous-ai-agents/hermes-diagnostics/SKILL.md`
+- **Tamanho:** 15,595 chars
+- **Resumo:** Systematic methodology for diagnosing Hermes Agent behavioral issues — session resets, context loss, compression failures
+- **Type:** Research
+- **Timestamp:** 2026-07-15T08:00:00Z
+
+Load this skill when the user reports Hermes misbehaving: conversations resetting mid-turn, context being lost, sessions ending abruptly, repeated model fallbacks, or provider errors. Covers the full diagnostic pipeline: config analysis (compression, auxiliary models, session_reset settings), gateway log inspection (fallback patterns, compression events, error signatures), state.db SQLite analysis (session lifecycle, end_reasons, compression_failures, session_key chains), compressor source-code review, provider chain analysis, and causal-chain synthesis into a concrete remediation plan.
+
+**Relações:**
+- `similar` → `autonomous-ai-agents/hermes-agent`
 ### Product Development Pipeline
 
 - **Nome:** `autonomous-ai-agents/product-pipeline`
@@ -339,6 +352,23 @@ Load this skill when you need to apply professional UI/UX design fundamentals to
 **Relações:**
 - `similar` → `creative/style-guide-consultation`
 - `similar` → `creative/popular-web-designs`
+
+## Copywriting
+
+### Oferta Irresistível (Hormozi) — Landing Pages
+
+- **Nome:** `copywriting/oferta-hormozi`
+- **Arquivo:** `copywriting/oferta-hormozi/SKILL.md`
+- **Tamanho:** 12,090 chars
+- **Resumo:** Framework de Oferta Irresistível (Alex Hormozi) para landing pages de cursos e infoprodutos
+- **Type:** Creative
+- **Timestamp:** 2026-07-15T00:00:00Z
+
+Carregue esta skill quando for escrever ou revisar uma landing page, página de vendas, seção de preços ou estrutura de oferta para cursos e infoprodutos. Aplica a Value Equation, o MAGIC headline framework, e os princípios de Grand Slam Offer para transformar copy de features em copy de transformação. pt-BR, zero anglicismos.
+
+**Relações:**
+- `similar` → `creative/copywriting`
+
 
 ## Dogfood
 
@@ -554,7 +584,7 @@ Load this skill when tracking body recomposition metrics — weight, body fat, a
 
 - **Nome:** `infrastructure/data-pipeline-patterns`
 - **Arquivo:** `infrastructure/data-pipeline-patterns/SKILL.md`
-- **Tamanho:** 5,373 chars
+- **Tamanho:** 6,648 chars
 - **Resumo:** Reliability patterns for batch data pipelines — exponential backoff, API safeguards, cell-size truncation, and parallel execution guardrails
 - **Type:** Reference
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -598,6 +628,18 @@ Exponential backoff for Google Gemini API rate limits (HTTP 429). Covers monkey-
 - `similar` → `infrastructure/data-pipeline-patterns`
 - `used_by` → `software-development/dedalo-squad`
 
+### GCP Cloud Build — CI/CD Automation
+
+- **Nome:** `infrastructure/gcp-cloud-build`
+- **Arquivo:** `infrastructure/gcp-cloud-build/SKILL.md`
+- **Tamanho:** 6,166 chars
+- **Resumo:** GCP Cloud Build CI/CD setup — GitHub triggers, connections, Docker builds, troubleshooting
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-07-17T00:00:00Z
+
+Load this skill when setting up continuous integration on GCP: connecting GitHub repos to Cloud Build, creating push-to-deploy triggers, debugging connection/authentication issues, and wiring builds to Cloud Run jobs.
+
+**Relações:**
 ### Oracle VM — SSH Access from Hermes Container
 
 - **Nome:** `infrastructure/oracle-host-access`
@@ -646,6 +688,20 @@ Load this skill when deploying a built application to production: verifying DB m
 - `similar` → `infrastructure/vercel-deploy`
 - `uses` → `infrastructure/oracle-host-access`
 
+### WhatsApp via Baileys — Python Integration
+
+- **Nome:** `infrastructure/whatsapp-baileys-integration`
+- **Arquivo:** `infrastructure/whatsapp-baileys-integration/SKILL.md`
+- **Tamanho:** 16,630 chars
+- **Resumo:** Integrate WhatsApp messaging into Python pipelines via Baileys — lifecycle, QR auth, REST bridge, multi-number
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-07-17T00:00:00Z
+
+Load this skill when you need to send WhatsApp messages from Python without paid APIs. Covers full lifecycle management (spawn, QR auth, session persistence, health checks, graceful shutdown), REST bridge with Z-API compatible interface for file/media delivery, and multi-number architecture. Replaces paid Z-API with local WhatsApp Web.
+
+**Relações:**
+- `similar` → `messaging/whatsapp-automation`
+- `similar` → `autonomous-ai-agents/messaging-platforms`
 ## Media
 
 ### HyperFrames Video Production
@@ -767,12 +823,12 @@ Render research reports as dark-themed HTML with SVG charts and Tufte-inspired t
 
 - **Nome:** `productivity/html-to-pdf-chromium`
 - **Arquivo:** `productivity/html-to-pdf-chromium/SKILL.md`
-- **Tamanho:** 6,661 chars
-- **Resumo:** Convert HTML to high-fidelity PDF using Chromium headless via .deb extraction
+- **Tamanho:** 8,436 chars
+- **Resumo:** Convert HTML to high-fidelity PDF using Chromium headless via .deb extraction. Fallback to WeasyPrint on ARM64
 - **Type:** Template
-- **Timestamp:** 2026-06-19T19:47:50Z
+- **Timestamp:** 2026-07-16T22:30:00Z
 
-Convert HTML files to high-fidelity PDF using Chromium headless (via Debian .deb extraction, no root or Playwright required). Use when weasyprint or other tools lose CSS features like gradients, webkit-background-clip, grid, and glow effects.
+Convert HTML to high-fidelity PDF using Chromium headless via .deb extraction. Fallback to WeasyPrint on ARM64 when Chromium binaries are unavailable. Covers Chromium headless installation via Debian .deb extraction without root or Playwright, PDF generation with full CSS support, WeasyPrint for ARM64 systems, and common rendering fixes.
 
 **Relações:**
 - `uses` → `productivity/html-report-hermes`
@@ -841,13 +897,30 @@ Load this skill when you want to browse, install, or switch animated mascot pets
 **Relações:**
 - `similar` → `autonomous-ai-agents/hermes-agent`
 
+## Messaging
+
+### WhatsApp Automation (Baileys)
+
+- **Nome:** `messaging/whatsapp-automation`
+- **Arquivo:** `messaging/whatsapp-automation/SKILL.md`
+- **Tamanho:** 5,416 chars
+- **Resumo:** Automate WhatsApp messaging from Python projects — Baileys bridge, Z-API migration, multi-assessor patterns
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-07-16T00:00:00Z
+
+Load this skill when your Python project needs to send WhatsApp messages (text, PDFs, documents) without paying for third-party APIs. Covers Baileys Node.js bridge setup, Z-API compatible REST interface, QR authentication workflow, and multi-number multi-assessor patterns.
+
+**Relações:**
+- `similar` → `infrastructure/whatsapp-baileys-integration`
+
+
 ## Read Reddit
 
 ### Read Reddit via RSS
 
 - **Nome:** `read-reddit`
 - **Arquivo:** `read-reddit/SKILL.md`
-- **Tamanho:** 7,445 chars
+- **Tamanho:** 11,231 chars
 - **Resumo:** Read Reddit subreddits via RSS feeds — bypasses API rate limits and bot detection
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1247,7 +1320,7 @@ Load this skill after making code changes that need cleanup. Three parallel agen
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 43,850 chars
+- **Tamanho:** 48,419 chars
 - **Resumo:** Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1264,7 +1337,7 @@ Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, 
 
 - **Nome:** `software-development/pipeline-educacional`
 - **Arquivo:** `software-development/pipeline-educacional/SKILL.md`
-- **Tamanho:** 24,010 chars
+- **Tamanho:** 28,936 chars
 - **Resumo:** Pipeline de produto educacional — da concepcao pedagogica ao lancamento.
 - **Type:** Orchestrator
 - **Timestamp:** 2026-07-12T00:00:00Z

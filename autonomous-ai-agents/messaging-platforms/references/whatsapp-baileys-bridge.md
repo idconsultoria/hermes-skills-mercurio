@@ -173,6 +173,12 @@ Group IDs are opaque — always verify name before sending. Contact JIDs follow 
 
 ## Pitfalls
 
+⚠️ **Baileys v6: `printQRInTerminal` is deprecated.** Use the `connection.update` event to capture the `qr` field, then render with the `qrcode` npm package (`QRCode.toDataURL()` for PNG, `QRCode.toString()` for ASCII). The old option is silently ignored — no error, just no QR output. See `references/baileys-standalone-zapi-replacement.md` for a complete working example.
+
+⚠️ **Datacenter IPs are blocked by WhatsApp Web.** Oracle Cloud, AWS, GCP, and similar hosting IPs are often blocked at the WebSocket level. The bridge may generate QR codes successfully (authentication handshake works) but the subsequent WebSocket connection fails with `Connection Failure` / `connection errored`. This is not a Baileys bug — it's WhatsApp's anti-abuse. Workarounds: (a) run the bridge on a residential IP (home server, Raspberry Pi), (b) use a proxy/VPN with residential exit node, (c) fall back to a paid API (Z-API, Evolution API) for cloud deployments. Always test connectivity from the target host before committing to Baileys for production.
+
+⚠️ **QR code timeout.** Baileys v6 QR codes expire after ~60 seconds. The bridge has a `qrTimeout` option (default 60s in `makeWASocket`). After timeout, a new QR is generated on reconnect. For headless deployments, expose QR via a REST endpoint (`GET /qr`) so it can be fetched and displayed remotely.
+
 ⚠️ **ID errado de grupo é o erro mais comum.** Sempre confirme o nome ANTES de enviar. Um grupo pode ser ativo nos logs mas não ser o grupo alvo.
 
 ⚠️ **`curl /send` retorna `success: true` mesmo se a mensagem não chegar.** O `sendMessage` da baileys confirma o recebimento pelo servidor do WhatsApp, mas self-chat mode pode silenciar a entrega em grupos. Verificar visualmente.

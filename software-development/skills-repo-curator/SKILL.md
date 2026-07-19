@@ -499,7 +499,7 @@ for root, dirs, files in os.walk('.'):
 
 ⚠️ **Offload em cron não funciona com skip_memory=true.** Cron jobs têm `skip_memory=true` por padrão — a seção `MEMORY` não é injetada no prompt do agente. O tool `memory` não tem action `list`. O agente não consegue ver quais entradas existem para decidir o que remover. **Soluções:** (a) incluir as entradas da memória explicitamente no prompt do cron job, ou (b) pular o offload em cron e executar manualmente quando necessário.
 
-⚠️ **Ciclo pode morrer no meio e deixar working directory sujo.** O cron job tem timeout — se o ciclo não completa, SKILL.md ficam modificados mas sem commit, index.md desatualizado, log.md sem entrada. **Recuperação:** **Recuperação:**
+⚠️ **Ciclo pode morrer no meio e deixar working directory sujo.** O cron job tem timeout — se o ciclo não completa, SKILL.md ficam modificados mas sem commit, index.md desatualizado, log.md sem entrada. **Recuperação:**
 
    1. **Diagnóstico** — `cronjob(action='list')` → ver `last_status: error`. O campo `last_error` no `jobs.json` (`/opt/data/cron/jobs.json`) tem a mensagem de erro completa. O output do cron está em `/opt/data/cron/output/<job_id>/<timestamp>.md` — contém o prompt completo + a seção `## Error` com o trace.
    2. **Avaliação** — `git status` + `git diff --stat` mostra quais skills foram tocadas. `git diff <file>` pra ver se as mudanças são válidas ou corrompidas.
@@ -529,6 +529,70 @@ for root, dirs, files in os.walk('.'):
 ```python
 SKILLS_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 ```
+
+⚠️ **`content.replace()` com strings curtas pode aplicar no local ERRADO.** Ao usar `content.replace()` para inserir entries no index.md, strings como nomes de skill (`skills-repo-curator`, `production-deployment`) aparecem em MÚLTIPLOS lugares no arquivo — dentro de relations de outras skills (ex: `- `similar` → `skills-repo-curator``), no Resumo, e no Nome. O replace cai no primeiro match, que pode ser uma relation em outra skill, não o bloco da própria skill.
+
+**Sinais de que o replace caiu no lugar errado:**
+- A skill nomeada fica com Relations vazias após o replace (o replace atingiu a relation em outro lugar, não o Nome)
+- O `###` que deveria estar perto do Relações está a 500+ linhas de distância no diff
+
+**Procedimento correto — sempre buscar pelo campo Nome, não pelo nome puro:**
+```python
+# RUIM — encontra skill name em QUALQUER lugar (relations, descrições):
+content.replace('skills-repo-curator', '...')
+
+# BOM — ancora no campo Nome (único por skill):
+pattern = r'\*\*Nome:\*\* `' + re.escape(nome) + r'`'
+match = re.search(pattern, content)
+# Agora match.start() está exatamente no Nome, não numa relation
+```
+
+**Inspeção pós-replace:** após um `content.replace()` em index.md, SEMPRE verificar:
+```python
+# Contar ocorrências da string alvo — se >1, o replace pode ter acertado o lugar errado
+count = content.count(target_string)
+if count > 1:
+    print(f'WARNING: {target_string} appears {count} times; verify result')
+```
+
+⚠️ **Regex de description: `(?:\s*$|\n\s*\S)` FALHA na captura de multi-linha.** Ao extrair o valor de `description: "..."` do frontmatter YAML com regex, o padrão `r'^description:\s*"(.*?)"(?:\s*$|\n\s*\S)'` frequentemente falha quando a descrição termina perto do final da linha `"` seguida imediatamente por `\n` + novo campo (ex: `"\\ncategory: ...`). O grupo `(?:\s*$|\n\s*\S)` espera ver um caractere não-whitespace após o `\n`, mas a sintaxe YAML coloca `category:` na linha seguinte — o regex captura `\nc` como `\n\S` e fecha a captura cedo demais, truncando a descrição.
+
+**Regex comprovado para description multi-linha:**
+```python
+# FUNCIONA — captura corretamente descrições multi-linha no YAML quoted string
+import re
+with open('SKILL.md') as f:
+    content = f.read()
+m = re.search(r'^description:\s*"(.*?)"\n\w', content, re.DOTALL | re.MULTILINE)
+if m:
+    desc = m.group(1)  # descrição completa entre aspas
+    parts = desc.split('\n\n', 1)
+    summary = parts[0].strip()      # primeira linha (≤85 chars)
+    paragraph = parts[1].strip()    # resto (descrição expandida)
+```
+
+O truque: `\n\w` após a aspa de fechamento — a linha seguinte ao `"...\n` sempre começa com uma letra (`category:`, `type:`, etc.). O `re.DOTALL` faz o `.*?` cruzar quebras de linha, e a ancora `\n\w` fecha a captura exatamente no início do próximo campo YAML.
+
+**NUNCA usar escapes `\\n` no padrão de busca.** O regex opera sobre o texto BRUTO do arquivo, que contém caracteres de nova linha reais, não a representação `\n` literal. Se você escreve `\\n\\n`, está buscando a string literal `backslash-n-backslash-n`, não duas quebras de linha.
+
+⚠️ **Inserção cirúrgica (replace de âncora) vs regeneração total para <15 entries.** A regra do index.md diz "regeneração total quando >30% muda". Mas regenerar perde todas as relações antigas se o script de geração não as preserva fielmente. Para adicionar <15 entries, a inserção cirúrgica com `content.replace()` e âncora única é **mais segura**:
+
+```python
+# Padrão comprovado: achar uma borda de seção próxima e inserir antes/depois
+# Exemplo: inserir nova entrada antes de uma seção ## existente
+anchor = '\n## Target Section\n'
+new_block = '## New Section\n\n### Entry Title\n\n...\n\n'
+content = content.replace(anchor, new_block + anchor)
+
+# Para inserir dentro de uma seção, ancorar no último Nome da seção
+# (mais seguro que ancorar no ## da seção pai)
+last_entry = '\n### Existing Last Entry\n'
+content = content.replace(last_entry, last_entry + new_block)
+```
+
+**Verificação pós-inserção:** `grep -c 'Nome:' index.md` deve ser exatamente o número esperado. Rodar `python3 scripts/generate_graph.py` detecta entradas sem relações (que se tornam nós isolados no grafo) — o que confirma que a inserção criou entradas válidas.
+
+**Quando regenerar é aceitável:** >30% mudanças (30+ entries afetadas), E você já validou que o script de geração preserva todas as relações — testar com um subset primeiro. Caso contrário, prefira inserção cirúrgica.
 
 ⚠️ **Patch fuzzy-matching pode aplicar no local ERRADO quando o texto existe em seções diferentes.** O `patch` tool usa fuzzy matching (9 estratégias). Se o `old_string` aparecer em mais de um lugar no arquivo — mesmo com contexto extra — o match pode cair na seção errada, corrompendo outras partes do documento. Isso é especialmente perigoso quando:
 - Um patch anterior já criou uma cópia duplicada do trecho que você quer editar no local errado

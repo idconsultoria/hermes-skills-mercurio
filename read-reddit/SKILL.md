@@ -52,6 +52,23 @@ Append `?limit=N` or `&limit=N` to control post count (max 100):
 https://www.reddit.com/r/artificial/hot/.rss?limit=10
 ```
 
+### Search within a subreddit
+
+Reddit's built-in search works over RSS too — useful for topic research when `web_search` returns empty or rate-limited. Append query params to constrain results:
+
+```
+https://www.reddit.com/r/{SUBREDDIT}/search/.rss?q={keywords}&sort=new&restrict_sr=on&limit=10
+```
+
+| Param | Value | Notes |
+|-------|-------|-------|
+| `q` | URL-encoded keywords | Use `+` for spaces (e.g. `coding+agent+comparison`) |
+| `sort` | `new`, `relevance`, `top`, `comments` | `new` is great for catching the latest discussion |
+| `restrict_sr` | `on` | Keep results scoped to the subreddit |
+| `t` | `day`, `week`, `month`, `year`, `all` | Time filter (only when `sort=top` or `sort=comments`) |
+
+The feed title will read `"{SUBREDDIT}: search results - {query}"`. The XML structure is identical to standard feeds — same `<entry>` elements, same parsing code. This is the only way to do targeted topic research within a single subreddit via RSS.
+
 ### Multiple subreddits
 
 Reddit supports multi-reddit feeds:
@@ -155,6 +172,7 @@ curl -sL --max-time 10 -A "$UA" "https://www.reddit.com/r/artificial/hot/.rss?li
 ## Reference Files
 
 - `references/iaf-subreddit-config.md` — Categorized subreddit list, per-subreddit sorting strategy, activity notes, and fetch limits for daily AI news curation.
+- `references/community-tool-research-methodology.md` — Multi-source pipeline for community-driven tool research: Reddit RSS → HN Algolia API → web_search blog discovery → web_extract deep content → consensus classification. Use when researching tool recommendations from communities.
 - `scripts/reddit_rss_parser.py` — Standalone Python script with JSON output, argparse, and configurable subreddit groups.
 
 ## Critical: Source URL Requirement
@@ -175,3 +193,10 @@ When using this skill to collect data that will be consumed by a downstream proc
 8. **Old Reddit format** → `old.reddit.com` uses the same block rules. Stick with `www.reddit.com/.../.rss`.
 9. **Host-level blocking** → Some hosts (e.g. Oracle Cloud IPs) are blocked by Reddit's CDN (Fastly/Cloudflare) even with a browser User-Agent. If RSS feeds return "Blocked" HTML, try the JSON API as fallback or switch to an alternative source (Nyaa for manga, Archive.org for ebooks, Google/Bing for general content).
 10. **Link verification** → When using this skill inside a `delegate_task` subagent, the subagent may link to wrong sources if `web_search` returns empty results. Verify key links independently: check that (a) the URL resolves, (b) the URL content matches the story, and (c) version-specific URLs (e.g. Claude Opus 4.8 → not 4.7) point to the exact right page. This is especially important when the RSS content is later used in a newsletter or report.
+11. **Search RSS as web_search fallback** → When `web_search` returns empty for community/research queries (rate limiting, query complexity), skip it and go directly to subreddit RSS search feeds. This is often faster and more targeted — `r/ClaudeAI/search/.rss?q=...` delivers direct community posts with zero intermediary summarization. Combine with `web_extract` on the post URLs for full thread content.
+
+12. **HTTP 429 on specific subreddits** → Some popular subreddits (r/ClaudeAI, r/Midjourney, r/StableDiffusion) aggressively rate-limit even RSS feeds with a valid User-Agent, returning HTTP 429 after just one or two requests. Workarounds in priority order: (a) try `top/.rss?t=year` instead of `hot/.rss` — top feeds are more rate-limit-resistant and often return data when hot returns 429, (b) wait 60s between requests to rate-limited subs, (c) use `web_search` with `site:reddit.com/r/{subreddit}` as a fallback to find relevant threads, (d) stagger subreddit requests across time rather than batching — one subreddit at a time with a delay. Before assuming a subreddit is blocked, always test with `curl -sI --max-time 10 -A "$UA"` to check the HTTP status code — don't rely on parser errors alone since empty XML (from 429 pages or HTML error pages) throws the same `ParseError` as a genuinely empty feed.
+
+13. **search.rss with multi-reddit syntax returns empty** → The `r/sub1+sub2/search.rss` pattern (multi-reddit search) often returns zero `<entry>` elements even though the XML parses successfully. Individual `search.rss` calls per subreddit work fine, but combining them with `+` silently drops results. Multi-reddit syntax works reliably only for the standard feeds (`hot/.rss`, `top/.rss`, `new/.rss`) — not for `search.rss`. For cross-subreddit queries, use `web_search` with `site:reddit.com` instead.
+
+14. **web_extract pivot for deep content** → When Reddit feeds are rate-limited or return empty, pivot to `web_search` to find independent review/comparison blog posts (e.g., "HeyGen vs Synthesia 2026 comparison Reddit"), then extract their full content with `web_extract`. Blog comparison articles often summarize community sentiment as well or better than individual Reddit threads and are never rate-limited. This is especially effective for tool/research comparison tasks. See `references/community-tool-research-methodology.md` for the full multi-source pipeline combining Reddit RSS, HN Algolia API, and blog extraction.
