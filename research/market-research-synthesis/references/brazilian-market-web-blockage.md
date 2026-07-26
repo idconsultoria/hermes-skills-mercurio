@@ -55,6 +55,14 @@ browser_navigate(url="bing.com/search?q=...") → Cloudflare challenge
 | ead.com.br/blog | 404 | N/A | N/A | Page not found |
 | suno.com.br | 404 | N/A | N/A | Article not found |
 | neilpatel.com/br | Blocked | N/A | N/A | Anti-bot |
+| capterra.com.br | Anti-bot | N/A | N/A | Scrape aborted (document_antibot) |
+| g2.com | Anti-bot | N/A | N/A | Scrape aborted (document_antibot) |
+| crunchbase.com | Anti-bot | N/A | N/A | Scrape aborted (document_antibot) |
+| instagram.com | Anti-bot | Empty page | N/A | Login wall / empty snapshot |
+| pitchbook.com | Anti-bot | N/A | N/A | Scrape aborted |
+| distrito.me | N/A | N/A | N/A | 404 on startup profiles |
+| startups.com.br | N/A | N/A | N/A | 404 on company profiles |
+| web.archive.org | N/A | Cloudflare CAPTCHA | N/A | Wayback Machine also captcha'd |
 
 ## What DOES Work (Brazilian Market)
 

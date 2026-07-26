@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 82 skills*
+*Total: 89 skills*
 
 ---
 
@@ -24,7 +24,7 @@ Load this skill whenever the `computer_use` tool is available. Cross-platform (m
 
 - **Nome:** `autonomous-ai-agents/autonomous-ai-agents`
 - **Arquivo:** `autonomous-ai-agents/autonomous-ai-agents/SKILL.md`
-- **Tamanho:** 3,337 chars
+- **Tamanho:** 3,388 chars
 - **Resumo:** Delegate coding tasks to AI coding agent CLIs via Hermes: one-shot, review
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -42,7 +42,7 @@ Load this skill when you need to delegate coding tasks to autonomous AI coding a
 
 - **Nome:** `autonomous-ai-agents/hephaistos`
 - **Arquivo:** `autonomous-ai-agents/hephaistos/SKILL.md`
-- **Tamanho:** 66,923 chars
+- **Tamanho:** 67,272 chars
 - **Resumo:** Hephaistos meta-framework — orquestra pipelines de projeto com Hermes, OpenCode e agy
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-19T19:47:50Z
@@ -59,7 +59,7 @@ Hephaistos meta-framework — Hermes-orchestrated project pipeline using delegat
 
 - **Nome:** `autonomous-ai-agents/hermes-agent`
 - **Arquivo:** `autonomous-ai-agents/hermes-agent/SKILL.md`
-- **Tamanho:** 46,977 chars
+- **Tamanho:** 47,025 chars
 - **Resumo:** Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, and multi-agent
 - **Type:** Reference
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -80,7 +80,7 @@ Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, an
 
 - **Nome:** `autonomous-ai-agents/messaging-platforms`
 - **Arquivo:** `autonomous-ai-agents/messaging-platforms/SKILL.md`
-- **Tamanho:** 24,182 chars
+- **Tamanho:** 24,693 chars
 - **Resumo:** Reference for Hermes cross-platform messaging — platform quirks, ID formats, and
 - **Type:** Reference
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -132,7 +132,7 @@ Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl), agy (prot
 
 - **Nome:** `autonomous-ai-agents/hermes-diagnostics`
 - **Arquivo:** `autonomous-ai-agents/hermes-diagnostics/SKILL.md`
-- **Tamanho:** 15,595 chars
+- **Tamanho:** 15,494 chars
 - **Resumo:** Systematic methodology for diagnosing Hermes Agent behavioral issues — session resets, context loss, compression failures
 - **Type:** Research
 - **Timestamp:** 2026-07-15T08:00:00Z
@@ -145,7 +145,7 @@ Load this skill when the user reports Hermes misbehaving: conversations resettin
 
 - **Nome:** `autonomous-ai-agents/product-pipeline`
 - **Arquivo:** `autonomous-ai-agents/product-pipeline/SKILL.md`
-- **Tamanho:** 59,840 chars
+- **Tamanho:** 81,763 chars
 - **Resumo:** Multi-agent product pipeline — idea to MVP via sprints. Hermes orchestration
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-14T05:19:11Z
@@ -171,7 +171,7 @@ Load this skill when building a product from scratch through the full pipeline �
 
 - **Nome:** `content-production/ai-sound-design`
 - **Arquivo:** `content-production/ai-sound-design/SKILL.md`
-- **Tamanho:** 5,891 chars
+- **Tamanho:** 5,914 chars
 - **Resumo:** Generate, process, and optimize sound effects and ambient audio using AI tools and
 - **Type:** Media
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -186,7 +186,7 @@ Load this skill when you need to create sound effects, ambient audio, or UI soun
 
 - **Nome:** `content-production/iaf-newsletter-pipeline`
 - **Arquivo:** `content-production/iaf-newsletter-pipeline/SKILL.md`
-- **Tamanho:** 39,405 chars
+- **Tamanho:** 43,906 chars
 - **Resumo:** Umbrella skill for newsletters — cron scheduling, curation, dedup, deploy
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-19T19:47:50Z
@@ -205,7 +205,7 @@ Load this skill to set up, modify, run, or troubleshoot any daily newsletter, br
 
 - **Nome:** `content-production/sound-design`
 - **Arquivo:** `content-production/sound-design/SKILL.md`
-- **Tamanho:** 10,147 chars
+- **Tamanho:** 10,132 chars
 - **Resumo:** Umbrella skill for AI sound effects and audio production — prompt engineering and
 - **Type:** Media
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -220,7 +220,7 @@ Umbrella skill for AI sound effects (SFX) and audio production — prompt engine
 
 - **Nome:** `content-production/text-to-speech`
 - **Arquivo:** `content-production/text-to-speech/SKILL.md`
-- **Tamanho:** 15,454 chars
+- **Tamanho:** 15,498 chars
 - **Resumo:** Umbrella skill for TTS — voice design, multi-provider fallback, persona to audio
 - **Type:** Media
 - **Timestamp:** 2026-06-19T19:47:50Z
@@ -240,7 +240,7 @@ Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback,
 
 - **Nome:** `creative/ai-creative-assets`
 - **Arquivo:** `creative/ai-creative-assets/SKILL.md`
-- **Tamanho:** 8,873 chars
+- **Tamanho:** 8,810 chars
 - **Resumo:** Research AI tools for generating visual creative assets (textures, 3D models, sprites, vector icons) and craft optimized prompts
 - **Type:** Creative
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -256,7 +256,7 @@ Research AI tools for generating visual creative assets (textures, 3D models, sp
 
 - **Nome:** `creative/brand-studio-forge`
 - **Arquivo:** `creative/brand-studio-forge/SKILL.md`
-- **Tamanho:** 21,222 chars
+- **Tamanho:** 21,269 chars
 - **Resumo:** Create, refine, or evolve a brand identity: interviews, identity kit, content
 - **Type:** Creative
 - **Timestamp:** 2026-06-19T19:47:50Z
@@ -274,7 +274,7 @@ Use when the user wants to create, refine, or evolve a brand identity. Covers br
 
 - **Nome:** `creative/copywriting`
 - **Arquivo:** `creative/copywriting/SKILL.md`
-- **Tamanho:** 9,288 chars
+- **Tamanho:** 9,304 chars
 - **Resumo:** Expert conversion copywriting: write, rewrite, or improve marketing copy with
 - **Type:** Creative
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -292,7 +292,7 @@ Load this skill when the user needs marketing copy — landing pages, homepage s
 
 - **Nome:** `creative/humanizer`
 - **Arquivo:** `creative/humanizer/SKILL.md`
-- **Tamanho:** 30,301 chars
+- **Tamanho:** 30,348 chars
 - **Resumo:** Humanize text by stripping AI-isms and adding authentic voice and personality
 - **Type:** Creative
 - **Timestamp:** 2026-06-14T05:15:09Z
@@ -309,7 +309,7 @@ Humanize text: strip AI-isms and add real voice.
 
 - **Nome:** `creative/popular-web-designs`
 - **Arquivo:** `creative/popular-web-designs/SKILL.md`
-- **Tamanho:** 10,308 chars
+- **Tamanho:** 10,356 chars
 - **Resumo:** 54 real-world design systems from Stripe, Linear, Vercel — HTML and CSS
 - **Type:** Reference
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -324,7 +324,7 @@ Humanize text: strip AI-isms and add real voice.
 
 - **Nome:** `creative/style-guide-consultation`
 - **Arquivo:** `creative/style-guide-consultation/SKILL.md`
-- **Tamanho:** 8,041 chars
+- **Tamanho:** 8,089 chars
 - **Resumo:** Catalog of style guides — load the correct design system for any visual task.
 - **Type:** Reference
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -359,7 +359,7 @@ Load this skill when you need to apply professional UI/UX design fundamentals to
 
 - **Nome:** `copywriting/oferta-hormozi`
 - **Arquivo:** `copywriting/oferta-hormozi/SKILL.md`
-- **Tamanho:** 12,090 chars
+- **Tamanho:** 12,257 chars
 - **Resumo:** Framework de Oferta Irresistível (Alex Hormozi) para landing pages de cursos e infoprodutos
 - **Type:** Creative
 - **Timestamp:** 2026-07-15T00:00:00Z
@@ -376,7 +376,7 @@ Carregue esta skill quando for escrever ou revisar uma landing page, página de 
 
 - **Nome:** `dogfood`
 - **Arquivo:** `dogfood/SKILL.md`
-- **Tamanho:** 9,552 chars
+- **Tamanho:** 9,600 chars
 - **Resumo:** Exploratory QA of web applications — find bugs, gather evidence, produce reports
 - **Type:** Reference
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -395,7 +395,7 @@ Load this skill when you need to test a web application for issues. Covers syste
 
 - **Nome:** `education/backwards-design-unit-planner`
 - **Arquivo:** `education/backwards-design-unit-planner/SKILL.md`
-- **Tamanho:** 21,889 chars
+- **Tamanho:** 22,009 chars
 - **Resumo:** Plan a unit using backwards design — outcomes to assessment to activities.
 - **Type:** Template
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -412,7 +412,7 @@ Load this skill when starting a new unit or redesigning an existing one from sta
 
 - **Nome:** `education/competency-framework-translator`
 - **Arquivo:** `education/competency-framework-translator/SKILL.md`
-- **Tamanho:** 25,059 chars
+- **Tamanho:** 25,189 chars
 - **Resumo:** Translate competency frameworks (DigComp, GreenComp, ISTE) into classroom activities.
 - **Type:** Template
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -429,7 +429,7 @@ Load this skill when implementing framework standards in specific teaching conte
 
 - **Nome:** `education/curriculum-knowledge-architecture-designer`
 - **Arquivo:** `education/curriculum-knowledge-architecture-designer/SKILL.md`
-- **Tamanho:** 47,694 chars
+- **Tamanho:** 48,056 chars
 - **Resumo:** Map epistemic structure of a subject — knowledge types for curriculum sequencing.
 - **Type:** Template
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -446,7 +446,7 @@ Load this skill when designing courses, restructuring programmes, or analysing k
 
 - **Nome:** `education/leverage-and-response-design`
 - **Arquivo:** `education/leverage-and-response-design/SKILL.md`
-- **Tamanho:** 13,159 chars
+- **Tamanho:** 13,195 chars
 - **Resumo:** Design wise systems interventions — maps actions against Meadows' leverage points.
 - **Type:** Template
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -462,7 +462,7 @@ Load this skill when you have a systems analysis and need to design an intervent
 
 - **Nome:** `education/mental-model-mapper`
 - **Arquivo:** `education/mental-model-mapper/SKILL.md`
-- **Tamanho:** 9,307 chars
+- **Tamanho:** 9,320 chars
 - **Resumo:** Surface beliefs, assumptions, and values shaping a system.
 - **Type:** Template
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -478,7 +478,7 @@ Load this skill when deeper mental models need examining with care and evidence.
 
 - **Nome:** `education/scope-and-sequence-designer`
 - **Arquivo:** `education/scope-and-sequence-designer/SKILL.md`
-- **Tamanho:** 57,467 chars
+- **Tamanho:** 57,831 chars
 - **Resumo:** Design scope and sequence — curriculum coherence across a programme or year.
 - **Type:** Template
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -496,7 +496,7 @@ Load this skill when building new programmes, restructuring subjects, or ensurin
 
 - **Nome:** `github/codebase-inspection`
 - **Arquivo:** `github/codebase-inspection/SKILL.md`
-- **Tamanho:** 10,272 chars
+- **Tamanho:** 10,326 chars
 - **Resumo:** Multi-layered codebase diagnostics: structural mapping, dependency audit, git history, metrics, and health reports
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -512,7 +512,7 @@ Multi-layered codebase diagnostics: structural mapping, dependency audit, git hi
 
 - **Nome:** `github/github-pr-workflow`
 - **Arquivo:** `github/github-pr-workflow/SKILL.md`
-- **Tamanho:** 13,373 chars
+- **Tamanho:** 13,427 chars
 - **Resumo:** GitHub umbrella — authentication, PR lifecycle, code review, and repo management
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-19T19:47:50Z
@@ -532,7 +532,7 @@ GitHub PR lifecycle: branch, commit, open, CI, merge.
 
 - **Nome:** `health/ares-fitness-coach`
 - **Arquivo:** `health/ares-fitness-coach/SKILL.md`
-- **Tamanho:** 6,404 chars
+- **Tamanho:** 6,392 chars
 - **Resumo:** Deus da Guerra como coach fitness do Projeto Ares. Perfil, treinos e dieta calculados com base no biotipo
 - **Type:** Health
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -547,7 +547,7 @@ Load this skill when the user wants Ares (War God persona) as a fitness coach. C
 
 - **Nome:** `health/grafico-progresso-peso-ares`
 - **Arquivo:** `health/grafico-progresso-peso-ares/SKILL.md`
-- **Tamanho:** 7,496 chars
+- **Tamanho:** 7,587 chars
 - **Resumo:** Grafico de progresso de peso estilo Ares — matplotlib, vermelhos, claro.
 - **Type:** Health
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -565,7 +565,7 @@ Carregue esta skill quando precisar gerar o grafico padrao de progresso de peso 
 
 - **Nome:** `health-fitness/body-recomposition`
 - **Arquivo:** `health-fitness/body-recomposition/SKILL.md`
-- **Tamanho:** 8,468 chars
+- **Tamanho:** 8,465 chars
 - **Resumo:** Tracking de métricas corporais (peso, BF, composição) + cálculos de TDEE/BMR, déficit calórico e timeline para recomposição
 - **Type:** Health
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -579,6 +579,22 @@ Load this skill when tracking body recomposition metrics — weight, body fat, a
 - `similar` → `productivity/html-report-hermes`
 
 ## Infrastructure
+
+### Dashboard Performance Pipeline
+
+- **Nome:** `infrastructure/dashboard-performance-pipeline`
+- **Arquivo:** `infrastructure/dashboard-performance-pipeline/SKILL.md`
+- **Tamanho:** 5,942 chars
+- **Resumo:** Optimize dashboards — move aggregation from browser to backend via materialized views
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-07-26T05:05:12Z
+
+Load this skill when a SPA dashboard loads slowly or transfers too much data (300 MB to 50 KB target). Covers Supabase materialized views, progressive loading with pagination, Vercel preview branch deployment, and the full backend-aggregation pipeline pattern.
+
+**Relações:**
+- `similar` → `infrastructure/data-pipeline-patterns`
+- `similar` → `infrastructure/vercel-deploy`
+- `uses` → `infrastructure/supabase`
 
 ### Data Pipeline Patterns
 
@@ -600,7 +616,7 @@ Reliability patterns for batch data pipelines: exponential backoff, API call saf
 
 - **Nome:** `infrastructure/deployment-pipeline`
 - **Arquivo:** `infrastructure/deployment-pipeline/SKILL.md`
-- **Tamanho:** 46,016 chars
+- **Tamanho:** 46,064 chars
 - **Resumo:** CI/CD for Docker apps — GitHub Actions, ghcr.io registry, SSH deploy to bare metal
 - **Type:** Reference
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -617,7 +633,7 @@ CI/CD pipeline for Docker-based apps: GitHub Actions → ghcr.io → SSH deploy 
 
 - **Nome:** `infrastructure/gemini-rate-limit-backoff`
 - **Arquivo:** `infrastructure/gemini-rate-limit-backoff/SKILL.md`
-- **Tamanho:** 4,375 chars
+- **Tamanho:** 4,395 chars
 - **Resumo:** Exponential backoff for Google Gemini API rate limits (HTTP 429) — monkey-patching the genai SDK with jitter
 - **Type:** Reference
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -632,7 +648,7 @@ Exponential backoff for Google Gemini API rate limits (HTTP 429). Covers monkey-
 
 - **Nome:** `infrastructure/gcp-cloud-build`
 - **Arquivo:** `infrastructure/gcp-cloud-build/SKILL.md`
-- **Tamanho:** 6,166 chars
+- **Tamanho:** 6,140 chars
 - **Resumo:** GCP Cloud Build CI/CD setup — GitHub triggers, connections, Docker builds, troubleshooting
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-07-17T00:00:00Z
@@ -643,6 +659,20 @@ Load this skill when setting up continuous integration on GCP: connecting GitHub
 - `similar` → `infrastructure/deployment-pipeline`
 - `similar` → `infrastructure/vercel-deploy`
 - `similar` → `github/github-pr-workflow`
+
+### Hermes Cron Patterns
+
+- **Nome:** `infrastructure/hermes-cron-patterns`
+- **Arquivo:** `infrastructure/hermes-cron-patterns/SKILL.md`
+- **Tamanho:** 3,591 chars
+- **Resumo:** Hermes cron job patterns — timeout limits and background execution
+- **Type:** Reference
+- **Timestamp:** 2026-07-26T05:05:12Z
+
+Load this skill when a cron job exceeds the 3-minute hard limit or needs to run long scripts. Covers the nohup background spawn pattern, script delivery, and timeout workarounds for the Hermes cron scheduler.
+
+**Relações:**
+- `similar` → `infrastructure/data-pipeline-patterns`
 
 ### Oracle VM — SSH Access from Hermes Container
 
@@ -680,7 +710,7 @@ Deploy static sites and frontend apps to Vercel — from zero to production. Cov
 
 - **Nome:** `infrastructure/production-deployment`
 - **Arquivo:** `infrastructure/production-deployment/SKILL.md`
-- **Tamanho:** 10,233 chars
+- **Tamanho:** 10,286 chars
 - **Resumo:** Post-CI deploy operations — Docker rollout, DB schema, ingress routing, DNS fallback.
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -696,7 +726,7 @@ Load this skill when deploying a built application to production: verifying DB m
 
 - **Nome:** `infrastructure/whatsapp-baileys-integration`
 - **Arquivo:** `infrastructure/whatsapp-baileys-integration/SKILL.md`
-- **Tamanho:** 16,630 chars
+- **Tamanho:** 20,615 chars
 - **Resumo:** Integrate WhatsApp messaging into Python pipelines via Baileys — lifecycle, QR auth, REST bridge, multi-number
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-07-17T00:00:00Z
@@ -706,13 +736,58 @@ Load this skill when you need to send WhatsApp messages from Python without paid
 **Relações:**
 - `similar` → `messaging/whatsapp-automation`
 - `similar` → `autonomous-ai-agents/messaging-platforms`
+
+### Selfhost Service Deploy — Oracle ARM64
+
+- **Nome:** `infrastructure/selfhost-service-deploy`
+- **Arquivo:** `infrastructure/selfhost-service-deploy/SKILL.md`
+- **Tamanho:** 12,856 chars
+- **Resumo:** Deploy selfhosted services on Oracle ARM64 — Docker Compose, NPM routing, SSL
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-07-26T05:05:12Z
+
+Load this skill when deploying any new selfhosted service on the Oracle VM (Docker host). Follows the established pattern: directory structure, docker-compose.yml, Nginx Proxy Manager routing, SSL termination via Let's Encrypt, and common ARM64 pitfalls.
+
+**Relações:**
+- `similar` → `infrastructure/selfhost-web-apps`
+- `uses` → `infrastructure/oracle-host-access`
+
+### Selfhost Web Apps on Oracle ARM64
+
+- **Nome:** `infrastructure/selfhost-web-apps`
+- **Arquivo:** `infrastructure/selfhost-web-apps/SKILL.md`
+- **Tamanho:** 7,658 chars
+- **Resumo:** Deploy web apps on Oracle ARM64 — Docker Compose, NPM, SSL, and hardening
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-07-26T05:05:12Z
+
+Load this skill when deploying PHP, Python, or Node web applications on the Oracle host behind Nginx Proxy Manager. Covers the standard architecture pattern, SSL termination, PHP redirect loop fixes, and post-deploy hardening.
+
+**Relações:**
+- `similar` → `infrastructure/selfhost-service-deploy`
+- `uses` → `infrastructure/oracle-host-access`
+
+### Supabase Operations
+
+- **Nome:** `infrastructure/supabase`
+- **Arquivo:** `infrastructure/supabase/SKILL.md`
+- **Tamanho:** 7,054 chars
+- **Resumo:** Manage Supabase from Hermes — run SQL, deploy Edge Functions, manage migrations
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-07-26T05:05:12Z
+
+Load this skill when working with any Supabase-backed project from a restricted environment. Covers running SQL without psql, linking projects, deploying Edge Functions, managing migrations, and refreshing materialized views.
+
+**Relações:**
+- `similar` → `infrastructure/data-pipeline-patterns`
+
 ## Media
 
 ### HyperFrames Video Production
 
 - **Nome:** `media/hyperframes-video-production`
 - **Arquivo:** `media/hyperframes-video-production/SKILL.md`
-- **Tamanho:** 22,507 chars
+- **Tamanho:** 22,551 chars
 - **Resumo:** Produce deterministic MP4 videos via HyperFrames — HTML compositions to video
 - **Type:** Media
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -729,7 +804,7 @@ Produce deterministic MP4 videos using HyperFrames (HTML→video engine). Genera
 
 - **Nome:** `media/kindle-manga`
 - **Arquivo:** `media/kindle-manga/SKILL.md`
-- **Tamanho:** 57,282 chars
+- **Tamanho:** 58,440 chars
 - **Resumo:** Prepare and transfer manga to Kindle — quality-gated conversion with resolution check, contrast correction, and grayscale EPUB generation
 - **Type:** Media
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -745,7 +820,7 @@ Load this skill when putting manga or comics on a Kindle, converting CBR/CBZ/PDF
 
 - **Nome:** `media/manga-anime-data`
 - **Arquivo:** `media/manga-anime-data/SKILL.md`
-- **Tamanho:** 4,717 chars
+- **Tamanho:** 4,718 chars
 - **Resumo:** Research manga and anime data via AniList GraphQL API — rankings, scores, metadata, completion status, and genre filtering
 - **Type:** Research
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -759,7 +834,7 @@ Load this skill instead of web search when you need authoritative community rati
 
 - **Nome:** `media/arxiv-latex-to-kindle`
 - **Arquivo:** `media/arxiv-latex-to-kindle/SKILL.md`
-- **Tamanho:** 18,727 chars
+- **Tamanho:** 18,789 chars
 - **Resumo:** Convert arXiv LaTeX to Kindle EPUB — tables, figures, Gmail delivery.
 - **Type:** Media
 - **Timestamp:** 2026-07-08T10:30:00Z
@@ -775,7 +850,7 @@ Load this skill when the user wants to download an arXiv paper, convert its LaTe
 
 - **Nome:** `media/kindle-articles`
 - **Arquivo:** `media/kindle-articles/SKILL.md`
-- **Tamanho:** 18,756 chars
+- **Tamanho:** 19,012 chars
 - **Resumo:** Prepare text content for Kindle — markdown to reflowable EPUB3.
 - **Type:** Media
 - **Timestamp:** 2026-07-07
@@ -787,13 +862,43 @@ Load this skill when putting research papers, long-form articles, blog posts, or
 - `similar` → `media/kindle-manga`
 - `uses` → `productivity/google-workspace`
 
+### HTML to Social Image (PNG)
+
+- **Nome:** `media/html-to-social-image`
+- **Arquivo:** `media/html-to-social-image/SKILL.md`
+- **Tamanho:** 5,922 chars
+- **Resumo:** Render HTML to social-media-optimized PNG images using Chromium headless screenshots
+- **Type:** Media
+- **Timestamp:** 2026-07-26T05:05:12Z
+
+Load this skill when creating images for Instagram, Twitter, Open Graph, or any social media platform. Covers Instagram stories/posts/reels, Twitter/OG cards, and any HTML-to-PNG export using Chromium headless via .deb extraction.
+
+**Relações:**
+- `similar` → `productivity/html-to-pdf-chromium`
+- `similar` → `productivity/html-report-hermes`
+
+## Hermes Desktop Plugins
+
+### Hermes Desktop Plugins
+
+- **Nome:** `hermes-desktop-plugins`
+- **Arquivo:** `hermes-desktop-plugins/SKILL.md`
+- **Tamanho:** 9,198 chars
+- **Resumo:** Write desktop app plugins for Hermes — UI panes, commands, keybinds, and themes
+- **Type:** Reference
+- **Timestamp:** 2026-07-26T05:05:12Z
+
+Load this skill when adding new UI elements or commands to the Hermes desktop app. Covers the plugin SDK: statusbar items, layout panes, command-palette commands, keybinds, routes, themes, and the Python backend namespace. A plugin is a single ESM file with no build step.
+
+**Relações:**
+
 ## Productivity
 
 ### Google Workspace
 
 - **Nome:** `productivity/google-workspace`
 - **Arquivo:** `productivity/google-workspace/SKILL.md`
-- **Tamanho:** 21,326 chars
+- **Tamanho:** 21,380 chars
 - **Resumo:** Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -810,7 +915,7 @@ Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation
 
 - **Nome:** `productivity/html-report-hermes`
 - **Arquivo:** `productivity/html-report-hermes/SKILL.md`
-- **Tamanho:** 15,281 chars
+- **Tamanho:** 15,328 chars
 - **Resumo:** Render research reports as dark-themed HTML with SVG charts and Tufte typography
 - **Type:** Template
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -827,7 +932,7 @@ Render research reports as dark-themed HTML with SVG charts and Tufte-inspired t
 
 - **Nome:** `productivity/html-to-pdf-chromium`
 - **Arquivo:** `productivity/html-to-pdf-chromium/SKILL.md`
-- **Tamanho:** 8,436 chars
+- **Tamanho:** 8,717 chars
 - **Resumo:** Convert HTML to high-fidelity PDF using Chromium headless via .deb extraction. Fallback to WeasyPrint on ARM64
 - **Type:** Template
 - **Timestamp:** 2026-07-16T22:30:00Z
@@ -843,7 +948,7 @@ Convert HTML to high-fidelity PDF using Chromium headless via .deb extraction. F
 
 - **Nome:** `productivity/notion`
 - **Arquivo:** `productivity/notion/SKILL.md`
-- **Tamanho:** 15,928 chars
+- **Tamanho:** 15,982 chars
 - **Resumo:** Notion API plus ntn CLI — pages, databases, markdown import, Workers integration
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -858,7 +963,7 @@ Notion API + ntn CLI: pages, databases, markdown import, Workers integration.
 
 - **Nome:** `productivity/relatorio-de-custos`
 - **Arquivo:** `productivity/relatorio-de-custos/SKILL.md`
-- **Tamanho:** 10,307 chars
+- **Tamanho:** 10,354 chars
 - **Resumo:** Generate cost reports for multi-agent projects with real token data from Hermes and
 - **Type:** Template
 - **Timestamp:** 2026-06-19T19:47:50Z
@@ -907,7 +1012,7 @@ Load this skill when you want to browse, install, or switch animated mascot pets
 
 - **Nome:** `messaging/whatsapp-automation`
 - **Arquivo:** `messaging/whatsapp-automation/SKILL.md`
-- **Tamanho:** 5,416 chars
+- **Tamanho:** 5,717 chars
 - **Resumo:** Automate WhatsApp messaging from Python projects — Baileys bridge, Z-API migration, multi-assessor patterns
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-07-16T00:00:00Z
@@ -944,7 +1049,7 @@ Read Reddit subreddits reliably via RSS feeds — bypasses API rate limits and b
 
 - **Nome:** `research/augmentacao-query`
 - **Arquivo:** `research/augmentacao-query/SKILL.md`
-- **Tamanho:** 4,388 chars
+- **Tamanho:** 4,590 chars
 - **Resumo:** Busca semântica nas 97 soluções de Aumentação de Processos com IA via Vulcano MCP
 - **Type:** Research
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -959,7 +1064,7 @@ Busca semântica nas 97 soluções de Aumentação de Processos com IA via Vulca
 
 - **Nome:** `research/augmentation-process-design`
 - **Arquivo:** `research/augmentation-process-design/SKILL.md`
-- **Tamanho:** 9,644 chars
+- **Tamanho:** 9,639 chars
 - **Resumo:** Design, research and curadoria de soluções de augmentação de processos com IA
 - **Type:** Research
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -976,7 +1081,7 @@ Design, research and curadoria de soluções de augmentação de processos com I
 
 - **Nome:** `research/deep-research`
 - **Arquivo:** `research/deep-research/SKILL.md`
-- **Tamanho:** 25,691 chars
+- **Tamanho:** 25,738 chars
 - **Resumo:** Multi-agent deep research: decompose, dispatch agents, cross-validate, synthesize
 - **Type:** Research
 - **Timestamp:** 2026-06-19T19:47:50Z
@@ -995,7 +1100,7 @@ Multi-agent deep research pipeline: decompose topics, dispatch parallel agents, 
 
 - **Nome:** `research/digital-clone-persona`
 - **Arquivo:** `research/digital-clone-persona/SKILL.md`
-- **Tamanho:** 10,076 chars
+- **Tamanho:** 10,081 chars
 - **Resumo:** Create digital clone personas through deep web research — discover, extract, and
 - **Type:** Research
 - **Timestamp:** 2026-06-14T05:15:09Z
@@ -1012,7 +1117,7 @@ Create digital clone personas through deep web research — discover, extract, a
 
 - **Nome:** `research/model-benchmark-frontier`
 - **Arquivo:** `research/model-benchmark-frontier/SKILL.md`
-- **Tamanho:** 7,324 chars
+- **Tamanho:** 7,371 chars
 - **Resumo:** Compare AI models — intelligence vs parameters, convex hull, local hardware analysis
 - **Type:** Research
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1029,7 +1134,7 @@ Compare AI models — intelligence vs parameters, convex hull analysis, local ha
 
 - **Nome:** `research/tech-trend-discovery`
 - **Arquivo:** `research/tech-trend-discovery/SKILL.md`
-- **Tamanho:** 15,594 chars
+- **Tamanho:** 15,641 chars
 - **Resumo:** Discover what tech and AI communities discuss — trending topics and hot discussions
 - **Type:** Research
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1047,7 +1152,7 @@ Discover what the tech/AI community is discussing right now — trending topics,
 
 - **Nome:** `research/user-interview`
 - **Arquivo:** `research/user-interview/SKILL.md`
-- **Tamanho:** 9,511 chars
+- **Tamanho:** 9,558 chars
 - **Resumo:** Structured user/proxy interview protocol for product research — plan, frame
 - **Type:** Research
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1065,7 +1170,7 @@ Structured user/proxy interview protocol for product research — plan, frame, l
 
 - **Nome:** `research/market-research-synthesis`
 - **Arquivo:** `research/market-research-synthesis/SKILL.md`
-- **Tamanho:** 6,269 chars
+- **Tamanho:** 9,025 chars
 - **Resumo:** Produce market analysis reports — personas, journeys, expectations, behavior.
 - **Type:** Research
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -1083,7 +1188,7 @@ Load this skill when conducting market research for Brazilian/LATAM markets wher
 
 - **Nome:** `social-media/brand-iaf-conteudo`
 - **Arquivo:** `social-media/brand-iaf-conteudo/SKILL.md`
-- **Tamanho:** 5,819 chars
+- **Tamanho:** 5,867 chars
 - **Resumo:** Content for IA que Funciona community — brand constants, voice, tone, templates
 - **Type:** Reference
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1174,7 +1279,7 @@ Backlog management and Sprint execution for product iteration (Fase 5). Mantém 
 
 - **Nome:** `software-development/bpmn-diagram-renderer`
 - **Arquivo:** `software-development/bpmn-diagram-renderer/SKILL.md`
-- **Tamanho:** 10,960 chars
+- **Tamanho:** 10,968 chars
 - **Resumo:** Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js and Chromium headless
 - **Type:** Template
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1192,7 +1297,7 @@ Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js + Chromium headless — id
 
 - **Nome:** `software-development/dedalo-squad`
 - **Arquivo:** `software-development/dedalo-squad/SKILL.md`
-- **Tamanho:** 18,793 chars
+- **Tamanho:** 18,807 chars
 - **Resumo:** Pipeline Dédalo Squad — mapeamento de processos com POPs e diagramas BPMN 2.0
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-19T19:47:50Z
@@ -1210,7 +1315,7 @@ Pipeline Dédalo Squad — mapeamento de processos com POPs e diagramas BPMN 2.0
 
 - **Nome:** `software-development/hermes-agent-skill-authoring`
 - **Arquivo:** `software-development/hermes-agent-skill-authoring/SKILL.md`
-- **Tamanho:** 12,249 chars
+- **Tamanho:** 12,297 chars
 - **Resumo:** Author SKILL.md and DESIGN.md token specs in-repo — frontmatter, validator
 - **Type:** Reference
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1226,7 +1331,7 @@ Author in-repo SKILL.md + DESIGN.md token specs: frontmatter, validator, structu
 
 - **Nome:** `software-development/ideation-drilling`
 - **Arquivo:** `software-development/ideation-drilling/SKILL.md`
-- **Tamanho:** 14,592 chars
+- **Tamanho:** 14,643 chars
 - **Resumo:** Product ideation (Fase 1): refine raw ideas through structured drilling
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1244,7 +1349,7 @@ Product ideation (Fase 1): refine raw ideas through structured drilling. Covers 
 
 - **Nome:** `software-development/improve-codebase-architecture`
 - **Arquivo:** `software-development/improve-codebase-architecture/SKILL.md`
-- **Tamanho:** 16,634 chars
+- **Tamanho:** 16,646 chars
 - **Resumo:** Scan a codebase for deepening opportunities and present them as a structured report
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1262,7 +1367,7 @@ Scan a codebase for deepening opportunities, present them as a structured report
 
 - **Nome:** `software-development/plan`
 - **Arquivo:** `software-development/plan/SKILL.md`
-- **Tamanho:** 11,814 chars
+- **Tamanho:** 11,862 chars
 - **Resumo:** Write actionable markdown plans to .hermes/plans — bite-sized tasks, exact paths
 - **Type:** Reference
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1305,7 +1410,7 @@ Load this skill when the user requests the ID Consultoria process augmentation p
 
 - **Nome:** `software-development/simplify-code`
 - **Arquivo:** `software-development/simplify-code/SKILL.md`
-- **Tamanho:** 11,179 chars
+- **Tamanho:** 11,210 chars
 - **Resumo:** Simplify recent code changes — 3 parallel agents review logic, formatting, and dead
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1324,7 +1429,7 @@ Load this skill after making code changes that need cleanup. Three parallel agen
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 48,419 chars
+- **Tamanho:** 50,454 chars
 - **Resumo:** Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1359,7 +1464,7 @@ Carregue esta skill quando for projetar um curso, treinamento, bootcamp ou jorna
 
 - **Nome:** `software-development/spike`
 - **Arquivo:** `software-development/spike/SKILL.md`
-- **Tamanho:** 9,318 chars
+- **Tamanho:** 9,365 chars
 - **Resumo:** Throwaway experiments to validate an idea before building — fast, focused
 - **Type:** Research
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1378,7 +1483,7 @@ Throwaway experiments to validate an idea before building — fast, focused.
 
 - **Nome:** `software-development/systematic-debugging`
 - **Arquivo:** `software-development/systematic-debugging/SKILL.md`
-- **Tamanho:** 12,855 chars
+- **Tamanho:** 12,903 chars
 - **Resumo:** 4-phase root cause debugging — methodology plus Python debugpy and Node.js inspect
 - **Type:** Reference
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1395,7 +1500,7 @@ Throwaway experiments to validate an idea before building — fast, focused.
 
 - **Nome:** `software-development/test-driven-development`
 - **Arquivo:** `software-development/test-driven-development/SKILL.md`
-- **Tamanho:** 10,384 chars
+- **Tamanho:** 10,432 chars
 - **Resumo:** Enforce RED-GREEN-REFACTOR cycle — tests before code, incremental development
 - **Type:** Reference
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1414,7 +1519,7 @@ TDD: enforce RED-GREEN-REFACTOR, tests before code.
 
 - **Nome:** `software-development/threejs-rendering-debug`
 - **Arquivo:** `software-development/threejs-rendering-debug/SKILL.md`
-- **Tamanho:** 5,200 chars
+- **Tamanho:** 5,232 chars
 - **Resumo:** Debug invisible 3D WebGL/Three.js scenes — shaders, fog, visibility, and asset
 - **Type:** Reference
 - **Timestamp:** 2026-06-28T05:11:55Z

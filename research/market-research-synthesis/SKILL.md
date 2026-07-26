@@ -99,6 +99,7 @@ Brazilian websites deploy aggressive anti-bot protection:
 - Hotmart, Eduzz, Sympla — transaction data: generally blocked, use second-hand citations from news articles
 
 See `references/brazilian-market-web-blockage.md` for the full blockage pattern, specific blocked sites, and tested workarounds.
+See `references/brazilian-agricultural-saas-landscape.md` for a worked example of competitor analysis in the Brazilian ag SaaS vertical (July 2026), including verified URLs, alternative TLD patterns, and market gaps.
 
 ## Pitfalls
 
@@ -107,3 +108,30 @@ See `references/brazilian-market-web-blockage.md` for the full blockage pattern,
 - **Don't skip the strategic implications section.** The user needs actionable recommendations for their specific project/product, not just raw market data.
 - **Brazilian URLs are unstable.** Blog posts from 2022-2024 on Brazilian edtech sites have a high probability of 404. Prefer .gov.br sources and industry-wide reports over individual blog posts.
 - **Language matters.** Research queries for Brazilian markets MUST be in Portuguese. English queries return sparse or irrelevant results for Brazil-specific data. But web_search tool may fail regardless of language — the issue is the backend, not the query.
+- **Brazilian SaaS never publishes prices.** 100% of Brazilian B2B SaaS companies use demo-based/consultative sales. "Planos", "Preços", and "Pricing" pages universally return 404. Don't waste time hunting for public pricing — note the pattern and estimate from benchmarks.
+- **Alternative TLDs often work when .com.br fails.** Many Brazilian companies use non-obvious domains: .app, .com (without .br), .agr.br. When the obvious .com.br returns errors or blocks, try alternative TLDs. LinkedIn company pages also reliably confirm existence and positioning even when the main site is fully down.
+
+## Direct-URL Extraction Technique (CRITICAL)
+
+When `web_search` returns empty arrays but you have a list of target companies/URLs, **skip search entirely** and go directly to `web_extract` with the known URLs. This is consistently the most productive path:
+
+1. Batch up to 5 competitor URLs in one `web_extract` call
+2. For sites that fail in `web_extract` (anti-bot), fall back to `browser_navigate`
+3. For sites that are fully down (404 on all pages), use LinkedIn company pages for positioning confirmation
+4. When a site loads partially, use `read_file` with offset/limit on the cached copy to get the full content
+
+This approach yielded rich data for 5/7 competitors in one session even when `web_search` was completely non-functional across 10+ queries.
+
+## Competitor Analysis Workflow (Brazilian SaaS)
+
+When the task is competitor/market analysis for a Brazilian SaaS vertical:
+
+1. **Map known players** from the user's brief — they usually name the top competitors
+2. **Batch-extract competitor websites** via `web_extract` (5 URLs per call)
+3. **Build a comparison matrix** early: features, pricing model, target audience, differentiators, scale metrics
+4. **Identify pricing patterns**: Brazilian SaaS universally uses consultative sales; note this as a market norm AND as a potential differentiator if the client adopts transparent pricing
+5. **Hunt for gaps**: focus on features NO competitor offers (checking site menus, FAQ, feature pages)
+6. **Note exit signals**: competitors with dead websites, 404s across all pages, or empty social media are market exit signals — these are opportunities for the client
+7. **Save as structured markdown** with tables for features, pricing, and a dedicated "gaps and opportunities" section
+
+See `references/brazilian-agricultural-saas-landscape.md` for the full competitor data from the agricultural SaaS session (July 2026) as a reference template.

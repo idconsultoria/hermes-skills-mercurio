@@ -58,6 +58,7 @@ unique.sort(key=page_sort_key)
 - **Old regex breaks silently**: The CDN path has changed from `/file/mangap/...jpg` to `/file/CDN-M-A-N/...png`. If the cron script finds a chapter but downloads 4.8 KB placeholders, the regex still needs updating.
 - **Domain rotation**: `ww{N}.readonepiece.com` rotates between `ww5` and `ww20`. The cron script probes all of them. The browser may redirect to a different domain (`ww5 → ww12`, for example) — always use the actual redirect target's domain for the Referer header.
 - **Chapter numbering**: Some chapters have decimal variants (e.g., `1054.5`, `1053.4`). The cron script increments by 1, so it won't catch fractional chapters automatically — they'd need manual dispatch.
+- **`.jpeg` extension filter blind spot**: `process_images()` filters for `.jpg` and `.png` but not `.jpeg`. When the CDN serves UUID-based format (`.../{page}.jpeg`), the script downloads `0001.jpeg`, finds zero matches in the filter, processes nothing, and sends an empty EPUB → Amazon E999. **Fix:** add `.jpeg` to `str.endswith(('.jpg', '.jpeg', '.png'))` in process_images, AND add a zero-image guard: abort if `len(os.listdir(proc_dir)) == 0` instead of building an empty EPUB.
 
 ## Key configuration
 

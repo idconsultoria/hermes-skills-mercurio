@@ -1,6 +1,7 @@
 ---
 name: gcp-cloud-build
-description: "GCP Cloud Build CI/CD setup — GitHub triggers, connections, Docker builds, and troubleshooting.
+description: "GCP Cloud Build CI/CD — GitHub triggers, connections, Docker builds.
+
 Load this skill when setting up continuous integration on GCP: connecting GitHub repos to Cloud Build, creating push-to-deploy triggers, debugging connection/authentication issues, and wiring builds to Cloud Run jobs."
 version: 1.0.0
 author: Hermes Agent

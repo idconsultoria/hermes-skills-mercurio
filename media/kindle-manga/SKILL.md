@@ -916,6 +916,22 @@ Checks:
 
   **4. Filename mismatch between OPF and actual files:** If source images have zero-padded names (`0001.jpg`) but OPF references non-padded names (`page1.jpg`), Amazon can't find them. Same if extension mismatch: OPF says `page1.jpg` but file is `page1.jpeg`. **Fix:** verify every OPF href matches an actual file in the ZIP.
 
+  **5. `.jpeg` extension missing from image-processing filter (silent zero-page EPUB → E999):** When the CDN serves images with `.jpeg` extension (UUID-based format: `.../{page}.jpeg`), the download step saves files as `0001.jpeg`. If `process_images()` filters only for `('.jpg', '.png')`, it finds nothing → processes zero images → sends empty EPUB → Amazon E999.
+
+  **Fix (two-part):**
+  ```python
+  # 1. Add `.jpeg` to the filter in process_images():
+  files = sorted([f for f in os.listdir(src_dir) if f.endswith(('.jpg', '.jpeg', '.png'))])
+
+  # 2. Add a safety guard after process_images() to abort on zero output:
+  proc_files = os.listdir(proc_dir) if os.path.exists(proc_dir) else []
+  if not proc_files:
+      print("ERROR: Zero images processed. Aborting to avoid sending empty EPUB.", flush=True)
+      return
+  ```
+
+  **Detection:** Check raw_dir after download — if files end in `.jpeg` but process_images only looks for `.jpg`/`.png`, this is the bug. `total_kb == 0` on the "Processed:" line is the symptom.
+
   Verify ZIP structure before sending:
   ```python
   from zipfile import ZipFile
@@ -944,7 +960,8 @@ Checks:
   `data-src` regex. See `references/mangapill-source.md`.
 - **readonepiece.com CDN requires Referer header**: Since mid-2026, the CDN at `cdn.readonepiece.com` returns **403 + 4.8 KB HTML placeholder** when curl/requests download images without a `Referer: https://{domain}.readonepiece.com/` header. Without it, all pages download as 4.8 KB invalid files and PIL raises `UnidentifiedImageError`. **Fix:** always pass `Referer` and a full Chrome User-Agent when downloading images from this CDN.
 - **readonepiece.com CDN path changed multiple times**: The image URL path evolved through `/file/mangap/op_{chapter}_{page:02d}.jpg` → `/file/CDN-M-A-N/op_{chapter}_nnd_{page:03d}.png` → `/file/mangap/{year}/{week}/{manga_id}/{chapter_id}/{uuid}/{page}.jpeg` (UUID-based, same pattern as MangaPill). Use a **generic regex** that catches all variants: `(https://cdn\\.readonepiece\\.com/file/[^\"' ]+?\\.(?:png|jpe?g))`. Sort by the last numeric segment before extension for correct page ordering. If extraction returns 0 results or downloads HTML placeholders, the CDN likely changed format again.
-- **Cron script `one_piece_kindle_cron.py` filename**: The automated One Piece delivery watchdog is stored at `~/./scripts/one_piece_kindle_cron.py` (note the `_cron` suffix). If creating or updating the cron job, ensure the `script` parameter matches the exact filename. A mismatch produces `Script not found: /opt/data/scripts/one_piece_kindle.py`. Fix with `cronjob action=update job_id=388e767fcc7c script=one_piece_kindle_cron.py`.
+- **⚠️ `.jpeg` extension breaks image processing filter**: When the CDN migrates to `.jpeg` extension (current UUID-based format), any code that filters images by `endswith(('.jpg', '.png'))` will find ZERO files — downloads succeed (saved as `NNNN.jpeg`) but the processing loop runs zero iterations, producing an empty EPUB that Amazon rejects with **E999**. **Fix:** include `.jpeg` in the filter: `endswith(('.jpg', '.jpeg', '.png'))` with `.lower()`. Also add a guard — abort if zero images processed.
+- **Cron script `one_piece_kindle_cron.py` filename**
 - **Using `fixed-epub-builder.py` from Python**: Import via `importlib.util.spec_from_file_location`:
   ```python
   import importlib.util

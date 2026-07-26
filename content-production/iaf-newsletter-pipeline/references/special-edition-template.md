@@ -9,6 +9,30 @@ When the user requests a special edition of the IAF newsletter — a deep-dive o
 single topic (model launch, regulatory event, major industry shift). Distinct from
 daily editions which aggregate 20+ items across sections.
 
+## Research Rules — Multi-Source Mandatory
+
+> ⚠️ **O anúncio oficial NÃO é suficiente.** Edições especiais exigem pesquisa em
+> múltiplas fontes independentes (mínimo 5, ideal 8+). O blog/post oficial é o ponto
+> de partida, não o ponto final.
+
+**Fontes obrigatórias por tipo de edição:**
+
+| Tipo de Edição | Fontes Esperadas |
+|----------------|-----------------|
+| Lançamento de modelo | Blog oficial + 2+ veículos de tech (9to5Google, The Verge, TechCrunch) + 1+ análise de benchmarks (OfficeChai, Artificial Analysis, BenchLM) + 1+ comunidade (Reddit, Hacker News) |
+| Evento regulatório | Documento oficial + 2+ análise jurídica + 2+ reação da indústria |
+| Mudança de mercado | 3+ veículos financeiros + 2+ análise de consultoria + dados primários |
+
+**O que buscar além do anúncio oficial:**
+- Comparações competitivas com modelos/produtos rivais (quem lidera em quê)
+- Contexto omitido (atrasos, problemas, controvérsias)
+- Dados de benchmarks independentes (não apenas os auto-reportados)
+- Reação da comunidade (Reddit, HN, Twitter)
+- Preços dos concorrentes para escala
+- Histórico da família/linha de produto (timeline)
+
+**⚠️ Pitfall real (21/07/2026):** Edição do Gemini 3.6 Flash começou usando apenas o Google Blog como fonte. O usuário interrompeu com "Não se baseie só no blog da Google, procure bem mais fontes sobre o tema". O anúncio oficial não mencionava: que o 3.5 Pro está atrasado (Android Headlines), comparações com GPT‑5.6 Luna e Grok 4.5 (OfficeChai), resultados reais do Flash Cyber no motor V8 (CyberSecurity News), que o Flash-Lite supera o 3 Flash original (9to5Google), ou a data de corte avançada para março/2026 (9to5Google). Sem essas fontes, a edição teria sido um release regurgitado — não uma análise.
+
 ## File naming
 
 ```
@@ -30,6 +54,7 @@ The accent color changes per edition to match the topic's identity:
 |---------|---------------|--------------|----------------|
 | GPT‑5.6 | `#0a8f88` (teal) | `#06b8a0` | Navy → red |
 | Kimi K3 | `#5b3cc4` (purple) | `#7c5ce7` | Navy → purple |
+| Gemini 3.6 Flash | `#1a73e8` (Google blue) | `#4285f4` | Navy → blue |
 
 To change colors, edit the `:root` block:
 ```css
@@ -146,13 +171,14 @@ Each page uses `<div class="page">` with:
 
 ## Editorial Writing Guide
 
+- **Research first:** Execute the Research Rules above BEFORE writing. Gather 5-8+ sources. The editorial must incorporate facts, comparisons, and context that the official announcement omits. If you can't name at least 3 things the reader wouldn't learn from reading the official blog post, you haven't researched enough.
 - **Length:** ~8-12 paragraphs total, spread across 3 pages
-- **Opening:** Date-stamped scene-setting with dropcap on first paragraph
+- **Opening:** Date-stamped scene-setting with dropcap on first paragraph. Anchor the launch in the week's broader context (what else happened? what does this respond to?)
 - **Tone:** Stratechery/Every style — opinionated, analytical, warm
-- **Structure:** Hook → context → pullquote → analysis → counterpoint → pullquote → conclusion
-- **Pullquotes:** 1-2 per editorial, 1-2 sentences each, provocative or ironic
+- **Structure:** Hook → context → pullquote → competitive analysis → counterpoint → pullquote → forward-looking conclusion
+- **Pullquotes:** 2-3 per editorial, sourced from different outlets (not all from the official blog). At least one should come from an independent analyst or community voice.
 - **Stats:** 4-stat row after key numeric claims (use `.stat-row`)
-- **Sources:** Footer with 5-8 linked sources in `.sources-block`
+- **Sources:** Footer with 5-8 linked sources in `.sources-block`, spanning at least 4 different domains (not 5 links to the same blog)
 - **Language:** Zero anglicisms, PT-BR throughout
 
 ## WhatsApp Companion
@@ -192,3 +218,4 @@ curl -s -X POST http://127.0.0.1:3000/send \
 | `especial-mythos` | 09/06/2026 | Anthropic Fable 5 / Mythos 5 launch |
 | `especial-gpt56` | 26/06/2026 | OpenAI GPT‑5.6 (Sol/Terra/Luna) + gov approval |
 | `especial-kimi-k3` | 16/07/2026 | Moonshot Kimi K3 (2.8T open-weight) |
+| `especial-gemini-3-6-flash` | 21/07/2026 | Google Gemini 3.6 Flash + 3.5 Flash-Lite + 3.5 Flash Cyber |

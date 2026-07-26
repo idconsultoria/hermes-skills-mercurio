@@ -1,12 +1,12 @@
 ---
 name: whatsapp-baileys-integration
-description: "Integrate WhatsApp messaging into Python pipelines via Baileys (Node.js subprocess) — lifecycle management, session persistence, QR auth, REST bridge, and multi-number architecture.
+description: "Integrate WhatsApp into Python via Baileys — lifecycle, QR auth, REST bridge.
 
 Load this skill when you need to send WhatsApp messages from Python without paid APIs. Covers full lifecycle management (spawn, QR auth, session persistence, health checks, graceful shutdown), REST bridge with Z-API compatible interface for file/media delivery, and multi-number architecture. Replaces paid Z-API with local WhatsApp Web."
-version: 1.0.0
+version: 1.1.0
 type: ToolIntegration
 tags: [whatsapp, baileys, messaging, nodejs, subprocess, automation, zapi-migration]
-timestamp: 2026-07-17T00:00:00Z
+timestamp: 2026-07-23T00:00:00Z
 ---
 
 # WhatsApp via Baileys — Python Integration
@@ -182,6 +182,9 @@ Both fixes must be in `makeWASocket()` config. See issues #1382, #2008, #390.
 | `printQRInTerminal` deprecated | API do Baileys mudou na v6 | Use `qrcode` npm + endpoint REST (ver seção QR Code Handling) |
 | Usuário escaneia QR com câmera normal do celular | Confusão comum — o QR do WhatsApp Web só é lido pelo scanner interno do app | **Sempre instrua:** "Escaneie DENTRO do WhatsApp → Configurações → Aparelhos Pareados → Escanear QR Code". Se escanear errado, mate o processo, limpe `sessions/<N>/` e reinicie. |
 | **Erro 428 "Connection Terminated by Server"** ao escanear QR (usuário reporta "não foi possível conectar") | WhatsApp rejeita o handshake de pareamento por 3 motivos: (1) browser UA string padrão é Linux de datacenter → rejeitada, (2) IP de cloud provider sofre mais escrutínio, (3) `defaultQueryTimeoutMs` não definido como `undefined` | **Correções no `makeWASocket`:** `browser: ["Windows", "Chrome", "114.0.5735.198"]`, `defaultQueryTimeoutMs: undefined`. Se persistir, use pairing code em vez de QR (ver seção Pairing Code). Ver `references/baileys-428-error.md` para detalhes. |
+| `File not found` no Google Doc/Planilha/Pasta mesmo após compartilhar | Você compartilhou com a service account ERRADA (ex: a do Drive, não a do Cloud Run) | Verificar qual SA o job usa via `gcloud run jobs describe`. A compute default é `PROJECT_NUMBER-compute@developer.gserviceaccount.com`. A service account do Drive é uma conta diferente que NÃO tem permissão de Cloud Run. |
+| Job usa IDs do Drive do ambiente de teste em vez dos IDs corretos do projeto original | Múltiplos ambientes (teste vs produção) têm IDs diferentes para pastas/planilhas/documentos | Confirmar a FONTE dos IDs. O `.env.example` do projeto original contém os IDs corretos. Usar `gcloud run jobs describe <job-existente>` como referência de env vars atuais. |
+| `YAML parse error` ao usar `--env-vars-file` com JSON de service account | YAML exige indentação no conteúdo de block scalar `|` | O JSON abaixo de `ASSESSOR_N_GOOGLE_CREDENTIALS_JSON: |` precisa estar indentado 2 espaços. Gerar com Python: `json.dumps(sa, indent=2)` + indentar cada linha. |
 
 ## Cloud Run Job Pattern (liga → usa → desliga)
 
@@ -218,33 +221,88 @@ executar(config, whatsapp_client=manager.client)
 manager.encerrar()
 ```
 
-### Multi-Assessor via Cloud Run Jobs
+### Multi-Assessor via Cloud Run Jobs (Arquitetura Isolada)
 
-Uma imagem no Container Registry → N jobs, cada um com seu `ASSESSOR_PREFIX`:
+**Cada Cloud Run Job é um ambiente isolado.** Todo job usa `ASSESSOR_PREFIX=ASSESSOR_1` — o que diferencia os assessores são OS VALORES das env vars, não o prefixo.
 
 ```bash
-# Job 1: Assessor João
-ASSESSOR_PREFIX=ASSESSOR_1
-ASSESSOR_1_NOME="João Silva"
-ASSESSOR_1_BAILEYS_CREDS_B64=eyJub2lzZUt...
-ASSESSOR_1_GEMINI_API_KEY=...
-ASSESSOR_1_GOOGLE_CREDENTIALS_JSON={...}
-ASSESSOR_1_ID_PASTA_PENDENTES=...
-ASSESSOR_1_ID_PASTA_PROCESSADOS=...
-ASSESSOR_1_ID_PLANILHA_CLIENTES=...
-ASSESSOR_1_ID_DOC_PERSONALIZACAO=...
-ASSESSOR_1_NOME_ABA_CLIENTES=Clientes
-ASSESSOR_1_NOME_ABA_LOGS=Registros
-ENVIOS_POR_EXECUCAO=8
+# ── Job 1: Assessor XP ───────────────────────────
+gcloud run jobs deploy xperformance-assessor-teste \
+  --image=gcr.io/.../augmentacao-assessores:latest \
+  --region=us-east1 --cpu=1 --memory=2Gi --task-timeout=1200s \
+  --command=./entrypoint.sh \
+  --set-env-vars="ASSESSOR_PREFIX=ASSESSOR_1,ASSESSOR_1_NOME=Assessor XP,..."
 
-# Job 2: Assessora Maria
-ASSESSOR_PREFIX=ASSESSOR_2
-ASSESSOR_2_NOME="Maria Oliveira"
-ASSESSOR_2_BAILEYS_CREDS_B64=...
-...
+# ── Job 2: Assessor Igor (job separado, mesmas envs mas outro número) ──
+gcloud run jobs deploy assessor-igor \
+  --image=gcr.io/.../augmentacao-assessores:latest \
+  --region=us-east1 --cpu=1 --memory=2Gi --task-timeout=1200s \
+  --command=./entrypoint.sh \
+  --set-env-vars="ASSESSOR_PREFIX=ASSESSOR_1,ASSESSOR_1_NOME=Igor Rodrigues,..."
 ```
 
-**NUNCA use `ASSESSORES_ATIVOS=1,2` em um job só com Cloud Run.** Cada job = um assessor. O entrypoint decodifica a sessão específica do prefixo, o Python inicia/para o Baileys, e o pipeline executa só os clientes daquele assessor.
+O entrypoint (`entrypoint.sh`) decodifica `${ASSESSOR_PREFIX}_BAILEYS_CREDS_B64` para `sessions/${PREFIX##ASSESSOR_}/creds.json`:
+- `ASSESSOR_PREFIX=ASSESSOR_1` → `sessions/1/creds.json`
+- Cada job tem seu próprio filesystem efêmero → sem conflito entre jobs.
+
+**NUNCA use `ASSESSORES_ATIVOS=1,2` em um job só com Cloud Run.** NUNCA crie scripts avulsos. A infra é Cloud Run Jobs com env vars.
+
+### Deploy Workflow para Novo Assessor
+
+Sempre criar um `/plan.md` antes de executar deploys. Passos:
+
+1. **Verificar jobs existentes** (referência de env vars):
+   ```bash
+   gcloud run jobs list --region=us-east1
+   gcloud run jobs describe xperformance-assessor-teste --region=us-east1
+   ```
+
+2. **Criar env-vars.yaml** com os IDs de Google Drive/Sheets/Docs. **⚠️ Confirme a FONTE dos IDs:**
+   - O job legado original (ex: Agemini) tem seus próprios IDs
+   - O ambiente de teste pode ter IDs DIFERENTES
+   - Sempre verificar no `.env.example` do projeto ORIGINAL quais IDs usar
+   - `gcloud run jobs describe <job-existente>` mostra as env vars atuais como referência
+   
+   Alterar apenas:
+   - `ASSESSOR_1_NOME` → nome do novo assessor
+   - `ASSESSOR_1_BAILEYS_CREDS_B64` → base64 do creds.json do novo número
+
+3. **Gerar creds do WhatsApp** para o novo número:
+   - Rodar `baileys_service.js` com sessão limpa
+   - Escanear QR (DENTRO do WhatsApp, nunca com câmera normal)
+   - Extrair base64: `base64 -w0 sessions/<N>/creds.json`
+
+4. **Deploy**:
+   ```bash
+   gcloud run jobs deploy assessor-igor \
+     --image=gcr.io/idata-421415/augmentacao-assessores:latest \
+     --region=us-east1 --cpu=1 --memory=2Gi --task-timeout=1200s \
+     --max-retries=3 --command=./entrypoint.sh \
+     --env-vars-file=env-vars-igor.yaml
+   ```
+
+5. **Testar:**
+   ```bash
+   gcloud run jobs execute assessor-igor --region=us-east1 --wait
+   ```
+
+⚠️ **gcloud token expira.** A service account do Drive NÃO tem permissão de Cloud Run. Duas formas de reautenticar:
+
+**Via OAuth interativo (background + pty):**
+```bash
+terminal(command="gcloud auth login", background=true, pty=true)
+process(action="log", session_id="proc_xxx")  # extrair URL
+# → enviar URL ao usuário
+process(action="submit", session_id="proc_xxx", data="4/0AXEQx...")
+```
+⚠️ Cada `gcloud auth login` gera um PKCE único. O código NÃO reusa entre chamadas.
+
+**Via service account key (fallback sem interação):**
+Se existir uma chave de service account com permissões de Cloud Run no projeto alvo, use-a diretamente:
+```bash
+gcloud auth activate-service-account --key-file=caminho/da/chave.json
+```
+Isso evita todo o fluxo browser + código de verificação.
 
 ### Variáveis de Ambiente — Job Mínimo
 

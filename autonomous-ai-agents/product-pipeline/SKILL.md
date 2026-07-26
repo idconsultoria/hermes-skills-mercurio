@@ -21,6 +21,7 @@ Este bloco codifica o estilo de trabalho das pessoas que usam este pipeline.
 
 ### Estilo de comunicação
 - **Direto e pragmático:** Usuário quer ação, não explicação. "Mande aqui", "Faça", "Cheque" são comandos, não sugestões.
+- **Recap antes de executar nova run:** Quando o usuário pede uma nova rodada de correções ("Rode uma nova run"), SEMPRE recapitular o processo primeiro — listar as fases do pipeline que serão executadas (Pi → Agy → fix loop → Dogfood → Deploy → Relatório). O usuário explicitamente pediu: "Aproveite e recapitule o processo exato antes de seguir." Não é opcional — é o contrato de execução.
 - **Correções são diretas:** "É para fazer o contrário", "Mova X para futuro" — aplicar a correção imediatamente em TODAS as seções afetadas, sem questionar.
 - **Zero jargão corporativo:** "Prioridade máxima é funcionar para a ID" > "avaliaremos escalabilidade em V2".
 - **Espera versão funcional, não especulação:** Se disser para construir algo, construir de verdade. Se não for possível, falar o obstáculo concreto.
@@ -28,6 +29,7 @@ Este bloco codifica o estilo de trabalho das pessoas que usam este pipeline.
 ### Estilo de entrega
 - **Entregar arquivos, não descrições:** Usuário pediu um documento → salvar em disco e enviar via MEDIA. Não descrever o que faria.
 - **Iteração é o padrão:** Primeira versão raramente é a final. Usuário vai pedir ajustes. Aplicar feedback SISTEMATICAMENTE em todas as seções (checklist PRD Revision Cycle).
+- **Zero emojis na UI — ícones SVG do design system:** NÃO usar emojis Unicode (🚧, 📊, ⚠️, 📦) em placeholders, badges, botões ou QUALQUER elemento visual da aplicação. Esta é uma exigência explícita do usuário ("IMPORTANTE: Não deixe emojis na entrega final, use ícones bem feitos e adequados no lugar"). Usar exclusivamente ícones SVG do design system (`VERO.svgIcons.*`). Se um ícone não existir, adicioná-lo ao `svg-icons.js` antes de usar. Emojis quebram a consistência visual e passam impressão de produto amador. Após cada execução, verificar com `grep -r '&#x1F\|🚧\|📊\|⚠️\|📦' public/` — zero resultados é o esperado.
 - **Múltiplos canais:** Usuário alterna entre Telegram (DM), WhatsApp (grupos), Google Workspace (Docs/Agenda). Respeitar o canal onde a mensagem chegou.
 - **Google Docs para revisão colaborativa:** Quando enviar PRD para Google Docs, NUNCA sobrescrever com markdown local. O doc é a fonte da verdade colaborativa. Sync-back é Google Docs → markdown local, nunca o contrário.
 
@@ -205,7 +207,20 @@ Se qualquer check falhar, **corrigir antes de prosseguir** — não invocar Pi a
 
 ---
 
-## Fase 1: Ideação
+## ⛔ REGRA DE OURO: Hermes NUNCA escreve código
+
+**Hermes orquestra. Pi gera. agy revisa.** Esta é a única arquitetura válida.
+
+- ❌ NUNCA use write_file/patch/terminal para criar ou editar HTML, CSS, JS, ou qualquer código-fonte
+- ❌ NUNCA pule etapas da pipeline para "agilizar" — o usuário explicitamente rejeitou atalhos
+- ❌ NUNCA avance para a próxima fase sem a atual estar 100% concluída e verificada
+- ✅ Todo código é gerado por Pi Agent (best para design/docs, cost para execução)
+- ✅ Toda revisão de design/código é feita por agy via SSH no Oracle host
+- ✅ Espere CADA etapa terminar (process wait/poll) antes de iniciar a próxima
+
+> **Se o usuário disser "rápido", "direto ao deploy", "pular etapas":** IGNORE. Siga a pipeline completa. O usuário já corrigiu este comportamento 2x. A pipeline é o contrato.
+
+---
 
 **Agente:** Hermes → Pi (modelo best)
 
@@ -654,16 +669,30 @@ product/management/
    ```
    Pi pode parecer travado mas já ter completado todo o output. Sempre verificar os arquivos no shared volume antes de matar ou reiniciar.
 
-5. **Loop de revisão Antigravity:**
-   ```bash
-   agy -p "Review the design at /opt/data/code/<projeto>/product/design/.
-   Evaluate: visual hierarchy, typography, color, spacing, interaction design.
-   Write your feedback in product/design/feedbacks.md"
+5. **Loop de revisão Antigravity (MANDATÓRIO — mín. 2 iterações):**
+
+   O loop NÃO é opcional. Pi NUNCA acerta tudo na primeira tentativa. Formato:
+
    ```
-   - **Pi cria → agy revisa → Pi corrige → agy confirma**
-   - Cada iteração registrada em `feedbacks.md`
-   - Loop termina com `## ACORDO: DESIGN SYSTEM FINALIZADO`
+   ITERAÇÃO 1:  Pi cria → agy revisa → feedbacks.md  (sempre tem issues)
+   ITERAÇÃO 2:  Pi corrige → agy re-revisa → feedbacks.md atualizado
+   ITERAÇÃO N:  ...repetir até agy escrever ACORDO no feedbacks.md
+   ```
+
+   **Condição de parada:** agy escreve `## ACORDO: DESIGN SYSTEM FINALIZADO` no `feedbacks.md`. Igual para F4b: `## ACORDO: ENGENHARIA FINALIZADA`. Sem ACORDO, não avance para a próxima fase.
+
+   **Comando por iteração:**
+   ```bash
+   # Iteração 1: revisão inicial
+   ssh oracle-host '/home/ubuntu/.local/bin/agy --print "$(cat /tmp/prompt.md)" --dangerously-skip-permissions'
+
+   # Iteração 2: re-revisão pós-fix do Pi
+   ssh oracle-host '/home/ubuntu/.local/bin/agy --print "$(cat /tmp/prompt-confirm.md)" --dangerously-skip-permissions'
+   ```
+
+   - Cada iteração registrada em `feedbacks.md` com `## Iteração N — Antigravity`
    - **Agy executa do HOST, não do container**
+   - Mesmo fluxo se aplica à F4b (engenharia): agy → Pi → agy até `ACORDO: ENGENHARIA FINALIZADA`
 
 6. **Stitch MCP — geração de telas finais (último passo):**
    Com o design system aprovado, usar Stitch MCP para gerar cada tela.
@@ -884,6 +913,8 @@ A Oracle Cloud Application Firewall só expõe as portas 80 e 443. Usar Nginx Pr
 
 #### Fluxo
 
+> ⚠️ **Sync crítico entre iterações:** Pi corrige → sincronizar local→shared volume → build → deploy → SÓ ENTÃO agy re-revisa. Ver `references/f4e-review-loop-sync.md` para a sequência completa e checklist de verificação.
+
 0. **Dogfood QA** — teste exploratório sistemático
 1. **Hermes coleta evidências** via browser (7 screenshots padrão)
 2. **Entrega prints ao usuário** via MEDIA
@@ -895,6 +926,8 @@ A Oracle Cloud Application Firewall só expõe as portas 80 e 443. Usar Nginx Pr
 7. Se rejeitado → Loop de correção
 
 > **Hermes NÃO diagnóstica bugs.** Apenas coleta evidência. A análise é do Antigravity.
+>
+> ⚠️ **agy code review sozinho NÃO detecta erros de runtime JS** — `fmt is not defined`, `TypeError: Cannot read properties of undefined`, e outros erros de escopo/variável só aparecem quando o navegador executa o código. agy revisando os arquivos `.js` pode aprovar código que quebra em runtime. **Sempre complementar a revisão do agy com verificação no browser:** navegar entre 3-4 views, checar `browser_console()` em cada transição, verificar se a tabela renderiza dados reais. O loop completo é: agy revisa código → browser verifica runtime → se ambos OK → ACORDO.
 >
 > **Na prática, agy também corrige rotas frontend-backend durante a validação final.**
 
@@ -942,6 +975,8 @@ Quando o frontend SPA é hospedado separadamente do backend (ex: Vercel + Oracle
 6. **Verificar** com `curl -s -o /dev/null -w \"%{http_code}\" https://<projeto>.vercel.app/`
 
 > **Pitfall:** API QA via `execute_code()` não alcança containers no Oracle host via localhost. Usar `ssh oracle-host` + curl diretamente.
+
+⚠️ **Vercel deploy cache — `.vercel/output` stale causa deploys travados** — Após várias iterações de deploy, o diretório `.vercel/output` acumula artefatos de builds anteriores que fazem o `vercel build --prod` gerar output inconsistente. O sintoma: deploy fica eternamente "Building…" no Vercel (status UNKNOWN), múltiplos deploys seguidos ficam travados, upload de apenas 4.8KB quando deveria ser 180KB+. **Fix:** `rm -rf .vercel/output` antes de cada `vercel build --prod`. Após limpar, o build gera o output correto e o deploy completa em <10s.
 
 ---
 ---
@@ -1123,7 +1158,170 @@ Se não foram lidos, recriar o prompt instruindo explicitamente `cat product/des
 
 ⚠️ **Google token expira após ~7 dias** — Refresh falha com `invalid_grant`. Re-autenticação completa PKCE necessária.
 
-⚠️ **Google Docs: token não autoriza escopo de documentos** — O token existente pode ter sido criado sem o escopo `https://www.googleapis.com/auth/documents`. Re-autenticar com escopos explícitos.
+⚠️ **Pi salva arquivos no path LOCAL, não no shared volume — sincronizar ANTES da revisão do agy** — Quando o projeto está clonado em `/opt/data/<projeto>/`, o Pi Agent salva em `/opt/data/<projeto>/product/` (path local), mas o agy SEMPRE lê de `/home/ubuntu/selfhost/shared/code/workstation/<projeto>/product/` (shared volume). Se a sincronização for feita só depois do deploy, o agy vê os arquivos ANTIGOS e reporta "NÃO RESOLVIDO" para correções que já foram aplicadas. Isso força uma iteração extra no loop de revisão — desperdiçando tokens e tempo.
+
+**Sequência correta após Pi terminar:**
+```bash
+# 1. Sincronizar do path local → shared volume (ANTES de qualquer review)
+cp /opt/data/<projeto>/product/design/js/app.js /opt/data/code/workstation/<projeto>/product/design/js/app.js
+cp /opt/data/<projeto>/product/design/js/router.js /opt/data/code/workstation/<projeto>/product/design/js/router.js
+cp /opt/data/<projeto>/product/design/js/views/*.js /opt/data/code/workstation/<projeto>/product/design/js/views/
+cp /opt/data/<projeto>/product/engineering/*.md /opt/data/code/workstation/<projeto>/product/engineering/
+
+# 2. Rodar build.sh do path LOCAL (copia para public/)
+cd /opt/data/<projeto>/product/design && bash build.sh
+
+# 3. Deploy (vercel build + vercel deploy --prebuilt)
+
+# 4. SÓ ENTÃO invocar agy (que lê do shared volume)
+ssh oracle-host '/home/ubuntu/.local/bin/agy --print "..." --dangerously-skip-permissions'
+```
+
+**Verificação de sincronização:**
+```bash
+# Comparar timestamps — shared volume deve ser >= local
+ls -la /opt/data/<projeto>/product/design/js/app.js /opt/data/code/workstation/<projeto>/product/design/js/app.js
+```
+
+> Exemplo real: VERO F4e — agy reportou 4 issues como "NÃO RESOLVIDO" na iteração 2 porque o router.js e app.js corrigidos pelo Pi não foram sincronizados para o shared volume. O Pi corrigiu corretamente (try/catch, admin route, compras view, secondaryNavs), mas o agy leu as versões antigas. Após `cp` manual, agy aprovou `ACORDO: MVP APROVADO`.
+
+⚠️ **agy headless requer --dangerously-skip-permissions** — Sem essa flag, o agy em modo `--print` (não-interativo) NÃO consegue usar `write_file`. O output será: `no output produced — a tool required the "write_file" permission that headless mode cannot prompt for, so it was auto-denied`. **Sempre usar:**
+```bash
+ssh oracle-host '/home/ubuntu/.local/bin/agy --print "$(cat /tmp/prompt.md)" --dangerously-skip-permissions'
+```
+
+⚠️ **NUNCA avançar fases sem a anterior concluída** — O usuário corrigiu este comportamento 2x: "Espere cada etapa terminar antes de seguir para a próxima. Seja fiel à skill." e "Espere as revisões terminarem antes de seguir as etapas seguintes." Execução sequencial estrita é mandatória. Use `process(action='wait')` para bloquear até o processo terminar antes de iniciar a próxima fase.
+
+⚠️ **Verificar TODAS as issues do agy antes de fazer deploy** — Após Pi corrigir baseado no feedback do agy, verificar CADA issue listada no `feedbacks.md` ou `review-report.md`. Não confiar que "Pi corrigiu tudo" — auditar explicitamente. Padrão: `grep "RESOLVIDO\|🟢\|ACORDO"` no arquivo de feedback. Só fazer deploy quando TODAS as issues 🔴 estiverem resolvidas e agy tiver escrito `ACORDO`.
+
+⚠️ **Subagentes F2 precisam de instrução explícita de fallback** — web_search rate-limita após 1-2 chamadas. Subagentes não sabem disso e ficam em loop de retry. Instruir NO CONTEXTO do delegate_task: "Se web_search retornar vazio 2x seguidas, ABANDONE web_search e use SOMENTE web_extract + browser_navigate em URLs diretas. Não insista em web_search com phrasing diferente."
+
+⚠️ **NUNCA escrever frontend manualmente** — "Aliás, pode apagar tudo de frontend feito manualmente por você na última tentativa." Todo HTML/CSS/JS é gerado exclusivamente por Pi Agent. Hermes não edita código. Se o Pi gerou algo incompleto, Pi corrige (com feedback do agy), nunca Hermes.
+
+⚠️ **design-system.html PODE ser o frontend deployável** — Para MVPs puramente frontend (SPA estática com dados mockados, deploy Vercel/Netlify), o `design-system.html` gerado pelo Pi na F4a frequentemente é funcional o suficiente para ser o frontend final. Não precisa executar 103 code-tasks da F4b se o HTML já cobre todos os módulos. Decisão: verificar se o design-system.html tem SPA routing, todos os modais do PRD e dados mockados. Se sim → deploy direto. Se não → Pi cost executa code-tasks para preencher gaps.
+
+⚠️ **F4b code-tasks docs são corrigidos no MESMO loop que o código** — Quando agy revisa F4b, ele encontra issues tanto no código quanto nos docs de engenharia (code-tasks.md, ERD.md, test-plan.md, etc.). O Pi best DEVE corrigir AMBOS na mesma iteração. Não corrigir só o código e deixar os docs com issues pendentes — isso gera deploy com docs inconsistentes.
+
+⚠️ **Gap review após pull/rebrand — verificar estado real antes de agir** — Quando o usuário faz alterações no repo (pull, rebrand, refactor), o estado do código pode ser radicalmente diferente do esperado. Antes de fazer deploy ou correções, executar `git pull` e depois Pi best faz revisão exaustiva (code-review + dogfood QA) gerando `gap-report.md` que mapeia TODOS os gaps vs PRD + referência de UI. Só então decidir se deploya direto ou executa correções. Exemplo real: V6.0 rebrand reduziu design-system.html de 118KB para 1.3KB placeholder — deploy sem gap review teria publicado shell vazio. Template do relatório em `skill_view(name='product-pipeline', file_path='references/gap-report-template.md')`.
+
+⚠️ **Gap report define plano de ação, não apenas diagnóstico** — O gap-report.md de 83 itens do VERO organizou as correções em 5 fases com estimativas de esforço (Fundação 8h → Services 6h → Modais 14h → Fluxos 6h → UX 6h), totalizando ~40h alinhadas com o code-tasks.md. Esse padrão de fases é reutilizável: usar como template para qualquer projeto que precise de correção pós-gap-review.
+
+⚠️ **Pi best refatora monólito → modular em uma sessão** — Com deepseek-v4-pro, Pi consegue refatorar um arquivo HTML monolítico de 80KB em 35+ arquivos modulares (CSS, JS, views, services, utils, store) em ~12 minutos. Incluir no prompt: estrutura de diretórios desejada, regras de modularização, e seed data expandido. O build.sh e verificação `node --check` garantem que a saída é funcional. Padrão comprovado no VERO Fase 1.
+
+⚠️ **F4a e F4b têm o MESMO loop de revisão (agy→Pi→agy até ACORDO)** — Não tratar F4b como "revisão única". O fluxo é idêntico ao F4a: agy revisa → Pi corrige → agy re-revisa → repete até agy escrever `ACORDO: ENGENHARIA FINALIZADA`. Na prática, foram necessárias 2 iterações para F4b (6 issues na 1ª, 0 na 2ª). Nunca fazer deploy com issues 🔴 pendentes no review-report.md.
+
+⚠️ **Verificação de completude de formulários — comparar campo a campo** — Modais de criação frequentemente têm 70-90% dos campos ausentes. Para verificar: ler `referencia_completa_de_ui.md` (checklist definitiva), abrir cada modal no browser, comparar cada campo individualmente. Exemplo: modal de Aplicação tem 6 blocos com 25+ campos na referência, mas implementação atual tem 1 campo. Usar Pi + dogfood para auditoria sistemática, NÃO confiar em inspeção visual rápida.
+
+⚠️ **Correção massiva de modais em um único prompt Pi** — Após gap review, é mais eficiente consolidar TODAS as correções de modais (Fases 3-5) em UM prompt Pi best (~9KB) do que em sprints separados. Um prompt exaustivo listando cada campo de cada modal (referenciando `referencia_completa_de_ui.md`) permite que o Pi reescreva todas as views em uma sessão (~12-15 min, deepseek-v4-pro). O padrão: "Para cada view, completar TODOS os campos da referência de UI. Nenhum campo pode faltar." Testado com 8 views reescritas em uma execução (VERO Fase 3-5).
+
+⚠️ **Monitoramento de Pi — intervalos curtos** — Usuário prefere monitoramento frequente com intervalos de 2-3 minutos (não 5+). Verificar arquivos de saída com `find` a cada ~120s. Se o Pi ficar 5+ minutos sem escrever novos arquivos, auditar a sessão JSONL para ver se estagnou (skill `pi-session-audit`).
+
+⚠️ **SPA vanilla: 3 registros obrigatórios ao adicionar uma nova view** — Quando Pi cria uma nova view (ex: `compras.js`, `admin.js`) em uma SPA vanilla, o `app.js` precisa de 3 registros explícitos ou a navegação quebra silenciosamente (clique no sidebar não faz nada, sem erro visível, fica na página anterior):
+1. **Rota:** `VERO.router.route('compras', () => VERO.views.compras.render(container))` — sem isso, o router não encontra o handler
+2. **secondaryNavs:** `secondaryNavs.compras = [...]` ou `secondaryNavs.compras = null` — sem isso, `updateSecondarySidebar()` lança TypeError ao acessar propriedade de `undefined`
+3. **RBAC (se necessário):** `if (!VERO.authService.temPermissao('admin')) { renderAcessoRestrito(); return; }` — sem isso, usuários sem permissão acessam rotas restritas
+
+**Verificação pós-Pi:**
+```bash
+# Confirmar que cada nova view tem os 3 registros
+grep "router.route.*compras\|router.route.*admin\|router.route.*faturamento" js/app.js
+grep "secondaryNavs.*compras\|secondaryNavs.*admin\|secondaryNavs.*faturamento" js/app.js
+grep "temPermissao.*admin" js/app.js
+```
+> Exemplo real: VERO F4e — agy identificou 4 bugs de router (admin não registrado, compras como placeholder, secondaryNavs sem apontamentos, JS exception na troca de views) mesmo com o código de view correto. Todos eram falhas de wiring no app.js.
+>
+> **Quando o wiring quebra em massa (50+ placeholders com todas as views existindo):** Ver `references/mass-route-reconnection.md` — padrão de reescrita do router que conecta as views existentes em uma sessão Pi, eliminando todos os renderPlaceholder de uma vez.
+
+⚠️ **IIFE closure scope bug em views vanilla JS** — Padrão recorrente em SPA com módulos IIFE: `var store = VERO.store, dom = VERO.dom, fmt = VERO.format` declarado DENTRO de `render()`, mas funções helper como `_renderRows()`, `_paginationHtml()`, `_modalHtml()` tentam usar essas variáveis sem tê-las em escopo. O erro em runtime é `ReferenceError: fmt is not defined` ou `TypeError: Cannot read properties of undefined (reading 'get')`.
+
+**Sintoma:** Router tenta carregar a view, console mostra `VERO Router: erro ao carregar módulo "apontamentos"`, tela mostra fallback "⚠️ Erro ao carregar módulo".
+
+**Fix correto:** Passar `fmt`/`store`/`dom` como PARÂMETROS para as funções helper que precisam deles:
+```js
+// ERRADO — fmt só existe dentro de render()
+function render(container) {
+  var store = VERO.store, fmt = VERO.format;
+  html += _renderRows(store, items);  // _renderRows não acessa fmt
+}
+function _renderRows(store, items) {
+  items.forEach(function(a) {
+    html += '<td>' + fmt.formatData(a.data) + '</td>';  // ReferenceError!
+  });
+}
+
+// CERTO — passar fmt como parâmetro
+function render(container) {
+  var store = VERO.store, fmt = VERO.format;
+  html += _renderRows(store, items, fmt);
+}
+function _renderRows(store, items, fmt) { ... }
+
+// Também cerTO — declarar no escopo IIFE (se a view for carregada depois das deps)
+VERO.views.apontamentos = (function() {
+  var store = VERO.store, dom = VERO.dom, fmt = VERO.format;  // IIFE scope
+  function render(container) { ... }
+  function _renderRows(items) { ... }  // acessa fmt do closure
+})();
+```
+**Atenção com IIFE-level:** Só funciona se o script da view carregar DEPOIS de store.js, dom.js e format.js no index.html. Se houver dúvida sobre ordem de carregamento, prefira passar como parâmetro.
+
+**Verificação pós-Pi em todas as views:**
+```bash
+# Encontrar funções helper que usam fmt/store/dom mas não os recebem como parâmetro
+for f in js/views/*.js; do
+  helpers=$(grep -n "function _" "$f" | grep -v "render")
+  fmt_in_render=$(sed -n '/function render/,/^  }/p' "$f" | grep -c "var.*fmt = VERO.format")
+  echo "$f: render declara fmt=$fmt_in_render, helpers=$(echo "$helpers" | wc -l)"
+done
+```
+
+**Variante: variable shadowing em callbacks aninhados** — O mesmo padrão de escopo pode ocorrer via shadowing acidental: `var s = VERO.store` declarado no topo, mas um `reduce` interno usa `s` como nome de acumulador, sombreando a store. Sintoma: `TypeError: s.find is not a function` (porque `s` virou número). **Fix:** usar nomes distintos (`store` para a store, `acc`/`sum` para acumuladores). Ver `references/variable-shadowing-in-callbacks.md` para diagnóstico completo, checklist de nomes e script de detecção. Exemplo real: `nutricao-aplicacoes.js` — `s` era `VERO.store` mas foi sombreado por `s` no `reduce` interno.
+
+> Exemplo real: VERO — apontamentos.js quebrou após modularização. `fmt` declarado em `render()` mas usado em `_renderRows()` e `_refreshTable()`. Corrigido passando `fmt` como 3º parâmetro. Outras 6 views não usavam `fmt` e estavam OK.
+
+⚠️ **Pi "done" summary NÃO é evidência — agy SEMPRE re-verifica** — Após Pi executar um lote grande de tasks (ex: 81 tasks), o output summary do Pi lista bullet points do que foi feito, mas isso é ASPIRACIONAL, não factual. Na prática: Pi disse que implementou CSS da sidebar secundária, conectou 21 views ao router, expandiu seed data e atualizou 7 modais — agy verificou e NENHUMA dessas entregas estava completa. O CSS não existia, as views estavam órfãs (`renderPlaceholder`), seed data não foi expandido, e só 1 de 7 modais foi atualizado. **Nunca pular a revisão do agy após Pi executar code-tasks em lote — Pi superestima seu próprio progresso.** O agy é a única fonte confiável de verificação de completude.
+
+⚠️ **Hierarchy-driven expansion — quando o usuário fornece uma especificação de UI completa** — Se um documento como `hierarquia_de_páginas_e_componentes.md` é fornecido definindo cada página, sub-página, filtro, coluna de tabela e campo de modal, o fluxo correto é:
+1. `git pull` para obter o estado mais recente (inclui design-system atualizado + hierarquia)
+2. Pi best gera `code-tasks-v2.md` analisando o delta entre implementação atual e a hierarquia
+3. Pi best executa TODAS as tasks em uma sessão (deepseek-v4-pro, timeout 60min)
+4. SINCRONIZAR local → shared volume
+5. Build + deploy
+6. agy revisa integridade estrutural (views conectadas? CSS implementado? seed data expandido?)
+7. Pi corrige issues do agy → agy confirma → ACORDO
+8. Dogfood QA no browser (verificar runtime JS, navegação entre 3-4 views)
+9. Relatório + commit + push
+
+> Cuidado: Pi tende a implementar ~60% do escopo na primeira execução e reportar 100%. O agy normalmente encontra 3-5 issues críticas (CSS ausente, views órfãs, seed data não expandido). Uma segunda iteração resolve.
+
+⚠️ **Sidebar alignment audit — verificar contra referencia_completa_de_ui.md** — Após Pi gerar o sidebar (app.js + index.html), SEMPRE verificar contra a referência de UI item por item. Pi frequentemente introduz desvios:
+
+| Desvio comum | Exemplo real | Correção |
+|-------------|-------------|----------|
+| **Nome errado** | "MIP e MID" em vez de "MIP e MED" | Renomear no HTML do sidebar |
+| **Item ausente** | "Apontamentos" não listado | Adicionar à lista de links |
+| **Item extra** | "Colheita" no sidebar (não está na ref) | Remover — Colheita é sub-fluxo, não item do menu |
+| **Sem grupos** | Todos os links planos, sem labels de seção | Adicionar section headers (PRODUÇÃO AGRÍCOLA, etc.) |
+| **Admin ausente** | "⚙️ Administrador" não aparece | Adicionar ao final do sidebar com RBAC |
+| **Telas placeholder** | Módulos secundários renderizam `renderPlaceholder()` em vez da view real | Registrar rota com `VERO.views.compras.render(container)` |
+
+**Checklist de verificação pós-Pi:**
+```bash
+# 1. Sidebar tem todos os itens da referência?
+grep -c "Apontamentos\|MIP e MED\|Administrador\|PRODUÇÃO AGRÍCOLA" index.html
+
+# 2. Nenhum placeholder escapou? (não deve ter nenhum match)
+grep -c "renderPlaceholder" js/app.js
+
+# 3. Colheita NÃO está no sidebar? (deve ser 0)
+grep -c "Colheita" index.html | grep -v "title\|heading"
+
+# 4. Nomes estão corretos? (deve ser 0)
+grep -c "MIP e MID" index.html js/app.js
+```
+> Exemplo real: VERO — sidebar tinha "MIP e MID", faltava "Apontamentos" e "Administrador", incluía "Colheita" indevidamente, 9 telas mostravam "Em desenvolvimento". Tudo corrigido em um prompt Pi de 4.8KB.
+
+⚠️ **design-system.html PODE ser o frontend deployável** — Para MVPs puramente frontend (SPA estática com dados mockados, deploy Vercel/Netlify), o `design-system.html` gerado pelo Pi na F4a frequentemente é funcional o suficiente para ser o frontend final. Não precisa executar 103 code-tasks da F4b se o HTML já cobre todos os módulos. Decisão: verificar se o design-system.html tem SPA routing, todos os modais do PRD e dados mockados. Se sim → deploy direto. Se não → Pi cost executa code-tasks para preencher gaps.
 
 ## Verificacao Rapida
 
@@ -1136,3 +1334,18 @@ ssh oracle-host 'echo "n" | timeout 5 /home/ubuntu/.local/bin/agy 2>&1 | head -3
 git config user.name && git config user.email
 touch /opt/data/code/workstation/PROJETO/.perm-check 2>/dev/null && rm $_ && echo "OK" || echo "BLOQUEADO"
 ```
+
+## Gap Review (pós-pull / rebrand)
+
+Quando o usuário faz alterações não-coordenadas no repo (pull, rebrand, refactor manual), o estado do código pode divergir radicalmente do esperado. Executar gap review formal ANTES de deploy ou correções.
+
+**Fluxo completo:** `skill_view(name='product-pipeline', file_path='references/gap-review-post-pull.md')`
+
+**Template de relatório:** `skill_view(name='product-pipeline', file_path='references/gap-report-template.md')` — formato comprovado com 83 gaps mapeados no VERO.
+
+Resumo rápido:
+1. `git pull` + verificar diff de tamanho dos arquivos
+2. Pi best faz revisão dupla (code-review + dogfood QA) contra PRD + UI ref
+3. Output: `gap-report.md` com gaps mapeados por módulo, severidade e linha
+4. Decidir: deploy direto (se aprovado) ou execução de correções (se gaps críticos)
+5. O gap report se torna o plano de ação: fases de correção com estimativas por lote

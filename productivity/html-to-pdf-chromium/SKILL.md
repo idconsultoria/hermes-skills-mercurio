@@ -1,6 +1,8 @@
 ---
 name: html-to-pdf-chromium
-description: "Convert HTML to high-fidelity PDF using Chromium headless via .deb extraction. Fallback to WeasyPrint on ARM64 when Chromium binaries are unavailable."
+description: "Convert HTML to PDF via Chromium headless — ARM64 fallback to WeasyPrint.
+
+Load this skill when generating PDF from HTML with browser-quality rendering, or when weasyprint output lacks CSS features like -webkit-background-clip or gradients. Covers Chromium headless installation via Debian .deb extraction without root or Playwright, PDF generation with full CSS support, WeasyPrint for ARM64 systems, and common rendering fixes."
 trigger: User asks to generate PDF from HTML with browser-quality rendering, or when weasyprint output lacks CSS features like -webkit-background-clip or gradients.
 related_skills: [html-report-hermes, iaf-newsletter-pipeline]
 type: Template

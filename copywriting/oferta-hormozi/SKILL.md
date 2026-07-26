@@ -1,6 +1,6 @@
 ---
 name: oferta-hormozi
-description: "Framework de Oferta Irresistível (Alex Hormozi) para landing pages de cursos e infoprodutos.
+description: "Framework de Oferta Irresistível (Hormozi) — landing pages de cursos.
 
 Carregue esta skill quando for escrever ou revisar uma landing page, página de vendas, seção de preços ou estrutura de oferta para cursos e infoprodutos. Aplica a Value Equation, o MAGIC headline framework, e os princípios de Grand Slam Offer para transformar copy de features em copy de transformação. pt-BR, zero anglicismos."
 version: 1.1.0

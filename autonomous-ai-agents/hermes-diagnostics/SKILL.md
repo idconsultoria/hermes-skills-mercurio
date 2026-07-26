@@ -1,6 +1,6 @@
 ---
 name: hermes-diagnostics
-description: "Systematic methodology for diagnosing Hermes Agent behavioral issues—session resets, context loss, compression failures, provider instability, and session lifecycle problems.
+description: "Diagnose Hermes Agent issues — session resets, context loss, compression.
 
 Load this skill when the user reports Hermes misbehaving: conversations resetting mid-turn, context being lost, sessions ending abruptly, repeated model fallbacks, or provider errors. Covers the full diagnostic pipeline: config analysis (compression, auxiliary models, session_reset settings), gateway log inspection (fallback patterns, compression events, error signatures), state.db SQLite analysis (session lifecycle, end_reasons, compression_failures, session_key chains), compressor source-code review, provider chain analysis, and causal-chain synthesis into a concrete remediation plan."
 type: Research

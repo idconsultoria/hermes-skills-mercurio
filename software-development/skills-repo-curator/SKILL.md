@@ -6,7 +6,7 @@ Load this skill when the skills repo needs maintenance — evolve cycles, descri
 
 category: software-development
 type: Orchestrator
-timestamp: 2026-06-28T05:11:55Z
+timestamp: 2026-07-19T05:00:00Z
 ---
 
 # Skills Repository Curator
@@ -316,7 +316,8 @@ Memória guarda **preferências do usuário e fatos estáveis do ambiente**. Ski
 ### Como ler a memória atual
 
 - **Sessão normal:** as seções `MEMORY` e `USER PROFILE` estão injetadas no prompt do agente. Leia diretamente dali — cada entrada é separada por `§`.
-- **Sessão cron (`skip_memory=true`):** a memória **não** é pré-injetada. O tool `memory` não tem action `list` — o agente não consegue ver as entradas atuais via tool call. **Soluções:** (a) incluir as entradas da memória explicitamente no texto do prompt do cron, ou (b) aceitar que o offload não roda em cron — executar manualmente quando necessário. O workaround de "adicionar dummy para forçar rejeição" é frágil e não recomendado.
+- **Sessão cron (`skip_memory=true`):** a memória **não** é pré-injetada. O tool `memory` **não tem action `list`** — as únicas actions são `add`, `replace`, `remove`. Não há como listar entradas da memória programaticamente. **Soluções:** (a) incluir as entradas da memória explicitamente no texto do prompt do cron, ou (b) aceitar que o offload não roda em cron — executar manualmente quando necessário. O workaround de "adicionar dummy para forçar rejeição" é frágil e não recomendado.
+- ⚠️ Se o usuário instruir `memory(action='list', ...)`, isso não é uma action válida. O tool retornará erro. Explique que o memory tool não expõe listagem e sugira alternativa.
 
 ### Passos
 
@@ -464,7 +465,9 @@ for root, dirs, files in os.walk('.'):
 
 ## Pitfalls
 
-⚠️ **`execute_code` blocked em cron jobs.** O tool `execute_code` roda Python arbitrário com subprocess — cron jobs bloqueiam porque não há usuário para aprovar. Use `terminal(command='python3 -c \"...\"')` em vez de `execute_code` quando estiver rodando o ciclo via cron. Funciona em sessão normal.
+⚠️ **`execute_code` blocked em cron jobs.** O tool `execute_code` roda Python arbitrário com subprocess — cron jobs bloqueiam porque não há usuário para aprovar. Use scripts em arquivo `.py` executados via `python3 script.py` em vez de `execute_code` quando estiver rodando o ciclo via cron.
+
+⚠️ **`terminal(command='python3 -c \"...\"')` quebra com backticks no código Python.** Bash interpreta backticks (\`) como substituição de comando ANTES de passar o argumento para o Python. Se o código inline contiver backticks (ex: strings com f-strings, format strings contendo \`, ou regex patterns), o shell os executa como comandos — frequentemente resultando em erro `unexpected EOF` ou saída silenciosamente corrompida. **Sempre escrever scripts Python em arquivos `.py` via `write_file` e executar com `python3 script.py`.** Scripts com `-c` inline só são seguros para comandos sem backticks, sem aspas aninhadas, e sem caracteres especiais do shell.
 
 ⚠️ **`audit-descriptions.py` não verifica `type`/`timestamp`.** O script só valida formatação de descrição (quoted string, tamanho do sumário, gatilho). Skills novas podem ser commitadas sem `type` no frontmatter sem erro do audit. **Sempre rodar** o snippet de verificação da seção Verification (passo `python3 -c "import os, re; ..."`) após o update para capturar `type` e `timestamp` faltantes.
 
@@ -518,7 +521,11 @@ for root, dirs, files in os.walk('.'):
 
 ⚠️ **Diretório read-only impede patches/write_file.** Quando `patch` ou `write_file` falha com "Permission denied" ao criar arquivo temp (`.hermes-tmp.*`), o diretório da skill pode estar read-only (modo `dr-xr-xr-x` / 555). Verificar com `stat <dir> | grep Access`. Corrigir com `chmod u+w <dir>`. Arquivos 444 individuais usam `chmod 664 <file>`.
 
+⚠️ **`read_file` mostra `N|content` — pipe é separador, não conteúdo.** O tool `read_file` exibe cada linha como `NUM|CONTENT`. O `|` após o número é o SEPARADOR entre o número da linha e o conteúdo real. **Não faz parte do conteúdo do arquivo.** Confundir o separador com pipe real no conteúdo (ex: assumir que linhas começam com `|- `) leva a patches que não encontram match. Ao copiar texto do read_file para usar em patches, remova o prefixo `NUM|` — o conteúdo real começa após o primeiro `|`. Verificar com `python3 -c "with open('index.md') as f: print(repr(f.readlines()[115][:20]))"` para ver os bytes reais.
+
 ⚠️ **`.curator_backups/` não deve ser versionado.** O diretório `.curator_backups/` na raiz contém backups automáticos de skills. Adicionar ao `.gitignore`: `echo '.curator_backups/' >> .gitignore && git add .gitignore`.
+
+⚠️ **`.curator_backups/` já tracked antes do .gitignore.** Se o `.gitignore` foi adicionado DEPOIS que os backups foram commitados, `git status` ainda mostra os arquivos como deletados (D). O .gitignore só impede tracking de NOVOS arquivos — não remove os já rastreados. **Correção:** `git rm --cached -r .curator_backups/` para untrack os backups existentes sem deletá-los do disco. Depois `git add -A && git commit -m "update: remove curator backups from tracking"`.
 
 ⚠️ **Regex `re.MULTILINE` silencioso.** Ao parsear relações do index.md com `re.findall`, o padrão `r'^- `(\\w+)` → `(.+)'` (com Unicode → U+2192) **REQUER** `re.MULTILINE`. Sem a flag, `re.findall` retorna 0 matches sem erro ou aviso — o agente conclui erroneamente que não há relações no arquivo. **Sempre** incluir `re.MULTILINE` ao buscar relations multi-linha.
 

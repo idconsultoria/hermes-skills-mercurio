@@ -91,24 +91,53 @@ gcloud run jobs deploy xperformance-assessor-teste \
 
 ```yaml
 ASSESSOR_PREFIX: ASSESSOR_1
-ENVIOS_POR_EXECUCAO: "3"
-ASSESSOR_1_NOME: Assessor XP Teste
+ENVIOS_POR_EXECUCAO: "8"
+ASSESSOR_1_NOME: Igor Rodrigues
 ASSESSOR_1_GEMINI_API_KEY: AIza...
 ASSESSOR_1_GEMINI_MODEL: gemini-3.1-flash-lite
 ASSESSOR_1_BAILEYS_CREDS_B64: "eyJub2...Ijp7..."
-ASSESSOR_1_ID_PASTA_PENDENTES: 1w8i7...
+ASSESSOR_1_GOOGLE_CREDENTIALS_JSON: |
+  {
+    "type": "service_account",
+    "project_id": "idata-421319",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQ...",
+    "client_email": "servico@...",
+    ...
+  }
+ASSESSOR_1_ID_PASTA_PENDENTES: 1KbzH5gNxeHFhEH5mQP9RnJ4NXPQNbLwr
 ASSESSOR_1_NOME_ABA_CLIENTES: Clientes
 ASSESSOR_1_NOME_ABA_LOGS: Registros
 ```
 
-### Flags comuns
+**⚠️ YAML literal block scalar (`|`) com JSON precisa de indentação.** O conteúdo do JSON deve estar **recuado exatamente 2 espaços** abaixo da chave. YAML rejeita `|` seguido de conteúdo sem indentação. Use Python para gerar:
 
-| Flag | Descrição |
-|------|-----------|
-| `--task-timeout=1200s` | Timeout por tarefa (NÃO use `--timeout`) |
-| `--command=./entrypoint.sh` | Entrypoint customizado |
-| `--env-vars-file=file.yaml` | Env vars com valores longos (base64, JSON) |
-| `--max-retries=3` | Retentativas em caso de falha |
+```python
+sa_json = json.dumps(sa, indent=2)
+sa_indented = "\n".join(f"  {line}" for line in sa_json.splitlines())
+yaml_entry = f"ASSESSOR_1_GOOGLE_CREDENTIALS_JSON: |\n{sa_indented}"
+```
+
+A chave `ASSESSOR_1_GOOGLE_CREDENTIALS_JSON` (com o prefixo do assessor) define qual service account o pipeline usa para Google Drive/Sheets. Sem ela, o código cai em ADC (Application Default Credentials da compute default).
+
+### Cloud Scheduler — Execução Recorrente
+
+Para agendar execução do job em horário fixo (ex: seg-sex 08:00 BRT = 11:00 UTC):
+
+```bash
+# 1. Habilitar Cloud Scheduler API
+gcloud services enable cloudscheduler.googleapis.com --project=PROJECT_ID
+
+# 2. Criar schedule
+gcloud scheduler jobs create http xperformance-assessor-igor \
+  --schedule="0 11 * * 1-5" \                  # seg-sex 11:00 UTC = 08:00 BRT
+  --uri="https://us-east1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/PROJECT_ID/jobs/MEU_JOB:run" \
+  --http-method=POST \
+  --oidc-service-account-email=SA-EMAIL \
+  --location=us-east1 \
+  --description="Augmentação Assessor Igor — seg-sex 08h"
+```
+
+O `--oidc-service-account-email` precisa de permissão `run.jobs.run` no job alvo (roles/run.invoker).
 
 ### Verificar jobs existentes (referência)
 
@@ -123,9 +152,38 @@ gcloud run jobs describe <job-name> --region=us-east1 --format="yaml"
 # Executar e aguardar
 gcloud run jobs execute <job-name> --region=us-east1 --wait
 
-# Ver logs da execução mais recente
-gcloud logging read "resource.type=cloud_run_job AND resource.labels.job_name=<job-name>" --limit=30 --format="text(textPayload)"
+# Listar execuções recentes
+gcloud run jobs executions list --job=<job-name> --region=us-east1 \
+  --format="table(name,status.state)"
+
+# Ler logs da execução específica
+gcloud logging read \
+  "resource.type=cloud_run_job AND resource.labels.job_name=<job-name> AND labels.run.googleapis.com/execution_name=<exec-name>" \
+  --limit=50 --project=PROJECT_ID
+
+# Monitorar status em tempo real (polling)
+while true; do
+  gcloud run jobs executions describe <exec-name> --region=us-east1 \
+    --format="value(status.conditions.type)" | tr '\n' ' '
+  sleep 30
+done
+
+# Verificar execução mais recente (succeededCount confirma sucesso)
+gcloud run jobs executions list --job=<job-name> --region=us-east1 --limit=1 \
+  --format="value(status.succeededCount)"
 ```
+
+### Troubleshooting — Log Analysis
+
+Problemas comuns em execuções de Cloud Run Jobs:
+
+| Sintoma | Causa | O que checar |
+|---------|-------|-------------|
+| `File not found: <ID>` nos logs | Service account não tem acesso ao recurso | Verificar se o recurso foi compartilhado com o SA email. Usar `google-api.py` com a SA para testar acesso. |
+| `Nenhum relatório PDF encontrado` | Pasta de pendentes vazia OU SA não tem acesso | Comparar: 404 aparece com erro explícito, "não encontrado" sem erro = pasta vazia. |
+| Job executa 2m30s+ (mais que o normal) | Pipeline com muitos PDFs | Tempo escala com quantidade de arquivos (cada um passa por Gemini). |
+| `Completed` mas `succeededCount: 0` | Task falhou e retries esgotaram | `gcloud run jobs executions describe` → `status.conditions` mostra o erro. |
+| Token expirado ao executar `gcloud` | OAuth do usuário venceu (~12h) | Usar service account key com permissões de Cloud Run como fallback. |
 
 ## Dockerfile Unificado (Python + Node.js)
 

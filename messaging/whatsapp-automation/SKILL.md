@@ -1,6 +1,6 @@
 ---
 name: whatsapp-automation
-description: "Automate WhatsApp messaging from Python projects — Baileys bridge, Z-API migration, multi-assessor patterns.
+description: "Automate WhatsApp from Python — Baileys bridge, Z-API migration, multi-assessor.
 
 Load this skill when your Python project needs to send WhatsApp messages (text, PDFs, documents) without paying for third-party APIs. Covers Baileys Node.js bridge setup, Z-API compatible REST interface, QR authentication workflow, and multi-number multi-assessor patterns."
 version: "1.0.0"
