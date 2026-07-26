@@ -4,6 +4,8 @@ Diário cronológico de operações no repositório de skills.
 
 ---
 
+## [2026-07-26] evolve | MECE analysis: 89 skills, 0 merges, 0 deletes. 1 orphan resolved (hermes-desktop-plugins → similar → hermes-agent). Graph regenerated: 89 nodes, 236 edges. 5 root-level skills remain uncategorized by design (computer-use, dogfood, hermes-desktop-plugins, nsfw-content-discovery, read-reddit).
+
 ## [2026-07-26] update | Index synced 82→89. 7 new skills added: hermes-desktop-plugins (Reference), dashboard-performance-pipeline (ToolIntegration), hermes-cron-patterns (Reference), selfhost-service-deploy (ToolIntegration), selfhost-web-apps (ToolIntegration), supabase (ToolIntegration), html-to-social-image (Media). Frontmatter fixed on all 7 (type + timestamp). Descriptions audited: 13 skills fixed — 9 summaries shortened to ≤85 chars, 4 converted from single-line to summary+paragraph format with blank-line separator (dashboard-performance-pipeline, hermes-cron-patterns, selfhost-service-deploy, selfhost-web-apps, supabase, html-to-pdf-chromium, html-to-social-image, gcp-cloud-build), 1 unquoted description quoted (hermes-desktop-plugins). All 89 SKILL.md now have type + timestamp. All sizes synced to disk.
 
 ## [2026-06-28] update | Descriptions audited: 21 summaries shortened to ≤85 chars, 1 pt-BR trigger added (augmentacao-query), 3 missing blank-line separators fixed. Audit script updated to accept pt-BR trigger. 17 Resumo drifts synced. 60/100% compliant. Type + timestamp verified across all active skills.

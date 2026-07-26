@@ -891,6 +891,7 @@ Load this skill when creating images for Instagram, Twitter, Open Graph, or any 
 Load this skill when adding new UI elements or commands to the Hermes desktop app. Covers the plugin SDK: statusbar items, layout panes, command-palette commands, keybinds, routes, themes, and the Python backend namespace. A plugin is a single ESM file with no build step.
 
 **Relações:**
+- `similar` → `autonomous-ai-agents/hermes-agent`
 
 ## Productivity
 
