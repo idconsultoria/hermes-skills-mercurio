@@ -398,8 +398,8 @@ Carregue esta skill quando for escrever ou revisar uma landing page, página de 
 Carregue esta skill quando for orquestrar o design de um board game — do pitch ao protótipo digital para playtest e produção física. Cobre arquitetura de agentes (Hermes orquestra, Pi Agent executa, Antigravity revisa), pesquisa de mercado BGG, GDD completo, implementação de protótipo web, balanceamento e produção. Compartilha volume /opt/data/code com os executores.
 
 **Relações:**
-- `similar` → `boardgame-design-principles`
 - `uses` → `boardgame-design-principles`
+- `similar` → `autonomous-ai-agents/product-pipeline`
 
 ### Board Game Design Skill
 
@@ -413,7 +413,6 @@ Carregue esta skill quando for orquestrar o design de um board game — do pitch
 Load this skill when designing or balancing a board game — mechanical design, asymmetric faction design, resource economy systems, playtesting methodology, and rules documentation. Reference for German-style Eurogame principles: meaningful decisions, action economy, tension points, and elegant mechanics.
 
 **Relações:**
-- `similar` → `board-game-design`
 - `used_by` → `board-game-design`
 
 
@@ -768,6 +767,7 @@ Load this skill when deploying a built application to production: verifying DB m
 - `similar` → `infrastructure/deployment-pipeline`
 - `similar` → `infrastructure/vercel-deploy`
 - `uses` → `infrastructure/oracle-host-access`
+- `similar` → `infrastructure/moodle-admin`
 
 ### WhatsApp via Baileys — Python Integration
 
@@ -991,6 +991,7 @@ Render research reports as dark-themed HTML with SVG charts and Tufte-inspired t
 - `uses` → `productivity/html-to-pdf-chromium`
 - `used_by` → `productivity/relatorio-de-custos`
 - `used_by` → `productivity/html-to-pdf-chromium`
+- `similar` → `content-production/research-report-standards`
 
 ### HTML → PDF com Chromium Headless
 
@@ -1220,6 +1221,7 @@ Multi-agent deep research pipeline: decompose topics, dispatch parallel agents, 
 - `uses` → `read-reddit`
 - `similar` → `research/augmentacao-query`
 - `uses` → `productivity/html-report-hermes`
+- `similar` → `research/systematic-research`
 
 ### Digital Clone Persona
 
@@ -1237,6 +1239,7 @@ Create digital clone personas through deep web research — discover, extract, a
 - `uses` → `research/user-interview`
 - `similar` → `research/tech-trend-discovery`
 - `similar` → `creative/brand-studio-forge`
+- `similar` → `research/systematic-research`
 
 ### Model Benchmark Frontier
 
@@ -1306,6 +1309,8 @@ Load this skill when conducting market research for Brazilian/LATAM markets wher
 - `similar` → `research/deep-research`
 - `similar` → `research/user-interview`
 - `similar` → `software-development/ideation-drilling`
+- `similar` → `research/systematic-research`
+- `similar` → `content-production/research-report-standards`
 
 ### Systematic Single-Agent Research
 

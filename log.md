@@ -4,6 +4,8 @@ Diário cronológico de operações no repositório de skills.
 
 ---
 
+## [2026-08-02] evolve | MECE analysis: 99 skills, 0 merges, 0 deletes, 0 orphans. 8 relation changes — board-game-design dedup (similar+uses→uses) + similar→product-pipeline, boardgame-design-principles dedup, 5 inbound symmetric edges (deep-research, html-report-hermes, market-research-synthesis, digital-clone-persona, production-deployment). 346→351 edges. Graph regenerated (99 nodes).
+
 ## [2026-08-02] update | Index synced 89→99. 10 new skills added: board-game-design (Orchestrator), boardgame-design-principles (Reference), research-report-standards (Reference), moodle-admin (ToolIntegration), docx (ToolIntegration), pdf (ToolIntegration), xlsx (ToolIntegration), systematic-research (Research), taskflow-ui-debugging (ToolIntegration), taskflow-mcp-rules (Reference). New section: Board Game Design. Frontmatter fixed on all 10 (type + timestamp; research-report-standards type Guideline→Reference; moodle-admin timestamp ISO). Descriptions audited: 99/99 compliant — 10 new skills converted from single-line to summary+paragraph with trigger, systematic-research literal \n escapes replaced with real newlines, taskflow-mcp-rules unquoted description quoted. 2 Resumo drifts fixed in index (pipeline-educacional accents, grafico-progresso-peso-ares accent). 3 stale index paragraphs synced (product-pipeline, taskflow-mcp, skills-repo-curator). 8 sizes synced to disk. All 99 SKILL.md have valid type + timestamp.
 
 ## [2026-07-26] offload | Skipped — memory unavailable (cron skip_memory=true, no entries to offload). See pitfall: offload needs manual session.
