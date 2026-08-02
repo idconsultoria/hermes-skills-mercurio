@@ -3,7 +3,7 @@ name: production-deployment
 description: "Post-CI deploy operations — Docker rollout, DB schema, ingress routing, DNS fallback.
 
 Load this skill when deploying a built application to production: verifying DB migrations ran, diagnosing container startup failures, checking Nginx/NPM routing, or handling a domain that stopped resolving. Covers the gray zone between CI completing and the site being live — the step most pipelines leave unscripted."
-version: 1.4.0
+version: 1.5.0
 author: Hermes Agent
 license: MIT
 type: ToolIntegration
@@ -199,6 +199,87 @@ curl -s -X GET "https://your.domain/api/v1/integrations/google/auth-url/" \
 ```
 
 **Cannot configure OAuth client via CLI** — the authorized redirect URIs in Google Cloud Console can only be set through the web UI at `https://console.cloud.google.com/apis/credentials`. Even `gcloud` CLI doesn't expose this configuration.
+
+## Deployment Verification — What Code Is Actually Running
+
+> 📘 **Pre-merge branch analysis:** `skill_view(name='production-deployment', file_path='references/pre-merge-branch-analysis.md')` — commands to assess how far branches have diverged, anticipate conflict risk, and recover from an aborted merge. Use BEFORE any merge attempt on diverged branches.
+
+After a CI/CD push completes, verify that the **intended commit** is what's actually running in production — CI can report success while the deploy step silently fails (wrong tag, stale image, pull error).
+
+### 1. Check Running Images and Their Ages
+
+```bash
+ssh deploy-host 'docker compose images'
+```
+
+Sample output:
+```
+CONTAINER           REPOSITORY                                       TAG       CREATED
+taskflow-backend    ghcr.io/org/repo/backend                         latest    2 weeks ago
+```
+
+Note the **CREATED** column — it tells you when the image was built. Compare with git commit timestamps.
+
+### 2. Cross-Reference Image Build Time with Git Commits
+
+```bash
+# Get image creation timestamp (UTC)
+ssh deploy-host 'docker inspect <repo>/backend:latest \
+  --format "{{.Created}}"'
+
+# Get latest master commit timestamp (author date)
+git log origin/master --format="%H %ai %s" -1
+#                SHA ^      ^ author date (with TZ)
+```
+
+The image `Created` timestamp should be **within minutes** of the git commit's author date (or committer date, whichever is later). A gap of hours or days means CI pushed a stale image or the deploy job didn't run.
+
+### 3. Check the Image Digest (SHA256)
+
+The image SHA is a content-addressable hash of the actual layers:
+
+```bash
+ssh deploy-host 'docker inspect <repo>/backend:latest \
+  --format "{{.Id}}"'
+# Returns: sha256:a6cc79224c92...
+```
+
+Useful when comparing across hosts or correlating with CI build logs.
+
+### 4. Verify Container Config Matches Expectations
+
+```bash
+# Check which image tag a running container was started from
+ssh deploy-host 'docker inspect $(docker compose ps -q backend) \
+  --format "{{.Config.Image}}"'
+# e.g. ghcr.io/org/repo/backend:latest
+
+# Verify expected env vars reached the container
+ssh deploy-host 'docker exec <container> env | grep -E "^MY_VAR"'
+```
+
+### 5. Full Verification Sequence (Single SSH Call)
+
+```bash
+ssh deploy-host ' \
+  echo "=== IMAGES ===" && \
+  docker compose images && \
+  echo "=== BACKEND IMAGE ===" && \
+  docker inspect $(docker compose ps -q backend 2>/dev/null) \
+    --format "{{.Config.Image}} — Created: {{.Created}}" && \
+  echo "=== HEALTH CHECK ===" && \
+  curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health'
+```
+
+### 6. Pitfall: Images Tagged `latest` Can Stay Stale
+
+If CI builds and pushes but the deploy host never runs `docker compose pull`, `:latest` still points to the old image. **Always check the `Created` date, not just the tag name.**
+
+If the image is old, force a pull and recreate:
+
+```bash
+ssh deploy-host 'docker compose pull && docker compose up -d --remove-orphans'
+```
 
 ## Domain / DDNS Fallback
 

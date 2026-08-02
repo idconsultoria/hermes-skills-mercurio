@@ -97,9 +97,13 @@ Brazilian websites deploy aggressive anti-bot protection:
 - ABED (abed.org.br) — Censo EAD.BR: often blocked but is the primary source for distance education data
 - Brasscom — IT workforce deficit data: available through press releases and news coverage
 - Hotmart, Eduzz, Sympla — transaction data: generally blocked, use second-hand citations from news articles
+- **Wikipedia (pt.wikipedia.org)** — API via terminal works reliably for baseline statistics. Passos: (a) `curl -sL "https://pt.wikipedia.org/w/api.php?action=query&titles=TITLE&format=json&prop=extracts&exintro=1&explaintext=1" -o /tmp/wiki.json`, (b) `python3 -c "import json; d=json.load(open('/tmp/wiki.json')); pages=d['query']['pages']; [print(v.get('extract','')) for v in pages.values()]"`. Use para dados econômicos, demográficos, educacionais — sempre o primeiro passo antes de perseguir portais bloqueados.
+- **Banco Central do Brasil (bcb.gov.br)** — JS-heavy frontend but static HTML structure accessible via curl. Use for economic indicators, Open Finance stats, and inflation data.
+- **B2C fintech pricing pages** — B2C Brazilian fintech apps DO publish prices openly (e.g., organizze.com.br/planos). The "never publishes prices" rule applies to B2B enterprise SaaS only. Always try `/planos`, `/precos`, `/pricing` on consumer-facing apps before falling back to benchmarks.
 
 See `references/brazilian-market-web-blockage.md` for the full blockage pattern, specific blocked sites, and tested workarounds.
 See `references/brazilian-agricultural-saas-landscape.md` for a worked example of competitor analysis in the Brazilian ag SaaS vertical (July 2026), including verified URLs, alternative TLD patterns, and market gaps.
+See `references/brazilian-fintech-personal-finance-landscape.md` for a worked example of market research in the Brazilian personal finance app vertical (July 2026), with competitor pricing data, Open Finance context, and market sizing.
 
 ## Pitfalls
 
@@ -108,7 +112,7 @@ See `references/brazilian-agricultural-saas-landscape.md` for a worked example o
 - **Don't skip the strategic implications section.** The user needs actionable recommendations for their specific project/product, not just raw market data.
 - **Brazilian URLs are unstable.** Blog posts from 2022-2024 on Brazilian edtech sites have a high probability of 404. Prefer .gov.br sources and industry-wide reports over individual blog posts.
 - **Language matters.** Research queries for Brazilian markets MUST be in Portuguese. English queries return sparse or irrelevant results for Brazil-specific data. But web_search tool may fail regardless of language — the issue is the backend, not the query.
-- **Brazilian SaaS never publishes prices.** 100% of Brazilian B2B SaaS companies use demo-based/consultative sales. "Planos", "Preços", and "Pricing" pages universally return 404. Don't waste time hunting for public pricing — note the pattern and estimate from benchmarks.
+- **Brazilian B2B SaaS never publishes prices.** Enterprise B2B SaaS companies universally use demo-based/consultative sales. "Planos", "Preços", and "Pricing" pages return 404 or redirect to "fale conosco". **EXCEPTION:** B2C fintech/consumer apps (Mobills, Organizze, etc.) DO publish transparent pricing. Distinguish the segment before spending time hunting — check if the product serves consumers (likely published) or enterprises (likely hidden).
 - **Alternative TLDs often work when .com.br fails.** Many Brazilian companies use non-obvious domains: .app, .com (without .br), .agr.br. When the obvious .com.br returns errors or blocks, try alternative TLDs. LinkedIn company pages also reliably confirm existence and positioning even when the main site is fully down.
 
 ## Direct-URL Extraction Technique (CRITICAL)
@@ -122,16 +126,18 @@ When `web_search` returns empty arrays but you have a list of target companies/U
 
 This approach yielded rich data for 5/7 competitors in one session even when `web_search` was completely non-functional across 10+ queries.
 
-## Competitor Analysis Workflow (Brazilian SaaS)
+## Competitor Analysis Workflow (Brazilian Market)
 
-When the task is competitor/market analysis for a Brazilian SaaS vertical:
+When the task is competitor/market analysis for a Brazilian vertical:
 
 1. **Map known players** from the user's brief — they usually name the top competitors
 2. **Batch-extract competitor websites** via `web_extract` (5 URLs per call)
-3. **Build a comparison matrix** early: features, pricing model, target audience, differentiators, scale metrics
-4. **Identify pricing patterns**: Brazilian SaaS universally uses consultative sales; note this as a market norm AND as a potential differentiator if the client adopts transparent pricing
-5. **Hunt for gaps**: focus on features NO competitor offers (checking site menus, FAQ, feature pages)
-6. **Note exit signals**: competitors with dead websites, 404s across all pages, or empty social media are market exit signals — these are opportunities for the client
-7. **Save as structured markdown** with tables for features, pricing, and a dedicated "gaps and opportunities" section
+3. **Check segment: B2C vs B2B early.** Consumer fintech/apps likely publish prices on `/planos` or `/precos`. Enterprise B2B SaaS hides them behind demo walls. Distinguish before spending time hunting.
+4. **Build a comparison matrix** early: features, pricing model, target audience, differentiators, scale metrics
+5. **Identify pricing patterns**: If the segment is B2B, note consultative sales as market norm (and potential differentiator if the client adopts transparent pricing). If B2C, collect all published prices and identify the market range.
+6. **Hunt for gaps**: focus on features NO competitor offers (checking site menus, FAQ, feature pages)
+7. **Note exit signals**: competitors with dead websites, 404s across all pages, or empty social media are market exit signals — these are opportunities for the client
+8. **Save as structured markdown** with tables for features, pricing, and a dedicated "gaps and opportunities" section
 
 See `references/brazilian-agricultural-saas-landscape.md` for the full competitor data from the agricultural SaaS session (July 2026) as a reference template.
+See `references/brazilian-fintech-personal-finance-landscape.md` for the fintech/personal-finance-app vertical (July 2026) with competitor pricing data and market sizing.

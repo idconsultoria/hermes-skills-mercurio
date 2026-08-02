@@ -391,21 +391,111 @@ não aceitar timeout por parâmetro, assegure que:
    - **Produto pessoal:** Hermes entrevista o usuário diretamente
    - **Produto com outros perfis:** simular entrevista para cada perfil de usuário
 
+   **Simulação paralela (recomendada p/ 3+ perfis):** Disparar subagentes via `delegate_task` em paralelo, cada um simulando um perfil diferente com persona detalhada (idade, renda, situação financeira, citação típica). Cada subagente produz um `.md` individual com transcrição completa + análise (pain points, desired outcomes, emotional arc, concept test reaction).
+
+   **Cross-interview synthesis:** Consolidar os relatórios individuais em `user-interview.md` com:
+   - Tabela comparativa dos perfis (renda, dores, gatilhos, preço aceitável)
+   - Temas recorrentes (mencionados por 2+ perfis) — estes viram recomendações P0
+   - Non-obvious insights (padrões que contrariam suposições iniciais)
+   - Recomendações de produto priorizadas (P0/P1/P2) baseadas na frequência entre perfis
+   - Seção de cada perfil com resumo + emotional arc + key quotes
+
 6. Cada resultado de pesquisa armazenado como `.md` em `product/research/`.
 
    ```bash
    git add -A && git commit -m "feat: F2 research complete"
    ```
 
+### Research Suite Output: Raw + Premium + Synthesis
+
+When F2 research needs both source documents (.md) and polished deliverables (.html):
+
+```
+                    ┌─────────────────────────────┐
+                    │  Decompose research into    │
+                    │  N topics (explicitas,       │
+                    │  implicitas, mercado, reg.)   │
+                    └─────────────┬───────────────┘
+                                  │
+                                  ▼
+                    ┌─────────────────────────────┐
+                    │  Dispatch N subagents in     │
+                    │  parallel (delegate_task     │
+                    │  batch), each writes 1 .md   │
+                    │  report to product/research/ │
+                    └─────────────┬───────────────┘
+                                  │
+                    ┌─────────────▼───────────────┐
+                    │  Run "direto" research items │
+                    │  yourself (web_search +       │
+                    │  web_extract), write .md      │
+                    └─────────────┬───────────────┘
+                                  │
+                    ┌─────────────▼───────────────┐
+                    │  Create a design system     │
+                    │  HTML (single-file, tokens)  │
+                    │  — shared visual foundation  │
+                    └─────────────┬───────────────┘
+                                  │
+                    ┌─────────────▼───────────────┐
+                    │  Convert each .md → .html   │
+                    │  premium (via agy SSH):      │
+                    │  SSH host, agy --print       │
+                    │  --dangerously-skip-perms    │
+                    │  Each HTML embeds design     │
+                    │  system CSS (single-file)    │
+                    └─────────────┬───────────────┘
+                                  │
+                    ┌─────────────▼───────────────┐
+                    │  Generate 1 synthesis .html │
+                    │  (executive summary +       │
+                    │  key findings from all)     │
+                    └─────────────────────────────┘
+```
+
+**When to use:** User asks for "research folder / base de referências" and expects both raw markdown and polished deliverables + executive summary.
+
+**Key details:**
+- **Markdown reports (.md):** Written by subagents, each focused on ONE angle. Saved under `product/research/`.
+- **Design system HTML:** Created once, shared visual foundation. CSS custom properties for colors, typography, spacing. Dark mode support. Inspired by Notion/Stripe/Linear minimal aesthetic. Saved as `product/research/design_system_minimal_neutral.html`.
+- **Premium HTML versions:** One per report. Embed the design system CSS directly (single-file, no external deps). Add navbar, sections with alternating backgrounds, pure-CSS charts (progress bars, quadrant matrices, bar charts), dark mode toggle, scroll animations, IntersectionObserver sidebar highlighting.
+
+**Report formatting rules (user preference, apply to ALL reports):**
+- Labels "nível", "status", "projeto" ou "data" NÃO devem aparecer em lugar algum
+- Sempre adicionar seção "Sobre este Relatório" no início: o que é, como foi feito, o que pretende informar
+- Máxima consistência visual entre relatórios — mesmo design system (:root CSS tokens idênticos), mesma navbar glass, mesma estrutura de seções
+- Tabelas SEMPRE usando `.table-wrap > table` padrão — nunca grid customizado com CSS
+
+**Synthesis report (executive summary):**
+- **Abordagem MBB (McKinsey/BCG/Bain):** Capa branca limpa, minimalista, sem gradientes decorativos, glassmorphism ou floreios visuais. NADA de decorativo que não sirva à informação.
+- **Framework SCR:** Organizar a capa em Situação → Complicação → Resolução. A Resolução ocupa 60-70% do espaço. Cada claim em negrito com dados de suporte.
+- **Métricas visuais:** Números em destaque com mini barras de progresso ou badges. Grid limpo, hierarquia tipográfica.
+- **Conteúdo manda:** "Silent read test" — a página deve ser compreendida sem apresentador. Zero jargão de consultoria. Claims completos com evidências. page-break-after para PDF.
+- **Sem metadados irrelevantes:** Não incluir nomes de consultoria, fases, confidencialidade ou datas na capa a menos que o usuário peça.
+
+**PDF generation (post-HTML, opcional):**
+- Usar Chromium headless: `LD_LIBRARY_PATH=.../chromium .../chromium --headless --no-sandbox --disable-gpu --print-to-pdf-no-header --print-to-pdf="output.pdf" "file://input.html"`
+- Adicionar `@page { margin: 0; }` no CSS para remover margens padrão de impressão
+- Google Drive upload opcional: `$GAPI drive upload file.pdf --name "file.pdf" --parent FOLDER_ID`
+
+**agy integration:** Copy design system + reports to host, SSH in, run `agy --dangerously-skip-permissions --print "$(cat prompt.md)"`. Each call generates one single-file HTML. Copy back with `scp`.
+- **Pitfall: filename collisions.** Assign distinct filenames in each subagent's context. Use `mkdir -p product/research/` before dispatching.
+- **Pitfall: agy headless needs --dangerously-skip-permissions.** Without it, `write_file` is denied.
+- **Pitfall: executive summary florals.** User explicitly rejected decorative-only heroes. If the hero doesn't communicate real SCR-structured information with data, it will be rejected. Content-first, data-driven, clean hierarchy.
+> **Referência completa:** `skill_view(name='product-pipeline', file_path='references/mbb-executive-summary-standards.md')` — pesquisa completa sobre padrões McKinsey/BCG/Bain.
+
 ### Saída
 
 ```
 product/research/
-├── index.html            (opcional — página consolidada com visual Agy)
+├── index.html                (opcional — página consolidada com visual Agy)
+├── design_system_minimal_neutral.html  (design system compartilhado)
 ├── <topico-1>.md
-├── <topico-2>.md
+├── <topico-2>.html            (versão premium, opcional)
 ├── mercado.md
+├── mercado.html               (versão premium, opcional)
 ├── user-interview.md
+├── sintese-executiva.html     (relatório-síntese final)
 └── <outros>.md
 ```
 
@@ -452,6 +542,7 @@ product/research/
    - **Opportunity Solution Tree** — `/skill:opportunity-solution-tree`
    - **User Stories** — `/skill:user-story`
    - **Product Roadmap** — `/skill:roadmap-planning`
+     - Se existir uma planilha/roadmap anterior no Google Drive, lê-la primeiro e fazer o novo roadmap ser um SUPERSET (preservar quinzenas existentes, expandir com mais granularidade e horizontes futuros)
    - (e outros que julgar necessários)
 
 #### Persona Research Strategy: Proto vs. Pessoas Reais

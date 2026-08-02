@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 89 skills*
+*Total: 99 skills*
 
 ---
 
@@ -145,12 +145,11 @@ Load this skill when the user reports Hermes misbehaving: conversations resettin
 
 - **Nome:** `autonomous-ai-agents/product-pipeline`
 - **Arquivo:** `autonomous-ai-agents/product-pipeline/SKILL.md`
-- **Tamanho:** 81,763 chars
+- **Tamanho:** 89,572 chars
 - **Resumo:** Multi-agent product pipeline — idea to MVP via sprints. Hermes orchestration
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-14T05:19:11Z
 
-Multi-agent product pipeline from raw idea to MVP with iterative sprints. Orchestrated by Hermes, executed by Pi Agent + Antigravity.
 Load this skill when building a product from scratch through the full pipeline — ideation, research, design, sprints, and delivery. Covers orchestrating a multi-agent team with Hermes as coordinator, Pi Agent for execution, and Antigravity for visual design review.
 
 **Relações:**
@@ -186,7 +185,7 @@ Load this skill when you need to create sound effects, ambient audio, or UI soun
 
 - **Nome:** `content-production/iaf-newsletter-pipeline`
 - **Arquivo:** `content-production/iaf-newsletter-pipeline/SKILL.md`
-- **Tamanho:** 43,906 chars
+- **Tamanho:** 44,468 chars
 - **Resumo:** Umbrella skill for newsletters — cron scheduling, curation, dedup, deploy
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-19T19:47:50Z
@@ -233,6 +232,21 @@ Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback,
 - `uses` → `autonomous-ai-agents/messaging-platforms`
 - `uses` → `infrastructure/oracle-host-access`
 - `uses` → `infrastructure/gemini-rate-limit-backoff`
+
+### Research Report Standards — Estrutura e Conteúdo
+
+- **Nome:** `content-production/research-report-standards`
+- **Arquivo:** `content-production/research-report-standards/SKILL.md`
+- **Tamanho:** 8,437 chars
+- **Resumo:** Research report standards — content, narrative flow, visual consistency.
+- **Type:** Reference
+- **Timestamp:** 2026-07-26T20:15:00Z
+
+Carregue esta skill quando for produzir um relatório de pesquisa, análise de mercado ou estudo entregue como HTML + PDF. Define o que o conteúdo deve conter: remoção de metadados de rótulo (nível/status/projeto/data), seção obrigatória 'Sobre este Relatório', framework SCR para sumário executivo e regras de consistência visual entre relatórios relacionados.
+
+**Relações:**
+- `similar` → `productivity/html-report-hermes`
+- `similar` → `research/market-research-synthesis`
 
 ## Creative
 
@@ -368,6 +382,39 @@ Carregue esta skill quando for escrever ou revisar uma landing page, página de 
 
 **Relações:**
 - `similar` → `creative/copywriting`
+
+
+## Board Game Design
+
+### Board Game Design Pipeline
+
+- **Nome:** `board-game-design`
+- **Arquivo:** `board-game-design/SKILL.md`
+- **Tamanho:** 19,393 chars
+- **Resumo:** Board game design pipeline: concept to physical production.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-07-31T00:00:00Z
+
+Carregue esta skill quando for orquestrar o design de um board game — do pitch ao protótipo digital para playtest e produção física. Cobre arquitetura de agentes (Hermes orquestra, Pi Agent executa, Antigravity revisa), pesquisa de mercado BGG, GDD completo, implementação de protótipo web, balanceamento e produção. Compartilha volume /opt/data/code com os executores.
+
+**Relações:**
+- `similar` → `boardgame-design-principles`
+- `uses` → `boardgame-design-principles`
+
+### Board Game Design Skill
+
+- **Nome:** `boardgame-design-principles`
+- **Arquivo:** `boardgame-design-principles/SKILL.md`
+- **Tamanho:** 8,202 chars
+- **Resumo:** Eurogame design: asymmetry, economy, playtesting.
+- **Type:** Reference
+- **Timestamp:** 2026-07-31T00:00:00Z
+
+Load this skill when designing or balancing a board game — mechanical design, asymmetric faction design, resource economy systems, playtesting methodology, and rules documentation. Reference for German-style Eurogame principles: meaningful decisions, action economy, tension points, and elegant mechanics.
+
+**Relações:**
+- `similar` → `board-game-design`
+- `used_by` → `board-game-design`
 
 
 ## Dogfood
@@ -548,7 +595,7 @@ Load this skill when the user wants Ares (War God persona) as a fitness coach. C
 - **Nome:** `health/grafico-progresso-peso-ares`
 - **Arquivo:** `health/grafico-progresso-peso-ares/SKILL.md`
 - **Tamanho:** 7,587 chars
-- **Resumo:** Grafico de progresso de peso estilo Ares — matplotlib, vermelhos, claro.
+- **Resumo:** Gráfico de progresso de peso estilo Ares — matplotlib, vermelhos, claro.
 - **Type:** Health
 - **Timestamp:** 2026-07-12T00:00:00Z
 
@@ -664,7 +711,7 @@ Load this skill when setting up continuous integration on GCP: connecting GitHub
 
 - **Nome:** `infrastructure/hermes-cron-patterns`
 - **Arquivo:** `infrastructure/hermes-cron-patterns/SKILL.md`
-- **Tamanho:** 3,591 chars
+- **Tamanho:** 6,165 chars
 - **Resumo:** Hermes cron job patterns — timeout limits and background execution
 - **Type:** Reference
 - **Timestamp:** 2026-07-26T05:05:12Z
@@ -710,7 +757,7 @@ Deploy static sites and frontend apps to Vercel — from zero to production. Cov
 
 - **Nome:** `infrastructure/production-deployment`
 - **Arquivo:** `infrastructure/production-deployment/SKILL.md`
-- **Tamanho:** 10,286 chars
+- **Tamanho:** 13,295 chars
 - **Resumo:** Post-CI deploy operations — Docker rollout, DB schema, ingress routing, DNS fallback.
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -756,7 +803,7 @@ Load this skill when deploying any new selfhosted service on the Oracle VM (Dock
 
 - **Nome:** `infrastructure/selfhost-web-apps`
 - **Arquivo:** `infrastructure/selfhost-web-apps/SKILL.md`
-- **Tamanho:** 7,658 chars
+- **Tamanho:** 8,167 chars
 - **Resumo:** Deploy web apps on Oracle ARM64 — Docker Compose, NPM, SSL, and hardening
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-07-26T05:05:12Z
@@ -780,6 +827,22 @@ Load this skill when working with any Supabase-backed project from a restricted 
 
 **Relações:**
 - `similar` → `infrastructure/data-pipeline-patterns`
+
+### Moodle Administration — treinamentos.idconsultoria.ai
+
+- **Nome:** `infrastructure/moodle-admin`
+- **Arquivo:** `infrastructure/moodle-admin/SKILL.md`
+- **Tamanho:** 6,922 chars
+- **Resumo:** Administer Moodle — DB, students, mass email.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-07-29T00:00:00Z
+
+Carregue esta skill quando precisar administrar o Moodle 5.2 de treinamentos.idconsultoria.ai — consultas SQL no Postgres via docker exec, gestão de estudantes, envio de email em massa personalizado e operações de manutenção. Cobre arquitetura Docker Compose (app, nginx, postgres, redis, cron) no host Oracle via SSH.
+
+**Relações:**
+- `uses` → `infrastructure/oracle-host-access`
+- `similar` → `productivity/google-workspace`
+- `similar` → `infrastructure/production-deployment`
 
 ## Media
 
@@ -981,17 +1044,32 @@ Generate cost reports for multi-agent projects with real token data from Hermes 
 
 - **Nome:** `productivity/taskflow-mcp`
 - **Arquivo:** `productivity/taskflow-mcp/SKILL.md`
-- **Tamanho:** 9,294 chars
+- **Tamanho:** 9,983 chars
 - **Resumo:** GTD task management via MCP (Model Context Protocol) — connects over SSE
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-14T05:15:09Z
 
-TaskFlow é um sistema GTD de gerenciamento de tarefas exposto via MCP (Model Context Protocol). Conecta-se via SSE.
+Load this skill when managing tasks via the TaskFlow MCP server. Covers connecting over SSE (StreamableHTTP POST does not work), creating and updating tasks, managing contexts and projects, processing inbox items, and running weekly GTD reviews.
 
 **Relações:**
 - `similar` → `productivity/notion`
 - `similar` → `software-development/backlog-and-sprint`
 - `used_by` → `autonomous-ai-agents/hermes-agent`
+
+### TaskFlow MCP Rules — Timezone e Padrões
+
+- **Nome:** `taskflow-mcp-rules`
+- **Arquivo:** `taskflow-mcp-rules/SKILL.md`
+- **Tamanho:** 2,258 chars
+- **Resumo:** TaskFlow MCP usage rules — timezone, date patterns, best practices.
+- **Type:** Reference
+- **Timestamp:** 2026-08-02T00:00:00Z
+
+Carregue esta skill ao usar as ferramentas MCP do TaskFlow: converte datas UTC para BRT (UTC-3) ao exibir, segue o padrão de confirmação em 2 passos para escritas com ActionToken, e usa os comandos de leitura disponíveis. Cobre regras de exibição de prioridade e boas práticas de escrita.
+
+**Relações:**
+- `uses` → `productivity/taskflow-mcp`
+- `similar` → `software-development/taskflow-ui-debugging`
 
 ### Petdex — Animated Mascot Pets
 
@@ -1006,6 +1084,52 @@ Load this skill when you want to browse, install, or switch animated mascot pets
 
 **Relações:**
 - `similar` → `autonomous-ai-agents/hermes-agent`
+
+### DOCX Skill
+
+- **Nome:** `productivity/docx`
+- **Arquivo:** `productivity/docx/SKILL.md`
+- **Tamanho:** 8,637 chars
+- **Resumo:** Create, read, edit Word .docx documents and templates.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-02T00:00:00Z
+
+Load this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx) or Word templates (.dotx) — reports, memos, letters, letterheads, tables of contents, tracked changes, and comments. Covers both the high-level creation path (docx-js npm) and surgical XML editing, plus pandoc/LibreOffice for reading and rendering. Do NOT use for PDFs, spreadsheets, or presentations.
+
+**Relações:**
+- `similar` → `productivity/pdf`
+- `similar` → `productivity/xlsx`
+
+### PDF Skill
+
+- **Nome:** `productivity/pdf`
+- **Arquivo:** `productivity/pdf/SKILL.md`
+- **Tamanho:** 7,498 chars
+- **Resumo:** Create, merge, split, fill, and secure PDF files.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-02T00:00:00Z
+
+Load this skill whenever the user wants to do anything with PDF files: reading or extracting text/tables, combining or merging multiple PDFs, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting, extracting images, or OCR on scanned PDFs. Uses pypdf, pdfplumber, reportlab, poppler-utils, and qpdf. For heavy text extraction from scanned documents prefer ocr-and-documents.
+
+**Relações:**
+- `similar` → `productivity/docx`
+- `similar` → `productivity/xlsx`
+- `similar` → `productivity/html-to-pdf-chromium`
+
+### XLSX Skill
+
+- **Nome:** `productivity/xlsx`
+- **Arquivo:** `productivity/xlsx/SKILL.md`
+- **Tamanho:** 9,632 chars
+- **Resumo:** Create, read, edit Excel .xlsx spreadsheets and CSVs.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-02T00:00:00Z
+
+Load this skill any time a spreadsheet file is the primary input or output: opening, reading, editing, or fixing an existing .xlsx, .xlsm, .xltx, .csv, or .tsv file; creating a new spreadsheet from scratch or from other data; converting between tabular formats; cleaning messy tabular data. Uses openpyxl, pandas, markitdown, and LibreOffice for formula recalculation. Every formula-bearing output must be recalculated and error-free before delivery.
+
+**Relações:**
+- `similar` → `productivity/docx`
+- `similar` → `productivity/pdf`
 
 ## Messaging
 
@@ -1171,7 +1295,7 @@ Structured user/proxy interview protocol for product research — plan, frame, l
 
 - **Nome:** `research/market-research-synthesis`
 - **Arquivo:** `research/market-research-synthesis/SKILL.md`
-- **Tamanho:** 9,025 chars
+- **Tamanho:** 10,859 chars
 - **Resumo:** Produce market analysis reports — personas, journeys, expectations, behavior.
 - **Type:** Research
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -1182,6 +1306,22 @@ Load this skill when conducting market research for Brazilian/LATAM markets wher
 - `similar` → `research/deep-research`
 - `similar` → `research/user-interview`
 - `similar` → `software-development/ideation-drilling`
+
+### Systematic Single-Agent Research
+
+- **Nome:** `research/systematic-research`
+- **Arquivo:** `research/systematic-research/SKILL.md`
+- **Tamanho:** 7,304 chars
+- **Resumo:** Single-agent deep research via direct source URLs.
+- **Type:** Research
+- **Timestamp:** 2026-08-02T00:00:00Z
+
+Load this skill when web_search is consistently unavailable (returns empty arrays for ALL queries after 2+ attempts) and you need thorough research without multi-agent dispatch. Uses domain knowledge to identify authoritative source URLs, batch parallel web_extract calls, handle blocked/404 pages, and page through large truncated encyclopedia-style articles. Produces cited, structured reports with source attribution. Complementary to deep-research (which covers multi-agent dispatch).
+
+**Relações:**
+- `similar` → `research/deep-research`
+- `similar` → `research/market-research-synthesis`
+- `similar` → `research/digital-clone-persona`
 
 ## Social Media
 
@@ -1430,12 +1570,12 @@ Load this skill after making code changes that need cleanup. Three parallel agen
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 50,454 chars
+- **Tamanho:** 52,863 chars
 - **Resumo:** Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z
 
-Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph generation.
+Load this skill when the skills repo needs maintenance — evolve cycles, description audits, relation rebuilding, orphan review, or installing community skills. Covers the full consolidation lifecycle: update, evolve, offload, commit, push, and interactive D3 graph generation.
 
 **Relações:**
 - `uses` → `software-development/hermes-agent-skill-authoring`
@@ -1448,7 +1588,7 @@ Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, 
 - **Nome:** `software-development/pipeline-educacional`
 - **Arquivo:** `software-development/pipeline-educacional/SKILL.md`
 - **Tamanho:** 28,936 chars
-- **Resumo:** Pipeline de produto educacional — da concepcao pedagogica ao lancamento.
+- **Resumo:** Pipeline de produto educacional — da concepção pedagógica ao lançamento.
 - **Type:** Orchestrator
 - **Timestamp:** 2026-07-12T00:00:00Z
 
@@ -1532,3 +1672,19 @@ Load this skill when a Three.js scene is rendering (triangles > 0) but appears i
 - `similar` → `productivity/html-report-hermes`
 - `uses` → `software-development/systematic-debugging`
 - `used_by` → `software-development/process-augmentation-pipeline`
+
+### TaskFlow UI Debugging
+
+- **Nome:** `software-development/taskflow-ui-debugging`
+- **Arquivo:** `software-development/taskflow-ui-debugging/SKILL.md`
+- **Tamanho:** 2,211 chars
+- **Resumo:** Debug TaskFlow UI when API returns data but frontend hides.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-02T00:00:00Z
+
+Load this skill when diagnosing a TaskFlow frontend issue where the backend API returns correct data but the page doesn't render what is expected. Pipeline: verify DB data via psql, test the API directly with curl, verify the frontend build for expected strings, and check date/timezone handling (UTC vs BRT). Includes diagnostic queries and curl examples.
+
+**Relações:**
+- `similar` → `taskflow-mcp-rules`
+- `uses` → `productivity/taskflow-mcp`
+- `similar` → `software-development/systematic-debugging`

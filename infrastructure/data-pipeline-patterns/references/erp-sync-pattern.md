@@ -96,3 +96,26 @@ async function fetchAllFromSupabase(table, columns) {
 
 - **Rate limiting**: GraphQL APIs often rate-limit. 400ms between pages is safe for
   most providers. Exponential backoff on failure (5 retries, doubling delay).
+
+- **Crash mid-execution (Node.js OOM/signal kill)**: The `nohup` background wrapper
+  spawns the sync and exits — but if Node.js is killed by OOM or a signal during the
+  collect or upload phase, the log simply truncates with no error line. The cron
+  still reports success (the spawn exited 0). **Diagnosis:** compare log file size
+  against historic successful runs (e.g. 41KB vs 2.5KB), check for missing
+  `✅ Sincronização concluída!` final line. **Mitigation:** add a `timeout` + retry
+  guard in the shell wrapper:
+  ```bash
+  timeout 3600 node scripts/sync-erp.mjs >> "$LOG" 2>&1
+  if [ $? -ne 0 ]; then
+    echo "⚠️ Primeira tentativa falhou, retentando..." >> "$LOG"
+    sleep 60
+    timeout 3600 node scripts/sync-erp.mjs >> "$LOG" 2>&1
+  fi
+  ```
+
+- **Node.js stdout buffering hides progress**: When `node script.mjs >> logfile 2>&1`,
+  stdout is block-buffered (not line-buffered), so upload progress lines may not
+  appear in the log until the buffer fills or the process exits. Add
+  `node --unhandled-rejections=strict ...` or use `script.mjs 2>&1 | while read line;
+  do echo "$line" >> $LOG; done` for real-time logging. Or simply rely on file size
+  growth as a liveness indicator.

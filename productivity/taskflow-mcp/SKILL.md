@@ -145,6 +145,12 @@ A task vai para **inbox** por padrão. Use `process_inbox` depois para triar.
 4. **Execução**: filtre `get_next_actions` por contexto
 5. **Revisão semanal**: use `weekly_review` + resource `taskflow://stats/weekly`
 
+## Diagnóstico — Frontend & API
+
+Quando a página Hoje não exibe tarefas atrasadas mas a mesma query funciona no Upcoming,
+consulte `references/frontend-overdue-diagnostic.md` para o rastro completo de depuração
+(DB → API → componente, normalização de timezone, bug do `_to_local_date`).
+
 ## Diagnóstico — Production vs Preview
 
 Quando o MCP retorna erros (502, 404, dados errados), verifique qual ambiente está ativo:
@@ -212,3 +218,4 @@ PR_NUMBER=4 docker compose \
 - Status `pending` e `in_progress` violam `ck_tasks_status` — use `waiting` para "aguardando" e `next_action` para em andamento
 - O MCP não usa o mesmo user do git config local — sempre verificar MCP_USER_EMAIL antes de assumir identidade
 - **Hora padrão do usuário:** quando não especificada, usar 23:59 como due_time
+- **⚠️ Seção de atrasadas no Hoje some durante loading:** o `<TaskList>` renderiza `<TaskListSkeleton />` enquanto `useInfiniteQuery` está `isLoading=true`, engolindo a prop `overdueTasks`. A seção só aparece depois que a query principal resolve. Corrigir: renderizar inline (fora do TaskList), igual `Upcoming.tsx` faz. Detalhes em `references/frontend-overdue-diagnostic.md`.

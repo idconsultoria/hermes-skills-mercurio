@@ -6,7 +6,7 @@ Load this skill when the skills repo needs maintenance — evolve cycles, descri
 
 category: software-development
 type: Orchestrator
-timestamp: 2026-07-19T05:00:00Z
+timestamp: 2026-07-26T05:20:00Z
 ---
 
 # Skills Repository Curator
@@ -183,9 +183,26 @@ Após corrigir SKILL.md, rode `audit-descriptions.py --drift`. Para cada DRIFT:
      sk_desc = sk_desc[:sk_desc.find('"')]
      summary = sk_desc.split('\\n\\n', 1)[0] if '\\n\\n' in sk_desc else sk_desc.split('\\\\n\\\\n', 1)[0]
      ```
-     Skills com `Resumo` que termina em `...` ou difere do sumário real devem ter o Resumo corrigido.
-5. Registra no log.md com prefixo `update` incluindo o resumo de tudo que foi alterado
-6. **Stage + commit**
+     - **Sem exceção** — faz para todas as skills fora do formato.
+     - **⚠️ Sincronizar tamanhos pós-edição:** Após editar descrições em SKILL.md, os tamanhos no disco mudam. Os valores `Tamanho:` no index.md ficam obsoletos. Antes de commitar, sincronize TODOS os tamanhos com um script que varre cada `**Nome:**` no index.md e atualiza `**Tamanho:**` com `os.path.getsize()` real do disco. Exemplo:
+       ```python
+       import re, os
+       with open('index.md') as f: content = f.read()
+       def update_sizes(m):
+           name = m.group(1)
+           sk_path = f'/opt/data/skills/{name}/SKILL.md'
+           if os.path.exists(sk_path):
+               size = os.path.getsize(sk_path)
+               prefix = m.group(0).rsplit('**Tamanho:**', 1)[0]
+               return f'{prefix}**Tamanho:** {size:,} chars'
+           return m.group(0)
+       content = re.sub(r'\*\*Nome:\*\* `(.+?)`\n.*?\*\*Tamanho:\*\* [\d,]+ chars',
+                        update_sizes, content, flags=re.DOTALL)
+       with open('index.md', 'w') as f: f.write(content)
+       ```
+       Rode este script como parte do update, após corrigir descrições e antes do commit. Verifique com `python3 _verify_sizes.py` (script auxiliar de uso único) ou com o grep na seção Verification.
+     5. Registra no log.md com prefixo `update` incluindo o resumo de tudo que foi alterado
+     6. **Stage + commit**
 
 ### Formato exato esperado da description
 
@@ -454,12 +471,32 @@ for root, dirs, files in os.walk('.'):
     if '.archive' in root or '.git' in root: continue
     if 'SKILL.md' in files:
         with open(os.path.join(root, 'SKILL.md')) as f: c = f.read()
-        fm = re.search(r'^---\n(.*?)\n---', c, re.DOTALL)
+        fm = re.search(r'^---\\n(.*?)\\n---', c, re.DOTALL)
         if not fm: print(f'MISSING FM: {root}')
         else:
             f = fm.group(1)
             if not re.search(r'^type:', f, re.MULTILINE): print(f'MISSING type: {root}')
             if not re.search(r'^timestamp:', f, re.MULTILINE): print(f'MISSING timestamp: {root}')
+'
+
+# Verify index.md Tamanho matches actual disk sizes
+python3 -c "
+import os, re
+with open('index.md') as f: content = f.read()
+mismatches = 0
+for m in re.finditer(r'\*\*Nome:\*\* `(.+?)`\n.*?\*\*Tamanho:\*\* ([\d,]+) chars', content, re.DOTALL):
+    name = m.group(1)
+    idx_size = m.group(2).replace(',', '')
+    sk_path = name + '/SKILL.md'
+    if os.path.exists(sk_path):
+        disk = str(os.path.getsize(sk_path))
+        if disk != idx_size:
+            print(f'SIZE MISMATCH: {name}: index={idx_size} disk={disk}')
+            mismatches += 1
+if mismatches:
+    print(f'WARNING: {mismatches} size mismatches — run size sync before commit')
+else:
+    print(f'OK: all {len(list(re.finditer(...)))} sizes match disk')
 "
 ```
 
@@ -528,6 +565,8 @@ for root, dirs, files in os.walk('.'):
 ⚠️ **`.curator_backups/` já tracked antes do .gitignore.** Se o `.gitignore` foi adicionado DEPOIS que os backups foram commitados, `git status` ainda mostra os arquivos como deletados (D). O .gitignore só impede tracking de NOVOS arquivos — não remove os já rastreados. **Correção:** `git rm --cached -r .curator_backups/` para untrack os backups existentes sem deletá-los do disco. Depois `git add -A && git commit -m "update: remove curator backups from tracking"`.
 
 ⚠️ **Regex `re.MULTILINE` silencioso.** Ao parsear relações do index.md com `re.findall`, o padrão `r'^- `(\\w+)` → `(.+)'` (com Unicode → U+2192) **REQUER** `re.MULTILINE`. Sem a flag, `re.findall` retorna 0 matches sem erro ou aviso — o agente conclui erroneamente que não há relações no arquivo. **Sempre** incluir `re.MULTILINE` ao buscar relations multi-linha.
+
+⚠️ **Regex `re.DOTALL` igualmente silencioso.** Ao parsear blocos multi-linha do index.md (ex: `**Nome:**` + `**Tamanho:**` separados por quebras de linha), o padrão `r'\*\*Nome:\*\* `(.+?)`\n.*?\*\*Tamanho:\*\*'` exige `flags=re.DOTALL`. Sem `DOTALL`, o `.*?` não cruza quebras de linha e o match retorna vazio silenciosamente — o agente conclui que não há entries no index.md. **Sempre** usar `flags=re.DOTALL` (ou `re.DOTALL | re.MULTILINE`) em padrões que cruzam linhas.
 
 ⚠️ **Archived skills poluem o grafo como nós órfãos.** O `generate_graph.py` varre ALL subdiretórios em busca de SKILL.md, incluindo `.archive/`. Skills arquivadas não têm `type` nem relações no index.md, então aparecem como nós isolados (ilhas) no grafo. **Fix:** o script `scripts/generate_graph.py` deve pular dot-directories com `dirs[:] = [d for d in dirs if not d.startswith('.')]` no `os.walk`. Verificar sempre antes de regenerar o grafo se o número de nós corresponde ao de skills ativas, não ao total incluindo arquivadas.
 

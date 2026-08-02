@@ -202,6 +202,7 @@ Oracle free tier: 2 ARM vCPUs, 11.65 GiB RAM. With 20+ containers at ~5.5 GiB us
 
 ## References
 
-- `references/moodle-selfhost.md` — Full Moodle 5.2 deployment on ARM64: Docker Compose, nginx HTTPS passthrough, `sslproxy` vs `reverseproxy` pitfall, post-deploy `build_theme_css.php`, and diagnostic workflow for asset 500s
+- `references/moodle-selfhost.md` — Full Moodle 5.2 deployment on ARM64: Docker Compose, nginx HTTPS passthrough, `sslproxy` vs `reverseproxy` pitfall, diagnostic workflow for asset 500s, SCSS pipeline pitfall (fields don't compile in 5.2), `additionalhtmlhead` workaround for CSS injection, login page dark-theme polish lessons, agy CSS generation workflow, Chromium `background-clip: text` and `.visually-hidden` pitfalls, user creation and course enrolment via SQL, admin account promotion/demotion via `siteadmins`, language string customization and caching pitfalls
+- `references/id-consultoria-brand-tokens.md` — ID Consultoria design system: colors, typography, shadows, Google Fonts URL, and Moodle Boost Union mapping table
 - `references/npm-proxy-host-insert.md` — Complete NPM SQLite proxy host insert recipe
 - `templates/post-deploy-moodle.sh` — Minimal post-deploy: just `build_theme_css.php` (no warm caches needed after the reverseproxy fix)

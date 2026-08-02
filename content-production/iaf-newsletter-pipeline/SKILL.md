@@ -501,6 +501,10 @@ Use when Cron #3 failed but #1 and #2 succeeded.
 
 ## WhatsApp Companion Format
 
+> ⚠️ **ANTIPADRÃO CONFIRMADO — NUNCA incluir seção "O que mais importa" na mensagem WhatsApp.**
+> Esta seção foi usada em edições passadas e está **PROIBIDA**. A mensagem WhatsApp deve seguir ESTRITAMENTE o formato abaixo com 🔥 *Destaques do dia*, SEM variações. Se você encontrar exemplos anteriores com "O que mais importa", IGNORE-OS.
+> Motivo: o leitor do WhatsApp já recebe o link da edição web como primeira informação. A seção "O que mais importa" duplica o editorial sem valor agregado e alonga a mensagem desnecessariamente.
+
 Formato aprovado (exemplo real da edição de 28/06):
 
 ```
