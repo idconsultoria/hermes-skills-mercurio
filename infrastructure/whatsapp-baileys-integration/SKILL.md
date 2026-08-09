@@ -2,11 +2,11 @@
 name: whatsapp-baileys-integration
 description: "Integrate WhatsApp into Python via Baileys — lifecycle, QR auth, REST bridge.
 
-Load this skill when you need to send WhatsApp messages from Python without paid APIs. Covers full lifecycle management (spawn, QR auth, session persistence, health checks, graceful shutdown), REST bridge with Z-API compatible interface for file/media delivery, and multi-number architecture. Replaces paid Z-API with local WhatsApp Web."
+Load this skill when you need to send WhatsApp messages from Python without paid APIs. Covers full lifecycle management (spawn, QR auth, session persistence, health checks, graceful shutdown), REST bridge with Z-API compatible interface for file/media delivery, and multi-number architecture. Replaces paid Z-API with local WhatsApp Web. Absorveu messaging/whatsapp-automation (merge 08/2026): migration checklist Z-API→Baileys, rate limiting, WhatsApp Web limitations e reference files (baileys-bridge-server.js, whatsapp_client.py, multi_assessor_config.py)."
 version: 1.1.0
 type: ToolIntegration
 tags: [whatsapp, baileys, messaging, nodejs, subprocess, automation, zapi-migration]
-timestamp: 2026-07-23T00:00:00Z
+timestamp: 2026-08-09T05:08:04Z
 ---
 
 # WhatsApp via Baileys — Python Integration
@@ -426,3 +426,41 @@ url = "http://localhost:3100/send-text"
 Headers adicionais como `Client-Token` não são necessários no modo local. Para segurança em produção, use firewall (bind apenas em localhost) ou autenticação básica no Express.
 
 For extracting config from a legacy Z-API Cloud Run job and mapping to the `ASSESSOR_N_` format, see `references/legacy-job-migration.md`.
+
+## WhatsApp Web Limitations
+
+- **No group messaging** in basic mode — send only to individual numbers
+- **QR code expires** after ~20 seconds — start the bridge with the phone ready
+- **WhatsApp bans** possible with aggressive sending — respect rate limits
+
+## Rate Limiting
+
+- WhatsApp Web has undocumented rate limits
+- Keep messages under 8 per execution batch
+- PDFs over 10MB may fail — keep reports lean
+
+## Z-API Compatibility Details
+
+- Bridge accepts raw phone numbers but uses `@s.whatsapp.net` JIDs internally
+- `phone-exists` returns `{exists, lid}` — same format as Z-API
+- PDF delivery uses base64 data URIs (same as Z-API `send-document/pdf`)
+- Headers adicionais como `Client-Token` não são necessários no modo local
+
+## Migration Checklist (Z-API → Baileys)
+
+1. Install Node.js 18+ on host
+2. `npm install` bridge dependencies
+3. Start bridge, scan QR code with assessor WhatsApp
+4. Verify: `curl http://localhost:3100/health` → `{"status":"connected"}`
+5. Test text: `curl -X POST http://localhost:3100/send-text -H "Content-Type: application/json" -d '{"phone":"55SEUNUMERO","message":"teste"}'`
+6. Update `.env`: `ZAPI_URL` → `WHATSAPP_SERVICE_URL=http://localhost:3100`
+7. Remove `ZAPI_CLIENT_TOKEN` (not needed by Baileys)
+8. Run pipeline and verify delivery
+
+## References (merged from whatsapp-automation)
+
+| File | Purpose |
+|------|---------|
+| `references/baileys-bridge-server.js` | Full Node.js bridge server (Z-API compatible REST API) |
+| `references/whatsapp_client.py` | Python client class with phone-exists, send-text, send-pdf-and-text |
+| `references/multi_assessor_config.py` | Multi-instance config loader with prefixed env vars |

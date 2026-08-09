@@ -3,8 +3,6 @@ name: hermes-agent-skill-authoring
 description: "Author SKILL.md and DESIGN.md token specs in-repo — frontmatter, validator
 
 Load this skill when creating or modifying skills in the Hermes repository. Covers SKILL.md and DESIGN.md frontmatter format, token specification structure, the built-in validator, and conventions for skill authoring with proper descriptions, triggers, and references."
-
-Load this skill when creating or modifying skills in the Hermes repository. Covers SKILL.md and DESIGN.md frontmatter format, token specification structure, the built-in validator, and conventions for skill authoring with proper descriptions, triggers, and references."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

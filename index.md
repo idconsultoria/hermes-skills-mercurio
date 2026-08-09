@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 102 skills*
+*Total: 101 skills*
 
 ---
 
@@ -790,15 +790,14 @@ Load this skill when deploying a built application to production: verifying DB m
 
 - **Nome:** `infrastructure/whatsapp-baileys-integration`
 - **Arquivo:** `infrastructure/whatsapp-baileys-integration/SKILL.md`
-- **Tamanho:** 20,615 chars
+- **Tamanho:** 22,530 chars
 - **Resumo:** Integrate WhatsApp messaging into Python pipelines via Baileys — lifecycle, QR auth, REST bridge, multi-number
 - **Type:** ToolIntegration
-- **Timestamp:** 2026-07-17T00:00:00Z
+- **Timestamp:** 2026-08-09T05:08:04Z
 
-Load this skill when you need to send WhatsApp messages from Python without paid APIs. Covers full lifecycle management (spawn, QR auth, session persistence, health checks, graceful shutdown), REST bridge with Z-API compatible interface for file/media delivery, and multi-number architecture. Replaces paid Z-API with local WhatsApp Web.
+Load this skill when you need to send WhatsApp messages from Python without paid APIs. Covers full lifecycle management (spawn, QR auth, session persistence, health checks, graceful shutdown), REST bridge with Z-API compatible interface for file/media delivery, and multi-number architecture. Replaces paid Z-API with local WhatsApp Web. Absorveu messaging/whatsapp-automation (merge 08/2026): migration checklist Z-API→Baileys, rate limiting, WhatsApp Web limitations e reference files (baileys-bridge-server.js, whatsapp_client.py, multi_assessor_config.py).
 
 **Relações:**
-- `similar` → `messaging/whatsapp-automation`
 - `similar` → `autonomous-ai-agents/messaging-platforms`
 
 ### Selfhost Service Deploy — Oracle ARM64
@@ -1149,23 +1148,6 @@ Load this skill any time a spreadsheet file is the primary input or output: open
 - `similar` → `productivity/docx`
 - `similar` → `productivity/pdf`
 
-## Messaging
-
-### WhatsApp Automation (Baileys)
-
-- **Nome:** `messaging/whatsapp-automation`
-- **Arquivo:** `messaging/whatsapp-automation/SKILL.md`
-- **Tamanho:** 5,717 chars
-- **Resumo:** Automate WhatsApp messaging from Python projects — Baileys bridge, Z-API migration, multi-assessor patterns
-- **Type:** ToolIntegration
-- **Timestamp:** 2026-07-16T00:00:00Z
-
-Load this skill when your Python project needs to send WhatsApp messages (text, PDFs, documents) without paying for third-party APIs. Covers Baileys Node.js bridge setup, Z-API compatible REST interface, QR authentication workflow, and multi-number multi-assessor patterns.
-
-**Relações:**
-- `similar` → `infrastructure/whatsapp-baileys-integration`
-
-
 ## Read Reddit
 
 ### Read Reddit via RSS
@@ -1494,7 +1476,7 @@ Pipeline Dédalo Squad — mapeamento de processos com POPs e diagramas BPMN 2.0
 
 - **Nome:** `software-development/hermes-agent-skill-authoring`
 - **Arquivo:** `software-development/hermes-agent-skill-authoring/SKILL.md`
-- **Tamanho:** 12,297 chars
+- **Tamanho:** 12,026 chars
 - **Resumo:** Author SKILL.md and DESIGN.md token specs in-repo — frontmatter, validator
 - **Type:** Reference
 - **Timestamp:** 2026-06-12T02:23:22Z
