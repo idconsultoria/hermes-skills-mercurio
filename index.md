@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 99 skills*
+*Total: 102 skills*
 
 ---
 
@@ -185,10 +185,10 @@ Load this skill when you need to create sound effects, ambient audio, or UI soun
 
 - **Nome:** `content-production/iaf-newsletter-pipeline`
 - **Arquivo:** `content-production/iaf-newsletter-pipeline/SKILL.md`
-- **Tamanho:** 44,468 chars
+- **Tamanho:** 44,854 chars
 - **Resumo:** Umbrella skill for newsletters — cron scheduling, curation, dedup, deploy
 - **Type:** Orchestrator
-- **Timestamp:** 2026-06-19T19:47:50Z
+- **Timestamp:** 2026-08-09T05:08:04Z
 
 Load this skill to set up, modify, run, or troubleshoot any daily newsletter, briefing, digest, or curated report pipeline. Covers multi-source content collection, editorial ranking and dedup, HTML generation, deploy no Vercel, e entrega via Telegram no formato WhatsApp-style.
 
@@ -237,10 +237,10 @@ Umbrella skill for TTS: voice design, Gemini prompting, multi-provider fallback,
 
 - **Nome:** `content-production/research-report-standards`
 - **Arquivo:** `content-production/research-report-standards/SKILL.md`
-- **Tamanho:** 8,437 chars
+- **Tamanho:** 10,541 chars
 - **Resumo:** Research report standards — content, narrative flow, visual consistency.
 - **Type:** Reference
-- **Timestamp:** 2026-07-26T20:15:00Z
+- **Timestamp:** 2026-08-09T05:08:04Z
 
 Carregue esta skill quando for produzir um relatório de pesquisa, análise de mercado ou estudo entregue como HTML + PDF. Define o que o conteúdo deve conter: remoção de metadados de rótulo (nível/status/projeto/data), seção obrigatória 'Sobre este Relatório', framework SCR para sumário executivo e regras de consistência visual entre relatórios relacionados.
 
@@ -415,6 +415,23 @@ Load this skill when designing or balancing a board game — mechanical design, 
 **Relações:**
 - `used_by` → `board-game-design`
 
+
+## Business
+
+### Análise Contratual (Risco para Subcontratada)
+
+- **Nome:** `business/analise-contratual`
+- **Arquivo:** `business/analise-contratual/SKILL.md`
+- **Tamanho:** 5,159 chars
+- **Resumo:** Use ao analisar contratos/minutas — subcontratação, LGPD.
+- **Type:** Reference
+- **Timestamp:** 2026-08-09T05:08:04Z
+
+Carregue esta skill quando precisar analisar minuta de contrato, contrato, edital, plano de trabalho ou proposta — especialmente quando a ID Consultoria (ou um cliente) é subcontratada/fornecedora. Cobre checklist de riscos (subcontratação, pay-when-paid, LGPD, propriedade intelectual, SLA/multas), cruzamento contrato × plano de trabalho para achar divergências de escopo/valor/prazo, e identificação de partes e regime jurídico (Lei 14.133/2021, LGPD 13.709/2018). Usa google-workspace para localizar documentos no Drive e scripts/pdf2txt.py para extrair texto de PDFs. Entrega resumo executivo no chat + arquivo .md completo via MEDIA.
+
+**Relações:**
+- `uses` → `productivity/google-workspace`
+- `uses` → `productivity/pdf`
 
 ## Dogfood
 
@@ -646,10 +663,10 @@ Load this skill when a SPA dashboard loads slowly or transfers too much data (30
 
 - **Nome:** `infrastructure/data-pipeline-patterns`
 - **Arquivo:** `infrastructure/data-pipeline-patterns/SKILL.md`
-- **Tamanho:** 6,648 chars
+- **Tamanho:** 6,742 chars
 - **Resumo:** Reliability patterns for batch data pipelines — exponential backoff, API safeguards, cell-size truncation, and parallel execution guardrails
 - **Type:** Reference
-- **Timestamp:** 2026-06-28T05:11:55Z
+- **Timestamp:** 2026-08-09T05:08:04Z
 
 Reliability patterns for batch data pipelines: exponential backoff, API call safeguards, error handling strategies for cron-driven automation.
 
@@ -710,10 +727,10 @@ Load this skill when setting up continuous integration on GCP: connecting GitHub
 
 - **Nome:** `infrastructure/hermes-cron-patterns`
 - **Arquivo:** `infrastructure/hermes-cron-patterns/SKILL.md`
-- **Tamanho:** 6,165 chars
+- **Tamanho:** 6,450 chars
 - **Resumo:** Hermes cron job patterns — timeout limits and background execution
 - **Type:** Reference
-- **Timestamp:** 2026-07-26T05:05:12Z
+- **Timestamp:** 2026-08-09T05:08:04Z
 
 Load this skill when a cron job exceeds the 3-minute hard limit or needs to run long scripts. Covers the nohup background spawn pattern, script delivery, and timeout workarounds for the Hermes cron scheduler.
 
@@ -832,10 +849,10 @@ Load this skill when working with any Supabase-backed project from a restricted 
 
 - **Nome:** `infrastructure/moodle-admin`
 - **Arquivo:** `infrastructure/moodle-admin/SKILL.md`
-- **Tamanho:** 6,922 chars
+- **Tamanho:** 22,057 chars
 - **Resumo:** Administer Moodle — DB, students, mass email.
 - **Type:** ToolIntegration
-- **Timestamp:** 2026-07-29T00:00:00Z
+- **Timestamp:** 2026-08-09T05:08:04Z
 
 Carregue esta skill quando precisar administrar o Moodle 5.2 de treinamentos.idconsultoria.ai — consultas SQL no Postgres via docker exec, gestão de estudantes, envio de email em massa personalizado e operações de manutenção. Cobre arquitetura Docker Compose (app, nginx, postgres, redis, cron) no host Oracle via SSH.
 
@@ -867,10 +884,10 @@ Produce deterministic MP4 videos using HyperFrames (HTML→video engine). Genera
 
 - **Nome:** `media/kindle-manga`
 - **Arquivo:** `media/kindle-manga/SKILL.md`
-- **Tamanho:** 58,440 chars
+- **Tamanho:** 59,831 chars
 - **Resumo:** Prepare and transfer manga to Kindle — quality-gated conversion with resolution check, contrast correction, and grayscale EPUB generation
 - **Type:** Media
-- **Timestamp:** 2026-06-28T05:11:55Z
+- **Timestamp:** 2026-08-09T05:08:04Z
 
 Load this skill when putting manga or comics on a Kindle, converting CBR/CBZ/PDF to Kindle format, or using KCC and Calibre for MOBI/AZW3 conversion. Covers source acquisition (Archive.org, Nyaa torrents, MangaDex API), quality gate with resolution and contrast checks, grayscale EPUB generation with PW11-native resize, and USB or Drive delivery.
 
@@ -1316,10 +1333,10 @@ Load this skill when conducting market research for Brazilian/LATAM markets wher
 
 - **Nome:** `research/systematic-research`
 - **Arquivo:** `research/systematic-research/SKILL.md`
-- **Tamanho:** 7,304 chars
+- **Tamanho:** 13,216 chars
 - **Resumo:** Single-agent deep research via direct source URLs.
 - **Type:** Research
-- **Timestamp:** 2026-08-02T00:00:00Z
+- **Timestamp:** 2026-08-09T05:08:04Z
 
 Load this skill when web_search is consistently unavailable (returns empty arrays for ALL queries after 2+ attempts) and you need thorough research without multi-agent dispatch. Uses domain knowledge to identify authoritative source URLs, batch parallel web_extract calls, handle blocked/404 pages, and page through large truncated encyclopedia-style articles. Produces cited, structured reports with source attribution. Complementary to deep-research (which covers multi-agent dispatch).
 
@@ -1327,6 +1344,22 @@ Load this skill when web_search is consistently unavailable (returns empty array
 - `similar` → `research/deep-research`
 - `similar` → `research/market-research-synthesis`
 - `similar` → `research/digital-clone-persona`
+
+### Grounded Citations
+
+- **Nome:** `research/grounded-citations`
+- **Arquivo:** `research/grounded-citations/SKILL.md`
+- **Tamanho:** 11,937 chars
+- **Resumo:** Ground answers and documents in cited, verifiable sources.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-09T05:08:04Z
+
+Load this skill whenever an answer or artifact rests on information you fetched rather than knew — research, comparisons, news summaries, reports, briefs, docs, decks, or any multi-source synthesis where the user will want to check your work. Uses a ledger script (scripts/sources.py, stdlib-only) that owns the url → [n] mapping so citation numbers come from retrieval, never memory; cite-while-drafting with inline [n] ids, mechanically rendered Sources blocks, and a verify step that fails drafts with unknown ids or thin coverage. Fact-checking mode attaches verbatim quotes per source and flags model-knowledge claims [unverified].
+
+**Relações:**
+- `similar` → `research/systematic-research`
+- `similar` → `research/deep-research`
+- `similar` → `content-production/research-report-standards`
 
 ## Social Media
 
@@ -1624,6 +1657,22 @@ Throwaway experiments to validate an idea before building — fast, focused.
 - `uses` → `software-development/test-driven-development`
 - `similar` → `research/model-benchmark-frontier`
 - `used_by` → `software-development/improve-codebase-architecture`
+
+### Inspecting Hermes Desktop DOM
+
+- **Nome:** `software-development/inspecting-hermes-desktop-dom`
+- **Arquivo:** `software-development/inspecting-hermes-desktop-dom/SKILL.md`
+- **Tamanho:** 6,867 chars
+- **Resumo:** Read the live Hermes desktop DOM/CSS over CDP.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-09T05:08:04Z
+
+Load this skill when developing apps/desktop and you need to inspect the live rendered DOM of the running Hermes desktop app — computed styles, geometry, which CSS rule won, renderer console errors. Dev-server runs open a CDP port on 127.0.0.1:9222; scripts/eval.mjs and the shared CDP client in scripts/perf/lib/cdp.mjs read the Chromium page directly. Answers factual questions (did this render, which selector matches, inherited vs own styles) — not aesthetics. Includes isolated-instance launch pattern, stable data-slot selectors, and pitfalls (never kill the user's app, never dump the whole DOM).
+
+**Relações:**
+- `similar` → `software-development/systematic-debugging`
+- `similar` → `dogfood`
+- `similar` → `hermes-desktop-plugins`
 
 ### Systematic Debugging
 

@@ -10,7 +10,7 @@ author: Hermes
 license: MIT
 tags: [kindle, manga, comics, kcc, calibre, mobi, ereader, usb-transfer]
 type: Media
-timestamp: 2026-06-28T05:11:55Z
+timestamp: 2026-08-09T05:08:04Z
 ---
 
 # Kindle Manga Transfer
@@ -88,7 +88,7 @@ For **individual weekly chapters** (not full volumes), the standard torrent + KC
 
 | Source | URL pattern | Notes |
 |--------|------------|-------|
-| readonepiece.com | `ww{N}.readonepiece.com/chapter/one-piece-chapter-{N}/` | **Best One Piece source.** CDN at `cdn.readonepiece.com`. Domain rotates ww5-ww20. ⚠️ CDN requires `Referer: https://{domain}.readonepiece.com/` header — without it, returns 403 and a 4.8 KB HTML placeholder instead of the image. Images are PNG or JPEG depending on release. Extract URLs from raw HTML with a **generic regex** that catches both old patterns (`_NNN.png`) and new UUID-based patterns: `r"(https://cdn\\.readonepiece\\.com/file/[^\"' ]+?\\.(?:png|jpe?g))"`. Sort by the last numeric segment before the extension for correct page ordering — new format uses `/{page}.jpeg` at end of URL, old format uses `_NNN.png`. |
+| readonepiece.com | `ww{N}.readonepiece.com/chapter/one-piece-chapter-{N}/` | **Best One Piece source.** Domain rotates ww5-ww20. ⚠️ CDN host changed 3+ times in 2026 (currently `cdn.onepiecechapters.com`). **Never hardcode the CDN host** — use the cascading CDN-agnostic extraction (see Pitfalls: "readonepiece.com CDN changed 3+ times"). Require `Referer` = image host + full Chrome UA for downloads; validate magic bytes. Extract page URLs from `<img class="...js-page...">` tags (data-src for lazy pages), fallback to any remote `<img>` src, then any manga-path URL. Sort by last numeric segment before extension. |
 | MangaPlus (reference only) | `mangaplus.shueisha.co.jp/viewer/{chapter_id}` | Official. DRM blob URLs — browser + Performance API needed. Oracle Cloud IP blocked from API. |
 | MangaPill | `mangapill.com/chapters/{manga_id}-{ch_id}/{slug}` | Good for series not on MangaDex. CDN: `cdn.readdetectiveconan.com`. Requires `User-Agent + Referer` headers. Image URLs embedded as `data-src` in raw HTML (no browser/JS needed — curl + grep works). URL pattern includes per-chapter UUID — extract from HTML, don't guess. See `references/mangapill-source.md`. |
 | daemonsoftheshadowreal.com (qubn.us) | `daemonsoftheshadowreal.com/manga/daemons-of-the-shadow-realm-chapter-{N}/` | Historical source — CDN migrated. See `references/qubn-us-source.md` for archive. |
@@ -959,7 +959,28 @@ Checks:
   the pattern likely changed again — extract fresh URLs from current chapter page HTML using
   `data-src` regex. See `references/mangapill-source.md`.
 - **readonepiece.com CDN requires Referer header**: Since mid-2026, the CDN at `cdn.readonepiece.com` returns **403 + 4.8 KB HTML placeholder** when curl/requests download images without a `Referer: https://{domain}.readonepiece.com/` header. Without it, all pages download as 4.8 KB invalid files and PIL raises `UnidentifiedImageError`. **Fix:** always pass `Referer` and a full Chrome User-Agent when downloading images from this CDN.
-- **readonepiece.com CDN path changed multiple times**: The image URL path evolved through `/file/mangap/op_{chapter}_{page:02d}.jpg` → `/file/CDN-M-A-N/op_{chapter}_nnd_{page:03d}.png` → `/file/mangap/{year}/{week}/{manga_id}/{chapter_id}/{uuid}/{page}.jpeg` (UUID-based, same pattern as MangaPill). Use a **generic regex** that catches all variants: `(https://cdn\\.readonepiece\\.com/file/[^\"' ]+?\\.(?:png|jpe?g))`. Sort by the last numeric segment before extension for correct page ordering. If extraction returns 0 results or downloads HTML placeholders, the CDN likely changed format again.
+- **readonepiece.com CDN changed 3+ times in 2026 (domain AND path)**: The image URLs evolved: `/file/mangap/op_{chapter}_{page:02d}.jpg` → `/file/CDN-M-A-N/op_{chapter}_nnd_{page:03d}.png` → `/file/mangap/{year}/{week}/{manga_id}/{chapter_id}/{uuid}/{page}.jpeg` → **new host `cdn.onepiecechapters.com`** (Aug 2026; old host `cdn.readonepiece.com` dead). Each change broke scripts that hardcoded the host. **Robust fix (implemented in `one_piece_kindle_cron.py` Aug 2026): CDN-agnostic cascading extraction with ZERO hardcoded hosts:**
+  ```python
+  def extract_page_urls(html):
+      # Strategy 1: reader <img class="...js-page..."> tags — order guaranteed.
+      # src may come BEFORE class in the tag; lazy pages use data-src (real URL)
+      # + a data: GIF in src. Prefer data-src, else http(s) src, never data: URIs.
+      urls = []
+      for tag in re.findall(r'<img[^>]*>', html):
+          if 'js-page' in tag:
+              m = re.search(r'\bdata-src="([^"]+)"', tag) or \
+                  re.search(r'\bsrc="(https?://[^"]+)"', tag)
+              if m: urls.append(m.group(1))
+      if urls: return _dedupe_sort(urls)
+      # Strategy 2: any <img> with remote image src (any host)
+      urls = re.findall(r'<img[^>]*\bsrc="(https?://[^"]+\.(?:png|jpe?g|webp))"', html)
+      if urls: return _dedupe_sort(urls)
+      # Strategy 3: any absolute image URL with a manga-ish path (any host)
+      urls = re.findall(
+          r'https?://[a-z0-9.-]+/(?:file|manga|media|img|images|uploads?|content)/[^"\'\\s]+?\.(?:png|jpe?g|webp)', html)
+      return _dedupe_sort(urls)
+  ```
+  Sort by last numeric segment before extension (`/(\d+)\.` → `_(\d+)\.` → bare `(\d+)\.`). Referer header for downloads should be **derived from the first image URL's host** (not hardcoded). Also validate downloaded bytes with magic bytes (`\xff\xd8` JPEG / `\x89PNG`) — size-only checks miss HTML placeholders. If all strategies return 0, dump the page to disk with a DIAGNOSTIC message instead of failing silently — that's how you'll see the next format change in the cron output.
 - **⚠️ `.jpeg` extension breaks image processing filter**: When the CDN migrates to `.jpeg` extension (current UUID-based format), any code that filters images by `endswith(('.jpg', '.png'))` will find ZERO files — downloads succeed (saved as `NNNN.jpeg`) but the processing loop runs zero iterations, producing an empty EPUB that Amazon rejects with **E999**. **Fix:** include `.jpeg` in the filter: `endswith(('.jpg', '.jpeg', '.png'))` with `.lower()`. Also add a guard — abort if zero images processed.
 - **Cron script `one_piece_kindle_cron.py` filename**
 - **Using `fixed-epub-builder.py` from Python**: Import via `importlib.util.spec_from_file_location`:

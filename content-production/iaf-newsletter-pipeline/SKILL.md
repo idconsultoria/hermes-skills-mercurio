@@ -9,7 +9,7 @@ metadata:
     tags: [newsletter, pipeline, cron, iaf, briefing, digest, curation]
     related_skills: [brand-iaf-conteudo]
 type: Orchestrator
-timestamp: 2026-06-19T19:47:50Z
+timestamp: 2026-08-09T05:08:04Z
 ---
 
 # IAF Newsletter Pipeline — Manhã Aumentada
@@ -473,6 +473,12 @@ The script's stdout is delivered verbatim.
 ## Recovery Manual (After Cron #3 Failure)
 
 Use when Cron #3 failed but #1 and #2 succeeded.
+
+> **TODOS os crons falharam na mesma janela?** Provavelmente provider outage, não
+> bugs independentes. Ver `references/pipeline-failure-modes.md` → "Provider Outage
+> (all crons failed)" para triagem + rerun em ordem de dependência. Sinal clássico:
+> `TimeoutError: idle for 600s — waiting for non-streaming API response` no
+> errors.log, com jobs OK antes e depois da janela.
 
 ### Diagnosis
 1. `cronjob(action='list')` — check `last_status`

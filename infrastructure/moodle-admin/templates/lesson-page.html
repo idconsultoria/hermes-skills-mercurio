@@ -1,0 +1,19 @@
+<!--
+  Template da página de aula no Moodle (mod_page) — curso "Ferramentas de IA" (id=2).
+  Fonte: mdl_page id=1 "Boas-vindas ao Ferramentas de IA!" (aula de introdução).
+  Para integrar uma aula: copiar este arquivo e trocar APENAS o valor de <source src>
+  pela URL do asset do GitHub Release (idconsultoria/iaf, tag "video").
+  Gravar em mdl_page.content via UPDATE (placeholder existente) ou criar página nova.
+-->
+<p>
+<script src="https://vjs.zencdn.net/8.16.1/video.min.js"></script>
+</p>
+<p><video id="aula-player" class="video-js vjs-big-play-centered" preload="auto" controls="controls" data-setup="{
+    &quot;fluid&quot;: true,
+    &quot;playbackRates&quot;: [0.5, 1, 1.25, 1.5, 2],
+    &quot;controlBar&quot;: {
+      &quot;pictureInPictureToggle&quot;: false
+    }
+  }">
+    <source src="URL_DO_ASSET_MP4" type="video/mp4">
+  </video></p>

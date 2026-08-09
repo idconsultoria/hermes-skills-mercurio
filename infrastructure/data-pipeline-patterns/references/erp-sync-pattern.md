@@ -82,6 +82,53 @@ async function fetchAllFromSupabase(table, columns) {
 }
 ```
 
+## Token Rotation & Auth Validation (ATLAS / Maxprod)
+
+Trocar a chave de API é operação recorrente. No ATLAS a chave fica **hardcoded em 4
+arquivos** — atualizar só um quebra em silêncio (sessão 2026-08-03 confirmou):
+
+1. `scripts/sync-erp.mjs` — usado pelo cron noturno (o que importa para dados)
+2. `api/sync.ts` — serverless function Vercel
+3. `src/data/syncService.ts` — frontend (fallback de sync no browser)
+4. `docs/fontes e apis.md` — documentação
+
+Após trocar, `grep -rl "ANTIGO_TOKEN" .` ainda acha cópias em `.vercel/output/`
+(build artifacts). **Não editar** — regeneram no próximo `vercel build`.
+
+### Validar token sem rodar o sync completo (~25 min)
+
+Auth Maxprod é Basic: `Authorization: Basic <TOKEN>`. Faça uma query mínima:
+
+```bash
+node -e "
+const T='<TOKEN>';
+fetch('https://api.maxiprod.com.br/graphql/', {
+  method:'POST',
+  headers:{'Content-Type':'application/json','Authorization':'Basic '+T},
+  body: JSON.stringify({query:'{ empresas { totalCount } }'})
+}).then(async r=>console.log('HTTP',r.status, (await r.text()).slice(0,300)));
+"
+```
+
+- **HTTP 401** → token inválido/revogado
+- **HTTP 400 com erro de schema GraphQL** (ex.: `field does not exist on type`) →
+  **auth OK**, a query de teste é que está errada. Não confundir com falha de token.
+
+### Cron vs Deploy: o que a troca afeta
+
+O cron `ATLAS — Sync ERP noturno` (`/opt/data/scripts/sync-atlas-erp.sh`) roda
+`node scripts/sync-erp.mjs` **localmente** → a troca de token no arquivo vale para o
+próximo tick sem deploy. Deploy Vercel só é necessário se o frontend em produção
+usar `api/sync.ts`/`syncService.ts` para busca ao vivo (o padrão ATLAS não usa —
+frontend consome JSONs estáticos gerados pelo cron).
+
+Para testar o sync com o token novo e acompanhar pelo Hermes, rode direto em
+background com `notify_on_complete` (não use o wrapper nohup, que perde o tracking):
+
+```bash
+cd /opt/data/atlas-ravello && node scripts/sync-erp.mjs 2>&1 | tee logs/sync-teste-token-$(date +%Y%m%d-%H%M%S).log
+```
+
 ## Pitfalls
 
 - **Token in source code**: the ATLAS sync script has the Maxprod API token hardcoded.

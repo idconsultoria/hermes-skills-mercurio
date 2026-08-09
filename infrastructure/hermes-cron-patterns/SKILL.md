@@ -7,7 +7,7 @@ version: 1.0.0
 author: Hermes Agent
 tags: [hermes, cron, background, nohup, timeout]
 type: Reference
-timestamp: 2026-07-26T05:05:12Z
+timestamp: 2026-08-09T05:08:04Z
 ---
 
 # Hermes Cron Patterns
@@ -111,6 +111,11 @@ echo "📋 Log: $LOG_FILE"
 ---
 
 ## Model Pinning & Drift Protection
+
+> 📖 **Leia também:** `references/cron-provider-outage-triage.md` — triage de vários
+> crons agent-driven falhando na mesma janela (`idle for 600s — waiting for
+> non-streaming API response` = provider outage) + rerun em ordem de dependência +
+> verificação por artefatos.
 
 Hermes cron jobs that use an LLM (agent-driven, not `no_agent`) must match the
 currently configured model/provider — or be explicitly pinned — to avoid a
