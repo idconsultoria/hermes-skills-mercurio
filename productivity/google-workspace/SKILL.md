@@ -51,6 +51,7 @@ $GSETUP --check
 - `references/service-account-sharing.md` — Cross-account Drive access: service account vs user OAuth visibility (404 on valid IDs, sharing patterns)
 - `references/gmail-large-file-delivery.md` — Gmail 25 MB attachment limit and Drive sharing workaround for larger files
 - `references/drive-file-organization.md` — Moving files to folders and deduplicating after batch uploads (uses `scripts/drive-move-to-folder.py`)
+- `references/md-to-gdoc.md` — Convert markdown → Google Docs with correct formatting (headings, bold, bullets, native tables, callouts). Uses `scripts/md-to-gdoc.py`. **Use this whenever a Doc must look right — NOT `docs create --body` (plain text only).**
 
 ## Scripts
 
@@ -58,6 +59,7 @@ $GSETUP --check
 - `scripts/google_api.py` — compatibility wrapper CLI
 - `scripts/gws_bridge.py` — bridge for gws CLI backend
 - `scripts/drive-move-to-folder.py` — batch-move Drive files to a folder, deduplicating (see `references/drive-file-organization.md`)
+- `scripts/md-to-gdoc.py` — markdown → Google Docs converter (headings, bold/italic/code inline, bullets, numbered lists, native tables with smart widths, callouts, code blocks, paragraph spacing). Batch mode avoids 429 rate limits. See `references/md-to-gdoc.md`.
 
 ## First-Time Setup
 
@@ -338,8 +340,11 @@ $GAPI sheets append SHEET_ID "Sheet1!A:C" --values '[[\"new\",\"row\",\"data\"]]
 ```bash
 # Read
 $GAPI docs get DOC_ID
-# ⚠️ Returns plain text only — tables and checkboxes are stripped.
-#    For table extraction, see references/docs-api-table-extraction.md
+# ⚠️ Retorna texto com ESTRUTURA preservada: headings (# ##), bullets (-),
+#    checklists (- [ ]), chips ([Título]) e TABELAS (blocos | a | b |).
+#    (Corrigido 2026-08-11: antes perdia tabelas/chips/checkboxes porque
+#    iterava só "paragraph"; agora percorre recursivamente incluindo tabelas.)
+#    Para extração de tabelas via REST API, ver references/docs-api-table-extraction.md
 
 # Create a new Doc (optionally seeded with body text)
 $GAPI docs create --title "Meeting Notes"
@@ -351,6 +356,13 @@ $GAPI docs append DOC_ID --text "Additional content to append"
 # Inline update/replace — NOT available via google_api.py.
 # Use the Google Docs REST API batchUpdate endpoint directly.
 # See references/docs-api-batch-update.md for the technique.
+
+# Create/update a Doc WITH correct formatting (headings, bold, bullets,
+# native tables, callouts) from markdown — preferred over --body (plain text):
+MD2DOC="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py"
+$MD2DOC documento.md --title "Título" --parent FOLDER_ID     # create + move to folder
+$MD2DOC documento.md --title "Título" --doc-id DOCUMENT_ID  # update existing (preserves ID)
+# See references/md-to-gdoc.md for supported markdown, pitfalls, and batch mode.
 ```
 
 ## Output Format
@@ -403,6 +415,8 @@ For programmatic Google Drive and Sheets patterns (folder trees, batch populatio
 | Google Docs downloaded as `.pdf` instead of text | Add `--export-mime text/plain` to download Docs as readable text. Without it, the default export is PDF. |
 | `Gmail send` fails for attachments >25 MB | Gmail API/SMTP has a ~25 MB total message limit (base64 overhead). Files >25 MB cannot be attached — upload to Drive instead and share the link. See `references/gmail-large-file-delivery.md`. |
 | `$GAPI gmail send` has no `--attach` flag | The CLI wrapper `gmail send` does not support file attachments. For sending emails with attachments (e.g. EPUB manga files), use the Python Gmail API directly with MIMEBase — see kindle-manga's `references/gmail-kindle-delivery.md` for the complete script. |
+| `docs create --body` produces plain text without formatting (no bold/headings/tables) | Use `scripts/md-to-gdoc.py` instead — converts markdown with real headings, bold, bullets, native tables, callouts. See `references/md-to-gdoc.md`. |
+| Google Doc "todo em fonte mono" ou "tudo com bullet" após conversão | Style bleeding: um `updateTextStyle`/`updateParagraphStyle` cujo range inclui o `\n` final propaga o estilo ao próximo parágrafo em cascata. O `md-to-gdoc.py` lida com isso (ranges `end-1` + `_normalize_font`), mas se você estiver editando via batchUpdate manual, nunca inclua o `\n` no range de estilo. |
 
 ## Revoking Access
 
@@ -414,5 +428,7 @@ $GSETUP --revoke
 
 | Data | Mudança |
 |------|---------|
+| 2026-08-11 | **CRÍTICO:** `docs get` perdia tabelas/chips/checkboxes — `_extract_doc_text` iterava só `paragraph`, e elementos `table` eram silenciosamente descartados (documentos pareciam vazios). Reescrevido para percorrer recursivamente: parágrafos + tabelas (células) + chips + checklists. Agora `docs get` mostra: headings `#`/`##`, bullets `-`, checklists `- [ ]` (detectado via `lists` map: checkbox = nestingLevels sem glyphSymbol), chips `[Título]`, tabelas como blocos `\| a \| b \|`. |
+| 2026-08-11 | Adicionado `scripts/md-to-gdoc.py` + `references/md-to-gdoc.md` — conversor markdown → Google Docs com formatação correta (headings, bold inline, bullets, tabelas nativas com largura inteligente, callouts, code blocks, espaçamento entre parágrafos). Modo batch para evitar 429; documentados 10 pitfalls reais (style bleeding por `\n`, herança de fonte/bullet, `tableCellLocation` inexistente, `weightedFontFamily`, etc.). |
 | 2026-06-21 | Adicionado `references/gmail-large-file-delivery.md` — Gmail 25 MB attachment limit, Drive sharing workaround, and Kindle manga delivery edge case. Added pitfall and reference pointer in SKILL.md. |
 | 2026-06-19 | Adicionados pitfalls: `drive search` parent queries exigem `--raw-query` (400 Invalid Value sem ele); Drive IDs case-sensitive; Docs precisam de `--export-mime text/plain` para download como texto. |

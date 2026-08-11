@@ -155,14 +155,107 @@ def _extract_message_body(msg: dict) -> str:
 
 
 def _extract_doc_text(doc: dict) -> str:
-    text_parts = []
-    for element in doc.get("body", {}).get("content", []):
-        paragraph = element.get("paragraph", {})
-        for pe in paragraph.get("elements", []):
-            text_run = pe.get("textRun", {})
-            if text_run.get("content"):
-                text_parts.append(text_run["content"])
-    return "".join(text_parts)
+    """Extrai o texto de um Google Doc preservando ESTRUTURA: parágrafos,
+    headings, bullets/checkboxes, chips e TABELAS (que o código antigo perdia).
+
+    Formato de saída (texto plano com marcadores):
+      - Parágrafo normal: texto puro
+      - Heading: linha com o texto
+      - Bullet/checkbox: prefixado com "- " / "- [ ] "
+      - Chip (rich link): [Título do doc]
+      - Tabela: bloco delimitado com cada célula em colunas
+    """
+    parts = []
+    lists_map = doc.get("lists", {})
+
+    def walk(elements, prefix=""):
+        for element in elements or []:
+            if "paragraph" in element:
+                parts.append(_para_text(element, prefix))
+            elif "table" in element:
+                parts.append(_table_text(element["table"], prefix))
+
+    def _is_checkbox_list(list_id):
+        """True se a lista usa preset BULLET_CHECKBOX.
+        Checklist real: nestingLevels sem glyphSymbol (glyphType UNSPECIFIED).
+        Bullet normal: glyphSymbol '●' (DISC) ou similar."""
+        ldata = lists_map.get(list_id, {})
+        nesting = ldata.get("listProperties", {}).get("nestingLevels", [])
+        if not nesting:
+            return False
+        level0 = nesting[0]
+        # checkbox → sem glyphSymbol (fica GLYPH_TYPE_UNSPECIFIED)
+        return "glyphSymbol" not in level0
+
+    def _para_text(element, prefix=""):
+        p = element.get("paragraph", {})
+        style = p.get("paragraphStyle", {})
+        named = style.get("namedStyleType", "NORMAL_TEXT")
+        bullet = p.get("bullet")
+        is_checkbox = False
+        if bullet:
+            is_checkbox = _is_checkbox_list(bullet.get("listId", ""))
+        chunks = []
+        for pe in p.get("elements", []):
+            if "textRun" in pe:
+                chunks.append(pe["textRun"].get("content", ""))
+            elif "richLink" in pe:
+                props = pe["richLink"].get("richLinkProperties", {})
+                title = props.get("title", props.get("uri", "link"))
+                chunks.append(f"[{title}]")
+            elif "inlineObjectElement" in pe:
+                chunks.append("[IMAGEM]")
+            elif "autoText" in pe:
+                chunks.append("[AUTOTEXT]")
+        text = "".join(chunks)
+        if not text.strip() and text == "\n":
+            return ""
+        # Prefixos de estrutura
+        if named.startswith("HEADING_"):
+            level = named.replace("HEADING_", "")
+            return f"{'#' * int(level)} {text.rstrip()}\n"
+        if is_checkbox:
+            return f"- [ ] {text.rstrip()}\n"
+        if bullet:
+            return f"- {text.rstrip()}\n"
+        return text.rstrip() + "\n"
+
+    def _table_text(table, prefix=""):
+        rows = table.get("tableRows", [])
+        n_cols = table.get("columns", 0)
+        lines = []
+        lines.append("| " + " | ".join(str(i + 1) for i in range(n_cols)) + " |")
+        lines.append("|" + "---|" * n_cols)
+        for row in rows:
+            cells = row.get("tableCells", [])
+            cell_texts = []
+            for cell in cells:
+                buf = []
+                _walk_cell(cell.get("content", []), buf)
+                cell_texts.append(" ".join(t.strip() for t in buf).strip())
+            # alinhar ao número de colunas
+            while len(cell_texts) < n_cols:
+                cell_texts.append("")
+            lines.append("| " + " | ".join(cell_texts[:n_cols]) + " |")
+        return "\n".join(lines) + "\n"
+
+    def _walk_cell(elements, buf):
+        for element in elements or []:
+            if "paragraph" in element:
+                for pe in element.get("paragraph", {}).get("elements", []):
+                    if "textRun" in pe:
+                        buf.append(pe["textRun"].get("content", ""))
+                    elif "richLink" in pe:
+                        props = pe["richLink"].get("richLinkProperties", {})
+                        buf.append(f"[{props.get('title', 'link')}]")
+            elif "table" in element:
+                # tabela aninhada — raro; achatamos o texto
+                for row in element["table"].get("tableRows", []):
+                    for cell in row.get("tableCells", []):
+                        _walk_cell(cell.get("content", []), buf)
+
+    walk(doc.get("body", {}).get("content", []))
+    return "".join(parts)
 
 
 def _datetime_with_timezone(value: str) -> str:
