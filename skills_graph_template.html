@@ -36,6 +36,7 @@ button:hover { background: #252540; }
 .legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-dashed { border-top: 2px dashed #8080a0; width: 18px; }
 .legend-solid { background: #6080ff; width: 18px; height: 2px; }
+.legend-parent { background: #b060e0; width: 18px; height: 2px; }
 #stats {
   position: fixed; top: 12px; right: 12px; z-index: 10;
   font-size: 11px; color: #606080; text-align: right;
@@ -100,6 +101,15 @@ button:hover { background: #252540; }
 .rel-uses { background: #1a2a40; color: #6080ff; }
 .rel-parent { background: #2a1a30; color: #b060e0; }
 .rel-used_by { background: #1a3020; color: #50b070; }
+.rel-child { background: #301a2a; color: #d0a0f0; }
+.modal-rel-group { margin-bottom: 8px; }
+.modal-rel-items { display: flex; flex-wrap: wrap; gap: 5px; }
+.modal-rel-chip {
+  font-size: 11px; padding: 3px 9px; border-radius: 5px;
+  background: #1a1a30; border: 1px solid #2a2a48; cursor: pointer;
+}
+.modal-rel-chip:hover { background: #252548; border-color: #404070; color: #fff; }
+#modal-path { font-size: 11px; color: #606090; margin-top: 2px; font-family: monospace; }
 
 @media (max-width: 480px) {
   #controls { top: 8px; left: 8px; gap: 4px; max-width: 160px; }
@@ -122,6 +132,7 @@ button:hover { background: #252540; }
 <div id="legend">
   <div class="legend-item"><div class="legend-solid"></div><span>uses / used by</span></div>
   <div class="legend-item"><div class="legend-dashed"></div><span>similar</span></div>
+  <div class="legend-item"><div class="legend-parent"></div><span>parent / child</span></div>
 </div>
 <div id="modal-backdrop" onclick="closeModal(event)">
   <div id="modal" onclick="event.stopPropagation()">
@@ -133,6 +144,7 @@ button:hover { background: #252540; }
         <span style="font-size:10px;color:#505070;margin-left:8px" id="modal-type"></span>
       </div>
       <div class="modal-title" id="modal-title"></div>
+      <div id="modal-path"></div>
     </div>
     <div id="modal-body">
       <div class="modal-section" id="modal-summary-section">
@@ -174,9 +186,13 @@ svg.call(zoom);
 svg.append("defs").append("marker").attr("id","arrow").attr("viewBox","0 -5 10 10")
   .attr("refX",24).attr("refY",0).attr("markerWidth",6).attr("markerHeight",6).attr("orient","auto")
   .append("path").attr("d","M0,-5L10,0L0,5").attr("fill","#6080ff");
+svg.append("defs").append("marker").attr("id","arrow-parent").attr("viewBox","0 -5 10 10")
+  .attr("refX",24).attr("refY",0).attr("markerWidth",6).attr("markerHeight",6).attr("orient","auto")
+  .append("path").attr("d","M0,-5L10,0L0,5").attr("fill","#b060e0");
 
 const nodes = DATA.nodes.map(d=>({...d}));
 const links = DATA.edges.map(d=>({...d}));
+const NODE_MAP = Object.fromEntries(nodes.map(n => [n.id, n]));
 const sizeScale = d3.scaleSqrt().domain([0,d3.max(nodes,d=>d.size)]).range([4,22]);
 
 const simulation = d3.forceSimulation(nodes)
@@ -190,6 +206,8 @@ link.filter(d=>d.type==="similar").append("line")
   .attr("stroke","#8080a0").attr("stroke-width",1).attr("stroke-dasharray","4,4").attr("opacity",0.5);
 link.filter(d=>d.type==="uses").append("line")
   .attr("stroke","#6080ff").attr("stroke-width",1.5).attr("marker-end","url(#arrow)").attr("opacity",0.6);
+link.filter(d=>d.type==="parent").append("line")
+  .attr("stroke","#b060e0").attr("stroke-width",1.5).attr("marker-end","url(#arrow-parent)").attr("opacity",0.6);
 
 const node = g.append("g").selectAll("g").data(nodes).join("g").attr("cursor","pointer")
   .call(d3.drag()
@@ -234,6 +252,7 @@ function openModal(d) {
   document.getElementById("modal-size").textContent = (d.size/1024).toFixed(1) + " KB";
   document.getElementById("modal-type").textContent = d.type ? "⏺ " + d.type : "";
   document.getElementById("modal-title").textContent = d.label;
+  document.getElementById("modal-path").textContent = d.id;
   
   // Summary
   const summary = d.summary || "";
@@ -245,15 +264,23 @@ function openModal(d) {
   document.getElementById("modal-desc").textContent = desc;
   document.getElementById("modal-desc-section").style.display = desc ? "block" : "none";
   
-  // Relations
-  const rels = DATA.edges.filter(e => e.source.id === d.id || e.target.id === d.id);
-  const relsHtml = rels.map(e => {
+  // Relations — grouped by type, direction-aware (uses vs used_by, parent vs child)
+  // NOTE: use `links` (mutated by forceLink into node objects), NOT DATA.edges (still string ids)
+  const rels = links.filter(e => e.source.id === d.id || e.target.id === d.id);
+  const groups = { uses: [], used_by: [], similar: [], parent: [], child: [] };
+  rels.forEach(e => {
     const isSource = e.source.id === d.id;
-    const other = isSource ? e.target.label : e.source.label;
-    const type = isSource ? e.type : (e.type === 'uses' ? 'used_by' : 'similar');
-    let typeClass = 'rel-' + type;
-    return `<div class="modal-rel"><span class="modal-rel-type ${typeClass}">${type}</span> ${other}</div>`;
-  }).join('');
+    const other = isSource ? e.target : e.source;
+    let type = e.type;
+    if (!isSource) type = (type === 'uses' ? 'used_by' : (type === 'parent' ? 'child' : type));
+    if (!(type in groups)) groups[type] = [];
+    groups[type].push(other);
+  });
+  const typeLabels = { uses: 'Uses', used_by: 'Used by', similar: 'Similar', parent: 'Parent', child: 'Children' };
+  const relsHtml = ['uses','used_by','similar','parent','child']
+    .filter(t => (groups[t] || []).length)
+    .map(t => `<div class="modal-rel-group"><span class="modal-rel-type rel-${t}">${typeLabels[t]} (${groups[t].length})</span><div class="modal-rel-items">${groups[t].map(n => `<span class="modal-rel-chip" title="${n.id}" onclick="openModalById('${n.id}')">${n.label}</span>`).join('')}</div></div>`)
+    .join('');
   document.getElementById("modal-relations").innerHTML = relsHtml || '<div style="font-size:11px;color:#505070">No relations</div>';
   
   document.getElementById("modal-backdrop").classList.add("open");
@@ -263,13 +290,13 @@ function closeModal(e) {
   if (e && e.target !== document.getElementById("modal-backdrop")) return;
   document.getElementById("modal-backdrop").classList.remove("open");
 }
+function openModalById(id){ const n = NODE_MAP[id]; if (n) openModal(n); }
 
 // Keyboard close
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
 simulation.on("tick",()=>{
-  link.filter(d=>d.type==="similar").select("line").attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
-  link.filter(d=>d.type==="uses").select("line").attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+  link.select("line").attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
   node.attr("transform",d=>`translate(${d.x},${d.y})`);
 });
 
