@@ -110,6 +110,20 @@ echo "📋 Log: $LOG_FILE"
 
 ---
 
+## Pattern: Retrieving Cron Outputs on Request
+
+When the user asks "os relatórios/documentos que o cron produziu" (or similar):
+
+1. `cronjob(action='list')` → achar o `job_id`, `last_run_at`, `last_status` (ok/error), `deliver` e `schedule`.
+2. Output bruto da sessão: `/opt/data/cron/output/<job_id>/<timestamp>.md` — começa com o prompt completo; a resposta final do agente fica no FIM do arquivo (crons LLM costumam terminar com marcadores tipo `REPORT:/GRAPH:/SUMMARY:`).
+3. Artefatos do job vivem no `workdir` do job (ex: ciclo de consolidação → `/opt/data/skills/reports/`, `skills_graph.html`, `log.md`, `index.md`).
+4. Entregar os artefatos como arquivos reais via `MEDIA:<path>` (sempre dentro de `/opt/data`) + legenda curta do que cada um é — não resumir tudo no texto. Oferecer output bruto e artefatos antigos por demanda.
+
+Pitfalls:
+- Sessões cron com `deliver: origin` entregam no chat E salvam em `cron/output/`; jobs `no_agent` com `deliver: local` só salvam no diretório.
+- `cron/output/` pode reter só as runs recentes — para histórico completo usar o git log do workdir (ex: `/opt/data/skills` tem `log.md` + `git log` dos ciclos).
+- Não confundir o arquivo de output (sessão inteira, prompt incluso) com os artefatos do job (relatórios/gráficos) — o usuário normalmente quer os artefatos.
+
 ## Model Pinning & Drift Protection
 
 > 📖 **Leia também:** `references/cron-provider-outage-triage.md` — triage de vários

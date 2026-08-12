@@ -74,6 +74,7 @@ cat /opt/data/logs/gateways/default/current
 | Log pattern | Indicates |
 |---|---|
 | `⟳ compacting context…` / `🗜️ Compacting context` | Compression fired — check frequency |
+| `📦 Preflight compression: ~N tokens >= threshold` | Context near ceiling; pre-call compression about to run — note the token count (huge counts here → hygiene timeouts likely, see Step 8) |
 | `Switched to fallback model: A → B` | Primary provider failing — note the source and target models |
 | `⚡ Interrupted during API call.` | API timeout or crash — often context-length related |
 | `⚠️ Truncated tool call arguments (finish_reason='error')` | Model output was cut off — context too large or provider error |
@@ -233,6 +234,61 @@ Verificar:
 
 **Fix:** Either (a) use a provider with reliable large-context support, (b) compress earlier (lower `threshold`), or (c) configure a dedicated compression model so compression works before the context gets too large.
 
+### Step 8 — Gateway Hygiene Commit-Fence Timeout (empty "auto-compress failed")
+
+Signature in errors.log (the error text is EMPTY — that is the expected signature, not a missing log):
+
+```
+WARNING gateway.run: Session hygiene compression for session X made no progress for 30.0s (total wait 41.5s, ceiling 600.0s); continuing without compression
+WARNING gateway.run: Session hygiene auto-compress failed:
+```
+
+What it means: gateway hygiene spawned a fresh AIAgent to compress; the commit fence aborts when the worker shows no progress for `_hyg_timeout_seconds = 30.0` (gateway/run.py, overridable via `compression.hygiene_timeout_seconds`; ceiling `_hyg_total_ceiling_seconds = 600.0`). The empty error is a re-raised `asyncio.TimeoutError` — `str()` is `""`, so don't hunt for missing error text. Typical trigger chain:
+
+1. Session at/over `compression.hygiene_hard_message_limit` (e.g. 1000) → hygiene fires on EVERY new message → stress loop
+2. Context is huge (100K–700K tokens; check `sessions.message_count` vs `messages` rows where `active=1`)
+3. Aux summary model (e.g. gemini-flash-lite-latest) takes >30s to first token → fence aborts
+4. User receives "⚠️ Context compression timed out after 30.0s with no output from the summary model"
+
+Verify in agent.log, NOT state.db (state.db may show `compression_failure_error` NULL — the cooldown record is gated on `compression.hygiene_failure_cooldown_seconds >= 0`):
+
+```
+INFO agent.conversation_compression: context compression started: session=X messages=1025 tokens=~308,557 model=<main> focus=None
+INFO agent.auxiliary_client: Auxiliary compression: using gemini (gemini-flash-lite-latest) ...
+INFO agent.conversation_compression: context compression attempt telemetry: {... "commit_status":"aborted","failure_class":"commit_fence_cancelled","total_duration_ms":40953}
+```
+
+Successes look like `"commit_status":"committed","split_status":"in_place_committed"` + `context compression done: messages=N->M`. A session can interleave successes (8s–70s) and timeouts — aux-model latency is the variable, not a broken provider.
+
+Fix ladder:
+1. `hermes config set compression.hygiene_timeout_seconds 120` — give the summary model room on large contexts
+2. `hermes config set compression.hygiene_hard_message_limit 1500` — reduce firing frequency (or lower it to compress earlier)
+3. `/reset` sessions with 20K+ message rows / millions of input tokens — history stays in session_search
+4. Faster aux compression model (e.g. gemini-2.5-flash over flash-lite at scale)
+
+Full worked case + code line numbers + query recipe: `references/gateway-hygiene-timeout.md`.
+
+### Step 9 — Shallow Compression ("comprimiu muito pouco")
+
+Symptom: compression now COMMITS (timeout fixed) but barely reduces anything — e.g. `messages=1047->978` (69 msgs) and `rough_tokens=~323,300 -> ~306,946` (5%). User asks "por que comprimiu tão pouco?".
+
+Root causes, in the order to check:
+
+1. **Hygiene fired on MESSAGE COUNT, not tokens.** The hygiene log line names the trigger: `Session hygiene: 1025 messages, ~308,557 tokens — auto-compressing (threshold: 85% of 1,000,000 = 850,000 tokens)`. If tokens are far below the token threshold but msgs >= `hygiene_hard_message_limit`, the compress has no token pressure → shallow cut. It only needs to drop the count back under the limit.
+2. **In-place compaction is incremental.** `split_status: in_place_committed` absorbs only the span between the previous `[CONTEXT COMPACTION]` marker and the new cut — it does NOT re-compact the whole session. Sessions compacted many times (29 markers seen) have a head that is already summary-of-summary: little dense material left to squeeze.
+3. **Tail protection limits the cut.** `protect_last_n: 15` + `_ensure_last_user_message_in_tail` + tool-group alignment: bulky recent tool outputs (10K+ tokens each) exhaust the tail token budget (`threshold_tokens * summary_target_ratio`, ~130K) fast, so the cut lands near the head and absorbs only small old messages.
+
+**Pathology flags in state.db** (session is a lost cause, recommend `/reset`):
+- 20K+ message rows, `compacted=1` on 95%+ of rows, 20+ `CONTEXT COMPACTION` markers
+- Duplicate message rows: same content, different ids (query `GROUP BY role, content HAVING cnt > 1`) — a symptom of repeated in-place rewrites
+- `message_count` oscillating around `hygiene_hard_message_limit` across days
+
+**Vicious cycle:** grows to ~1040 msgs → hygiene compresses shallow (count-only relief) → grows again. The token threshold (850K) is so far away that hygiene never cuts deep.
+
+**Recommendation:** `/reset` the session — history remains in session_search. Raising `hygiene_hard_message_limit` only reduces trigger frequency, it does not make cuts deeper. Verify expectations: on an already-29x-compacted session, a 5% token reduction IS the designed behavior of in-place compaction; do not call it a bug.
+
+Full worked case: `references/shallow-compression.md` (log lines, queries, duplicate-marker measurements).
+
 ## Common Diagnoses
 
 | Symptom | Most Likely Root Cause | Fix |
@@ -243,6 +299,8 @@ Verificar:
 | SQLite database is locked | Multiple gateway processes or long write operations | Restart gateway, add WAL mode |
 | finish_reason='error' with truncated tool calls | Context too large for model's output window | Lower `compression.threshold`, compress earlier |
 | Session ends with `ws_orphan_reap` | Gateway restart left websocket sessions orphaned | Normal cleanup; check gateway stability |
+| `auto-compress failed:` with EMPTY error + `made no progress for 30.0s` | Gateway hygiene commit-fence timeout — aux summary model too slow on a huge context (session over `hygiene_hard_message_limit`) | Raise `compression.hygiene_timeout_seconds`, raise `hygiene_hard_message_limit`, `/reset` giant sessions; see Step 8 |
+| Compression commits but reduces little (e.g. 1047→978 msgs, 5% tokens) | Hygiene fired on message count while tokens far below threshold; in-place compaction is incremental (marker-to-marker); tail protection + huge recent tool outputs cap the cut | Check the hygiene trigger line (msgs vs token threshold); `/reset` sessions with 20K+ rows / 20+ compaction markers; see Step 9 |
 | Sessão cai em fallback inesperado | `opencode-zen` base_url built-in errada OU `model.aliases` interferindo | Verificar base_url do model section + model.aliases |
 
 ## Remediation Sequence
@@ -259,6 +317,7 @@ Verificar:
 - `hermes-agent` skill — general Hermes setup and configuration (bundled, read-only)
 - `messaging-platforms` — cross-platform message delivery diagnostics
 - `references/config-change-protocol.md` — protocol for modifying Hermes config: never change provider/model/compression without explicit user instruction
+- `references/dashboard-auth-env-override.md` — dashboard login failing with `Invalid username or password` despite correct `dashboard.basic_auth` in config.yaml: env-over-config precedence in the basic_auth plugin, verification via `/auth/password-login` curl, fixing without dropping the gateway
 - `pi-session-audit` — Pi Agent session cost/token auditing (related methodology)
 
 ## Pitfalls
@@ -276,3 +335,7 @@ Verificar:
 ⚠️ **session_reset reason has no handoff data.** The `session_reset` end_reason is set without populating `handoff_state` or `handoff_error`, making it hard to trace the exact trigger from the database alone. Cross-reference with gateway log timestamps near the session's `ended_at`.
 
 ⚠️ **Provider fallback can cascade silently.** The fallback chain may complete (all providers tried) without any final error surfacing to the user. The session just dies. Check logs for the last provider in the chain failing.
+
+⚠️ **"auto-compress failed:" with empty message ≠ unknown error.** In the gateway hygiene path, an empty error string after `auto-compress failed:` is the re-raised `asyncio.TimeoutError` (`str() == ""`) from the commit fence — it means the summary model produced no output within `hygiene_timeout_seconds` (default 30.0s). Don't chase the missing error text; confirm via agent.log telemetry `"failure_class":"commit_fence_cancelled"` (see Step 8).
+
+⚠️ **state.db `compression_failure_error` may stay NULL even when compression fails.** Hygiene commit-fence timeouts record the cooldown only when `compression.hygiene_failure_cooldown_seconds >= 0`; otherwise the failure exists solely in errors.log/agent.log. Always cross-check logs, not just the DB columns.

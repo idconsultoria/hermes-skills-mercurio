@@ -58,6 +58,15 @@ curl -s "https://www.tiktok.com/oembed?url=<VIDEO_URL>&format=json"
 
 Returns title (hashtags), author, thumbnail. Use for quick context before subtitle download.
 
+### 4b. Instagram Reels — métricas de print + URL pública
+
+Para pedidos de métricas de Reels (likes, comments, views, legenda) a partir de
+screenshot ou URL, ver `references/instagram-reels-metrics.md`. Resumo: o print
+(analisado com vision) mostra likes/comments/shares/direct/saves — **views nunca
+aparecem no overlay**; a URL pública via curl com user-agent mobile expõe a
+`<meta name="description">` com "X likes, Y comments - @handle on <data>: <legenda
+completa>". Views exigem dashboard profissional ou Graph API — nunca inventar.
+
 ### 5. Fallback: download + transcribe audio
 
 Only if no subtitles exist and content is critical:

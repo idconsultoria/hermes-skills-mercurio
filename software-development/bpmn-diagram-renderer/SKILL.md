@@ -184,6 +184,8 @@ Ambos com fidelidade Camunda: fontes, espaçamento, bordas, conectores, swimlane
 
 > **Mapa completo de colunas da planilha:** `references/sergipetec-planilha-colunas.md` — use para diagnóstico e limpeza cirúrgica em retries.
 
+> **Mermaid (flowcharts) → PNG transparente:** `references/mermaid-rendering.md` — mmdc + headless_shell do Hermes para blocos ```mermaid``` de markdown (inserção em Google Docs via md-to-gdoc). Mesma classe de diagrama→imagem.
+
 O renderizador está integrado ao pipeline em `dedalo_squad/render/`:
 
 ```

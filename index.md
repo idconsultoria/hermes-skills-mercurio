@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 101 skills*
+*Total: 114 skills*
 
 ---
 
@@ -80,7 +80,7 @@ Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, an
 
 - **Nome:** `autonomous-ai-agents/messaging-platforms`
 - **Arquivo:** `autonomous-ai-agents/messaging-platforms/SKILL.md`
-- **Tamanho:** 24,693 chars
+- **Tamanho:** 25,570 chars
 - **Resumo:** Reference for Hermes cross-platform messaging — platform quirks, ID formats, and
 - **Type:** Reference
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -132,7 +132,7 @@ Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl), agy (prot
 
 - **Nome:** `autonomous-ai-agents/hermes-diagnostics`
 - **Arquivo:** `autonomous-ai-agents/hermes-diagnostics/SKILL.md`
-- **Tamanho:** 15,494 chars
+- **Tamanho:** 22,511 chars
 - **Resumo:** Systematic methodology for diagnosing Hermes Agent behavioral issues — session resets, context loss, compression failures
 - **Type:** Research
 - **Timestamp:** 2026-07-15T08:00:00Z
@@ -145,7 +145,7 @@ Load this skill when the user reports Hermes misbehaving: conversations resettin
 
 - **Nome:** `autonomous-ai-agents/product-pipeline`
 - **Arquivo:** `autonomous-ai-agents/product-pipeline/SKILL.md`
-- **Tamanho:** 89,572 chars
+- **Tamanho:** 104,088 chars
 - **Resumo:** Multi-agent product pipeline — idea to MVP via sprints. Hermes orchestration
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-14T05:19:11Z
@@ -163,6 +163,24 @@ Load this skill when building a product from scratch through the full pipeline �
 - `uses` → `research/user-interview`
 - `uses` → `research/deep-research`
 - `uses` → `read-reddit`
+
+### Pi Agent — Funcionamento Interno
+
+- **Nome:** `autonomous-ai-agents/pi-agent-internals`
+- **Arquivo:** `autonomous-ai-agents/pi-agent-internals/SKILL.md`
+- **Tamanho:** 5,006 chars
+- **Resumo:** How Pi Agent works internally — settings, sessions, compaction, costs.
+- **Type:** Reference
+- **Timestamp:** 2026-08-12T03:15:00Z
+
+How Pi Agent works internally — settings, sessions, compaction, costs.
+
+Load this skill when asked how the Pi Agent works internally — its settings.json hierarchy, session JSONL layout (--session append semantics), compaction, provider/model selection and the pi-cost wrapper. Reference for debugging Pi behavior and auditing sessions.
+
+**Relações:**
+- `similar` → `autonomous-ai-agents/pi-agent-coordination`
+- `similar` → `autonomous-ai-agents/pi-session-audit`
+- `similar` → `autonomous-ai-agents/product-pipeline`
 
 ## Content Production
 
@@ -185,7 +203,7 @@ Load this skill when you need to create sound effects, ambient audio, or UI soun
 
 - **Nome:** `content-production/iaf-newsletter-pipeline`
 - **Arquivo:** `content-production/iaf-newsletter-pipeline/SKILL.md`
-- **Tamanho:** 44,854 chars
+- **Tamanho:** 46,087 chars
 - **Resumo:** Umbrella skill for newsletters — cron scheduling, curation, dedup, deploy
 - **Type:** Orchestrator
 - **Timestamp:** 2026-08-09T05:08:04Z
@@ -553,6 +571,25 @@ Load this skill when building new programmes, restructuring subjects, or ensurin
 - `similar` → `education/curriculum-knowledge-architecture-designer`
 - `similar` → `education/leverage-and-response-design`
 
+## Email
+
+### Email Inbox Triage
+
+- **Nome:** `email/email-inbox-triage`
+- **Arquivo:** `email/email-inbox-triage/SKILL.md`
+- **Tamanho:** 4,320 chars
+- **Resumo:** Triage an inbox: prioritize threads, draft replies safely.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-10T02:24:47Z
+
+Triage an inbox: prioritize threads, draft replies safely.
+
+Load this skill when you need to triage an email inbox — prioritize threads, spot urgent items, and draft safe replies without sending. Uses CLI mailboxes and integrates with google-workspace for Gmail flows.
+
+**Relações:**
+- `uses` → `productivity/google-workspace`
+- `similar` → `productivity/document-to-action-items`
+
 ## Github
 
 ### Codebase Inspection & Architecture Diagnostic
@@ -588,6 +625,23 @@ GitHub PR lifecycle: branch, commit, open, CI, merge.
 - `similar` → `github/codebase-inspection`
 - `similar` → `software-development/systematic-debugging`
 - `uses` → `software-development/test-driven-development`
+
+### GitHub Issue to Pull Request
+
+- **Nome:** `github/github-issue-to-pr`
+- **Arquivo:** `github/github-issue-to-pr/SKILL.md`
+- **Tamanho:** 6,331 chars
+- **Resumo:** Carry a GitHub issue to a verified PR with honest CI state.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-10T02:24:47Z
+
+Carry a GitHub issue to a verified PR with honest CI state.
+
+Load this skill when you need to turn a GitHub issue into a pull request — branch strategy, commits, PR body, and running CI to verify the change actually passes before claiming success. Complements github-pr-workflow.
+
+**Relações:**
+- `uses` → `github/github-pr-workflow`
+- `similar` → `software-development/simplify-code`
 
 ## Health
 
@@ -727,7 +781,7 @@ Load this skill when setting up continuous integration on GCP: connecting GitHub
 
 - **Nome:** `infrastructure/hermes-cron-patterns`
 - **Arquivo:** `infrastructure/hermes-cron-patterns/SKILL.md`
-- **Tamanho:** 6,450 chars
+- **Tamanho:** 7,790 chars
 - **Resumo:** Hermes cron job patterns — timeout limits and background execution
 - **Type:** Reference
 - **Timestamp:** 2026-08-09T05:08:04Z
@@ -978,7 +1032,7 @@ Load this skill when adding new UI elements or commands to the Hermes desktop ap
 
 - **Nome:** `productivity/google-workspace`
 - **Arquivo:** `productivity/google-workspace/SKILL.md`
-- **Tamanho:** 21,380 chars
+- **Tamanho:** 24,272 chars
 - **Resumo:** Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1147,6 +1201,149 @@ Load this skill any time a spreadsheet file is the primary input or output: open
 **Relações:**
 - `similar` → `productivity/docx`
 - `similar` → `productivity/pdf`
+
+### Document to Action Items
+
+- **Nome:** `productivity/document-to-action-items`
+- **Arquivo:** `productivity/document-to-action-items/SKILL.md`
+- **Tamanho:** 4,231 chars
+- **Resumo:** Extract cited obligations, deadlines, tasks from documents.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-10T02:24:47Z
+
+Extract cited obligations, deadlines, tasks from documents.
+
+Load this skill when you need to extract obligations, deadlines and tasks from a document (contract, report, brief) — with citations back to the source, owners, and due dates. Works with pdf/docx/notion inputs.
+
+**Relações:**
+- `uses` → `productivity/pdf`
+- `uses` → `productivity/docx`
+- `similar` → `productivity/meeting-action-items`
+
+### Google Docs/Sheets Formatting (REST API)
+
+- **Nome:** `productivity/google-docs-formatting`
+- **Arquivo:** `productivity/google-docs-formatting/SKILL.md`
+- **Tamanho:** 7,080 chars
+- **Resumo:** Format Google Docs/Sheets via REST API (markdown, chips).
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-11T00:00:00Z
+
+Format Google Docs/Sheets via REST API (markdown, chips).
+
+Load this skill when you need to format Google Docs or Sheets through the REST API — markdown conversion (md-to-gdoc), chips and checkboxes, tables, and mermaid rendering to images. Complements google-workspace with pixel-level fidelity notes.
+
+**Relações:**
+- `uses` → `productivity/google-workspace`
+- `similar` → `productivity/google-sheets-automation`
+
+### Google Sheets Automation (UX/UI via API)
+
+- **Nome:** `productivity/google-sheets-automation`
+- **Arquivo:** `productivity/google-sheets-automation/SKILL.md`
+- **Tamanho:** 5,583 chars
+- **Resumo:** Polish Google Sheets via API (dropdowns, formulas, KPIs).
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-12T00:00:00Z
+
+Polish Google Sheets via API (dropdowns, formulas, KPIs).
+
+Load this skill when you need to polish Google Sheets via API — data validation dropdowns, formulas, KPI sheets, and UX best practices. Complements google-workspace and xlsx.
+
+**Relações:**
+- `uses` → `productivity/google-workspace`
+- `similar` → `productivity/google-docs-formatting`
+- `similar` → `productivity/xlsx`
+
+### HTML → PDF Fidelity (browser-identical)
+
+- **Nome:** `productivity/html-pdf-fidelity`
+- **Arquivo:** `productivity/html-pdf-fidelity/SKILL.md`
+- **Tamanho:** 7,204 chars
+- **Resumo:** HTML→PDF identical to the browser — fonts, layout, 1 page.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-12T02:54:45Z
+
+HTML→PDF identical to the browser — fonts, layout, 1 page.
+
+Load this skill when a PDF export differs from the browser rendering (fonts, layout, pagination) or the user demands fidelidade máxima HTML→PDF. Chromium headless print pipeline with exact font embedding and one-page control.
+
+**Relações:**
+- `uses` → `productivity/html-to-pdf-chromium`
+- `similar` → `productivity/resume-ats-engine`
+- `used_by` → `content-production/iaf-newsletter-pipeline`
+
+### Meeting Action Items
+
+- **Nome:** `productivity/meeting-action-items`
+- **Arquivo:** `productivity/meeting-action-items/SKILL.md`
+- **Tamanho:** 4,072 chars
+- **Resumo:** Turn meeting notes into cited decisions, owners, tickets.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-10T02:24:47Z
+
+Turn meeting notes into cited decisions, owners, tickets.
+
+Load this skill when you have meeting notes or transcripts and need to extract decisions, action items, owners and deadlines — with citations and optional ticket creation. Complements document-to-action-items.
+
+**Relações:**
+- `uses` → `productivity/google-workspace`
+- `similar` → `productivity/document-to-action-items`
+
+### Product Price Monitor
+
+- **Nome:** `productivity/product-price-monitor`
+- **Arquivo:** `productivity/product-price-monitor/SKILL.md`
+- **Tamanho:** 4,677 chars
+- **Resumo:** Watch product, flight, or listing prices; alert on target.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-10T02:24:47Z
+
+Watch product, flight, or listing prices; alert on target.
+
+Load this skill when you need to monitor product, flight or listing prices and alert when they hit a target — watch URLs, parse price changes, and deliver notifications. Pair with hermes-cron-patterns for scheduled checks.
+
+**Relações:**
+- `uses` → `infrastructure/hermes-cron-patterns`
+- `similar` → `research/competitor-news-monitor`
+
+### Resume ATS Engine — currículo otimizado por vaga
+
+- **Nome:** `productivity/resume-ats-engine`
+- **Arquivo:** `productivity/resume-ats-engine/SKILL.md`
+- **Tamanho:** 13,032 chars
+- **Resumo:** Currículo ATS: desenha p/ vaga, exporta .docx/PDF e avalia.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-11T00:00:00Z
+
+Currículo ATS: desenha p/ vaga, exporta .docx/PDF e avalia.
+
+Carregue esta skill quando for otimizar um currículo para uma vaga específica — desenho direcionado ao ATS, exportação .docx/PDF e avaliação 0-10 da adequação. Integra docx, pdf, html-to-pdf-chromium e html-report-hermes.
+
+**Relações:**
+- `uses` → `productivity/docx`
+- `uses` → `productivity/pdf`
+- `uses` → `productivity/html-to-pdf-chromium`
+- `uses` → `productivity/html-report-hermes`
+- `similar` → `software-development/agy`
+
+### Weekly Review and Planning
+
+- **Nome:** `productivity/weekly-review-planning`
+- **Arquivo:** `productivity/weekly-review-planning/SKILL.md`
+- **Tamanho:** 4,234 chars
+- **Resumo:** Weekly reset: commitments, stalled work, next-week plan.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-10T02:24:47Z
+
+Weekly reset: commitments, stalled work, next-week plan.
+
+Load this skill when you need a weekly review and planning session — collect open commitments, identify stalled work, and produce a focused next-week plan. Integrates with taskflow and calendar workflows.
+
+**Relações:**
+- `uses` → `productivity/google-workspace`
+- `similar` → `email/email-inbox-triage`
+- `similar` → `productivity/taskflow-mcp`
 
 ## Read Reddit
 
@@ -1343,6 +1540,24 @@ Load this skill whenever an answer or artifact rests on information you fetched 
 - `similar` → `research/deep-research`
 - `similar` → `content-production/research-report-standards`
 
+### Competitor News Monitor
+
+- **Nome:** `research/competitor-news-monitor`
+- **Arquivo:** `research/competitor-news-monitor/SKILL.md`
+- **Tamanho:** 4,752 chars
+- **Resumo:** Watch named companies for material news; cited digests.
+- **Type:** Research
+- **Timestamp:** 2026-08-10T02:24:47Z
+
+Watch named companies for material news; cited digests.
+
+Load this skill when you need to monitor named companies for material news — sources, deduplication, and cited digests delivered on a schedule. Complements market-research-synthesis and deep-research.
+
+**Relações:**
+- `similar` → `research/market-research-synthesis`
+- `similar` → `research/deep-research`
+- `similar` → `research/tech-trend-discovery`
+
 ## Social Media
 
 ### Brand IAF — Conteúdo
@@ -1366,7 +1581,7 @@ Content for IA que Funciona community — brand constants, voice, tone, template
 
 - **Nome:** `social-media/social-media-video-content`
 - **Arquivo:** `social-media/social-media-video-content/SKILL.md`
-- **Tamanho:** 3,945 chars
+- **Tamanho:** 4,495 chars
 - **Resumo:** Extract subtitles, descriptions, and metadata from social media videos
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T19:30:00Z
@@ -1398,7 +1613,7 @@ Load this skill when searching for explicit content from a specific creator or p
 
 - **Nome:** `software-development/agy`
 - **Arquivo:** `software-development/agy/SKILL.md`
-- **Tamanho:** 27,267 chars
+- **Tamanho:** 28,291 chars
 - **Resumo:** Versatile skill for coordinating Google Antigravity CLI for any design project type.
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -1440,7 +1655,7 @@ Backlog management and Sprint execution for product iteration (Fase 5). Mantém 
 
 - **Nome:** `software-development/bpmn-diagram-renderer`
 - **Arquivo:** `software-development/bpmn-diagram-renderer/SKILL.md`
-- **Tamanho:** 10,968 chars
+- **Tamanho:** 11,205 chars
 - **Resumo:** Render BPMN 2.0 XML diagrams to SVG/PNG using bpmn-js and Chromium headless
 - **Type:** Template
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1590,7 +1805,7 @@ Load this skill after making code changes that need cleanup. Three parallel agen
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 52,863 chars
+- **Tamanho:** 59,581 chars
 - **Resumo:** Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1724,3 +1939,20 @@ Load this skill when diagnosing a TaskFlow frontend issue where the backend API 
 - `similar` → `taskflow-mcp-rules`
 - `uses` → `productivity/taskflow-mcp`
 - `similar` → `software-development/systematic-debugging`
+
+### Telegram Bot (Python)
+
+- **Nome:** `software-development/telegram-bot-python`
+- **Arquivo:** `software-development/telegram-bot-python/SKILL.md`
+- **Tamanho:** 9,794 chars
+- **Resumo:** Telegram bots: mock-first, MarkdownV2, python-telegram-bot.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-12T03:30:00Z
+
+Telegram bots: mock-first, MarkdownV2, python-telegram-bot.
+
+Load this skill when building or debugging a Telegram bot in Python — mock-first development, MarkdownV2 formatting rules, and python-telegram-bot patterns that avoid silent send failures.
+
+**Relações:**
+- `similar` → `autonomous-ai-agents/messaging-platforms`
+- `uses` → `infrastructure/whatsapp-baileys-integration`

@@ -10,6 +10,65 @@ code-tasks.md → [LER por layer] → [AGRUPAR em lote] → [Pi gera] → [VERIF
 
 Cada layer vira UM prompt para Pi, não 72 prompts individuais.
 
+## ⚠️ Loop de Revisão agy — OBRIGATÓRIO (não pule)
+
+A execução de code-tasks NUNCA termina em "Pi gera → VERIFICAR → COMMIT". O loop completo é:
+
+```
+Pi gera (lotes) → [SYNC local→shared volume] → agy revisa (Turno 1, feedbacks.md)
+  → Pi corrige (MESMA sessão) → agy re-revisa (Turno 3) → ACORDO: <FASE> FINALIZADA
+  → build/typecheck/verificação visual → commit
+```
+
+Mesmo para frontend/mock/demo (sem backend), o agy é o revisor de design e encontra issues reais
+(ex.: seletores CSS quebrados, fórmula incorreta, hex estáticos quebrando dark theme, links sem
+auto-foco). Correção real (CFP IA, ago/2026): Hermes executou 3 lotes de Pi e só lembrou do agy
+depois — o usuário cobrou o fluxo padrão. Regra: NUNCA commitar demo/design sem o ACORDO do agy.
+Ver `design-review-loop.md` para os comandos exatos dos turnos.
+
+## Substituição Pi Best → Pi Cost (a pedido do usuário)
+
+Quando o usuário pedir "Pi Cost sempre" (ex.: demo/mock sem decisões de arquitetura), usar
+`--provider opencode-go --model deepseek-v4-flash` em TODOS os lotes — inclusive nos turnos de
+correção do feedback do agy. Pi best/pro fica reservado para decisões de arquitetura/design.
+
+## Loop em DUAS fases: design specs → eng implementation (cada uma com agy)
+
+Quando a mudança exige especificação + implementação (ex.: novo fluxo, novo componente), rodar DOIS
+loops completos, cada um terminando em ACORDO do agy — NUNCA pular o loop de design e ir direto para
+o código (validação real, CFP IA ago/2026: specs reprovadas no Turno 1 do agy com 8 itens — lista das
+7 perguntas faltando, mapeamento campos/schemas, wireframes desatualizados):
+
+```
+FASE 1 — DESIGN: Pi escreve specs (fluxos, roteiro IA×web, wireframes) → agy revisa (Turno 1)
+  → Pi corrige (MESMA sessão de design) → agy re-revisa (Turno 3) → ACORDO: <X> SPECS FINALIZADAS
+FASE 2 — ENG:    Pi implementa no código (lê as specs como fonte de verdade) → agy revisa
+  (Turno ENG 1) → Pi corrige (MESMA sessão de eng) → agy (Turno ENG 3) → ACORDO: <X> IMPLEMENTADO
+```
+
+- Prompt da FASE 1 pede `.md` apenas (specs); prompt da FASE 2 pede código, citando os arquivos de
+  spec como fonte de verdade com seções exatas.
+- Os turnos de correção registram-se no MESMO arquivo de feedback (feedbacks.md / feedbacks-<tema>.md),
+  cada turno como `## 🗨️ Turno N — @Antigravity` / `## 🗨️ Turno N — @Pi`.
+- **Pitfall — sessão certa para o turno de correção:** continuar a sessão que ESCREVEU o artefato.
+  Correção de specs → sessão de design; correção de código → sessão de eng. (Hermes errou isso: usou a
+  sessão de design para corrigir código e teve que matar/re-disparar na sessão de eng.) Localizar a
+  sessão pelo nome: ler `session_info.name` no JSONL.
+
+## Monitoramento — usar pi-session-audit, não só process wait
+
+A skill `pi-session-audit` tem a técnica "Progress Classification (Pi)": ler o JSONL da sessão e
+classificar a última entrada (LENDO git diff / LENDO codigo / ESCREVENDO arquivo / COMMIT / TRAVADO).
+NÃO monitorar Pi só com `process wait`/poll — o wait estoura em 180s e o stdout fica vazio enquanto
+o Pi trabalha. Combinar: classify_progress no JSONL + `find` de arquivos modificados no filesystem.
+
+## Continuar a MESMA sessão (requisito explícito do usuário)
+
+Quando o usuário exigir "continue a mesma sessão" (ex.: auditorias em fases), usar
+`pi --session /path/exato/sessao.jsonl` — `--name` cria sessão nova. Verificar a continuidade pelo
+CRESCIMENTO do arquivo (append no mesmo JSONL, não arquivo novo) e pelo custo acumulado
+(v1+v2 somam na mesma sessão). Passar o mesmo `--provider`/`--model` em cada continuação.
+
 ## Passo a Passo
 
 ### 1. Ler o escopo do layer
@@ -110,6 +169,32 @@ L10    | 057-069 | 1   | 7 min
 L11    | 070-072 | 1   | 6 min
 Total  | 72      | 9   | ~40 min Pi + ~10 min verify/commit
 ```
+
+## Servir e VERIFICAR a demo Next.js (validação visual real)
+
+Após o loop (Pi → agy → ACORDO), o protótipo precisa de verificação visual ANTES do commit:
+
+1. **Verificação visual = browser do Hermes no CONTAINER, não no host.** O browser do Hermes não
+   alcança o servidor do host (redes separadas). Subir o Next.js no container em porta ALTERNATIVA
+   (ex.: `npm start -- -p 3001`) e usar browser_navigate + browser_vision em `http://localhost:3001/...`.
+2. **NUNCA confiar em screenshot do chromium snap do host** (`chromium-browser --headless --screenshot`):
+   sob AppArmor o CSS não carrega → screenshot vem "quebrado" (ícones gigantes, sem header) — é artefato
+   do sandbox, não bug do app. Usar apenas o browser do Hermes para julgar visual.
+3. **EADDRINUSE na porta default**: o next-server do host é visível no namespace do container via rede
+   Docker (mesmo após pkill no host). Se `npm start` der EADDRINUSE na 3000, subir em 3001; não insistir.
+4. **Servidor do usuário (Android/SSH tunnel) fica no HOST porta 3000**: após validar, matar a instância
+   do container e subir no host com `setsid nohup npm start > /tmp/cfp-web.log 2>&1 < /dev/null &`
+   (o `nohup ... & disown` simples segura a sessão SSH e dá timeout — setsid desacopla de verdade).
+   Usuário acessa com `ssh -L 3000:localhost:3000 ubuntu@IP` no Termux + `http://localhost:3000`.
+5. **Verificar que o servidor serve o build NOVO**: conferir `cat web/.next/BUILD_ID` e testar a presença
+   de classes novas no HTML servido (ex.: `curl -s localhost:3000/dashboard | grep -o "level-pill"`).
+6. **Modo dev (hot reload) quando o usuário vai iterar no Android:** `npm run dev` no host recarrega
+   automaticamente a cada edição — sem reiniciar. Comando que persiste além do SSH (testado CFP IA):
+   `cd <projeto>/web && (setsid nohup npm run dev > /tmp/cfp-web-dev.log 2>&1 < /dev/null &)` — os
+   parênteses extras são o que faz o setsid sobreviver ao fim da sessão SSH. Primeira carga de cada rota
+   compila sob demanda (~6s), depois fica fluido. **EACCES em `.next/BUILD_ID` ao subir dev:** o `.next`
+   foi criado pelo usuário do container (hermes); no host o processo roda como ubuntu sem escrita —
+   corrigir com `sudo chown -R ubuntu:ubuntu <projeto>/web/.next` (ou chmod 777) antes de rodar dev.
 
 ## Pitfalls
 

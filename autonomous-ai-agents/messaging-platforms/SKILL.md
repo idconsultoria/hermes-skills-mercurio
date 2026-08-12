@@ -33,6 +33,15 @@ Here's the file you asked for.
 MEDIA:/tmp/report.pdf
 ```
 
+### MEDIA path must exist (silent drop otherwise)
+
+`MEDIA:` pointing to a **non-existent path** is silently dropped: no error to the agent, no file to the user. Symptom: user replies "cadê o arquivo?" / "não recebi nada".
+
+Before emitting `MEDIA:`, verify the path:
+- Generate files inside `HERMES_WRITE_SAFE_ROOT` (e.g. `/opt/data/...`) — `write_file` refuses `/tmp` outright, and files created in `/tmp` via terminal are outside the safe root for later tooling
+- `ls -lh <path>` immediately before sending; if the file isn't there, `cp` it into the safe root first (e.g. `cp /tmp/out.pdf /opt/data/tmp/out.pdf`)
+- Root cause pattern (validado 11/ago/2026): path drift between generation and delivery — script wrote to `/tmp`, MEDIA line referenced `/opt/data/...` (or vice-versa). Same for typo'd filenames: `ls` the exact path, don't trust the filename you intended.
+
 ### Known file-type limitations
 
 Telegram's media handler only recognizes common types natively:

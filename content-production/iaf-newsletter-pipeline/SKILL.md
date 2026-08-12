@@ -406,6 +406,22 @@ Mais detalhes em `references/tool-backend-architecture.md`.
 - **Arquivos de coleta desatualizados (stale).** Os arquivos `iaf_noticias_gerais.md`, `iaf_reddit.md` etc. REFLETEM a data/hora da ÚLTIMA execução do Cron #1, não necessariamente o dia atual. Se o Cron #1 falhar por vários dias, os arquivos ficam parados no tempo. **Sempre verificar a data de coleta no cabeçalho de cada arquivo** (ex: "Coleta: 2026-06-09 07:00 UTC"). Se a data de coleta for >24h atrás, NÃO confiar no conteúdo desses arquivos — executar `web_search` fresco para cada categoria antes de iniciar a pré-seleção. O marcador de data está no cabeçalho do arquivo (linha 2-3 do markdown). Ignorar este passo = notícias velhas na newsletter.
 - **Sessão não encontrada** — FTS5 pode não ter indexado sessões muito antigas. Buscar por prefixo.
 
+## Chromium do host — INFRA COMPARTILHADA (NÃO remover/instalar)
+
+O Chromium snap do host (`oracle-host`, `/snap/bin/chromium`) é usado por
+**várias sessões e skills em paralelo** (IAF PDF, html-to-pdf-chromium, outras).
+**NUNCA** executar `snap remove chromium` ou instalar browser no host — uma
+sessão fez isso por acidente (ao tentar instalar mermaid-cli nativo) e derrubou
+outra sessão que estava gerando PDF no meio. Se precisar de browser para
+renderização própria, use o **headless_shell do Hermes**:
+`/opt/hermes/.playwright/chromium_headless_shell-1234/chrome-linux/headless_shell`
+(nativo ARM, funciona com puppeteer via `executablePath` + `--no-sandbox`).
+
+Pitfalls de renderização com Chromium headless:
+- **Chrome x64 (cache puppeteer `linux-*64`) falha no ARM64** com `Exec format error` — usar o headless_shell do Hermes.
+- **Mermaid-cli**: instalar com `--ignore-scripts` (pula download do browser), configurar `puppeteer-config.json` com `executablePath` para o headless_shell, renderizar com `-b transparent -s 2` (fundo transparente, ~192 DPI).
+- **Labels mermaid com `" ' ( )` quebram o parse** (`Parse error on line N ... got 'PS'`) — remover esses caracteres dos labels antes de renderizar.
+
 ## Daily AI Digest Patterns
 
 Alternative format: branded magazine-style digest (more visual, less structured). Use when the user requests a "digest" or "magazine" format instead of the standard IAF newsletter.

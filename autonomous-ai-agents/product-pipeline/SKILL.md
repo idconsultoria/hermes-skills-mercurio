@@ -14,6 +14,14 @@ timestamp: 2026-06-14T05:19:11Z
 > **Executores:** Pi Agent (local, v0.78.1) + Antigravity (revisor visual)
 > **Shared volume:** `/opt/data/code/` ↔ `/workspace/code/`
 
+## Retomar sessão do Pi (REQUISITO do usuário)
+
+Para continuar uma tarefa do Pi (Turno 2, correções, iterações), **sempre retomar a MESMA sessão**
+com `pi --session /caminho/sessao.jsonl -p "<prompt>"` — nunca criar sessão nova. Verificar que a
+retomada funcionou: o JSONL cresce por APPEND (mesmo arquivo, tamanho aumenta) e o Pi lembra do
+contexto anterior (ex.: cita o próprio commit). Requisito explícito do usuário — repetido em
+múltiplas sessões.
+
 ## Preferências do Usuário (ID Consultoria / Gustavo)
 
 Este bloco codifica o estilo de trabalho das pessoas que usam este pipeline.
@@ -75,6 +83,8 @@ BARATO/ABUNDANTE Pi cost -- Dev junior (DeepSeek V4 Flash Free)
 GRATUITO         Pi cost -- Free tier Zen
 ```
 
+> **Nota (ago/2026, decisão explícita do usuário p/ CFP IA):** a nova versão do DeepSeek V4 Flash (checkpoint 0731) supera praticamente todos os modelos open source, **incluindo o V4 Pro anterior**. Para o projeto CFP IA, **Pi cost (v4 flash) substitui Pi best em todas as fases**. Em projetos novos, confirmar com o usuário a hierarquia vigente antes de escolher o modelo — não assumir que V4 Pro ainda é o "best".
+
 Ver skill pi-agent-coordination para detalhes completos.
 
 ### Conexões
@@ -83,7 +93,7 @@ Ver skill pi-agent-coordination para detalhes completos.
 |---------|------|
 | **Hermes ↔ Pi (one-shot)** | `pi -p "..." --provider deepseek --model deepseek-v4-flash` (local, sem SSH) |
 | **Hermes ↔ Pi (persistent session)** | Primeiro: `pi --name "sessao" -p "..."`, depois: `pi -c -p "..."` |
-| **Hermes ↔ Pi (sessão id)** | `pi --session /path/to/session.jsonl -p "..."` |
+| **Hermes ↔ Pi (sessão id)** | `pi --session /path/to/session.jsonl -p "..."` — continuar a MESMA sessão (append na mesma JSONL). Detalhes e verificação: `references/pi-session-continuation.md` |
 | **Hermes ↔ agy** | `ssh oracle-host 'cd /home/ubuntu/selfhost/shared/code/workstation/PROJETO && /home/ubuntu/.local/bin/agy -p "..."'` |
 | **Pi → agy (design feedback)** | Pi salva protótipo → Hermes chama agy → agy escreve em `feedbacks.md` |
 
@@ -111,6 +121,8 @@ Priorizar DeepSeek V4 Pro via Go:
 | 1 | `opencode` (Zen) | `opencode/deepseek-v4-flash-free` | **Gratuito** | Preferido. Chave OpenCode ativa |
 | 2 | `opencode-go` (Go) | `deepseek-v4-flash` | Cota semanal $30 | Fallback se Zen rate-limited |
 | 3 | `deepseek` (API direta) | `deepseek-v4-flash` | $0.14/M input | Último recurso |
+
+> ⚠️ **DeepSeek v4 Flash tem modo reasoning que engole o budget de tokens.** Ao chamar o modelo diretamente (OpenRouter/opencode-go), com `max_tokens` baixo (ex: 256) a resposta sai **VAZIA** (`content: ""`) — todo o budget vai para `reasoning_content` antes do texto final. Uso observado: ~380 tokens de reasoning + ~130 de resposta por chamada. **Fix: `max_tokens ≥ 1024`.** Sintoma no usage: `completion_tokens_details.reasoning_tokens ≈ max_tokens` com content vazio. Isso também eleva a latência para ~12s por chamada (vs alvo 3s) — considerar streaming/cache/modelo sem reasoning para produção.
 
 **Teste de conectividade (sempre verificar antes de invocar):**
 ```bash
@@ -1129,7 +1141,7 @@ Itens a verificar:
 
 ## Pitfalls
 
-⚠️ **agy via SSH pode quebrar permissões do container** — agy (SSH host, uid 1001) pode executar `sudo chown -R ubuntu:ubuntu` no diretório do projeto, e o container Hermes (uid 10000) perde escrita. **Fix:** rodar `ssh oracle-host 'sudo chmod -R 777 ...'`. Verificar permissões após agy executar.
+⚠️ **agy via SSH pode quebrar permissões do container** — agy (SSH host, uid 1001) pode executar `sudo chown -R ubuntu:ubuntu` no diretório do projeto, e o container Hermes (uid 10000) perde escrita. **Fix REAL (comprovado CFP IA ago/2026):** `sudo chmod -R 777` pelo hermes FALHA com "Operation not permitted" quando o diretório pertence ao uid 1001 — o hermes não é dono nem tem permissão de escrita no pai. A correção que funciona é pelo host: `ssh oracle-host 'sudo chown -R 10000:10000 /home/ubuntu/selfhost/shared/code/workstation/PROJETO'`. Verificar permissões após agy executar. **Prevenir:** antes de cada invocação do agy, rodar o chown de ida; depois, o chown de volta — ou conferir com `ls -ld` se o dono é `hermes`.
 
 ⚠️ **Stitch MCP — config no `/opt/data/config.yaml`, NÃO no `.hermes/config.yaml`** — O override (`~/.hermes/config.yaml`) funciona para desenvolvimento rápido, mas o config principal (`/opt/data/config.yaml`) é o repositório oficial. Stitch MCP HTTP não funciona via npx proxy — usar `url:` + `headers:` + `transport: http`. A API key vai no header `X-Goog-Api-Key`. Editar via SSH no host com Python (não sed) para evitar YAML malformado.
 
@@ -1300,6 +1312,8 @@ ssh oracle-host '/home/ubuntu/.local/bin/agy --print "$(cat /tmp/prompt.md)" --d
 ⚠️ **Pi best refatora monólito → modular em uma sessão** — Com deepseek-v4-pro, Pi consegue refatorar um arquivo HTML monolítico de 80KB em 35+ arquivos modulares (CSS, JS, views, services, utils, store) em ~12 minutos. Incluir no prompt: estrutura de diretórios desejada, regras de modularização, e seed data expandido. O build.sh e verificação `node --check` garantem que a saída é funcional. Padrão comprovado no VERO Fase 1.
 
 ⚠️ **F4a e F4b têm o MESMO loop de revisão (agy→Pi→agy até ACORDO)** — Não tratar F4b como "revisão única". O fluxo é idêntico ao F4a: agy revisa → Pi corrige → agy re-revisa → repete até agy escrever `ACORDO: ENGENHARIA FINALIZADA`. Na prática, foram necessárias 2 iterações para F4b (6 issues na 1ª, 0 na 2ª). Nunca fazer deploy com issues 🔴 pendentes no review-report.md.
+- ⚠️ **O loop de revisão agy é OBRIGATÓRIO também em code-tasks de demonstração 100% mock (F4a demo loop).** Correção real do usuário (CFP IA, ago/2026): *"Você não parece ter carregado todo o loop da skill. Tem a parte de revisão com o Agy no final. Relembre a skill product-pipeline corretamente"* — eu tinha planejado só Pi gera → build → commit, sem agy. O plano correto para QUALQUER execução de code-tasks (mesmo mock-only, fechando lacunas de demonstração) é: Pi gera (lotes sequenciais, nunca paralelo) → **sync local→shared volume** → agy Turno 1 (escreve feedbacks.md) → Pi Turno 2 (correções) → agy Turno 3 (re-review até `ACORDO: DEMO FINALIZADA`) → build → commit.
+- ⚠️ **Auditoria de protótipo F4a: mock data é ESPERADO, não é gap.** Ao auditar rastreabilidade de protótipo de alta fidelidade (pré-integração), avaliar se cada passo de cada fluxo é **REPRODUZÍVEL na tela com dados mockados** — e NÃO se está conectado ao backend. Usar a classificação DEMONSTRADO / DEMONSTRÁVEL PARCIAL / NÃO DEMONSTRÁVEL. Dois passos de auditoria: v1 (critério backend — marca tudo PARCIAL) e v2 (critério mock — isola gaps reais de demonstração). Método completo, matriz card-a-card do dashboard e checklist do que NÃO é gap: `references/prototipo-mock-audit-criterio.md`.
 
 ⚠️ **Verificação de completude de formulários — comparar campo a campo** — Modais de criação frequentemente têm 70-90% dos campos ausentes. Para verificar: ler `referencia_completa_de_ui.md` (checklist definitiva), abrir cada modal no browser, comparar cada campo individualmente. Exemplo: modal de Aplicação tem 6 blocos com 25+ campos na referência, mas implementação atual tem 1 campo. Usar Pi + dogfood para auditoria sistemática, NÃO confiar em inspeção visual rápida.
 
@@ -1413,6 +1427,70 @@ grep -c "MIP e MID" index.html js/app.js
 > Exemplo real: VERO — sidebar tinha "MIP e MID", faltava "Apontamentos" e "Administrador", incluía "Colheita" indevidamente, 9 telas mostravam "Em desenvolvimento". Tudo corrigido em um prompt Pi de 4.8KB.
 
 ⚠️ **design-system.html PODE ser o frontend deployável** — Para MVPs puramente frontend (SPA estática com dados mockados, deploy Vercel/Netlify), o `design-system.html` gerado pelo Pi na F4a frequentemente é funcional o suficiente para ser o frontend final. Não precisa executar 103 code-tasks da F4b se o HTML já cobre todos os módulos. Decisão: verificar se o design-system.html tem SPA routing, todos os modais do PRD e dados mockados. Se sim → deploy direto. Se não → Pi cost executa code-tasks para preencher gaps.
+
+## Status Audit Quinzenal (pós-reunião com parceiro)
+
+Quando o usuário pede "verifique em que ponto estamos" em projeto de ciclo quinzenal (ex: CFP IA), o fluxo comprovado é: **triangular** repo local (`git log` + `git status` + `git log origin/main`) + `session_search` + Google Docs (transcrição da reunião e docs do parceiro via `$GAPI docs get`), **cruzar** decisões da reunião vs. PRD/roadmap para achar lacunas, e entregar DOIS arquivos .md no repo: relatório de status + plano de ação com responsáveis e dependências.
+
+**Referência completa:** `skill_view(name='product-pipeline', file_path='references/quinzenal-status-audit.md')` — extração de transcrições Fathom/Google Docs (JSON → body separado → ler em blocos), estrutura do relatório, formato do plano de ação por blocos (A–G) e pitfalls (Write denied fora de /opt/data, token expirado, decisão ≠ implementação).
+
+### Reorganização do plano em Workstreams (quando o usuário decide execução simultânea)
+
+Quando o usuário decide que duas quinzenas/fases serão executadas de forma **coordenada e simultânea** (ex: Q2+Q3 com culminação única), **reorganizar o plano de ação em workstreams paralelos (WS-N)**, não em blocos sequenciais por fase. Padrão comprovado no CFP IA (ago/2026):
+
+- Cada WS agrupa tarefas de um domínio (ex: WS-1 Fundação/Spec, WS-2 UX & Conceito, WS-3 Conteúdo do parceiro, WS-4 Engenharia).
+- Cada item mantém: responsável, prazo, e **o que bloqueia** (coluna "Bloqueia" — mapeia dependências em cadeia).
+- Incluir uma linha do tempo de **checkpoints** (ex: 14/08 fundação, 18/08 specs, 21/08 integração, 24/08 culminação) — marcos de verificação, não fases isoladas.
+- Identificar explicitamente o(s) item(ns) **independente(s)** que podem começar imediatamente (no CFP IA: o motor de cálculo não dependia de ninguém).
+- **Manter o roadmap original intocado** — a reorganização é do plano de execução, não do cronograma. O usuário explicitamente pediu para não alterar o roadmap.
+- Itens que o usuário marca como "responsável = parceiro" NÃO são executados por você: preparar o contexto/insumos e atribuir a ele.
+
+> **Caso completo:** `skill_view(name='product-pipeline', file_path='references/cfp-ia-q2q3-integrated-cycle.md')` — decisões do usuário, Base Técnica (arquitetura: núcleo agêntico Hermes-like + MCP + API única + Next.js + WhatsApp/Telegram + knowledge engine OKF), documentos produzidos no repo e pitfalls do ciclo.
+
+### Execução autônoma de workstreams — PUBLICAR a matriz de dependências ANTES de rodar
+
+Quando o usuário aprova a execução ("trabalhe da forma mais autônoma possível", "adiante tudo que não depender do WS3"), ele espera **análise de dependências explícita e publicada antes de começar** — não execução sequencial silenciosa. Correção real do usuário (CFP IA, ago/2026): *"Você chegou a verificar quais pontos do WS4 já poderiam ser feitos antes da conclusão do WS3? Ou só saiu fazendo tudo?"*
+
+Padrão comprovado:
+1. **Publique a matriz de dependências primeiro** — para cada item do WS que "não depende" do bloco do parceiro, diga: `❌ Não depende → ✅ posso fazer agora` vs `✅ Depende → ⏸️ aguardando`. O usuário quer VER o raciocínio, não descobrir depois.
+2. **Identifique o item independente mais valioso e comece por ele** — no CFP IA foi o motor de cálculo determinístico (spec 100% pronta nas diretrizes, zero dependência externa).
+3. **Dispare jobs Pi cost em background SEQUENCIAL** — `pi --name "PROJETO-tarefa" -p "$(cat prompts/pi-x.md)" --provider opencode-go --model deepseek-v4-flash` com `background=true` + `notify_on_complete=true`. Não rode 2+ jobs Pi pesados em paralelo (v4-flash demora 5–16 min por job grande; paralelismo não acelera e arrisca rate-limit).
+4. **Monitore pelos ARQUIVOS, não pelo stdout** — Pi escreve em rajadas: `ls -la` nos diretórios de saída; audite o JSONL da sessão (`pi-session-audit`) para distinguir "lendo contexto" (poucas entries, sem toolCall) de "escrevendo" (entries com `cat >`).
+5. **Não bloqueie no wait** — prepare o prompt do PRÓXIMO job enquanto o atual roda (padrão: `prompts/pi-ws4-*.md` prontos antes do job anterior terminar).
+6. **Registre pendências explícitas do usuário** — itens que só ele resolve (ex.: chave OpenRouter, créditos, sinalização de fim de sprint) viram linha no relatório final, nunca ficam implícitos.
+7. **Reporte explicitamente as FASES DO PIPELINE adiadas** — quando o usuário manda "adiante tudo que não depender do WS3", avançar só o back-end não significa que F4a/F4d/F4e foram concluídas. Correção real (CFP IA, ago/2026): *"Temos o protótipo de alta fidelidade gerado? ... você as pulou por estar esperando alguma entrega minha e do Igor ou por esquecimento?"* Padrão: no relatório final, listar por fase o que foi feito vs. adiado e POR QUÊ (bloqueio real vs. dependência vs. decisão de escopo). F4a (design system renderizado + protótipo de alta fidelidade Next.js + Stitch) costuma ser o elo perdido quando a instrução foi só "adiante o back-end". Nunca deixar o usuário descobrir a fase pulada perguntando.
+
+### Auditoria de rastreabilidade (produto ↔ design ↔ código)
+
+Quando o usuário pergunta se PM/designer/engenharia "concordariam que tudo está encadeado e implementado" (user stories e flows implementados?), NÃO responder por opinião — executar auditoria com evidências: inventariar código (endpoints, motor, telas), rodar testes (`.venv/bin/python -m pytest tests/ -q`), detectar descontinuidade frontend↔API (mock vs fetch por tela) e entregar tabela de rastreabilidade por camada. Protótipo de alta fidelidade usar mock data é esperado (F4a); integração é fase separada (F4d). Ver `references/traceability-audit.md`.
+
+### Casos completos para especialista de domínio — artefatos brutos simulados obrigatórios
+
+Quando "casos completos" de usuários são insumo para um especialista humano (CFP, consultor), o usuário exige que os **artefatos brutos simulados sejam os que a pessoa subiria no app**: extratos bancários, faturas de cartão, contratos com taxas/CET — com números batendo exatamente com o orçamento do caso. Requisito explícito do usuário (ago/2026): *"Os arquivos de cada usuário das entrevistas devem ser os mesmos que ele subiria se usasse a aplicação como fonte."* Ver `references/casos-completos-artefatos-brutos.md` para o padrão completo (geração via Pi cost com design system temporário, consistência numérica, PDF via WeasyPrint, entrega no Drive em Google Docs/PDF — nunca .md para o parceiro).
+
+**Chaves de provedor para validação de LLM:** as chaves de teste do ambiente estão em `~/.pi/agent/auth.json` (campos `openrouter.key`, `opencode.key`, `opencode-go.key`, `deepseek.key`). Para validar um LLM (ex.: WS4-13), ler a chave daí em vez de pedir ao usuário — mas NUNCA expor a chave completa em outputs/logs (mascarar). Se a chave do provedor-alvo não existir, rodar em `--dry-run` e reportar como pendência do usuário — nunca inventar resultado. Detalhes de endpoint/auth/armadilhas (opencode-go aceita `Authorization: Bearer` e NÃO `x-api-key`; urllib precisa de User-Agent Mozilla senão Cloudflare 403 error 1010; `GET /models` pode dar 403 mesmo com auth ok — ir direto no POST; falso positivo do detector de palavras proibidas quando o usuário ecoa a palavra): `skill_view(name='product-pipeline', file_path='references/llm-endpoint-probe.md')`.
+
+### Entregáveis para parceiro não-técnico (Google Docs/Sheets/PDF, nunca .md)
+
+> 📖 **Flowcharts mermaid → imagens no Google Docs:** quando o espelhamento para o Drive exige substituir blocos ```` ```mermaid ```` por imagens renderizadas, ver `references/mermaid-flowcharts-to-docs.md` — render via mmdc + headless_shell do Hermes, fundo transparente 2x, upload Drive público, `insertInlineImage` com dimensionamento para caber (pageless não existe na API), e a regra de NUNCA tocar no browser do host.
+
+> 📖 **Auditoria de rastreabilidade (protótipo vs user flows/stories):** quando o usuário pergunta se as US/fluxos estão contemplados no protótipo, ver `references/prototype-traceability-audit.md` — prompt Pi Cost auto-contido, validação com pi-session-audit, estrutura do relatório (matrizes US/fluxo, gaps, backend pronto para conectar).
+
+Quando um parceiro do projeto (ex: CFP certificado, especialista de domínio) tem disponibilidade limitada e **não lê .md nem código**, todo material para ele deve ser preparado em formatos de apresentação:
+
+- **Google Docs / Google Planilha / PDF exportado de HTML** (usando o design system temporário como base visual).
+- Estruturar como **UM documento mestre único, simples e didático, não muito extenso**, contendo: entregáveis claros, relevância de cada entrega (por que é crítica), o que é necessário para prosseguir (dependências), e onde está o contexto de apoio (links para os Docs do Drive).
+- Todo contexto de apoio deve estar **na pasta do Google Drive do projeto, propriamente formatado** — o parceiro não vai abrir o repo.
+- Casos completos montados por você (ex: dados completos dos 3 perfis) viram insumo para o parceiro escrever recomendações em texto corrido; depois você gamifica/estrutura.
+- **Organização no Drive em subpastas numeradas por entrega (01..N)** com templates preenchíveis, PDFs de docs ricos (tom, casos) via WeasyPrint com o design system, guia mestre com links diretos, e move de arquivos via PATCH na API (GET parents → PATCH addParents/removeParents com token de `google_token.json`). Padrão completo e pitfalls (search sem `trashed=false` inclui lixeira; `drive delete` → trashed reversível): `skill_view(name='product-pipeline', file_path='references/partner-drive-deliverable-package.md')`.
+- **Flowcharts mermaid → imagem nos Google Docs:** `.md` ficam só texto; o espelhamento renderiza ` ```mermaid ` como PNG transparente 2x (mmdc + headless_shell do Hermes — NUNCA o Chromium snap do host) e insere via `insertInlineImage` dimensionado para caber. Pageless NÃO é possível via API (issue 227875469). Ver `skill_view(name='product-pipeline', file_path='references/mermaid-to-docs-images.md')`.
+
+### AGENTS.md na raiz do repo (governança de documentos)
+
+Estabelecer `AGENTS.md` na raiz do repositório do projeto registrando:
+- **Hierarquia de documentos em caso de conflito** (padrão CFP IA): 1) decisões de reuniões/transcrições → 2) PRD → 3) documento de diretrizes → 4) demais documentos. Regra prática: decisão de reunião vence e o PRD deve ser atualizado.
+- **Regra de sincronização com Google Drive**: subpasta "Produto" do Drive só é atualizada quando o usuário sinalizar explicitamente que a sprint/quinzena foi finalizada — nunca automaticamente.
+- **Design system temporário como referência visual de TODOS os documentos do projeto** (não só pesquisa) — quando o usuário ampliar o escopo, atualizar o AGENTS.md e o skill.
 
 ## Verificacao Rapida
 

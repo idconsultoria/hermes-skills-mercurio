@@ -12,6 +12,7 @@ import argparse
 import json
 import os
 import re
+import struct
 import sys
 import time
 import urllib.request
@@ -162,6 +163,17 @@ def parse_md(text):
             blocks.append(("numbered", items))
             continue
 
+        # Mermaid / flowchart — bloco de código renderizado como IMAGEM no Docs
+        if line.strip().startswith("```mermaid"):
+            i += 1
+            code = []
+            while i < len(lines) and not lines[i].strip().startswith("```"):
+                code.append(lines[i])
+                i += 1
+            i += 1
+            blocks.append(("mermaid", "\n".join(code)))
+            continue
+
         # Code block
         if line.strip().startswith("```"):
             i += 1
@@ -186,6 +198,92 @@ def parse_md(text):
         blocks.append(("para", split_inline(line)))
         i += 1
     return blocks
+
+
+# ── Mermaid helpers ────────────────────────────────────────────────────
+
+MMDC = "/opt/data/mmdc/node_modules/.bin/mmdc"
+MMDC_CONFIG = "/opt/data/mmdc/puppeteer-config.json"
+
+
+def _fix_mermaid(code):
+    """Remove caracteres que quebram o parser mermaid:
+    - aspas (' ") e parênteses () em QUALQUER linha de diagrama (labels de nodes, arestas, diamond)
+    - colchetes aninhados ([...] dentro de [...]) — o [ interno é interpretado como novo node
+    - em sequenceDiagram: ; e | em mensagens (quebram o parser)
+    Mantém apenas o par de colchetes mais externo de cada label."""
+    is_sequence = "sequenceDiagram" in code or "sequence" in code.lower()
+    lines = []
+    for line in code.split("\n"):
+        if is_sequence and re.search(r"->>|->|-->>", line):
+            # Linha de mensagem em sequence: remove ; e | (separadores do parser)
+            line = line.replace(";", ",").replace("|", " e ")
+        if re.search(r"\[.*\]|\{.*\}|-->|--", line):
+            line = line.replace('"', "").replace("'", "").replace("(", "").replace(")", "")
+            abertos = [m.start() for m in re.finditer(r"\[", line)]
+            fechados = [m.start() for m in re.finditer(r"\]", line)]
+            if len(abertos) > 1 and len(fechados) > 1:
+                # Remove todos os colchetes exceto o par mais externo (primeiro [ e último ])
+                chars = list(line)
+                for i in abertos[1:] + fechados[:-1]:
+                    chars[i] = ""
+                line = "".join(chars)
+        lines.append(line)
+    return "\n".join(lines)
+
+
+def _render_mermaid_png(code, out_path):
+    """Renderiza mermaid → PNG transparente 2x via mmdc + headless_shell do Hermes."""
+    import subprocess
+    tmp = out_path + ".mmd"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(_fix_mermaid(code))
+    try:
+        r = subprocess.run(
+            [MMDC, "-i", tmp, "-o", out_path, "-b", "transparent", "-s", "2", "-p", MMDC_CONFIG],
+            capture_output=True, text=True, timeout=120)
+        if r.returncode != 0 or not os.path.exists(out_path):
+            print(f"  ⚠️ mmdc falhou: {(r.stderr or r.stdout)[-200:]}", file=sys.stderr)
+            return False
+        return True
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+
+
+def _png_size(path):
+    """Lê dimensões (w, h) de um PNG pelo header IHDR (sem depender de PIL)."""
+    with open(path, "rb") as f:
+        head = f.read(24)
+    if head[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("não é PNG")
+    w, h = struct.unpack(">II", head[16:24])
+    return w, h
+
+
+def _upload_image_drive(png_path, name):
+    """Upload do PNG para o Drive e torna público (para insertInlineImage)."""
+    import uuid
+    boundary = uuid.uuid4().hex
+    metadata = json.dumps({"name": name, "mimeType": "image/png"}).encode()
+    content = open(png_path, "rb").read()
+    parts = [f"--{boundary}\r\n".encode(), b"Content-Type: application/json; charset=UTF-8\r\n\r\n",
+             metadata, b"\r\n",
+             f"--{boundary}\r\n".encode(), b"Content-Type: image/png\r\n\r\n",
+             content, b"\r\n", f"--{boundary}--\r\n".encode()]
+    body = b"".join(parts)
+    url = "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name"
+    req = urllib.request.Request(url, data=body, method="POST",
+        headers={"Authorization": f"Bearer {get_token()}", "Content-Type": f"multipart/related; boundary={boundary}"})
+    with urllib.request.urlopen(req) as resp:
+        file_id = json.loads(resp.read())["id"]
+    # tornar público
+    perm = json.dumps({"role": "reader", "type": "anyone"}).encode()
+    preq = urllib.request.Request(f"https://www.googleapis.com/drive/v3/files/{file_id}/permissions",
+        data=perm, method="POST",
+        headers={"Authorization": f"Bearer {get_token()}", "Content-Type": "application/json"})
+    urllib.request.urlopen(preq)
+    return f"https://drive.google.com/thumbnail?id={file_id}&sz=w3000"
 
 
 # ── API helpers ────────────────────────────────────────────────────────
@@ -470,9 +568,24 @@ class DocBuilder:
         cells.sort(key=lambda c: c[0], reverse=True)
         cell_buf = []
         for cell_para_start, plain, segs, is_header in cells:
-            if not plain:
-                continue  # célula vazia — insertText com "" é rejeitado pela API (400)
-            cell_buf.append({"insertText": {"location": {"index": cell_para_start}, "text": plain}})
+            # Célula checkbox? formato "[ ] texto" ou "[x] texto"
+            is_cell_checkbox = False
+            if re.match(r"^\[[ xX]\]", plain):
+                is_cell_checkbox = True
+                # remover o "[ ] " do plain (pode sobrar vazio — checkbox vazio é válido)
+                plain = re.sub(r"^\[[ xX]\]\s?", "", plain)
+                # remover o "[ ] " do primeiro segmento dos segs
+                first = segs[0]
+                new_txt = re.sub(r"^\[[ xX]\]\s?", "", first[1])
+                segs = [("normal", new_txt, None)] + segs[1:] if new_txt else segs[1:]
+            if not plain and not is_cell_checkbox:
+                continue  # célula vazia sem checkbox — insertText com "" é rejeitado (400)
+            if plain:
+                cell_buf.append({"insertText": {"location": {"index": cell_para_start}, "text": plain}})
+            if is_cell_checkbox:
+                cell_buf.append({"createParagraphBullets": {
+                    "range": {"startIndex": cell_para_start, "endIndex": cell_para_start + max(u16len(plain), 1)},
+                    "bulletPreset": "BULLET_CHECKBOX"}})
             if is_header:
                 cell_buf.append({"updateTextStyle": {"range": {
                     "startIndex": cell_para_start, "endIndex": cell_para_start + u16len(plain)},
@@ -530,6 +643,39 @@ class DocBuilder:
                                "fontSize": {"magnitude": 9, "unit": "PT"}},
                  "fields": "weightedFontFamily,fontSize"}})
 
+    def add_mermaid(self, code):
+        """Renderiza flowchart mermaid como imagem (transparente, 2x) e insere no doc.
+        Dimensiona para CABER na página: max 550pt largura / 700pt altura (proporcional)."""
+        self.clear_bullet()
+        import tempfile
+        import os as _os
+        tmp_dir = tempfile.mkdtemp(prefix="mermaid-")
+        png_path = _os.path.join(tmp_dir, "flow.png")
+        try:
+            if not _render_mermaid_png(code, png_path):
+                # fallback: inserir o código como texto (não perde conteúdo)
+                self.add_code(code)
+                return
+            uri = _upload_image_drive(png_path, "cfp-ia-flowchart.png")
+            # Dimensões em PT: 2x de 96dpi → 72pt por 96px * 2 = 0.75pt/px
+            px_w, px_h = _png_size(png_path)
+            max_w, max_h = 550.0, 700.0
+            scale = min(max_w / (px_w * 0.75), max_h / (px_h * 0.75), 1.0)
+            w_pt = round(px_w * 0.75 * scale, 1)
+            h_pt = round(px_h * 0.75 * scale, 1)
+            self._add({"insertInlineImage": {
+                "location": {"index": self.cur},
+                "uri": uri,
+                "objectSize": {"width": {"magnitude": w_pt, "unit": "PT"},
+                               "height": {"magnitude": h_pt, "unit": "PT"}}}})
+            # imagem ocupa 1 posição de índice
+            self.cur += 1
+            self._add({"insertText": {"location": {"index": self.cur}, "text": "\n"}})
+            self.cur += 1
+        finally:
+            import shutil
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
     def finish(self):
         self.flush()
 
@@ -576,6 +722,8 @@ def main():
             b.add_table(header, rows)
         elif tipo == "code":
             b.add_code(dados)
+        elif tipo == "mermaid":
+            b.add_mermaid(dados)
         elif tipo == "hr":
             b.insert_text("\n")
     b.finish()
