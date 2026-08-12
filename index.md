@@ -180,7 +180,7 @@ Load this skill when asked how the Pi Agent works internally — its settings.js
 **Relações:**
 - `similar` → `autonomous-ai-agents/pi-agent-coordination`
 - `similar` → `autonomous-ai-agents/pi-session-audit`
-- `similar` → `autonomous-ai-agents/product-pipeline`
+- `similar` → `autonomous-ai-agents/hermes-diagnostics`
 
 ## Content Production
 
@@ -589,6 +589,8 @@ Load this skill when you need to triage an email inbox — prioritize threads, s
 **Relações:**
 - `uses` → `productivity/google-workspace`
 - `similar` → `productivity/document-to-action-items`
+- `uses` → `productivity/taskflow-mcp`
+- `similar` → `productivity/meeting-action-items`
 
 ## Github
 
@@ -642,6 +644,8 @@ Load this skill when you need to turn a GitHub issue into a pull request — bra
 **Relações:**
 - `uses` → `github/github-pr-workflow`
 - `similar` → `software-development/simplify-code`
+- `uses` → `software-development/test-driven-development`
+- `uses` → `software-development/systematic-debugging`
 
 ## Health
 
@@ -1219,6 +1223,9 @@ Load this skill when you need to extract obligations, deadlines and tasks from a
 - `uses` → `productivity/pdf`
 - `uses` → `productivity/docx`
 - `similar` → `productivity/meeting-action-items`
+- `uses` → `productivity/xlsx`
+- `uses` → `productivity/google-workspace`
+- `uses` → `productivity/notion`
 
 ### Google Docs/Sheets Formatting (REST API)
 
@@ -1236,6 +1243,8 @@ Load this skill when you need to format Google Docs or Sheets through the REST A
 **Relações:**
 - `uses` → `productivity/google-workspace`
 - `similar` → `productivity/google-sheets-automation`
+- `used_by` → `autonomous-ai-agents/product-pipeline`
+- `similar` → `productivity/xlsx`
 
 ### Google Sheets Automation (UX/UI via API)
 
@@ -1254,6 +1263,7 @@ Load this skill when you need to polish Google Sheets via API — data validatio
 - `uses` → `productivity/google-workspace`
 - `similar` → `productivity/google-docs-formatting`
 - `similar` → `productivity/xlsx`
+- `used_by` → `autonomous-ai-agents/product-pipeline`
 
 ### HTML → PDF Fidelity (browser-identical)
 
@@ -1272,6 +1282,9 @@ Load this skill when a PDF export differs from the browser rendering (fonts, lay
 - `uses` → `productivity/html-to-pdf-chromium`
 - `similar` → `productivity/resume-ats-engine`
 - `used_by` → `content-production/iaf-newsletter-pipeline`
+- `similar` → `media/html-to-social-image`
+- `similar` → `productivity/html-report-hermes`
+- `used_by` → `content-production/research-report-standards`
 
 ### Meeting Action Items
 
@@ -1289,6 +1302,9 @@ Load this skill when you have meeting notes or transcripts and need to extract d
 **Relações:**
 - `uses` → `productivity/google-workspace`
 - `similar` → `productivity/document-to-action-items`
+- `similar` → `productivity/weekly-review-planning`
+- `uses` → `productivity/taskflow-mcp`
+- `uses` → `productivity/notion`
 
 ### Product Price Monitor
 
@@ -1306,6 +1322,7 @@ Load this skill when you need to monitor product, flight or listing prices and a
 **Relações:**
 - `uses` → `infrastructure/hermes-cron-patterns`
 - `similar` → `research/competitor-news-monitor`
+- `uses` → `autonomous-ai-agents/messaging-platforms`
 
 ### Resume ATS Engine — currículo otimizado por vaga
 
@@ -1324,8 +1341,8 @@ Carregue esta skill quando for otimizar um currículo para uma vaga específica 
 - `uses` → `productivity/docx`
 - `uses` → `productivity/pdf`
 - `uses` → `productivity/html-to-pdf-chromium`
-- `uses` → `productivity/html-report-hermes`
-- `similar` → `software-development/agy`
+- `uses` → `software-development/agy`
+- `uses` → `autonomous-ai-agents/messaging-platforms`
 
 ### Weekly Review and Planning
 
@@ -1344,6 +1361,8 @@ Load this skill when you need a weekly review and planning session — collect o
 - `uses` → `productivity/google-workspace`
 - `similar` → `email/email-inbox-triage`
 - `similar` → `productivity/taskflow-mcp`
+- `similar` → `productivity/document-to-action-items`
+- `uses` → `taskflow-mcp-rules`
 
 ## Read Reddit
 
@@ -1557,6 +1576,7 @@ Load this skill when you need to monitor named companies for material news — s
 - `similar` → `research/market-research-synthesis`
 - `similar` → `research/deep-research`
 - `similar` → `research/tech-trend-discovery`
+- `uses` → `infrastructure/hermes-cron-patterns`
 
 ## Social Media
 
@@ -1955,4 +1975,5 @@ Load this skill when building or debugging a Telegram bot in Python — mock-fir
 
 **Relações:**
 - `similar` → `autonomous-ai-agents/messaging-platforms`
-- `uses` → `infrastructure/whatsapp-baileys-integration`
+- `similar` → `infrastructure/whatsapp-baileys-integration`
+- `uses` → `infrastructure/oracle-host-access`

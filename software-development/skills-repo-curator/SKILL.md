@@ -32,6 +32,16 @@ timestamp: 2026-07-26T05:20:00Z
 
 O ciclo é executado periodicamente (diariamente via cron às 02:00). Ele inicia os updates — não o contrário.
 
+### Protocolo obrigatório antes de executar o ciclo (validado 12/08/2026)
+
+O usuário corrigiu explicitamente quando o ciclo foi executado manualmente sem reler as fontes: *"Leia agora mesmo a skill associada a essa operação, o que o Cron Job instrui e também o agents.md no repositório de Skills. Você está descumprindo protocolos."* **ANTES de rodar o ciclo — manual em sessão OU re-execução após interrupção — carregue as 3 fontes nesta ordem:**
+
+1. `skill_view(name='skills-repo-curator')` — a skill completa (etapas, passos, pitfalls)
+2. `read_file('/opt/data/skills/AGENTS.md')` — regras do repo (index.md é território LLM, convenções de commit, estrutura)
+3. O prompt do cron: `cronjob(action='list')` ou `/opt/data/cron/jobs.json` → job `ciclo-consolidacao-diario` — etapas exatas + formato de resposta final `REPORT:/GRAPH:/SUMMARY:`
+
+Sem isso, NÃO começar o ciclo. Ter lido a skill "mais cedo na sessão" não basta — a skill evolui entre sessões e o AGENTS.md é a regra vigente do repo.
+
 ## Fases do Gerenciamento de Skills
 
 Este skill cobre as **duas fases** do ciclo de vida de uma skill:
@@ -660,6 +670,8 @@ content = content.replace(last_entry, last_entry + new_block)
 **Verificação pós-inserção:** `grep -c 'Nome:' index.md` deve ser exatamente o número esperado. Rodar `python3 scripts/generate_graph.py` detecta entradas sem relações (que se tornam nós isolados no grafo) — o que confirma que a inserção criou entradas válidas.
 
 **Quando regenerar é aceitável:** >30% mudanças (30+ entries afetadas), E você já validou que o script de geração preserva todas as relações — testar com um subset primeiro. Caso contrário, prefira inserção cirúrgica.
+
+⚠️ **Âncoras de seção no index.md são ambíguas com títulos de entries (`## X` vs `### X ...`).** Ao inserir entries antes de um header `## Section`, o `old_string` curto casa por substring em DOIS lugares: `## Health` casa `## Health & Fitness`; `## Read Reddit` casa `### Read Reddit via RSS`; `## Social Media` casa `### Social Media Video Content Extraction`. O patch falha com "Found 2 matches" (validado 12/08/2026 — 2 falhas até achar o padrão). **Fix: ancorar com as DUAS linhas seguintes** — header da seção + primeira `###` da seção (ex: `## Read Reddit\n\n### Read Reddit via RSS`), ou no fim da seção anterior com a última relation + `\n\n## Health`. Verificar SEMPRE com `grep -n '^## Nome$' index.md` antes do patch para confirmar unicidade e conferir qual `###` abre a seção alvo (não assumir — a primeira entry pode ter título diferente do esperado).
 
 ⚠️ **Patch fuzzy-matching pode aplicar no local ERRADO quando o texto existe em seções diferentes.** O `patch` tool usa fuzzy matching (9 estratégias). Se o `old_string` aparecer em mais de um lugar no arquivo — mesmo com contexto extra — o match pode cair na seção errada, corrompendo outras partes do documento. Isso é especialmente perigoso quando:
 - Um patch anterior já criou uma cópia duplicada do trecho que você quer editar no local errado
