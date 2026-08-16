@@ -2,7 +2,7 @@
 name: google-sheets-automation
 description: "Polish Google Sheets via API (dropdowns, formulas, KPIs).
 
-Load this skill when you need to polish Google Sheets via API — data validation dropdowns, formulas, KPI sheets, and UX best practices. Complements google-workspace and xlsx."
+Load this skill when you need to polish Google Sheets via API — data validation dropdowns, formulas, KPI sheets, and UX best practices. Complements google-workspace and xlsx. Absorveu google-sheets-formatting (merge 16/08/2026): pitfalls de formatação batchUpdate + convenções de cor financeiro."
 version: 1.0.0
 author: Hermes curator
 license: MIT
@@ -109,3 +109,25 @@ Batch: aplicar `requests` em lotes de ≤40 com `sleep(1)` entre lotes (anti-429
 ## Referências
 
 - `references/sheets-api-pitfalls.md` — payloads exatos, erros 400 vistos, checklist de correção
+- **Pitfalls de formatação complementares (absorvido de google-sheets-formatting, merge 16/08/2026):**
+  - **Índices de range são 0-based e `end*` é exclusivo** — erro clássico desloca tudo +1 linha (ex: "R$ 0", "3200000,0%"). Sempre conferir range contra a planilha 1-based: linha 1 = índice 0.
+  - **`addBanding` falha se já existe banding no range** — buscar `sheets(bandedRanges(bandedRangeId))` e emitir `deleteBanding` para cada ID ANTES de re-adicionar. O batchUpdate é atômico — se um request falha, NADA é aplicado (e o `values.clear` anterior já rodou, deixando a aba vazia).
+  - **Gráfico BAR só aceita `targetAxis BOTTOM_AXIS`** — `Bar charts series may only target the BOTTOM_AXIS`; omitir o campo em séries de bar chart.
+  - **Números gravados como string não formatam** — `str(v)` vira `stringValue` e ignora `numberFormat` de moeda. Usar `numberValue` para int/float, `formulaValue` para strings que começam com `=`, `stringValue` só para texto.
+  - **`endColumnIndex` = comprimento MÁXIMO das linhas** — com linhas de larguras diferentes, `len(values[0])` dá `Attempting to write column: 1, beyond the last requested column of: 0`. Usar `max(len(r) for r in values)`.
+  - **Fórmulas com separador decimal (locale BR)** — `*1.3` pode dar `#ERROR!` onde `*1,3` aceita; preferir vírgula ao injetar fórmulas via API.
+  - **`header()` de helper pinta SEMPRE a linha 0** — chamá-lo 2x na mesma aba sobrescreve o título/hero. Fazer `header_at(sheet, r, ncols)` parametrizado por linha.
+  - **Section titles via `updateCells` com `fields:"userEnteredValue"`** sobrescrevem valor mas preservam formato antigo — reaplicar formato depois, ou clear antes.
+  - **Buscar os sheetIds reais** com `spreadsheets().get(fields="sheets.properties(sheetId,title)")` — o Google atribui IDs NÃO sequenciais; usar `ABAS.index()` como sheetId dá `No grid with id: N`.
+
+## Convenções de cor (padrão Hermes Official / financeiro — absorvido de google-sheets-formatting)
+
+- Headers: fundo `#1A73E8`, texto branco bold 11pt, centralizado
+- Inputs/premissas-chave: fundo dourado `#FFD959` (r, ticket, pré-money, rNPV, post-money)
+- Zebra: `#F5F8FE` (branco alternado)
+- Confiança: ALTA verde `#E6F4EA` / MÉDIA âmbar `#FFF0E0` / BAIXA vermelha `#FCE8E6`
+- Números: moeda `R$ #,##0` (nunca sem formatação), `%` 0.0%, múltiplo `0.0"x"`
+- `td.num` (valores financeiros): `text-align:right`
+- **Nunca pizza/donut** (preferência do usuário) — barras horizontais ou tabelas
+- Congelar header: `updateSheetProperties gridProperties frozenRowCount`
+- Verificação: conferir valores formatados com `sheets().values().get()` (retorna FORMATTED_VALUE por default) — "R$ 0" ou "3200000,0%" = range errado ou número gravado como string

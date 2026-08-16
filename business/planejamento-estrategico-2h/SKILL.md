@@ -2,7 +2,7 @@
 name: planejamento-estrategico-2h
 description: "Facilitar planejamento estratégico em 2h — EOS V/TO + One-Page Strategic Plan.
 
-Carregue esta skill quando precisar facilitar uma sessão única de planejamento estratégico para dono de PME + time pequeno (3-12 pessoas), com entregável obrigatório de 1 página. Usa EOS V/TO (Wickman) + One-Page Strategic Plan (Harnish), técnicas Liberating Structures, pré-mortem e timeboxing rigoroso. BSC e Hoshin Kanri não fecham em 2h — servem só como lente conceitual."
+Carregue esta skill quando precisar facilitar uma sessão única de planejamento estratégico para dono de PME + time pequeno (3-12 pessoas), com entregável obrigatório de 1 página. Usa EOS V/TO (Wickman) + One-Page Strategic Plan (Harnish), técnicas Liberating Structures, pré-mortem e timeboxing rigoroso. BSC e Hoshin Kanri não fecham em 2h — servem só como lente conceitual. Absorveu planejamento-estrategico (merge 16/08/2026): tabela de adequação de 11 frameworks + catálogo."
 version: 1.0.0
 author: Hermes Agent
 license: MIT
@@ -140,6 +140,27 @@ Gary Klein (HBR): "É daqui a 90 dias e o plano falhou. Por quê?"
 - [ ] Follow-up semanal + revisão trimestral agendados com data
 - [ ] Board exportado, plano entregue (1 página + 5W2H) e resumo enviado em 24h
 
+## Seleção de framework por adequação a 2h
+
+Absorvido de `business/planejamento-estrategico` (merge 16/08/2026). Catálogo completo das 11 metodologias com URLs e confiança: `references/frameworks-2h.md`.
+
+| Adequação | Framework | Por quê |
+|---|---|---|
+| ALTA | EOS / V/TO (Wickman) | Calibrado para PME (10–250); 8 perguntas em 1 página; ferramentas oficiais gratuitas |
+| ALTA | V2MOM (Salesforce) | 5 perguntas (Vision, Values, Methods, Obstacles, Measures), 1 página, 60–120 min |
+| ALTA | OKR (Doerr/Grove) | Workshop padrão 90 min–2h; entrega objetivo + métricas executáveis no trimestre |
+| ALTA | One-Page Strategic Plan (Harnish) | Plano holístico em 1 página (BHAG→metas→Rocks→KPIs); cabe em 2h com pré-trabalho |
+| ALTA | Playing to Win (Lafley & Martin) | A estratégia inteira = 5 escolhas (cascade); percorrível em 2h com contexto pré-coletado |
+| ALTA* | Business Model Canvas | Canvas completo em 90–120 min — mas cobre modelo de negócio, não metas/execução |
+| ALTA* | 4DX (FranklinCovey) | WIG + lead measures em 90 min — mas assume visão já definida; melhor como fechamento |
+| MÉDIA | BHAG (Collins & Porras) | Componente de 30–45 min, ótimo bloco de abertura — não é framework completo |
+| BAIXA | Balanced Scorecard | Exige semanas/múltiplos workshops (4 perspectivas, mapa, cascata, KPIs) |
+| BAIXA | Hoshin Kanri | Ciclo anual contínuo (X-Matrix, catchball, PDCA); sessão única rende pouco |
+
+\* escopo estreito — combinar com outro framework do grupo ALTA.
+
+> ⚠️ URLs oficiais de V2MOM (salesforce.com/blog/v2mom) e Destination Postcard (eosworldwide.com/blog/destination-postcard) estão **fora do ar** — citar livros canônicos (*Behind the Cloud*, *Traction*) e ferramentas oficiais vivas (eosworldwide.com/vto-download). Validado 15/08/2026.
+
 ## Referências
 
-Fontes e URLs da pesquisa que embasou esta skill: `references/fontes-pesquisa.md`. Template do entregável: `templates/one-page-plan.md`.
+Fontes e URLs da pesquisa que embasou esta skill: `references/fontes-pesquisa.md`. Template do entregável: `templates/one-page-plan.md`. Catálogo de frameworks: `references/frameworks-2h.md`.

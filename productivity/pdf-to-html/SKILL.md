@@ -2,7 +2,7 @@
 name: pdf-to-html
 description: "PDF→HTML: Type3/Figma extraction gotchas + clean semantic rebuild.
 
-Load this skill when replicating a PDF design as HTML (slide deck, proposal, one-pager) or extracting vector art/text for the web. Especially relevant for Figma-exported PDFs (Type3 fonts) — full of silent traps. Default for this user: clean semantic rebuild with foreground/background separated, not pixel-perfect SVG."
+Load this skill when replicating a PDF design as HTML (slide deck, proposal, one-pager) or extracting vector art/text for the web. Especially relevant for Figma-exported PDFs (Type3 fonts) — full of silent traps. Default for this user: clean semantic rebuild with foreground/background separated, not pixel-perfect SVG. Absorveu pdf-deck-to-html, pdf-slides-to-html, pdf-to-html-replication e branded-html-replication (merge 16/08/2026): estrutura de proposta comercial aprovada, extração de assets, pipeline completo."
 version: 1.0.0
 author: hermes
 license: MIT
@@ -93,3 +93,21 @@ Single self-contained `.html` → send via Telegram Bot API `sendDocument` (work
 
 - `references/figma-pdf-extraction.md` — pixel-perfect extraction pipeline (working code, opacity sampling, XObject structure).
 - `references/consulting-proposal-guide.md` — os 12 princípios de propostas comerciais (deep-research ID Consultoria) + localização do guia e do template HTML com marca ID.
+- `references/type3-svg-extraction.md` — extração de logo/shields como componentes SVG (absorvido de pdf-to-html-replication, merge 16/08/2026).
+- `references/figma-pdf-pymupdf-pipeline.md` — code patterns: SVG parsing, path bbox, transform composition, text reconstruction (absorvido de pdf-slides-to-html, merge 16/08/2026).
+- `references/pdf-to-html-pipeline.md` — technical pipeline completo com thresholds (absorvido de branded-html-replication, merge 16/08/2026).
+
+## Templates de proposta comercial — estrutura aprovada (marca ID)
+
+Depois do deck, o usuário pediu um template HTML adaptável de proposta comercial com a marca ID (merge 16/08/2026 — absorvido de pdf-deck-to-html). Iteração de validação: **"um slide de cada vez"**; quando ele pedir comparação, **listar diferenças sem editar**; validar cada slide antes de seguir.
+
+### Estrutura aprovada (do Guia de Princípios)
+Capa → Resumo Executivo (com preço) → Entendimento do Desafio (com "custo de não agir") → Escopo & Entregáveis (com "fora do escopo") → Prova social → Metodologia & Cronograma → **ROI antes do preço** → transição teal → Investimento (3 opções Good-Better-Best, médio "Recomendado") → Garantia → Condições Comerciais → Responsabilidades → Sobre a empresa → Próximos Passos + assinatura → Final.
+
+### Estilo (seguir o deck aprovado, NÃO inventar)
+- Capa: logo do cliente (`{{CLIENTE_LOGO_URL}}`, box tracejado "LOGO DO CLIENTE") + divisor + logo ID no topo; título (96) e subtítulo (36) abaixo; meta em grid — tudo num **bloco centralizado na porção direita, NUNCA sobrepondo o diamante/escudo do fundo** (medir a extensão real do escudo no SVG de fundo antes de posicionar).
+- Transições: título gigante alinhado à **ESQUERDA** (como o deck original), fundo teal claro (contornos `#679DA3`).
+- Slide final: logo + "Proposta válida até {{VALIDADE}}" (teal `#1AAEBD`) + disclaimer.
+
+### Pitfall — usar o EXATO ícone da referência
+O header icon dos slides padrão era um diamante teal facetado (3 paths com topografia interna), NÃO o diamante da logo da capa — parecem similares mas diferem; o usuário rejeitou a aproximação. Inspecionar o HTML/SVG de referência (computed styles, paths) — nunca aproximar de memória.

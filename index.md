@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 128 skills*
+*Total: 122 skills*
 
 ---
 
@@ -266,21 +266,6 @@ Carregue esta skill quando for produzir um relatório de pesquisa, análise de m
 - `similar` → `productivity/html-report-hermes`
 - `similar` → `research/market-research-synthesis`
 
-### Branded HTML Replication
-
-- **Nome:** `content-production/branded-html-replication`
-- **Arquivo:** `content-production/branded-html-replication/SKILL.md`
-- **Tamanho:** 5,422 chars
-- **Resumo:** Replicate designed PDFs/decks as faithful branded HTML — assets, fonts, SVG.
-- **Type:** Creative
-- **Timestamp:** 2026-08-14T00:00:00Z
-
-Load this skill when recreating a designed document (PDF slides, deck, proposal) as HTML that carries the brand faithfully: backgrounds, logos, icons, fonts, colors — optionally as clean semantic HTML instead of pixel-perfect positioning. Validated with the ID Consultoria deck + proposal template (Aug 2026). Extracts brand assets from PDF for HTML use.
-
-**Relações:**
-- `similar` → `productivity/html-pdf-fidelity`
-- `similar` → `content-production/research-report-standards`
-
 ## Creative
 
 ### AI Creative Assets — Tool Research & Production Prompts
@@ -514,35 +499,20 @@ Load this skill when creating a commercial proposal from client context (documen
 - `uses` → `productivity/google-workspace`
 - `similar` → `content-production/research-report-standards`
 
-### Planejamento Estratégico para PME (≤2h)
-
-- **Nome:** `business/planejamento-estrategico`
-- **Arquivo:** `business/planejamento-estrategico/SKILL.md`
-- **Tamanho:** 5,389 chars
-- **Resumo:** Planejar estratégia de PME em sessão única de 2h — EOS, OKR, V2MOM, 1 página.
-- **Type:** Orchestrator
-- **Timestamp:** 2026-08-15T00:00:00Z
-
-Carregue esta skill quando um dono de PME (10-250 funcionários) + time pequeno pedirem planejamento estratégico em uma sessão de até 2h. Escolhe frameworks (EOS V/TO, OPSP, V2MOM, OKR) pelo tempo disponível e perfil da empresa, conduz a facilitação e entrega tudo em UMA página ao final. Trabalho em PT-BR com markdown estruturado e tabelas comparativas.
-
-**Relações:**
-- `similar` → `research/systematic-research`
-
 ### Facilitação de Planejamento Estratégico em 2 Horas
 
 - **Nome:** `business/planejamento-estrategico-2h`
 - **Arquivo:** `business/planejamento-estrategico-2h/SKILL.md`
-- **Tamanho:** 9,226 chars
+- **Tamanho:** 11,225 chars
 - **Resumo:** Facilitar planejamento estratégico em 2h — EOS V/TO + One-Page Strategic Plan.
 - **Type:** Orchestrator
-- **Timestamp:** 2026-08-15T02:39:34Z
+- **Timestamp:** 2026-08-16T05:00:00Z
 
-Carregue esta skill quando precisar facilitar uma sessão única de planejamento estratégico para dono de PME + time pequeno (3-12 pessoas), com entregável obrigatório de 1 página. Usa EOS V/TO (Wickman) + One-Page Strategic Plan (Harnish), técnicas Liberating Structures, pré-mortem e timeboxing rigoroso. BSC e Hoshin Kanri não fecham em 2h — servem só como lente conceitual.
+Carregue esta skill quando precisar facilitar uma sessão única de planejamento estratégico para dono de PME + time pequeno (3-12 pessoas), com entregável obrigatório de 1 página. Usa EOS V/TO (Wickman) + One-Page Strategic Plan (Harnish), técnicas Liberating Structures, pré-mortem e timeboxing rigoroso. BSC e Hoshin Kanri não fecham em 2h — servem só como lente conceitual. Absorveu planejamento-estrategico (merge 16/08/2026): tabela de adequação de 11 frameworks + catálogo.
 
 **Relações:**
 - `similar` → `productivity/meeting-action-items`
 - `similar` → `productivity/weekly-review-planning`
-- `similar` → `business/planejamento-estrategico`
 
 ### Proposta Comercial de Consultoria
 
@@ -1157,21 +1127,6 @@ Load this skill when creating images for Instagram, Twitter, Open Graph, or any 
 - `similar` → `productivity/html-to-pdf-chromium`
 - `similar` → `productivity/html-report-hermes`
 
-### PDF/Deck → HTML Reconstruction
-
-- **Nome:** `media/pdf-deck-to-html`
-- **Arquivo:** `media/pdf-deck-to-html/SKILL.md`
-- **Tamanho:** 7,714 chars
-- **Resumo:** Convert PDF/Figma decks to HTML slides — original art preserved, real text.
-- **Type:** Media
-- **Timestamp:** 2026-08-14T00:00:00Z
-
-Load this skill when converting presentations/PDFs into HTML that opens in the browser, keeping the ORIGINAL art with real selectable text. Validated formula: semantic HTML + original PDF art as background + real text positioned over PDF regions + explicit colors. Never redraw brand assets manually — extract them (v3 approved by user, v2 rejected).
-
-**Relações:**
-- `similar` → `productivity/html-pdf-fidelity`
-- `similar` → `content-production/research-report-standards`
-
 ## Hermes Desktop Plugins
 
 ### Hermes Desktop Plugins
@@ -1408,19 +1363,20 @@ Load this skill when you need to format Google Docs or Sheets through the REST A
 
 - **Nome:** `productivity/google-sheets-automation`
 - **Arquivo:** `productivity/google-sheets-automation/SKILL.md`
-- **Tamanho:** 5,953 chars
+- **Tamanho:** 8,856 chars
 - **Resumo:** Polish Google Sheets via API (dropdowns, formulas, KPIs).
 - **Type:** ToolIntegration
-- **Timestamp:** 2026-08-12T00:00:00Z
+- **Timestamp:** 2026-08-16T05:00:00Z
 
 Polish Google Sheets via API (dropdowns, formulas, KPIs).
 
-Load this skill when you need to polish Google Sheets via API — data validation dropdowns, formulas, KPI sheets, and UX best practices. Complements google-workspace and xlsx.
+Load this skill when you need to polish Google Sheets via API — data validation dropdowns, formulas, KPI sheets, and UX best practices. Complements google-workspace and xlsx. Absorveu google-sheets-formatting (merge 16/08/2026): pitfalls de formatação batchUpdate + convenções de cor financeiro.
 
 **Relações:**
 - `uses` → `productivity/google-workspace`
 - `similar` → `productivity/google-docs-formatting`
 - `similar` → `productivity/xlsx`
+- `similar` → `business/valuation-consultivo`
 - `used_by` → `autonomous-ai-agents/product-pipeline`
 
 ### HTML → PDF Fidelity (browser-identical)
@@ -1522,68 +1478,23 @@ Load this skill when you need a weekly review and planning session — collect o
 - `similar` → `productivity/document-to-action-items`
 - `uses` → `taskflow-mcp-rules`
 
-### Google Sheets — Formatação via API (pitfalls)
-
-- **Nome:** `productivity/google-sheets-formatting`
-- **Arquivo:** `productivity/google-sheets-formatting/SKILL.md`
-- **Tamanho:** 6,001 chars
-- **Resumo:** Formatar Google Sheets via API — batchUpdate pitfalls validados.
-- **Type:** ToolIntegration
-- **Timestamp:** 2026-08-15T09:15:00Z
-
-Carregue esta skill ao criar/popular/formatar planilha Google via Sheets API (googleapiclient, gws, batchUpdate): múltiplas abas, fórmulas vivas, banding, charts e numberFormat. Cobre erros reais (No grid with id, sobreposição de addBanding, BOTTOM_AXIS, valores que não formatam como moeda/%). Complementa google-workspace com lições de formatação validadas em execução real.
-
-**Relações:**
-- `uses` → `productivity/google-workspace`
-- `similar` → `business/valuation-consultivo`
-
-### PDF Slides → HTML
-
-- **Nome:** `productivity/pdf-slides-to-html`
-- **Arquivo:** `productivity/pdf-slides-to-html/SKILL.md`
-- **Tamanho:** 6,502 chars
-- **Resumo:** Convert PDF slide decks to HTML — original art preserved, real text.
-- **Type:** ToolIntegration
-- **Timestamp:** 2026-08-14T05:00:55Z
-
-Load this skill when the user hands over a PDF slide deck / proposal / presentation and wants it as HTML: pixel-perfect clone, strongly inspired rebuild, or semantic HTML. Also applies when the PDF came out of Figma or contains unselectable text. Covers analysis, vector art extraction, and semantic HTML output.
-
-**Relações:**
-- `similar` → `productivity/html-pdf-fidelity`
-- `uses` → `productivity/html-to-pdf-chromium`
-- `uses` → `productivity/pdf`
-
 ### PDF → HTML
 
 - **Nome:** `productivity/pdf-to-html`
 - **Arquivo:** `productivity/pdf-to-html/SKILL.md`
-- **Tamanho:** 9,297 chars
+- **Tamanho:** 11,787 chars
 - **Resumo:** PDF→HTML: Type3/Figma extraction gotchas + clean semantic rebuild.
 - **Type:** ToolIntegration
-- **Timestamp:** 2026-08-14T05:00:00Z
+- **Timestamp:** 2026-08-16T05:00:00Z
 
-Load this skill when replicating a PDF design as HTML (slide deck, proposal, one-pager) or extracting vector art/text for the web. Especially relevant for Figma-exported PDFs (Type3 fonts) — full of silent traps. Default for this user: clean semantic rebuild with foreground/background separated, not pixel-perfect SVG.
+Load this skill when replicating a PDF design as HTML (slide deck, proposal, one-pager) or extracting vector art/text for the web. Especially relevant for Figma-exported PDFs (Type3 fonts) — full of silent traps. Default for this user: clean semantic rebuild with foreground/background separated, not pixel-perfect SVG. Absorveu pdf-deck-to-html, pdf-slides-to-html, pdf-to-html-replication e branded-html-replication (merge 16/08/2026): estrutura de proposta comercial aprovada, extração de assets, pipeline completo.
 
 **Relações:**
 - `similar` → `productivity/html-pdf-fidelity`
 - `uses` → `productivity/pdf`
 - `uses` → `productivity/html-to-pdf-chromium`
 - `similar` → `productivity/html-report-hermes`
-
-### PDF → HTML Replication
-
-- **Nome:** `productivity/pdf-to-html-replication`
-- **Arquivo:** `productivity/pdf-to-html-replication/SKILL.md`
-- **Tamanho:** 5,893 chars
-- **Resumo:** Convert PDF decks/documents to faithful HTML — pixel-perfect or semantic.
-- **Type:** ToolIntegration
-- **Timestamp:** 2026-08-14T05:35:18Z
-
-Load this skill when converting a PDF deck or document to faithful HTML, whether the user wants pixel-perfect positioning or clean semantic structure. Covers brand asset extraction (logos, icons, backgrounds) and the pitfalls of Type3/Figma exports. Complements html-pdf-fidelity for the reverse direction.
-
-**Relações:**
-- `uses` → `productivity/pdf`
-- `similar` → `productivity/html-pdf-fidelity`
+- `similar` → `content-production/research-report-standards`
 - `similar` → `autonomous-ai-agents/messaging-platforms`
 
 ## Read Reddit
