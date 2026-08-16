@@ -302,6 +302,7 @@ Full worked case: `references/shallow-compression.md` (log lines, queries, dupli
 | `auto-compress failed:` with EMPTY error + `made no progress for 30.0s` | Gateway hygiene commit-fence timeout — aux summary model too slow on a huge context (session over `hygiene_hard_message_limit`) | Raise `compression.hygiene_timeout_seconds`, raise `hygiene_hard_message_limit`, `/reset` giant sessions; see Step 8 |
 | Compression commits but reduces little (e.g. 1047→978 msgs, 5% tokens) | Hygiene fired on message count while tokens far below threshold; in-place compaction is incremental (marker-to-marker); tail protection + huge recent tool outputs cap the cut | Check the hygiene trigger line (msgs vs token threshold); `/reset` sessions with 20K+ rows / 20+ compaction markers; see Step 9 |
 | Sessão cai em fallback inesperado | `opencode-zen` base_url built-in errada OU `model.aliases` interferindo | Verificar base_url do model section + model.aliases |
+| MCP server parked (`McpError: Connection closed`) + `Cannot find module '/opt/data/['` no mcp-stderr.log | `args` do bloco MCP como **string JSON** — o client pega `args[0]` da string (= `[`) e monta module path errado | Converter `args` para **lista YAML** e usar node absoluto no `command`; validar com `hermes mcp test <server>` (sem reload); detalhes na skill `open-design`, `references/mcp-connection-debug.md` |
 
 ## Remediation Sequence
 
@@ -319,6 +320,7 @@ Full worked case: `references/shallow-compression.md` (log lines, queries, dupli
 - `references/config-change-protocol.md` — protocol for modifying Hermes config: never change provider/model/compression without explicit user instruction
 - `references/dashboard-auth-env-override.md` — dashboard login failing with `Invalid username or password` despite correct `dashboard.basic_auth` in config.yaml: env-over-config precedence in the basic_auth plugin, verification via `/auth/password-login` curl, fixing without dropping the gateway
 - `pi-session-audit` — Pi Agent session cost/token auditing (related methodology)
+- `open-design` — operação do daemon Open Design + MCP (restore pós-wipe, shim agy, args como lista YAML)
 
 ## Pitfalls
 
@@ -339,3 +341,9 @@ Full worked case: `references/shallow-compression.md` (log lines, queries, dupli
 ⚠️ **"auto-compress failed:" with empty message ≠ unknown error.** In the gateway hygiene path, an empty error string after `auto-compress failed:` is the re-raised `asyncio.TimeoutError` (`str() == ""`) from the commit fence — it means the summary model produced no output within `hygiene_timeout_seconds` (default 30.0s). Don't chase the missing error text; confirm via agent.log telemetry `"failure_class":"commit_fence_cancelled"` (see Step 8).
 
 ⚠️ **state.db `compression_failure_error` may stay NULL even when compression fails.** Hygiene commit-fence timeouts record the cooldown only when `compression.hygiene_failure_cooldown_seconds >= 0`; otherwise the failure exists solely in errors.log/agent.log. Always cross-check logs, not just the DB columns.
+
+⚠️ **session_search FTS can miss sessions even with exact strings.** `session_search` returning 0 results does NOT mean a session doesn't exist. The FTS5 index (`messages_fts`) misses content present in the raw `messages` table — especially strings embedded in tool-output JSON and, occasionally, exact quoted phrases. When the user asks "which session was X" (cron creation, script, decision) and search comes up empty, fall back to a raw LIKE query on `messages.content` via Python sqlite3 (see `references/session-diagnostic-queries.md` § 11). Corroborate timing with artifact metadata: cron `last_run_at`/state, script `stat` mtimes. Worked case 2026-08-13: messageId `3EB0BE3D83318C47BA80E4` was unfindable via FTS across ~10 variants; one LIKE on `messages.content` resolved the session instantly.
+
+⚠️ **FTS can also return a PLAUSIBLE but WRONG session.** If the user's descriptor and the transcript wording differ, `session_search` may surface a related-but-wrong session (e.g. user said "quinzena 3", search returned the quinzena-2 session because both contain "transcrição"+"roadmap"). When the user corrects you ("não é essa" / "olha no banco de dados mesmo"), stop re-searching and go direct: date-window + distinctive-term LIKE against `/opt/data/state.db` (see § 12). Note `~/.hermes/state.db` may exist with zero tables — `/opt/data/state.db` is the live DB.
+
+⚠️ **Session IDs shown by `session_search` are truncated prefixes.** Displayed IDs are ~22 chars (e.g. `20260813_123130_dda538`); `messages.session_id`/`sessions.id` store the FULL id (`...dda5382b`). Exact-match lookups with the truncated ID return 0 rows. Resolve with `SELECT id FROM sessions WHERE id LIKE '<prefix>%'` first (§ 12.3).

@@ -85,10 +85,25 @@ Precedência de extensão:
 
 ## Sessões
 
-- JSONL em `~/.pi/agent/sessions/--<path-normalizado>--/*.jsonl`.
+- JSONL em `~/.pi/agent/sessions/--<path-normalizado>--/*.jsonl` (ex.: `--opt-data-code-workstation-cfp-ia--/2026-08-14T06-44-59-651Z_<uuid>.jsonl`; o dir mais recente com mtime crescendo = sessão ativa).
 - Eventos `model_change` registram provider/model — base da auditoria `pi-session-audit`.
 - `--session` = append no MESMO arquivo (nunca novo); `-c` continua a última; `-r` seletor interativo; `--fork` cria nova a partir de outra; `--export <file>` gera HTML legível.
 - Compaction: `dist/core/compaction/` com branch-summarization.
+
+### Schema do JSONL (para ler progresso de sessão ao vivo)
+
+Validado em 14/08/2026 (monitorar `zera-onda5-lote2` em andamento). Cada linha é um evento:
+
+- `{"type":"session", ...}` — primeira linha, tem `id`, `timestamp`, `cwd`.
+- `{"type":"session_info", "name":"<nome-da-sessão>", ...}` — segunda linha; **aqui está o nome** dado via `--name` (ex.: `zera-onda5-lote2`).
+- `{"type":"message", "id", "parentId", "timestamp", "message":{...}}` — o grosso. **O conteúdo NÃO é top-level**: está em `message.message.content[]` (lista de blocos):
+  - `{"type":"text","text":"..."}` — fala do modelo (para `role:assistant`) ou prompt inicial (para `role:user`).
+  - `{"type":"thinking","thinking":"...","thinkingSignature":"reasoning_content"}` — raciocínio, ignorável para progresso.
+  - `{"type":"toolCall","id","name","arguments":{...}}` — chamada de tool (mesma shape do formato Anthropic/OpenAI).
+  - `{"type":"toolResult","toolCallId","toolName","content":[...|str],"isError":bool,"timestamp"}` — resultado; `content` pode ser **lista** de `{"type":"text","text":...}` (não assumir string — a primeira tentativa de parse com `.content` string falha silenciosamente).
+  - `role` fica em `message.message.role` (user/assistant/toolResult); `toolName` em `message.message.content[i].toolName`.
+
+**Resumo rápido para monitoramento:** último evento `message` com `role:assistant` + `toolCall` indica o passo atual; `toolResult` com `isError:true` mostra falhas; pausas de minutos entre eventos são normais (comando bash longo rodando — o resultado só entra no fim).
 
 ## Inspeção rápida
 

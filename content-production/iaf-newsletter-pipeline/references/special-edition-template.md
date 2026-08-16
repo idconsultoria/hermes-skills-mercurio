@@ -33,6 +33,16 @@ daily editions which aggregate 20+ items across sections.
 
 **⚠️ Pitfall real (21/07/2026):** Edição do Gemini 3.6 Flash começou usando apenas o Google Blog como fonte. O usuário interrompeu com "Não se baseie só no blog da Google, procure bem mais fontes sobre o tema". O anúncio oficial não mencionava: que o 3.5 Pro está atrasado (Android Headlines), comparações com GPT‑5.6 Luna e Grok 4.5 (OfficeChai), resultados reais do Flash Cyber no motor V8 (CyberSecurity News), que o Flash-Lite supera o 3 Flash original (9to5Google), ou a data de corte avançada para março/2026 (9to5Google). Sem essas fontes, a edição teria sido um release regurgitado — não uma análise.
 
+**⚠️ Pitfall real (12/08/2026) — Versão pontual ≠ modelo antigo relançado.**
+Na edição do DeepSeek V4 Pro 0813 (GA após 4 meses de preview), o agente usou fontes da era do preview (Unite.AI, model card de abril) e concluiu: "o 0813 não é um modelo novo — é o mesmo preview, sem o rótulo". ERRADO. O usuário corrigiu: "O GA tem pesos novos sim. Refaça a pesquisa toda... Busque informações estritamente sobre a versão 0813. Dessa vez espere pela minha revisão antes de enviar no grupo."
+
+Regras que saíram da correção:
+1. **Quando o tema é um release pontual (0813, 0731, data no nome), pesquise ESTRITAMENTE a versão.** Fontes sobre o preview descrevem o build antigo. O "anúncio oficial" do release pode ser só uma linha na página de pricing + uma tabela de benchmarks vazada (WeChat oficial). Sem changelog/blog, o release ainda aconteceu.
+2. **Version bump ≠ mesmo modelo.** Um re-post-train (padrão DeepSeek: Flash-0731 e Pro-0813) mantém arquitetura e tamanho mas muda o checkpoint — e os ganhos podem ser enormes (DeepSWE 12,8→62,7; Terminal Bench 2.1 72,1→87,9). Nunca afirme "é o mesmo modelo" sem checar os benchmarks do build novo. Sinal narrativo valioso: se o irmão menor (Flash) tinha superado o Pro-Preview, o GA responde — "o Pro recupera o trono".
+3. **Verifique o que mudou via fontes primárias, não artigos:** API do Hugging Face (`/api/models?author=...&sort=lastModified`, `/commits/main`), ModelScope, changelog cru (grep no HTML), página do OpenRouter do build exato, preço oficial. Ver `references/model-release-verification.md`.
+4. **Ressalvas obrigatórias em lançamentos de horas:** benchmarks vendor-reported, rodados com harness próprio da empresa (às vezes ainda não lançado), sem réplica independente, testes manuais da comunidade mistos. Inclua — é o que separa análise de release regurgitado.
+5. **Gate de revisão:** edição especial pedida interativamente → apresente o resumo editorial + mensagem WhatsApp e ESPERE o OK antes de enviar ao grupo/site. (O pipeline cron diário auto-envia; pedido interativo não.)
+
 ## File naming
 
 ```
@@ -219,3 +229,4 @@ curl -s -X POST http://127.0.0.1:3000/send \
 | `especial-gpt56` | 26/06/2026 | OpenAI GPT‑5.6 (Sol/Terra/Luna) + gov approval |
 | `especial-kimi-k3` | 16/07/2026 | Moonshot Kimi K3 (2.8T open-weight) |
 | `especial-gemini-3-6-flash` | 21/07/2026 | Google Gemini 3.6 Flash + 3.5 Flash-Lite + 3.5 Flash Cyber |
+| `especial-deepseek-v4-pro` | 12/08/2026 | DeepSeek V4 Pro 0813 (GA — re-post-train, salto agentic, preço mantido) |

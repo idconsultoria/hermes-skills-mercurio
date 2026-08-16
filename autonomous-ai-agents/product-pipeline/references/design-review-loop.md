@@ -6,6 +6,39 @@
 
 O Antigravity CLI (agy) requer OAuth Google armazenado no keyring do host. O token não persiste no container Docker. Portanto, agy só funciona via SSH no host Oracle.
 
+## ⚠️ Invocação do agy — modo print com skip-permissions (padrão que funciona em revisões longas)
+
+**Sintoma:** `agy -p "<prompt>"` (como nos exemplos abaixo, sem flags) **aborta silenciosamente** em revisões
+longas — o processo sai com exit 0 e escreve só a primeira linha no output ("I will start by listing...").
+Causa: ao primeiro tool call que pede permissão, com stdin fechado (EOF), o agy encerra. O `echo "n" |`
+funciona apenas para tarefas curtas de 1-2 passos.
+
+**Fix (validado em Onda 1 e Onda 2 do Zera, ago/2026):** sempre passar `--dangerously-skip-permissions`
+(autoriza tool permissions automaticamente) e `--print-timeout` generoso:
+
+```bash
+ssh oracle-host 'cd /home/ubuntu/selfhost/shared/code/workstation/PROJETO && \
+  /home/ubuntu/.local/bin/agy -p "$(cat prompts/agy-review-<onda>.md)" \
+  --dangerously-skip-permissions --print-timeout 15m > /tmp/agy-<onda>.log 2>&1; echo "EXIT: $?"'
+```
+
+Com essas flags o agy roda o review completo (log de 13KB+), edita o feedbacks.md e escreve o ACORDO.
+Usar caminho absoluto `/home/ubuntu/.local/bin/agy` — o PATH da sessão SSH/tmux nem sempre inclui
+`~/.local/bin`. **Não** depender de tmux interativo para reviews headless.
+
+**Pitfall de ownership no shared volume:** o agy roda `sudo chown ubuntu` nos arquivos que edita no host
+(ex.: `product/engineering/feedbacks.md`, `.git/`). Como o volume é compartilhado com o container, isso
+quebra a escrita do Hermes no repo (`.git/index.lock Permission denied`). Antes de commitar pelo
+container, restaurar o owner:
+
+```bash
+ssh oracle-host 'sudo chown -R 10000:10000 /home/ubuntu/selfhost/shared/code/workstation/PROJETO/.git'
+```
+
+Sincronizar o shared volume antes de rodar o agy: `git reset --hard origin/main` no host após `git push`
+pelo container (o host não tem credenciais GitHub; usar `git config --global --add safe.directory` se o
+git reclamar de dubious ownership).
+
 ## Path Mapping
 
 | Ambiente | Path base |

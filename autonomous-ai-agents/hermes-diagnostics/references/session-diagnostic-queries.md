@@ -148,6 +148,114 @@ ORDER BY started_at DESC
 LIMIT 20;
 ```
 
+### 11. Content-based session lookup (session_search FTS fallback)
+
+When the user asks "which session did we talk about X" and `session_search` returns 0 results — even with exact quoted phrases or a distinctive string like a messageId — do NOT conclude it doesn't exist. The FTS5 index (`messages_fts`) misses content that the raw `messages` table has (notably strings embedded in tool-output JSON, and sometimes exact phrases). The raw LIKE query finds it instantly:
+
+```python
+import sqlite3
+# mode=ro: NEVER open the live 1.5GB gateway DB read-write from a probe script.
+con = sqlite3.connect('file:/opt/data/state.db?mode=ro', uri=True)
+cur = con.cursor()
+
+# Try the most distinctive needles: messageIds, exact quoted phrases,
+# script names, unique error text. One LIKE hit is enough to locate the session.
+needles = ['<messageId-or-unique-phrase>', '<another-distinctive-string>']
+for needle in needles:
+    cur.execute(
+        "SELECT session_id, id, role, substr(content,1,200) FROM messages WHERE content LIKE ? LIMIT 5",
+        (f'%{needle}%',)
+    )
+    for r in cur.fetchall():
+        print(r)
+
+# Confirm session identity + title once a session_id is found:
+cur.execute("SELECT id, title, source, started_at FROM sessions WHERE id = ?", ('<session_id>',))
+print(cur.fetchone())
+```
+
+### 11b. Full-column deep scan (when content-only LIKE fails)
+
+If `content` LIKE returns only your own investigation messages (self-noise) or nothing, the needle lives in a column FTS never indexes. The `messages` table has SIX text-bearing columns besides `content` — `tool_calls` (JSON of function-call arguments, including full file contents passed to `write_file`), `reasoning`, `reasoning_content`, `reasoning_details`, `codex_reasoning_items`, `codex_message_items`. Scan them all, exclude the current session, and group by session to triage:
+
+```python
+import sqlite3
+con = sqlite3.connect('file:/opt/data/state.db?mode=ro', uri=True)
+cur = con.cursor()
+
+NEEDLE = '%rio de janeiro%'  # any distinctive substring
+CURRENT_SESSION = '<the-session-id-you-are-running-in>'  # never trust its own hits
+
+for col in ['content', 'tool_calls', 'reasoning', 'reasoning_content',
+            'reasoning_details', 'codex_reasoning_items', 'codex_message_items']:
+    rows = cur.execute(f"""
+        SELECT m.session_id, COUNT(*) FROM messages m
+        WHERE lower(m.{col}) LIKE ? AND m.session_id != ?
+        GROUP BY m.session_id ORDER BY COUNT(*) DESC LIMIT 10
+    """, (NEEDLE, CURRENT_SESSION)).fetchall()
+    print(f'=== {col}: {len(rows)} sessions')
+    for r in rows:
+        print('  ', r[0][:40], r[1], 'msgs')
+```
+
+Triage rules:
+- **Filter self-noise**: your own session contains every needle you searched (assistant + tool rows echo your queries). Always exclude the current `session_id`.
+- **Group before reading**: `GROUP BY session_id` gives the session map in one pass — read individual messages only after a candidate session emerges.
+- **Heavy DB, be polite**: `state.db` is ~1.5GB. Always filter by `session_id` when you already have a candidate; use `mode=ro`; add `timeout` to long scans.
+
+### 11c. Corroborate with artifact state (which session = where we stopped)
+
+A recall request ("where did we stop", "which session created X") is only answered by matching DB hits to ON-DISK artifacts. Cross-check in this order:
+
+1. **Cron jobs**: `/opt/data/cron/jobs.json` — job `id`, `created_at`, `last_run_at`, `script`, `prompt` identify which session created/edited a cron. (Worked case: job `e962f5a06576` "Zera — Lembrete Demandas Igor" was created 2026-08-13 14:04 UTC → its builder session is that day's window.)
+2. **Git state of the project repo**: `git log --oneline -8` + `git status` — the HEAD commit timestamp is the last thing done in that workstream. (Worked case: HEAD `225839a` at 19:26 UTC dated the last CFP/Zera work.)
+3. **Pi agent session JSONL**: `/opt/data/home/.pi/agent/sessions/--<workspace-normalizado>--/*.jsonl` sorted by mtime — the newest file is the last thing the Pi did in that workspace. The `Entries: N` line count is a checkpoint marker for long builds (monitor growth: 153 → 202 = progress).
+4. **Script/file mtimes**: `stat` on `/opt/data/scripts/*.py`, cron `output/` artifacts (e.g. `cfp_guia_demandas.pdf`).
+
+If no DB hit matches the user's description after all scans — **do not guess**. Report the candidates found, state that the exact pattern is absent, and ask which part to continue (user rule: "padrão exato ausente = avisar e NÃO executar").
+
+Notes:
+- The `messages` table keeps content for ALL roles (`user`, `assistant`, `tool`) — tool rows store output as JSON-escaped text, which FTS often misses but LIKE matches.
+- `session_search` FTS and `content`-only LIKE both miss strings that live ONLY in `tool_calls` arguments (e.g. a document body passed to `write_file`) or in `reasoning*` columns — that is what § 11b scans for.
+- Corroborate timing to narrow the target: cron job creation (`cronjob action=list` → `last_run_at`/state), script mtimes (`stat` on `/opt/data/scripts/…`), file ctimes. If the artifact was created today at 14:27 UTC, expect the session in today's window.
+- `sqlite3` CLI may not exist on the host; Python's stdlib `sqlite3` always works.
+- Worked case (2026-08-13): user asked for the session that created the "Zera — Lembrete Demandas Igor" cron. session_search returned 0 across ~10 query variants including the literal messageId `3EB0BE3D83318C47BA80E4`; one LIKE on the messageId in `messages.content` resolved `20260813_123130_dda5382b` immediately.
+- Worked case (2026-08-13, deep scan): user asked to resume "where we stopped" on the CFP/Zera project, naming a number that matched nothing in `content`. Content-only LIKE across the DB surfaced only the probe's own messages; the real anchor (`Entries: 153` — Pi session JSONL entry count during the WS4 API build) was found in a `tool` row and confirmed against Pi session mtimes + `git log`. The user then corrected the anchor description twice ("só no banco de dados", "esqueça o Rio") — treat vague recall descriptors as unreliable; trust the DB + artifacts, then ASK.
+
+### 12. Direct-DB fast path when the user says "look in the database, not the tool"
+
+When the user explicitly says a session exists but `session_search` can't find it (or you get a *plausible-looking but wrong* session — FTS matched generic terms while the real session uses different wording), go straight to the DB. The user's descriptor may differ from the transcript's actual words (worked case: user said "quinzena 3", FTS returned the quinzena-2 session because both contain "transcrição"/"roadmap").
+
+1. **Use the RIGHT database file.** `/opt/data/state.db` is the live session DB. `~/.hermes/state.db` (= `/opt/data/home/.hermes/state.db`) can exist with **zero tables** — don't get fooled by its presence; check `.tables` first.
+2. **Narrow by date window first.** For "a session from today": `WHERE m.timestamp >= <day_start_utc>` (13/08 BRT 00:00 = 13/08 03:00 UTC). Combined with distinctive terms this cuts a 1.5GB table down to nothing fast.
+3. **The session ID shown by `session_search` is TRUNCATED.** Displayed IDs are ~22-char prefixes (e.g. `20260813_123130_dda538`); `messages.session_id` and `sessions.id` store the FULL id (`20260813_123130_dda5382b`). An exact-match `WHERE session_id = '<truncated>'` returns 0 rows and looks like a dead end. Resolve with `SELECT id FROM sessions WHERE id LIKE '<prefix>%'` before querying messages.
+4. **No sqlite3 CLI?** Python's stdlib `sqlite3` always works (`import sqlite3; con = sqlite3.connect('/opt/data/state.db')`). `sqlite3` shell may be missing on the host.
+5. **Answer "where did it stop" from session metadata, not message tail alone.** After dumping the last messages, read `sessions.ended_at`, `end_reason` (`session_reset` = reset later, not interrupted mid-task; `agent_close` = natural end), and `last_activity_at` (real last touch — can be hours before `ended_at`). A session that ended `session_reset` with a complete final assistant message finished its work; only a truncated/erroring tail indicates an interruption.
+
+### 13. Full-session read for recall ("give me the summary of what that session did")
+
+Once the full session ID is known, dump the whole flow ordered by `id` and collapse `tool` rows to their `output`/`content` first 150–200 chars:
+
+```python
+import sqlite3, datetime, json
+con = sqlite3.connect("file:/opt/data/state.db?mode=ro", uri=True)
+con.row_factory = sqlite3.Row
+def ts(t):
+    return datetime.datetime.fromtimestamp(t, datetime.timezone(datetime.timedelta(hours=-3))).strftime("%H:%M")
+rows = con.execute("SELECT id, role, content, tool_name, timestamp FROM messages WHERE session_id=? ORDER BY id", (FULL_SID,)).fetchall()
+for r in rows:
+    c = (r['content'] or "").strip()
+    if r['role'] == 'tool':
+        try:
+            j = json.loads(c); c = (j.get('output') or j.get('content') or str(j))[:200]
+        except Exception: c = c[:200]
+        print(f"[{ts(r['timestamp'])}] TOOL {r['tool_name']}: {c}")
+    else:
+        print(f"[{ts(r['timestamp'])}] {r['role'].upper()}: {c[:500]}")
+```
+
+Timestamps are REAL unix epoch; convert to BRT (UTC-3) for display. Tool rows store JSON-escaped output — `json.loads` before truncating. Read `sessions` meta (see § 12.5) to frame the tail.
+
 ## Combined Diagnosis Script
 
 Here's a complete Python script that runs all diagnostic queries at once:

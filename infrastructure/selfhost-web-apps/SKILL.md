@@ -116,6 +116,19 @@ docker cp /tmp/npm.sqlite nginx_proxy_manager:/data/database.sqlite
 docker restart nginx_proxy_manager  # required for proxy host changes to take effect
 ```
 
+**⚠️ ⚠️ ATUALIZAÇÃO (15/08/2026): `docker restart` NÃO regenera o `.conf` para hosts
+inseridos via banco direto** — o NPM só gera `proxy_host/{ID}.conf` quando o host é salvo
+pela UI/API. Sem o `.conf`, o domínio responde 404 apesar de `enabled=1`. Depois do insert,
+escreva o `.conf` manualmente (template completo em `scripts/register-preview.sh` do
+TaskFlow: `server { listen 80; server_name DOMAIN; location / { include
+conf.d/include/proxy.conf; } }`) e recarregue:
+```bash
+docker cp /tmp/proxy-{ID}.conf nginx_proxy_manager:/data/nginx/proxy_host/{ID}.conf
+docker exec nginx_proxy_manager nginx -t && docker exec nginx_proxy_manager nginx -s reload
+```
+Detalhes completos e pitfall do firewall (só 80/443 abertos) em
+`selfhost-service-deploy` → "Custom ports are NOT reachable from outside".
+
 ## SSL Redirect Loop (PHP apps behind NPM)
 
 **Symptom:** `ERR_TOO_MANY_REDIRECTS` in browser. `curl -I` shows 303 looping to the same URL.
@@ -202,6 +215,10 @@ Oracle free tier: 2 ARM vCPUs, 11.65 GiB RAM. With 20+ containers at ~5.5 GiB us
 
 ## References
 
+- **Node/Next.js apps and build-on-host pattern:** see `selfhost-service-deploy` skill →
+  "Build on the host (native ARM64)" (Next.js standalone Dockerfile, `NEXT_PUBLIC_*` build-arg
+  pitfall, preview-per-PR with compose override + NPM sslip.io). The PHP/nginx patterns below are
+  for PHP apps (Moodle, WordPress); Node/Next goes through the service-deploy pattern.
 - `references/moodle-selfhost.md` — Full Moodle 5.2 deployment on ARM64: Docker Compose, nginx HTTPS passthrough, `sslproxy` vs `reverseproxy` pitfall, diagnostic workflow for asset 500s, SCSS pipeline pitfall (fields don't compile in 5.2), `additionalhtmlhead` workaround for CSS injection, login page dark-theme polish lessons, agy CSS generation workflow, Chromium `background-clip: text` and `.visually-hidden` pitfalls, user creation and course enrolment via SQL, admin account promotion/demotion via `siteadmins`, language string customization and caching pitfalls
 - `references/id-consultoria-brand-tokens.md` — ID Consultoria design system: colors, typography, shadows, Google Fonts URL, and Moodle Boost Union mapping table
 - `references/npm-proxy-host-insert.md` — Complete NPM SQLite proxy host insert recipe

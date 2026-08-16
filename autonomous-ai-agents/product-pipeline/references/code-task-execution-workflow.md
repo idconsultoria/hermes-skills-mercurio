@@ -32,6 +32,63 @@ Quando o usuário pedir "Pi Cost sempre" (ex.: demo/mock sem decisões de arquit
 `--provider opencode-go --model deepseek-v4-flash` em TODOS os lotes — inclusive nos turnos de
 correção do feedback do agy. Pi best/pro fica reservado para decisões de arquitetura/design.
 
+## Ciclo com modelos especializados por papel (padrão Zera pré-checklist, ago/2026)
+
+Correção do usuário (13/08/2026): para executar um checklist de tarefas de engenharia (ex.: as ondas
+pré-alfa do Zera), o usuário especificou UM modelo por papel do ciclo de code-tasks — NÃO usar só Pi
+cost e NÃO usar Pi best max para tudo:
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│ 1. CODE-TASKS   Pi best        → gera/atualiza code-tasks.md da onda│
+│ 2. EXECUÇÃO     Pi cost        → executa as code-tasks em lotes     │
+│ 3. REVISÃO      agy (Turno 1)  → escreve feedbacks.md               │
+│ 4. CORREÇÃO     Pi best max    → corrige (MESMA sessão, Turno 2)    │
+│ 5. RE-REVISÃO   agy (Turno 3)  → até ACORDO: <ONDA> FINALIZADA      │
+│ 6. VERIFICAÇÃO  Hermes         → tsc/pytest/dogfood                 │
+│ 7. DOCUMENTAÇÃO Pi cost max    → atualiza docs (SAD, ERD, contratos)│
+│ 8. COMMIT + CHECKLIST          → push + status na planilha          │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+- **Modelos:** Pi best = `deepseek-v4-pro` (opencode-go); Pi cost = `deepseek-v4-flash` (opencode-go);
+  "max" = `--thinking xhigh`. Correção SEMPRE na MESMA sessão do executor (`pi --session`).
+- **Execução em lotes sequenciais** (nunca paralelo): 3-5 tasks por lote; cada lote roda em background
+  (`background=true` + `notify_on_complete=true`); Pi cost leva 5–25 min por lote.
+- **Gap analysis é o primeiro passo do Pi best:** o checklist da planilha pode estar desatualizado vs
+  código real (ex.: B06 "auth não iniciado" quando o auth JWT já existia da Task-004). O Pi best lê o
+  código e reporta "já existe (arquivo:linha) vs falta" ANTES de especificar — evita reimplementar.
+- **Cada onda = UM ciclo completo com ACORDO do agy** antes de avançar; nunca commitar código de uma
+  onda sem o ACORDO (mesma regra do loop agy obrigatório acima).
+- **Pi cost às vezes commita sozinho** (visto no Zera: Lotes 2-4 fizeram commit+push) e às vezes não
+  (Lote 1). Verificar `git log`/`git status` após cada lote antes de commitar pelo orquestrador;
+  commit atômico por lote é o padrão.
+
+## Política de decisão — 🔴 revisão obrigatória vs 🟢 execução direta (padrão Zera, ago/2026)
+
+O usuário exigiu uma política formal para o que para e pede aval dele vs o que executa direto
+(documentada em `product/management/politica-decisao.md` no repo do projeto, vigente 13/08/2026):
+
+- **🔴 PARAR e perguntar (checkpoints):** tecnologia crítica não especificada (lib/framework/serviço
+  novo fora da Base Técnica/PRD/ADRs), princípios de design/arquitetura, forma de implementação de
+  funcionalidade crítica (auth, motor, LLM, LGPD), custo recorrente, deploy produção, mudança de escopo.
+  Formato do checkpoint: 3–5 linhas — decisão, 2–3 opções, recomendação com justificativa, impacto.
+  Apresentar pendências 🔴 em lote, não uma a uma.
+- **🟢 Executar direto (reportar no relatório final):** implementação dentro de decisão já tomada,
+  correções mecânicas (lint, typo, imports), QA/verificação, documentação técnica, infra staging/CI
+  seguindo padrões do repo, atualização de status na planilha, commits.
+- **Regra de ouro:** reversível com esforço pequeno → executa; difícil de reverter ou afeta custo/
+  usuário/contrato público → pergunta; dúvida genuína → pergunta (custo da pergunta < retrabalho).
+- **O prompt de TODO agente (Pi best/cost/best max/cost max) DEVE incluir a política** e instruir o
+  agente a (a) ler `politica-decisao.md`, (b) parar e reportar se encontrar um 🔴 (nunca codar por
+  suposição), (c) declarar ao final: "Política de decisão: nenhuma decisão 🔴" OU listar as 🔴
+  reportadas. Quando o Pi reporta um 🔴, o Hermes faz o relay ao usuário via `clarify` e só prossegue
+  após o aval — registrar a decisão na política e nos docs (ex.: D12 cookie httpOnly, D13 frontend
+  separado do protótipo → ADR).
+- **Decisões do usuário viram ADR + entrada na tabela da política** (ex.: ADR-018 frontend real como
+  base separada do protótipo `web/`, decidida 13/08) — para que as próximas ondas não reabram a
+  discussão e os prompts carreguem a decisão como obrigatória ("não redecidir").
+
 ## Loop em DUAS fases: design specs → eng implementation (cada uma com agy)
 
 Quando a mudança exige especificação + implementação (ex.: novo fluxo, novo componente), rodar DOIS
@@ -55,12 +112,32 @@ FASE 2 — ENG:    Pi implementa no código (lê as specs como fonte de verdade)
   sessão de design para corrigir código e teve que matar/re-disparar na sessão de eng.) Localizar a
   sessão pelo nome: ler `session_info.name` no JSONL.
 
+## Sincronização host ↔ container — NUNCA `git reset --hard` no host (regra do usuário)
+
+Correção explícita do Gustavo (14/08/2026): ele **bloqueou** `git reset --hard origin/main` no host
+Oracle durante o fluxo agy. Regra absoluta deste pipeline:
+
+- **O volume É compartilhado** (`/home/ubuntu/selfhost/shared/...` no host = `/opt/data/...` no
+  container) — quando o Hermes commita/pusha do container, o host já vê o estado. **Não existe
+  "sincronização" a fazer via reset.**
+- **Reset destrói trabalho não commitado** — o agy edita `product/engineering/feedbacks.md` na
+  revisão; um reset na hora errada comeria o review.
+- **Antes do agy:** só conferir `git log --oneline -1` no host (leitura, sem mutação). **Depois:**
+  commitar o feedbacks.md direto do container. Se `git add` falhar por permissão (agy rodou como
+  uid 1001/ubuntu e chownou o `.git`), corrigir owner PELO HOST:
+  `sudo chown -R 10000:10000 <repo>/.git <repo>/prompts <repo>/product` — NUNCA reset.
+- Detalhes e diagnóstico: `references/sincronizacao-host-volume.md`.
+
 ## Monitoramento — usar pi-session-audit, não só process wait
 
 A skill `pi-session-audit` tem a técnica "Progress Classification (Pi)": ler o JSONL da sessão e
 classificar a última entrada (LENDO git diff / LENDO codigo / ESCREVENDO arquivo / COMMIT / TRAVADO).
 NÃO monitorar Pi só com `process wait`/poll — o wait estoura em 180s e o stdout fica vazio enquanto
 o Pi trabalha. Combinar: classify_progress no JSONL + `find` de arquivos modificados no filesystem.
+
+**Para o USUÁRIO ver a sessão ao vivo:** não abrir a TUI interativa sobre um JSONL que outro processo
+está appendando (corrompe). Usar o Pi Live Viewer (`pi_follow.py` no terminal ou `pi_follow_web.py`
+no browser com a interface real do Pi via `pi --export`) — ver `references/pi-live-viewer.md`.
 
 ## Continuar a MESMA sessão (requisito explícito do usuário)
 

@@ -141,6 +141,23 @@ Parágrafos normais recebem `spaceBelow: 8pt` para respiro de leitura.
     deletar o `\uFFFC` residual (`deleteContentRange [idx+1, idx+2]`) e somar
     `offset += 1` (não `u16len(label)`) para richlink. Sintoma: coluna "Abrir"
     de uma tabela mostrando ￼ em vez do chip.
+19. **Mermaid com MÚLTIPLOS nodes por linha (corrigido 2026-08-14):** a antiga
+    lógica de limpeza de colchetes do `_fix_mermaid()` assumia UM par de
+    colchetes por linha (um node). Em diagramas reais com `A[...] --> B[...]`
+    (dois+ nodes na MESMA linha), ela apagava o `]` do primeiro node e o `[`
+    do segundo → sintaxe mermaid corrompida. Duas formas de falhar:
+    - **RIPD:** mmdc falhava de vez → NENHUMA imagem subia (diagrama some do doc)
+    - **PRD/lgpd-onboarding/fluxo-solicitacoes:** mmdc renderizava a corrupção →
+      a imagem SUBIA MUTILADA (labels fundidos, arestas perdidas) — pior, porque
+      a contagem de imagens no Drive (`inlineObjects`) dizia "OK" (1 imagem existe)
+    **Fix:** `_fix_mermaid()` agora usa scanner de profundidade — preserva o par
+    mais externo de CADA label na linha e só remove colchetes/parênteses
+    ANINHADOS de verdade (nível > 0). Verificar: `/opt/data/igor-docs-md/verificar_mermaid_drive.py`
+    compara blocos mermaid no .md vs imagens inline no Drive, e avisa quando um
+    doc tem múltiplos nodes/linha (padrão que merece checagem visual).
+    Ao adicionar diagramas mermaid em markdown, NUNCA colocar mais de um node
+    por linha se quiser compatibilidade total com o renderer antigo — com o fix
+    atual, múltiplos nodes por linha são suportados.
 
 ## Tabelas com largura inteligente
 

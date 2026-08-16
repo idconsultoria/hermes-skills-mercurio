@@ -48,6 +48,27 @@ mermaid-cli local com o Chromium do Hermes:
    Verificar o PNG com `vision_analyze` (legibilidade + transparência) antes
    de entregar — fluxograma grande em 2x sai com ~440KB.
 
+## Pitfall crítico: MÚLTIPLOS nodes por linha (`A[...] --> B[...]`) — mutila o diagrama
+
+Corrigido 2026-08-14 (Zera/CFP IA — RIPD/PRD/lgpd-onboarding/fluxo-solicitacoes). Diagramas com
+dois+ nodes na MESMA linha (`A[...] -->|...| B[...]`) quebravam o `_fix_mermaid()` do `md-to-gdoc.py`,
+que assumia UM par de colchetes por linha e apagava o `]` do 1º node e o `[` do 2º:
+`A[App web] --> B[API]` → `A[App web --> BAPI]` (sintaxe corrompida).
+
+**Duas formas de falhar — a segunda é traiçoeira:**
+- **RIPD:** mmdc falhava de vez → **NENHUMA imagem** subia (diagrama some do doc, fácil de notar).
+- **PRD/lgpd-onboarding/fluxo-solicitacoes:** mmdc renderizava a corrupção → a imagem **SUBIA
+  MUTILADA** (labels fundidos, arestas perdidas) — e a contagem de imagens no Drive (`inlineObjects`)
+  dizia "OK" (1 imagem existe). Verificação por CONTAGEM não pega mutilação visual.
+
+**Fix (2026-08-14):** `_fix_mermaid()` agora usa scanner de profundidade — preserva o par mais
+externo de CADA label na linha e só remove colchetes/parênteses ANINHADOS de verdade (nível > 0).
+
+**Verificação ao espelhar docs com mermaid:** `/opt/data/igor-docs-md/verificar_mermaid_drive.py`
+compara blocos mermaid no `.md` vs imagens inline no Drive, e avisa quando um doc tem múltiplos
+nodes/linha (padrão que merece checagem visual). Após corrigir o script, **re-espelhar os docs
+afetados** (`--doc-id` preserva o ID; o conteúdo é reconstruído).
+
 ## Pitfall crítico: aspas E parênteses quebram o parser
 
 `Parse error on line N ... Expecting 'SQE', 'DOUBLECIRCLEEND', ... got 'PS'`

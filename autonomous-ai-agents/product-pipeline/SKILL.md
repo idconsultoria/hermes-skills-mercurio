@@ -27,9 +27,11 @@ múltiplas sessões.
 Este bloco codifica o estilo de trabalho das pessoas que usam este pipeline.
 **Carregar sempre que a skill for ativada — antes de qualquer ação.**
 
+> Multi-onda: `references/multi-wave-execution-pitfalls.md` (reset --hard proibido no shared volume).
+
 ### Estilo de comunicação
 - **Direto e pragmático:** Usuário quer ação, não explicação. "Mande aqui", "Faça", "Cheque" são comandos, não sugestões.
-- **Recap antes de executar nova run:** Quando o usuário pede uma nova rodada de correções ("Rode uma nova run"), SEMPRE recapitular o processo primeiro — listar as fases do pipeline que serão executadas (Pi → Agy → fix loop → Dogfood → Deploy → Relatório). O usuário explicitamente pediu: "Aproveite e recapitule o processo exato antes de seguir." Não é opcional — é o contrato de execução.
+- **Recap antes de executar nova run:** Quando o usuário pede uma nova rodada de correções ("Rode uma nova run"), SEMPRE recapitular o processo primeiro — listar as fases do pipeline que serão executadas (Pi → Agy → fix loop → Dogfood → Deploy → Relatório). Não é opcional — é o contrato de execução.
 - **Correções são diretas:** "É para fazer o contrário", "Mova X para futuro" — aplicar a correção imediatamente em TODAS as seções afetadas, sem questionar.
 - **Zero jargão corporativo:** "Prioridade máxima é funcionar para a ID" > "avaliaremos escalabilidade em V2".
 - **Espera versão funcional, não especulação:** Se disser para construir algo, construir de verdade. Se não for possível, falar o obstáculo concreto.
@@ -83,7 +85,7 @@ BARATO/ABUNDANTE Pi cost -- Dev junior (DeepSeek V4 Flash Free)
 GRATUITO         Pi cost -- Free tier Zen
 ```
 
-> **Nota (ago/2026, decisão explícita do usuário p/ CFP IA):** a nova versão do DeepSeek V4 Flash (checkpoint 0731) supera praticamente todos os modelos open source, **incluindo o V4 Pro anterior**. Para o projeto CFP IA, **Pi cost (v4 flash) substitui Pi best em todas as fases**. Em projetos novos, confirmar com o usuário a hierarquia vigente antes de escolher o modelo — não assumir que V4 Pro ainda é o "best".
+> **Nota (ago/2026, CFP IA):** v4 Flash supera o v4 Pro anterior — p/ CFP IA **Pi cost substitui Pi best em todas as fases**; confirmar hierarquia em projetos novos. **Code-tasks: papéis FIXOS por modelo (Pi best spec → Pi cost execução → agy revisão → Pi best max correção → Pi cost max docs) + política 🔴/🟢 + pitfalls CI/Postgres → `references/code-task-model-roles.md`.** **Refinamento Zera (14/08/2026): ciclo por papel — Pi best gera code-tasks, Pi cost executa, agy revisa, Pi best max corrige (mesma sessão), Pi cost max documenta** — ver `references/code-task-execution-workflow.md`.
 
 Ver skill pi-agent-coordination para detalhes completos.
 
@@ -97,7 +99,7 @@ Ver skill pi-agent-coordination para detalhes completos.
 | **Hermes ↔ agy** | `ssh oracle-host 'cd /home/ubuntu/selfhost/shared/code/workstation/PROJETO && /home/ubuntu/.local/bin/agy -p "..."'` |
 | **Pi → agy (design feedback)** | Pi salva protótipo → Hermes chama agy → agy escreve em `feedbacks.md` |
 
-> **Sem limite de tempo:** Toda invocacao de Pi e agy no pipeline roda **sem timeout**. Pi pode gerar output por minutos sem streamar stdout — `timeout N` mata o processo silenciosamente (exit code 0 não indica erro). agy pode levar minutos analisando código. Nunca usar `timeout` com Pi ou agy. Para Pi: usar `terminal(background=true)` ou foreground sem flag de timeout. Para agy: usar tmux interativo.
+> **Sem limite de tempo:** Toda invocacao de Pi e agy no pipeline roda **sem timeout**. Pi pode gerar output por minutos sem streamar stdout — `timeout N` mata o processo silenciosamente (exit code 0 não indica erro). agy pode levar minutos analisando código. Nunca usar `timeout` com Pi ou agy. Para Pi: usar `terminal(background=true)` ou foreground sem flag de timeout. Para agy: usar tmux interativo OU `agy -p "..." --dangerously-skip-permissions --print-timeout 15m` (sem `--dangerously-skip-permissions` o agy aborta quando stdin não é TTY — ver `references/design-review-loop.md`).
 > Pi e local — nao ha SSH, nao ha timeout de conexao, nao ha quoting hell.
 > Para tarefas muito longas (>5min), Pi pode stallar — usar agy ou quebrar em partes.
 > Ver skill pi-agent-coordination para detalhes de fallback entre modelos.
@@ -1432,7 +1434,7 @@ grep -c "MIP e MID" index.html js/app.js
 
 Quando o usuário pede "verifique em que ponto estamos" em projeto de ciclo quinzenal (ex: CFP IA), o fluxo comprovado é: **triangular** repo local (`git log` + `git status` + `git log origin/main`) + `session_search` + Google Docs (transcrição da reunião e docs do parceiro via `$GAPI docs get`), **cruzar** decisões da reunião vs. PRD/roadmap para achar lacunas, e entregar DOIS arquivos .md no repo: relatório de status + plano de ação com responsáveis e dependências.
 
-**Referência completa:** `skill_view(name='product-pipeline', file_path='references/quinzenal-status-audit.md')` — extração de transcrições Fathom/Google Docs (JSON → body separado → ler em blocos), estrutura do relatório, formato do plano de ação por blocos (A–G) e pitfalls (Write denied fora de /opt/data, token expirado, decisão ≠ implementação).
+**Referência completa:** `skill_view(name='product-pipeline', file_path='references/quinzenal-status-audit.md')` — extração de transcrições Fathom/Google Docs (JSON → body separado → ler em blocos), estrutura do relatório, formato do plano de ação por blocos (A–G) e pitfalls (Write denied fora de /opt/data, token expirado, decisão ≠ implementação). Se `session_search` não achar a sessão (FTS5 não indexa a mais recente), consultar `/opt/data/state.db` direto — `references/hermes-recent-session-lookup.md` (IDs truncados: casar com `LIKE '<prefixo>%'`).
 
 ### Reorganização do plano em Workstreams (quando o usuário decide execução simultânea)
 
@@ -1449,7 +1451,9 @@ Quando o usuário decide que duas quinzenas/fases serão executadas de forma **c
 
 ### Execução autônoma de workstreams — PUBLICAR a matriz de dependências ANTES de rodar
 
-Quando o usuário aprova a execução ("trabalhe da forma mais autônoma possível", "adiante tudo que não depender do WS3"), ele espera **análise de dependências explícita e publicada antes de começar** — não execução sequencial silenciosa. Correção real do usuário (CFP IA, ago/2026): *"Você chegou a verificar quais pontos do WS4 já poderiam ser feitos antes da conclusão do WS3? Ou só saiu fazendo tudo?"*
+> 📖 Ondas + 🔴/🟢 + pitfalls: `references/execucao-autonoma-ondas-politica-decisao.md` · espectador TUI ao vivo: `references/live-session-viewer-pi-tui.md`
+
+Usuário aprova execução autônoma → **análise de dependências publicada antes**, não sequencial silenciosa. Correção real (CFP IA, ago/2026): *"Você chegou a verificar quais pontos do WS4 já poderiam ser feitos antes da conclusão do WS3? Ou só saiu fazendo tudo?"*
 
 Padrão comprovado:
 1. **Publique a matriz de dependências primeiro** — para cada item do WS que "não depende" do bloco do parceiro, diga: `❌ Não depende → ✅ posso fazer agora` vs `✅ Depende → ⏸️ aguardando`. O usuário quer VER o raciocínio, não descobrir depois.

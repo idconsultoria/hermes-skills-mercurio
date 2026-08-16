@@ -1,6 +1,6 @@
 # Skills Index — Hermes Agent
 
-*Total: 114 skills*
+*Total: 128 skills*
 
 ---
 
@@ -80,7 +80,7 @@ Configure, extend, or contribute to Hermes Agent — setup, profiles, skills, an
 
 - **Nome:** `autonomous-ai-agents/messaging-platforms`
 - **Arquivo:** `autonomous-ai-agents/messaging-platforms/SKILL.md`
-- **Tamanho:** 25,570 chars
+- **Tamanho:** 26,940 chars
 - **Resumo:** Reference for Hermes cross-platform messaging — platform quirks, ID formats, and
 - **Type:** Reference
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -132,7 +132,7 @@ Audit agent sessions — tokens, costs, models from Pi Agent (.jsonl), agy (prot
 
 - **Nome:** `autonomous-ai-agents/hermes-diagnostics`
 - **Arquivo:** `autonomous-ai-agents/hermes-diagnostics/SKILL.md`
-- **Tamanho:** 22,511 chars
+- **Tamanho:** 24,782 chars
 - **Resumo:** Systematic methodology for diagnosing Hermes Agent behavioral issues — session resets, context loss, compression failures
 - **Type:** Research
 - **Timestamp:** 2026-07-15T08:00:00Z
@@ -145,7 +145,7 @@ Load this skill when the user reports Hermes misbehaving: conversations resettin
 
 - **Nome:** `autonomous-ai-agents/product-pipeline`
 - **Arquivo:** `autonomous-ai-agents/product-pipeline/SKILL.md`
-- **Tamanho:** 104,088 chars
+- **Tamanho:** 104,713 chars
 - **Resumo:** Multi-agent product pipeline — idea to MVP via sprints. Hermes orchestration
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-14T05:19:11Z
@@ -168,7 +168,7 @@ Load this skill when building a product from scratch through the full pipeline �
 
 - **Nome:** `autonomous-ai-agents/pi-agent-internals`
 - **Arquivo:** `autonomous-ai-agents/pi-agent-internals/SKILL.md`
-- **Tamanho:** 5,006 chars
+- **Tamanho:** 6,037 chars
 - **Resumo:** How Pi Agent works internally — settings, sessions, compaction, costs.
 - **Type:** Reference
 - **Timestamp:** 2026-08-12T03:15:00Z
@@ -265,6 +265,21 @@ Carregue esta skill quando for produzir um relatório de pesquisa, análise de m
 **Relações:**
 - `similar` → `productivity/html-report-hermes`
 - `similar` → `research/market-research-synthesis`
+
+### Branded HTML Replication
+
+- **Nome:** `content-production/branded-html-replication`
+- **Arquivo:** `content-production/branded-html-replication/SKILL.md`
+- **Tamanho:** 5,422 chars
+- **Resumo:** Replicate designed PDFs/decks as faithful branded HTML — assets, fonts, SVG.
+- **Type:** Creative
+- **Timestamp:** 2026-08-14T00:00:00Z
+
+Load this skill when recreating a designed document (PDF slides, deck, proposal) as HTML that carries the brand faithfully: backgrounds, logos, icons, fonts, colors — optionally as clean semantic HTML instead of pixel-perfect positioning. Validated with the ID Consultoria deck + proposal template (Aug 2026). Extracts brand assets from PDF for HTML use.
+
+**Relações:**
+- `similar` → `productivity/html-pdf-fidelity`
+- `similar` → `content-production/research-report-standards`
 
 ## Creative
 
@@ -385,6 +400,38 @@ Load this skill when you need to apply professional UI/UX design fundamentals to
 - `similar` → `creative/style-guide-consultation`
 - `similar` → `creative/popular-web-designs`
 
+### Hermes-Style Charts (matplotlib)
+
+- **Nome:** `creative/hermes-style-charts`
+- **Arquivo:** `creative/hermes-style-charts/SKILL.md`
+- **Tamanho:** 5,593 chars
+- **Resumo:** Data-viz in Hermes style — matplotlib pipeline, fonts, design tokens, QA.
+- **Type:** Reference
+- **Timestamp:** 2026-08-13T00:00:00Z
+
+Load this skill when generating charts (bar, line, scatter) in the Hermes Agent design system with matplotlib. Covers the render pipeline and pitfalls: fonts, brand tokens, layout QA. Load style-guide-consultation for the catalog of other brands' guides (ID, IAF).
+
+**Relações:**
+- `similar` → `creative/style-guide-consultation`
+- `similar` → `productivity/html-report-hermes`
+
+### Open Design — daemon, CLI, MCP
+
+- **Nome:** `creative/open-design`
+- **Arquivo:** `creative/open-design/SKILL.md`
+- **Tamanho:** 11,689 chars
+- **Resumo:** Open Design daemon :7456, CLI od e MCP — gera protótipos e artes de marca.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-14T06:00:15Z
+
+Carregue esta skill quando o usuário mencionar open-design, pedir para gerar artes/designs/protótipos, ou precisar diagnosticar o daemon :7456, o CLI od ou as tools MCP mcp_open_design_*. Workspace local-first (nexu-io/open-design, Apache-2.0) com daemon Express+SQLite e 460 plugins bundled (AirBnb, Apple, Ant, Linear). Layout persistente em /opt/data/open-design-repo — nunca /tmp.
+
+**Relações:**
+- `similar` → `software-development/agy`
+- `similar` → `creative/style-guide-consultation`
+- `similar` → `creative/ai-creative-assets`
+- `similar` → `creative/brand-studio-forge`
+
 ## Copywriting
 
 ### Oferta Irresistível (Hormozi) — Landing Pages
@@ -450,6 +497,86 @@ Carregue esta skill quando precisar analisar minuta de contrato, contrato, edita
 **Relações:**
 - `uses` → `productivity/google-workspace`
 - `uses` → `productivity/pdf`
+
+### Elaboração de Proposta Comercial
+
+- **Nome:** `business/elaboracao-proposta-comercial`
+- **Arquivo:** `business/elaboracao-proposta-comercial/SKILL.md`
+- **Tamanho:** 10,581 chars
+- **Resumo:** ID Consultoria commercial proposals — client context to branded HTML + minuta.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-14T06:30:00Z
+
+Load this skill when creating a commercial proposal from client context (documents, negotiation messages, meeting minutes). Builds the branded HTML proposal by editing the brand template directly, and produces a Google Docs contract minuta in the Minutas subfolder, preserving first/last pages. Validates content incrementally with the user following the Guia de Princípios.
+
+**Relações:**
+- `similar` → `business/analise-contratual`
+- `uses` → `productivity/google-workspace`
+- `similar` → `content-production/research-report-standards`
+
+### Planejamento Estratégico para PME (≤2h)
+
+- **Nome:** `business/planejamento-estrategico`
+- **Arquivo:** `business/planejamento-estrategico/SKILL.md`
+- **Tamanho:** 5,389 chars
+- **Resumo:** Planejar estratégia de PME em sessão única de 2h — EOS, OKR, V2MOM, 1 página.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-15T00:00:00Z
+
+Carregue esta skill quando um dono de PME (10-250 funcionários) + time pequeno pedirem planejamento estratégico em uma sessão de até 2h. Escolhe frameworks (EOS V/TO, OPSP, V2MOM, OKR) pelo tempo disponível e perfil da empresa, conduz a facilitação e entrega tudo em UMA página ao final. Trabalho em PT-BR com markdown estruturado e tabelas comparativas.
+
+**Relações:**
+- `similar` → `research/systematic-research`
+
+### Facilitação de Planejamento Estratégico em 2 Horas
+
+- **Nome:** `business/planejamento-estrategico-2h`
+- **Arquivo:** `business/planejamento-estrategico-2h/SKILL.md`
+- **Tamanho:** 9,226 chars
+- **Resumo:** Facilitar planejamento estratégico em 2h — EOS V/TO + One-Page Strategic Plan.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-15T02:39:34Z
+
+Carregue esta skill quando precisar facilitar uma sessão única de planejamento estratégico para dono de PME + time pequeno (3-12 pessoas), com entregável obrigatório de 1 página. Usa EOS V/TO (Wickman) + One-Page Strategic Plan (Harnish), técnicas Liberating Structures, pré-mortem e timeboxing rigoroso. BSC e Hoshin Kanri não fecham em 2h — servem só como lente conceitual.
+
+**Relações:**
+- `similar` → `productivity/meeting-action-items`
+- `similar` → `productivity/weekly-review-planning`
+- `similar` → `business/planejamento-estrategico`
+
+### Proposta Comercial de Consultoria
+
+- **Nome:** `business/proposta-comercial-consultoria`
+- **Arquivo:** `business/proposta-comercial-consultoria/SKILL.md`
+- **Tamanho:** 5,501 chars
+- **Resumo:** Proposta comercial de consultoria — princípios, pricing e modelo HTML da marca ID.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-14T06:00:00Z
+
+Carregue esta skill quando precisar criar, ajustar ou precificar uma proposta comercial de consultoria (ID Consultoria ou genérica). Validada em 14/08/2026 com 40+ fontes (HBR, VeraSage, RAIN Group, McKinsey/BCG/Bain). Cobre o Guia de Princípios, precificação, o modelo HTML com marca da ID e iterações slide a slide do modelo.
+
+**Relações:**
+- `similar` → `copywriting/oferta-hormozi`
+- `similar` → `research/deep-research`
+- `similar` → `creative/copywriting`
+- `similar` → `productivity/html-pdf-fidelity`
+
+### Valuation Consultivo
+
+- **Nome:** `business/valuation-consultivo`
+- **Arquivo:** `business/valuation-consultivo/SKILL.md`
+- **Tamanho:** 12,593 chars
+- **Resumo:** Valuation consultivo de startup early-stage — rNPV, âncoras de persuasão, planilha.
+- **Type:** Orchestrator
+- **Timestamp:** 2026-08-15T03:00:00Z
+
+Carregue esta skill quando conduzir valuation de empresa early-stage para investidores, do diálogo à planilha .xlsx pronta e narrativa persuasiva. Metodologia rNPV + 3 âncoras (deals comparáveis, rodadas, reverse DCF) + triangulação + cap table honesta. Não é biotech-only — serve para health, deeptech, SaaS e industrial.
+
+**Relações:**
+- `uses` → `productivity/xlsx`
+- `similar` → `content-production/research-report-standards`
+- `similar` → `business/proposta-comercial-consultoria`
+- `similar` → `research/deep-research`
 
 ## Dogfood
 
@@ -785,7 +912,7 @@ Load this skill when setting up continuous integration on GCP: connecting GitHub
 
 - **Nome:** `infrastructure/hermes-cron-patterns`
 - **Arquivo:** `infrastructure/hermes-cron-patterns/SKILL.md`
-- **Tamanho:** 7,790 chars
+- **Tamanho:** 10,219 chars
 - **Resumo:** Hermes cron job patterns — timeout limits and background execution
 - **Type:** Reference
 - **Timestamp:** 2026-08-09T05:08:04Z
@@ -799,7 +926,7 @@ Load this skill when a cron job exceeds the 3-minute hard limit or needs to run 
 
 - **Nome:** `infrastructure/oracle-host-access`
 - **Arquivo:** `infrastructure/oracle-host-access/SKILL.md`
-- **Tamanho:** 39,373 chars
+- **Tamanho:** 39,566 chars
 - **Resumo:** SSH from Hermes Docker container to Oracle Linux host — key setup and diagnostics
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -862,7 +989,7 @@ Load this skill when you need to send WhatsApp messages from Python without paid
 
 - **Nome:** `infrastructure/selfhost-service-deploy`
 - **Arquivo:** `infrastructure/selfhost-service-deploy/SKILL.md`
-- **Tamanho:** 12,856 chars
+- **Tamanho:** 40,247 chars
 - **Resumo:** Deploy selfhosted services on Oracle ARM64 — Docker Compose, NPM routing, SSL
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-07-26T05:05:12Z
@@ -877,7 +1004,7 @@ Load this skill when deploying any new selfhosted service on the Oracle VM (Dock
 
 - **Nome:** `infrastructure/selfhost-web-apps`
 - **Arquivo:** `infrastructure/selfhost-web-apps/SKILL.md`
-- **Tamanho:** 8,167 chars
+- **Tamanho:** 9,356 chars
 - **Resumo:** Deploy web apps on Oracle ARM64 — Docker Compose, NPM, SSL, and hardening
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-07-26T05:05:12Z
@@ -917,6 +1044,22 @@ Carregue esta skill quando precisar administrar o Moodle 5.2 de treinamentos.idc
 - `uses` → `infrastructure/oracle-host-access`
 - `similar` → `productivity/google-workspace`
 - `similar` → `infrastructure/production-deployment`
+
+### SearXNG + Firecrawl Repair (web_search vazio)
+
+- **Nome:** `infrastructure/searxng-firecrawl-repair`
+- **Arquivo:** `infrastructure/searxng-firecrawl-repair/SKILL.md`
+- **Tamanho:** 6,724 chars
+- **Resumo:** web_search empty? Diagnose and fix SearXNG→Firecrawl search engine chain.
+- **Type:** Research
+- **Timestamp:** 2026-08-15T04:00:00Z
+
+Load this skill when web_search returns success with an empty web list — the search backend died silently. Covers the SearXNG→Firecrawl architecture, how to verify each link in the chain on the Oracle host, and repair steps. Not a Hermes bug: fix the backend.
+
+**Relações:**
+- `similar` → `autonomous-ai-agents/hermes-diagnostics`
+- `similar` → `infrastructure/selfhost-service-deploy`
+- `uses` → `infrastructure/oracle-host-access`
 
 ## Media
 
@@ -1014,6 +1157,21 @@ Load this skill when creating images for Instagram, Twitter, Open Graph, or any 
 - `similar` → `productivity/html-to-pdf-chromium`
 - `similar` → `productivity/html-report-hermes`
 
+### PDF/Deck → HTML Reconstruction
+
+- **Nome:** `media/pdf-deck-to-html`
+- **Arquivo:** `media/pdf-deck-to-html/SKILL.md`
+- **Tamanho:** 7,714 chars
+- **Resumo:** Convert PDF/Figma decks to HTML slides — original art preserved, real text.
+- **Type:** Media
+- **Timestamp:** 2026-08-14T00:00:00Z
+
+Load this skill when converting presentations/PDFs into HTML that opens in the browser, keeping the ORIGINAL art with real selectable text. Validated formula: semantic HTML + original PDF art as background + real text positioned over PDF regions + explicit colors. Never redraw brand assets manually — extract them (v3 approved by user, v2 rejected).
+
+**Relações:**
+- `similar` → `productivity/html-pdf-fidelity`
+- `similar` → `content-production/research-report-standards`
+
 ## Hermes Desktop Plugins
 
 ### Hermes Desktop Plugins
@@ -1036,7 +1194,7 @@ Load this skill when adding new UI elements or commands to the Hermes desktop ap
 
 - **Nome:** `productivity/google-workspace`
 - **Arquivo:** `productivity/google-workspace/SKILL.md`
-- **Tamanho:** 24,272 chars
+- **Tamanho:** 24,914 chars
 - **Resumo:** Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-28T05:11:55Z
@@ -1053,7 +1211,7 @@ Gmail, Calendar, Drive, Docs, Sheets via gws CLI — OAuth2 setup and automation
 
 - **Nome:** `productivity/html-report-hermes`
 - **Arquivo:** `productivity/html-report-hermes/SKILL.md`
-- **Tamanho:** 15,328 chars
+- **Tamanho:** 15,276 chars
 - **Resumo:** Render research reports as dark-themed HTML with SVG charts and Tufte typography
 - **Type:** Template
 - **Timestamp:** 2026-06-12T02:23:22Z
@@ -1231,7 +1389,7 @@ Load this skill when you need to extract obligations, deadlines and tasks from a
 
 - **Nome:** `productivity/google-docs-formatting`
 - **Arquivo:** `productivity/google-docs-formatting/SKILL.md`
-- **Tamanho:** 7,080 chars
+- **Tamanho:** 7,564 chars
 - **Resumo:** Format Google Docs/Sheets via REST API (markdown, chips).
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-08-11T00:00:00Z
@@ -1250,7 +1408,7 @@ Load this skill when you need to format Google Docs or Sheets through the REST A
 
 - **Nome:** `productivity/google-sheets-automation`
 - **Arquivo:** `productivity/google-sheets-automation/SKILL.md`
-- **Tamanho:** 5,583 chars
+- **Tamanho:** 5,953 chars
 - **Resumo:** Polish Google Sheets via API (dropdowns, formulas, KPIs).
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-08-12T00:00:00Z
@@ -1269,7 +1427,7 @@ Load this skill when you need to polish Google Sheets via API — data validatio
 
 - **Nome:** `productivity/html-pdf-fidelity`
 - **Arquivo:** `productivity/html-pdf-fidelity/SKILL.md`
-- **Tamanho:** 7,204 chars
+- **Tamanho:** 9,298 chars
 - **Resumo:** HTML→PDF identical to the browser — fonts, layout, 1 page.
 - **Type:** Orchestrator
 - **Timestamp:** 2026-08-12T02:54:45Z
@@ -1363,6 +1521,70 @@ Load this skill when you need a weekly review and planning session — collect o
 - `similar` → `productivity/taskflow-mcp`
 - `similar` → `productivity/document-to-action-items`
 - `uses` → `taskflow-mcp-rules`
+
+### Google Sheets — Formatação via API (pitfalls)
+
+- **Nome:** `productivity/google-sheets-formatting`
+- **Arquivo:** `productivity/google-sheets-formatting/SKILL.md`
+- **Tamanho:** 6,001 chars
+- **Resumo:** Formatar Google Sheets via API — batchUpdate pitfalls validados.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-15T09:15:00Z
+
+Carregue esta skill ao criar/popular/formatar planilha Google via Sheets API (googleapiclient, gws, batchUpdate): múltiplas abas, fórmulas vivas, banding, charts e numberFormat. Cobre erros reais (No grid with id, sobreposição de addBanding, BOTTOM_AXIS, valores que não formatam como moeda/%). Complementa google-workspace com lições de formatação validadas em execução real.
+
+**Relações:**
+- `uses` → `productivity/google-workspace`
+- `similar` → `business/valuation-consultivo`
+
+### PDF Slides → HTML
+
+- **Nome:** `productivity/pdf-slides-to-html`
+- **Arquivo:** `productivity/pdf-slides-to-html/SKILL.md`
+- **Tamanho:** 6,502 chars
+- **Resumo:** Convert PDF slide decks to HTML — original art preserved, real text.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-14T05:00:55Z
+
+Load this skill when the user hands over a PDF slide deck / proposal / presentation and wants it as HTML: pixel-perfect clone, strongly inspired rebuild, or semantic HTML. Also applies when the PDF came out of Figma or contains unselectable text. Covers analysis, vector art extraction, and semantic HTML output.
+
+**Relações:**
+- `similar` → `productivity/html-pdf-fidelity`
+- `uses` → `productivity/html-to-pdf-chromium`
+- `uses` → `productivity/pdf`
+
+### PDF → HTML
+
+- **Nome:** `productivity/pdf-to-html`
+- **Arquivo:** `productivity/pdf-to-html/SKILL.md`
+- **Tamanho:** 9,297 chars
+- **Resumo:** PDF→HTML: Type3/Figma extraction gotchas + clean semantic rebuild.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-14T05:00:00Z
+
+Load this skill when replicating a PDF design as HTML (slide deck, proposal, one-pager) or extracting vector art/text for the web. Especially relevant for Figma-exported PDFs (Type3 fonts) — full of silent traps. Default for this user: clean semantic rebuild with foreground/background separated, not pixel-perfect SVG.
+
+**Relações:**
+- `similar` → `productivity/html-pdf-fidelity`
+- `uses` → `productivity/pdf`
+- `uses` → `productivity/html-to-pdf-chromium`
+- `similar` → `productivity/html-report-hermes`
+
+### PDF → HTML Replication
+
+- **Nome:** `productivity/pdf-to-html-replication`
+- **Arquivo:** `productivity/pdf-to-html-replication/SKILL.md`
+- **Tamanho:** 5,893 chars
+- **Resumo:** Convert PDF decks/documents to faithful HTML — pixel-perfect or semantic.
+- **Type:** ToolIntegration
+- **Timestamp:** 2026-08-14T05:35:18Z
+
+Load this skill when converting a PDF deck or document to faithful HTML, whether the user wants pixel-perfect positioning or clean semantic structure. Covers brand asset extraction (logos, icons, backgrounds) and the pitfalls of Type3/Figma exports. Complements html-pdf-fidelity for the reverse direction.
+
+**Relações:**
+- `uses` → `productivity/pdf`
+- `similar` → `productivity/html-pdf-fidelity`
+- `similar` → `autonomous-ai-agents/messaging-platforms`
 
 ## Read Reddit
 
@@ -1513,7 +1735,7 @@ Structured user/proxy interview protocol for product research — plan, frame, l
 
 - **Nome:** `research/market-research-synthesis`
 - **Arquivo:** `research/market-research-synthesis/SKILL.md`
-- **Tamanho:** 10,859 chars
+- **Tamanho:** 19,103 chars
 - **Resumo:** Produce market analysis reports — personas, journeys, expectations, behavior.
 - **Type:** Research
 - **Timestamp:** 2026-07-12T00:00:00Z
@@ -1531,7 +1753,7 @@ Load this skill when conducting market research for Brazilian/LATAM markets wher
 
 - **Nome:** `research/systematic-research`
 - **Arquivo:** `research/systematic-research/SKILL.md`
-- **Tamanho:** 13,216 chars
+- **Tamanho:** 26,836 chars
 - **Resumo:** Single-agent deep research via direct source URLs.
 - **Type:** Research
 - **Timestamp:** 2026-08-09T05:08:04Z
@@ -1633,7 +1855,7 @@ Load this skill when searching for explicit content from a specific creator or p
 
 - **Nome:** `software-development/agy`
 - **Arquivo:** `software-development/agy/SKILL.md`
-- **Tamanho:** 28,291 chars
+- **Tamanho:** 29,176 chars
 - **Resumo:** Versatile skill for coordinating Google Antigravity CLI for any design project type.
 - **Type:** ToolIntegration
 - **Timestamp:** 2026-06-21T05:11:49Z
@@ -1825,7 +2047,7 @@ Load this skill after making code changes that need cleanup. Three parallel agen
 
 - **Nome:** `software-development/skills-repo-curator`
 - **Arquivo:** `software-development/skills-repo-curator/SKILL.md`
-- **Tamanho:** 59,581 chars
+- **Tamanho:** 63,070 chars
 - **Resumo:** Manage the Hermes skills repo — consolidation cycles, MECE analysis, offload, graph
 - **Type:** Orchestrator
 - **Timestamp:** 2026-06-28T05:11:55Z

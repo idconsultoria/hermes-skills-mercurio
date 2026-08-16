@@ -180,3 +180,44 @@ trivial (the model field is visible in `cronjob list`).
 
 Unpinned is acceptable only when you intentionally want the job to follow whatever
 the global default is — but be prepared for it to block on the next update cycle.
+
+---
+
+## Pattern: Reminder/Monitor Cron over External State (Docs/Sheets/Web)
+
+Cron que inspeciona estado em fonte externa (ex.: Google Docs/Sheets) e dispara
+mensagem quando uma condição bate. Receita validada (ago/2026 — cron "Zera —
+Lembrete Demandas Igor", job e962f5a06576). Detalhes completos em
+`references/reminder-monitor-cron.md`.
+
+### Arquitetura em 2 camadas (script coleta, agente decide)
+
+1. **`script` coleta estado de forma determinística** → stdout JSON injetado no
+   prompt do agente. O script DEVE computar as flags de decisão (ex.:
+   `vence_amanha`, `vence_hoje`, `atrasada`) — nunca deixar o LLM recalcular datas
+   por conta própria (erro de fuso/cálculo é comum).
+2. **Agente usa visão para o que a API não expõe** (ex.: estado de checkbox em
+   Google Docs — a Docs REST API retorna bullet idêntico para marcado/vazio).
+   Exportar o doc como PDF via Drive API, renderizar a página com PyMuPDF (fitz
+   do venv google), `vision_analyze` na imagem pedindo "MARCADO ou VAZIO" por
+   linha. Se a visão falhar, o agente NÃO inventa — responde erro e não envia.
+3. **Entrega two-tier**: mensagem real vai via curl direto ao bridge WhatsApp
+   (contatos não cadastrados no channel directory), resposta final curta vai para
+   `origin` (o dono vê confirmação; o destinatário só vê a mensagem).
+
+### Pitfalls desta sessão
+
+- **Script path**: `cronjob create` REJEITA caminho absoluto — `Script path must
+  be relative to ~/.hermes/scripts/`. Copie o script para
+  `/opt/data/home/.hermes/scripts/` e passe só o nome do arquivo.
+- **Timezone**: o servidor roda UTC; se os prazos da fonte são BRT (UTC-3),
+  calcule `hoje`/`amanhã` DENTRO do script com `datetime.timezone(timedelta(hours=-3))`
+  — `date.today()` do host está errado para o fuso do usuário.
+- **Preferência do usuário (Gustavo) para lembretes**: avisar SÓ das tarefas não
+  concluídas que vencem AMANHÃ (véspera). Nunca cobrar as que vencem hoje nem as
+  atrasadas. Ao criar cron de lembrete, perguntar a regra de janela antes.
+- **Fonte Google Sheets**: abas do tipo OBJECT (sheetType OBJECT, sem
+  gridProperties) não são legíveis/graváveis via values API (erro `Unable to
+  parse range` ou `No grid with id`). Ignorar e usar as abas GRID (ex.:
+  `'Roadmap em tabela'`). Fórmulas tipo COUNTIF/COUNTA recalculam sozinhas — ler
+  a aba de progresso depois de escrever status em outra aba.

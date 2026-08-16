@@ -135,13 +135,7 @@ O usuário explicitou a estrutura preferida (após correção). Sempre use esta 
 
 ## Telegram Delivery
 
-**.html files nao sao suportados diretamente no Telegram.** Use um destes:
-
-1. **ZIP** — Python shutil.make_archive('nome', 'zip', '.', 'arquivo.html')
-2. **Renomear para .txt** — funciona, mas mostra o HTML puro (nao indicado)
-3. **Converter para .pdf** — via Chromium headless (veja skill html-to-pdf-chromium)
-
-Preferencia: ZIP com shutil.make_archive().
+**.html files chegam direto no Telegram como documento via Bot API (sendDocument).** NÃO zipar — confirmado pelo usuário em 13/ago/2026. O workaround de ZIP documentado anteriormente era desnecessário; o silent drop só ocorre no pipeline `MEDIA:` do gateway em TUI/cron, nunca no envio direto via Bot API.
 
 ### Princípios do Sistema (Atualizado — legibilidade em primeiro lugar)
 

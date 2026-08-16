@@ -80,6 +80,11 @@ bullets, native tables, clickable checkboxes, smart chips, callouts.
 
 ## References
 
+- `references/espelhamento-drive-em-massa.md` — espelhar product/ inteiro no Drive fora do fim de
+  quinzena (mapear .md → criar/atualizar, filtrar ruído interno, consolidar IDs em script) +
+  reorganizar em subpastas temáticas em massa (`addParents`/`removeParents` query params — NUNCA
+  `parents` no body, 403; DELETE corpo vazio; fundir pastas duplicadas; dry-run). Scripts:
+  `/opt/data/igor-docs-md/espelho_extra.py`, `organizar_drive.py`, `verificar_mermaid_drive.py`.
 - `references/mermaid-rendering.md` — render mermaid/flowchart notation to
   **transparent-background PNGs** (mermaid-cli + Hermes Chromium headless_shell,
   `-b transparent -s 2` ≈192 DPI) and swap code blocks for images in Docs.

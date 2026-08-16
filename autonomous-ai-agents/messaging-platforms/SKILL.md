@@ -52,7 +52,7 @@ Telegram's media handler only recognizes common types natively:
 | `.mp4` | ✅ Video | native |
 | `.ogg` (opus) | ✅ Voice | native |
 | `.txt`, `.md` | ✅ Document | native |
-| `.html` | ❌ silent drop | zip with Python: `shutil.make_archive('name','zip','.','file.html')` |
+| `.html` | ✅ Document via Bot API `sendDocument` (confirmado 13/ago/2026 — chega direto, NÃO zipar). O "silent drop" documentado antes só ocorre no pipeline `MEDIA:` do gateway em TUI/cron | native |
 | `.sh`, `.bat`, `.ps1` | ❌ silent drop | rename to `.txt` |
 | `.py`, `.js`, `.ts`, `.go` | ❌ silent drop | rename to `.txt` |
 | `.key`, `.pem`, `.env` | ❌ silent drop | rename to `.txt` |
@@ -493,6 +493,17 @@ To verify which session path the adapter is using:
 ```bash
 curl -s http://localhost:3000/health | python3 -c "import sys,json; print(json.load(sys.stdin))"
 ```
+
+### WhatsApp — success:true não garante entrega (diagnóstico validado 15/08/2026)
+
+O bridge `/send` e `/send-media` retornam `{"success":true, messageId}` mesmo quando o WhatsApp **não entrega** (destinatário sem WhatsApp ativo, dígito errado, ou privacidade que bloqueia mensagens de não-contato). O `bridge.log` registra eventos de entrada mas **não registra envios outbound** — impossível confirmar por log.
+
+**Sequência de diagnóstico:**
+1. Health check: `curl -s http://localhost:3000/health` (deve estar `connected`).
+2. Enviar mensagem de **texto puro** para o destinatário (isola problema de media vs canal).
+3. Enviar a MESMA mensagem para o **número do dono do bridge** — se chegar, o canal outbound funciona e o problema é específico do destinatário (número sem WhatsApp ativo, dígito errado, privacidade). Se não chegar, o bridge tem problema de outbound.
+4. Confirmar com o usuário: "o destinatário tem WhatsApp ativo nesse número? Ele recebe mensagens de números não salvos?" — privacidade padrão do WhatsApp descarta envios para não-contato silenciosamente (tick nunca vira azul).
+5. Se o destinatário for o problema: usuário salva o contato do bot (ou destinatário manda mensagem primeiro) — depois reenviar.
 
 ## Platform Latency Diagnostics
 

@@ -74,6 +74,11 @@ Batch: aplicar `requests` em lotes de ≤40 com `sleep(1)` entre lotes (anti-429
 9. **Smart-chips nativos do Sheets NÃO são criáveis via API** (só via UI com @). Aproximação visual:
    **pill** = fundo claro + bordas SOLID + `textFormatRuns` com link + center alignment.
 10. **Fórmulas**: escrever com `valueInputOption=USER_ENTERED` (senão vira texto literal).
+11. **Abas `sheetType: OBJECT` NÃO existem para o values API** — "Unable to parse range" /
+    "No grid with id" numa aba que existe = aba de painel visual sem grid (ex.: `Roadmap`,
+    `Tarefas` na planilha do CFP IA). Listar com
+    `?fields=sheets.properties(title,sheetType,gridProperties)`, operar SÓ nas GRID.
+    Ver `references/sheets-api-pitfalls.md` §11.
 
 ## Padrão UX para aba executiva
 

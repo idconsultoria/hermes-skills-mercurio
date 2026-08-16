@@ -49,6 +49,8 @@ metadata:
 ## Detalhe completo
 
 - `references/pi-internals-anatomy.md` — anatomia completa: tabela de tools com snippets, template do system prompt, mecanismo de skills/extensões/settings/sessões, comandos de inspeção rápida.
+- `references/pi-live-viewer-tui.md` + `templates/pi_follow_tui.mjs` — **acompanhar uma sessão Pi em andamento AO VIVO com a TUI original** (mensagens, tool calls, footer de tokens/custo): instanciar os componentes reais do Pi num app Node read-only (`SessionManager.open` + `AssistantMessageComponent`/`ToolExecutionComponent`/`UserMessageComponent`/`FooterComponent` + `initTheme`). Pitfalls: imports com paths relativos (exports do package bloqueia subpaths), API da TUI (`addChild`+`start`, não `setRoot`/`mount`), `ssh -t` obrigatório no Windows antes de `docker exec -it`.
+- `references/pi-live-viewer-web.md` — **variante BROWSER** (`/opt/data/scripts/pi_follow_web.py`): watcher re-exporta `pi --export` + servidor HTTP + script de polling que re-renderiza o `session-data` **preservando o scroll** (meta-refresh recarrega a página e zera a leitura — inaceitável). Túnel SSH aponta para o IP do container (`172.19.0.x`), não localhost do host. Não mostra footer de tokens ao vivo (usar a TUI para métricas).
 
 ## Relatório entregue ao usuário
 

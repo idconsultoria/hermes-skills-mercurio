@@ -26,7 +26,6 @@ User offers SSH access to the host machine, or you need to inspect/control the D
 > **Reference:** See `references/npm-database-schema.md` for Nginx Proxy Manager SQLite schema and proxy host CRUD operations.
 > **Reference:** See `deployment-pipeline` skill → `references/selfhost-initial-setup.md` for the pattern to set up a new selfhost service (Dockerfile, compose, SSH tunnel).
 > **Reference:** See `ai-voice-selfhost` skill for patterns specific to AI/ML services on ARM64 — PyTorch CPU build, model cache volumes, Hermes TTS command provider integration, voice steering, network setup (ai_mesh), and test workflow.
-> **Reference:** See `references/vulcano-mcp-deploy.md` for deploying Vulcano (or any Docker-based MCP service with custom adapters) on the host and connecting it to Hermes via ai_mesh.
 
 ## Step-by-step
 ### 1. Save the Key
@@ -578,7 +577,7 @@ healthcheck:
 
 ⚠️ **Healthcheck herdada da imagem pode testar porta errada.** Se o compose não define `healthcheck:`, Docker usa a da imagem. Imagens base (ex: taskflow backend) podem ter healthcheck em `localhost:8000`, mas o serviço MCP roda na `8100`. **Sempre definir healthcheck explicitamente no compose** para serviços com portas diferentes da padrão.
 
-⚠️ **`batch_indexer.py` ignores ADAPTER env var.** When deploying Vulcano with a custom adapter, the batch_indexer creates `VulcanoEngine` without passing `adapter=`. It reports 0 engrams because it defaults to scanning `engramas/` dirs. **Patch the script** to read `ADAPTER` and pass the correct adapter. See `references/vulcano-mcp-deploy.md` Step 5.
+⚠️ **`batch_indexer.py` ignores ADAPTER env var.** When deploying a custom-adapter MCP service, the batch_indexer creates `VulcanoEngine` without passing `adapter=`. It reports 0 engrams because it defaults to scanning `engramas/` dirs. **Patch the script** to read `ADAPTER` and pass the correct adapter.
 
 ⚠️ **Data loss fear on update?** Users often worry about this. Proactively explain bind mount persistence (Section 8). Confirm with `docker inspect` before the update.
 
@@ -696,6 +695,8 @@ Do NOT use the Docker gateway IP (`172.19.0.1`) for inter-container communicatio
 - **Uma geração por vez, com feedback.** Enviar resultado para o usuário e parar. Aguardar feedback antes de prosseguir. Nunca encadear múltiplas gerações.
 - **Requests abortadas travam workers single-thread.** Uvicorn com 1 worker fica preso se o cliente desconectar durante geração. `docker compose restart` recupera.
 - **Relatar diagnósticos, não esconder erros.** Quando algo falhar, mostrar o diagnóstico ao usuário e deixá-lo decidir o próximo passo.
+
+⚠️ **`docker volume prune` pode reportar 0B e NÃO remover volumes dangling** (observado 13/ago/2026). Volumes órfãos listados por `docker volume ls -f dangling=true` podem persistir após `docker volume prune -f`. Use remoção explícita: `docker volume rm <nome1> <nome2>`. Confirmar com `docker system df` — volumes órfãos somam GBs (ex: qwen3_models + pgdata_test = ~4.57 GB) e o `df -h /` mostra o ganho real.
 
 ## Verification
 ```bash

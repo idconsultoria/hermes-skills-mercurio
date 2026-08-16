@@ -134,6 +134,37 @@ PUT .../values/Progresso!A1:H116?valueInputOption=USER_ENTERED
 ```
 `RAW` grava `=COUNTIF(...)` como texto literal (sem calcular).
 
+## 11. Abas OBJECT (painel visual) — values API não lê nem escreve
+
+Planilha "Roadmap" do CFP IA tem 2 abas visuais (`Roadmap`, `Tarefas`) que são
+`sheetType: OBJECT` — painel com desenhos/objetos, SEM grid de células. Sintoma:
+
+```
+GET /values/'Roadmap'!A1:G8        → 400 Unable to parse range
+GET /values/Roadmap!A1:G8          → 400 Unable to parse range (mesmo sem aspas!)
+GET /values/A1:Z50                 → 400 Invalid range (bare range usa 1ª aba = OBJECT)
+POST batchGetByDataFilter (sheetId) → 400 No grid with id: <sheetId>
+```
+
+**Não é problema de escaping de nome.** O nome real NÃO tem aspas (verificar com
+`[hex(ord(c)) for c in title]` — `repr()` mostra `'Roadmap'` mas os bytes são só `Roadmap`).
+
+Diagnóstico decisivo — metadata mostra o tipo:
+```python
+GET /spreadsheets/{SID}?fields=sheets.properties(title,sheetType,gridProperties)
+# OBJECT: sem gridProperties  → inacessível via values API
+# GRID:   gridProperties.rowCount/columnCount → acessível
+```
+
+Solução: operar SÓ nas abas GRID, sempre com nome entre aspas na URL:
+```
+GET /values/'Tarefas em tabela'!A1:T88   → ✅
+GET /values/'Roadmap em tabela'!A1:AB1000 → ✅
+```
+
+Padrão de leitura robusto: (1) listar abas com sheetType, (2) iterar só GRID,
+(3) `urllib.parse.quote(rng, safe="'!:")` na URL.
+
 ## Verificação pós-escrita
 
 1. `valueRenderOption=FORMATTED_VALUE` nas células de fórmula → número, não `#ERROR!`

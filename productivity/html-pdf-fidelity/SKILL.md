@@ -90,3 +90,15 @@ ssh oracle-host 'cat /home/ubuntu/preview.png' > /opt/data/reports/preview.png
 - `--window-size=1240,1750` ≈ 1 página A4 em ~70 DPI — suficiente para conferir hero, cards e tabelas.
 - Para seções abaixo do fold, subir o height (ex.: `1240,3500`) e inspecionar o screenshot inteiro com `vision_analyze`.
 - Erros de DBus/UPower no stderr do snap são normais em servidor sem desktop — ignorar; conferir o arquivo PNG gerado.
+
+## PDF → HTML (fluxo inverso): replicar um deck/PDF como HTML com assets originais
+
+Validado 14/08/2026 (proposta Minuzzo → HTML v3). O usuário NÃO quer clone pixel-perfect de PDF — quer **HTML "que pareça nascido como HTML"**: sintaxe semântica (section/h1/h2/h3/p/ul/li, CSS grid/flex), **foreground (conteúdo) separado do background (arte decorativa)**, e **assets ORIGINAIS** (fundos, logos, ícones, cores exatas) extraídos do PDF — nunca recriados à mão. A v1 (SVG extraído + texto posicionado por coordenadas) foi aceita como base visual; a v2 (HTML limpo com arte recriada) foi rejeitada ("ficou péssimo sem os fundos e a logo originais"); a v3 (SVG original como `.bg` + HTML semântico no `.fg`) foi aprovada.
+
+Pipeline: `pymupdf` `page.get_svg_image()` → remover paths de texto (filtro por fill branco/teal + overlap com spans) → SVG limpo vira camada `.bg` → texto em HTML semântico sobreposto. Detalhe completo da técnica (anatomia Type3/XObjects, fix de ligaduras 'fi'/'fl', extração de logo por bbox, opacidade 0.4 da arte, extração de componentes de marca): `references/pdf-to-html-replication.md`.
+
+Pitfalls de processo que o usuário corrigiu:
+- **Verificar layout programaticamente, não pela vision model.** `browser_vision`/`vision_analyze` é impreciso com posicionamento (lê "centralizado" o que está à direita, vê "duplicado" slides separados, alucina descrições de ícones) e o zoom 0.66 distorce a leitura. A fonte da verdade é `getBoundingClientRect` + computed styles via `browser_console`; a vision serve só para sanidade visual.
+- **Ajustar um slide de cada vez com validação do usuário** — nunca refazer o deck inteiro numa tacada; cada slide aprovado vira referência.
+- **"Qual a logo/asset correto?" → olhar o arquivo de referência (deck v3) e extrair dele** (ex.: slides padrão usam o símbolo diamond teal, não a logo completa com tagline; a tagline fica só na capa/final).
+- Cores/posições: seguir o deck de referência por inspeção programática das posições reais (left/top/size), não por achismo.

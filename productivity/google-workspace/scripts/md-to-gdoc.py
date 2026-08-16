@@ -209,9 +209,10 @@ MMDC_CONFIG = "/opt/data/mmdc/puppeteer-config.json"
 def _fix_mermaid(code):
     """Remove caracteres que quebram o parser mermaid:
     - aspas (' ") e parênteses () em QUALQUER linha de diagrama (labels de nodes, arestas, diamond)
-    - colchetes aninhados ([...] dentro de [...]) — o [ interno é interpretado como novo node
+    - colchetes ANINHADOS ([... dentro de [...]]) — o [ interno é interpretado como novo node;
+      múltiplos pares de colchetes na MESMA linha (ex.: A[...] --> B[...]) são PRESERVADOS
     - em sequenceDiagram: ; e | em mensagens (quebram o parser)
-    Mantém apenas o par de colchetes mais externo de cada label."""
+    Mantém apenas o par de colchetes mais externo de CADA label na linha."""
     is_sequence = "sequenceDiagram" in code or "sequence" in code.lower()
     lines = []
     for line in code.split("\n"):
@@ -219,15 +220,54 @@ def _fix_mermaid(code):
             # Linha de mensagem em sequence: remove ; e | (separadores do parser)
             line = line.replace(";", ",").replace("|", " e ")
         if re.search(r"\[.*\]|\{.*\}|-->|--", line):
-            line = line.replace('"', "").replace("'", "").replace("(", "").replace(")", "")
-            abertos = [m.start() for m in re.finditer(r"\[", line)]
-            fechados = [m.start() for m in re.finditer(r"\]", line)]
-            if len(abertos) > 1 and len(fechados) > 1:
-                # Remove todos os colchetes exceto o par mais externo (primeiro [ e último ])
-                chars = list(line)
-                for i in abertos[1:] + fechados[:-1]:
-                    chars[i] = ""
-                line = "".join(chars)
+            line = line.replace('"', "").replace("'", "")
+            # Remove parênteses e colchetes ANINHADOS preservando o nível 0:
+            # varre a linha com contagem de profundidade; só apaga caracteres que
+            # estão em profundidade >= 1 (dentro de um par já aberto).
+            # Parênteses: remove apenas os internos a um colchete/chave (label),
+            # mas preserva parênteses no nível 0.
+            out = []
+            prof_col = 0   # profundidade de colchetes []
+            prof_cha = 0   # profundidade de chaves {}
+            prof_par = 0   # profundidade de parênteses ()
+            for ch in line:
+                if ch == "[":
+                    prof_col += 1
+                    if prof_col == 1:
+                        out.append(ch)
+                    continue
+                if ch == "]":
+                    if prof_col > 0:
+                        prof_col -= 1
+                    if prof_col == 0:
+                        out.append(ch)
+                    continue
+                if ch == "{":
+                    prof_cha += 1
+                    if prof_cha == 1:
+                        out.append(ch)
+                    continue
+                if ch == "}":
+                    if prof_cha > 0:
+                        prof_cha -= 1
+                    if prof_cha == 0:
+                        out.append(ch)
+                    continue
+                if ch == "(":
+                    # remove se estiver DENTRO de um label ([ ou { aberto); preserva nível 0
+                    if prof_col > 0 or prof_cha > 0:
+                        prof_par += 1
+                        continue
+                    out.append(ch)
+                    continue
+                if ch == ")":
+                    if prof_par > 0:
+                        prof_par -= 1
+                        continue
+                    out.append(ch)
+                    continue
+                out.append(ch)
+            line = "".join(out)
         lines.append(line)
     return "\n".join(lines)
 

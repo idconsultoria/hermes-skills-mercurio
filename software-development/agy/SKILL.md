@@ -340,6 +340,14 @@ O enum interno do proto (1016, 1020) **não corresponde** aos modelos 2.5 do sch
 
 Veja `references/session-audit-proto.md` para o script completo de extração de tokens de todas as 84+ sessões, geração de CSV, e mapeamento de modelos.
 
+## Open Design integration (agy como runtime do OD)
+
+O Open Design (daemon local, MCP `mcp__open_design__*`) usa o agy como runtime de geração: spawna `agy --log-file <path> -p -` (contrato escrito para agy v1.0.3, prompt via stdin).
+
+**Quebrou no agy 1.1.12+:** `-p -` não lê mais stdin — responde "request was empty or just a hyphen" e o run do OD termina com 0 artifacts. O `--print` exige o prompt como argumento string.
+
+**Shim instalado em `/opt/data/home/.local/bin/agy`** (o binário real virou `agy-real`): converte `-p -` → `--dangerously-skip-permissions --print "<$(cat)>"`. Necessário para o OD gerar qualquer coisa. Também exige `settings.json` do container com `permissions.allow` (sem allow-rules o modo headless auto-deny tools → "no output produced"). Auth do agy no container = copiar `~/.gemini/antigravity-cli/antigravity-oauth-token` do host Oracle.
+
 ## Pitfalls
 
 ⚠️ **`--print` syntax non-obvious.** `--print` takes a STRING argument. Pipe/redirect do NOT work.
