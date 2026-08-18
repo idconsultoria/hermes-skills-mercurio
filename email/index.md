@@ -1,5 +1,5 @@
-# Email
+# email — Correio da ID
 
-Email automation skills.
+Progressive disclosure: skills desta categoria.
 
-*No skills in this category yet.*
+- `email-inbox-triage` — Triagem de inbox: priorizar threads, rascunhar respostas seguras.

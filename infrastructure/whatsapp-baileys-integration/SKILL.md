@@ -150,8 +150,8 @@ const sock = makeWASocket({
 ### Uso
 
 ```bash
-# Requisitar código para o número 55 79 9842-3338
-curl http://localhost:3100/pairing-code/557998423338
+# Requisitar código para o número 55 79 [REDACTED]
+curl http://localhost:3100/pairing-code/[REDACTED]
 # → {"code":"TA65-DJMT","formatted":"TA65-DJMT"}
 ```
 

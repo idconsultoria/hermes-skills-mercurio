@@ -1,49 +1,18 @@
-# Productivity
+# productivity — Documentos e entrega
 
-Skills for productivity tools — Google Workspace, Notion, TaskFlow, HTML/PDF generation.
+Progressive disclosure: skills desta categoria (foco ID Consultoria).
 
-## Skills
-
-*6 skills*
-
-### [Google Workspace](google-workspace/SKILL.md)
-_Google OAuth2 client credentials (downloaded from Google Cloud Console)Google OAuth2 client credentials (downloaded from Google Cloud Console)_
-
-Type: ToolIntegration | Updated: 2026-06-28 | 21,380 chars
-
----
-
-### [HTML Report — Hermes Design System](html-report-hermes/SKILL.md)
-_Render research reports as dark-themed HTML with SVG charts and Tufte typographyRender research reports as dark-themed HTML with SVG charts and Tufte typography_
-
-Type: Template | Updated: 2026-06-12 | 15,328 chars
-
----
-
-### [HTML → PDF com Chromium Headless](html-to-pdf-chromium/SKILL.md)
-_Convert HTML to high-fidelity PDF using Chromium headless viaConvert HTML to high-fidelity PDF using Chromium headless via_
-
-Type: Template | Updated: 2026-06-19 | 6,708 chars
-
----
-
-### [Notion](notion/SKILL.md)
-_Notion API plus ntn CLI — pages, databases, markdown import, Workers integrationNotion API plus ntn CLI — pages, databases, markdown import, Workers integration_
-
-Type: ToolIntegration | Updated: 2026-06-12 | 15,982 chars
-
----
-
-### [Relatório de Custos — Skill de Geração](relatorio-de-custos/SKILL.md)
-_Generate cost reports for multi-agent projects with real token data from Hermes andGenerate cost reports for multi-agent projects with real token data from Hermes and_
-
-Type: Template | Updated: 2026-06-19 | 10,354 chars
-
----
-
-### [TaskFlow MCP — Ferramentas e Workflows](taskflow-mcp/SKILL.md)
-_GTD task management via MCP (Model Context Protocol) — connects over SSEGTD task management via MCP (Model Context Protocol) — connects over SSE_
-
-Type: ToolIntegration | Updated: 2026-06-14 | 7,752 chars
-
----
+- `document-to-action-items` — Extrair obrigações/prazos/tarefas citadas de documentos.
+- `docx` — Criar, ler, editar documentos Word (.docx) e templates.
+- `google-docs-formatting` — Formatar Google Docs/Sheets via REST API.
+- `google-sheets-automation` — Polir Google Sheets via API (dropdowns, fórmulas, KPIs).
+- `google-workspace` — Gmail/Drive/Docs/Sheets via gws CLI (OAuth2, conta da ID).
+- `html-pdf-fidelity` — HTML→PDF idêntico ao browser (1 página).
+- `html-report-hermes` — Relatórios de pesquisa como HTML dark com gráficos SVG.
+- `html-to-pdf-chromium` — HTML→PDF via Chromium headless (fallback ARM64).
+- `meeting-action-items` — Notas de reunião → decisões citadas, donos, tickets.
+- `notion` — API Notion + CLI `ntn` (páginas, databases, import markdown).
+- `pdf` — Criar, mesclar, dividir, preencher e proteger PDFs.
+- `pdf-to-html` — PDF→HTML: gotchas de extração Type3/Figma + rebuild semântico.
+- `relatorio-de-custos` — Relatórios de custo de projetos multi-agente (tokens reais).
+- `xlsx` — Criar, ler, editar planilhas Excel (.xlsx) e CSVs.

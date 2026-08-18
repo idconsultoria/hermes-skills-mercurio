@@ -19,7 +19,7 @@
 services:
   backend:
     container_name: taskflow-backend-${PR_NUMBER}
-    image: ghcr.io/gustavomello9600/taskflow-mvp/backend:pr-${PR_NUMBER}
+    image: ghcr.io/[REDACTED]/taskflow-mvp/backend:pr-${PR_NUMBER}
     environment:
       DATABASE_URL: postgresql+asyncpg://taskflow:taskflow@db:5432/taskflow_pr_${PR_NUMBER}
     networks:
@@ -28,7 +28,7 @@ services:
 
   frontend:
     container_name: taskflow-frontend-${PR_NUMBER}
-    image: ghcr.io/gustavomello9600/taskflow-mvp/frontend:pr-${PR_NUMBER}
+    image: ghcr.io/[REDACTED]/taskflow-mvp/frontend:pr-${PR_NUMBER}
     environment:
       VITE_API_URL: https://${PR_NUMBER}.praxis.129.146.163.107.sslip.io
     networks:

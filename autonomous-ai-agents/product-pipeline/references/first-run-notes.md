@@ -69,9 +69,9 @@ O usuário pediu que o prompt enviado ao agy fosse salvo como `.md`:
 
 Após validação, deploy feito seguindo o padrão selfhost:
 
-1. **GitHub:** criado repositório privado `gustavomello9600/taskflow-mvp`
+1. **GitHub:** criado repositório privado `[REDACTED]/taskflow-mvp`
 2. **Git push:** via `gh repo create --source . --push`
-3. **Clone para selfhost/:** `git clone https://USER:TOKEN@github.com/gustavomello9600/taskflow-mvp.git /home/ubuntu/selfhost/taskflow/` — usando token extraído de `/opt/data/.env` (grep GITHUB_TOKEN)
+3. **Clone para selfhost/:** `git clone https://USER:TOKEN@github.com/[REDACTED]/taskflow-mvp.git /home/ubuntu/selfhost/taskflow/` — usando token extraído de `/opt/data/.env` (grep GITHUB_TOKEN)
 4. **Stack migrada:** old stack parada (`docker compose down` no path antigo), nova iniciada no path novo (`/home/ubuntu/selfhost/taskflow/docker compose up -d`)
 5. **Systemd:** `/etc/systemd/system/taskflow.service` — `Type=oneshot` com `WorkingDirectory=/home/ubuntu/selfhost/taskflow`
 6. **Host nginx:** instalado em `/etc/nginx/sites-available/taskflow`, escutando em `:8081` como reverse proxy extra (interno)
