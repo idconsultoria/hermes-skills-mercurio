@@ -10,6 +10,8 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `html-pdf-fidelity` — HTML→PDF idêntico ao browser (1 página).
 - `html-report-hermes` — Relatórios de pesquisa como HTML dark com gráficos SVG.
 - `html-to-pdf-chromium` — HTML→PDF via Chromium headless (fallback ARM64).
+- `id-papel-timbrado` — Criar doc da ID com timbrado no Google Docs.
+- `md-to-timbrado-id` — Gerar Google Doc no timbrado da ID a partir de Markdown.
 - `meeting-action-items` — Notas de reunião → decisões citadas, donos, tickets.
 - `notion` — API Notion + CLI `ntn` (páginas, databases, import markdown).
 - `pdf` — Criar, mesclar, dividir, preencher e proteger PDFs.

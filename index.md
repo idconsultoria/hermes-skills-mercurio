@@ -3,11 +3,12 @@
 Catálogo consolidado de skills do **Hermes · Mercúrio**, rama dedicada à **ID Consultoria**
 (consultoria de gestão, augmentação de processos e produtos para PMEs). Fork independente
 de `gustavomello9600/hermes-agent-skills` (`hermes-skills-mercurio`), **sem sincronia de
-upstream**, já pruneado para foco 100% ID e com informação pessoal do operador removida.
+upstream**, pruneado para foco 100% ID + skills operacionais da ID (NFS-e, Inter, financeiro,
+timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-mercurio` (23/08).
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 41 skills** em 7 categorias.
+**Total: 82 skills** em 11 categorias.
 
 ---
 
@@ -16,7 +17,11 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | Skill | Type | Descrição |
 |---|---|---|
 | `analise-contratual` | Reference | Análise de contratos/minutas — subcontratação, LGPD, compliance. |
+| `auxiliar-adm-id` | Orchestrator | Auxiliar admin da ID: contratos, planilhas, NFS-e, Drive. |
 | `elaboracao-proposta-comercial` | Orchestrator | Propostas comerciais da ID — do contexto do cliente à proposta fechada. |
+| `emissao-nfse` | ToolIntegration | Emitir NFS-e/NF-e da ID via motor nfelib (NFS-e Nacional). |
+| `gestao-financeira-id` | Reference | Operar planilhas/Google da ID e fazer backfill de extrato. |
+| `inter-api-id-consultoria` | ToolIntegration | Consultar extrato/saldo da conta Inter da ID. |
 | `planejamento-estrategico-2h` | Orchestrator | Planejamento estratégico em 2h — EOS V/TO + One-Page Plan. |
 | `proposta-comercial-consultoria` | Orchestrator | Proposta comercial de consultoria — princípios, pricing e estrutura. |
 | `valuation-consultivo` | Orchestrator | Valuation consultivo de startup early-stage — rNPV, âncoras. |
@@ -46,6 +51,8 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `html-pdf-fidelity` | Orchestrator | HTML→PDF idêntico ao browser — fontes, layout, 1 página. |
 | `html-report-hermes` | Template | Relatórios de pesquisa como HTML dark com gráficos SVG. |
 | `html-to-pdf-chromium` | Template | HTML→PDF via Chromium headless — fallback ARM64. |
+| `id-papel-timbrado` | Reference | Use ao criar doc da ID com timbrado no Google Docs. |
+| `md-to-timbrado-id` | ToolIntegration | Gerar Google Doc no timbrado da ID a partir de Markdown. |
 | `meeting-action-items` | Orchestrator | Notas de reunião → decisões citadas, donos, tickets. |
 | `notion` | ToolIntegration | API Notion + CLI `ntn` — páginas, databases, import markdown. |
 | `pdf` | ToolIntegration | Criar, mesclar, dividir, preencher e proteger PDFs. |
@@ -63,21 +70,46 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 
 | Skill | Type | Descrição |
 |---|---|---|
+| `baas-offline-migration` | Orchestrator | Migrar SPA que usa Supabase p/ backend próprio offline. |
 | `backlog-and-sprint` | Orchestrator | Gestão de backlog e execução de Sprint para iteração de produto. |
 | `bpmn-diagram-renderer` | Template | Renderizar diagramas BPMN 2.0 (XML) para SVG/PNG via bpmn-js. |
 | `dedalo-squad` | Orchestrator | Pipeline Dédalo Squad — mapeamento de processos com POPs. |
+| `dogfood` | Research | Exploratory QA of web apps: find bugs, evidence, reports. |
+| `hermes-agent-skill-authoring` | Template | Author in-repo SKILL.md files: frontmatter and structure. |
 | `ideation-drilling` | Orchestrator | Ideação de produto (Fase 1) — refinar ideias brutas. |
+| `inspecting-hermes-desktop-dom` | ToolIntegration | Read the live Hermes desktop DOM/CSS over CDP. |
+| `internal-python-job-executor` | ToolIntegration | Executor interno Python p/ pipeline no backend FastAPI. |
+| `local-postgres-sandbox` | ToolIntegration | Verify DB behavior via local Postgres sandbox from app dump. |
+| `motor-nfse-id` | Orchestrator | Resume/update the ID NFS-e emission motor (living state). |
+| `node-inspect-debugger` | ToolIntegration | Debug Node.js via --inspect + Chrome DevTools Protocol CLI. |
 | `pipeline-educacional` | Orchestrator | Pipeline de produto educacional — concepção pedagógica a entrega. |
+| `plan` | Template | Write a markdown plan to .hermes/plans/; no execution. |
+| `postgres-dump-restore` | ToolIntegration | Seed Postgres de dump; evita falha 'unsupported version'. |
+| `postgres-sandbox-verification` | ToolIntegration | Verify features really persist against a throwaway Postgres. |
 | `process-augmentation-pipeline` | Orchestrator | Pipeline da ID: análise de processos, brainstorm e augmentação. |
+| `python-debugpy` | ToolIntegration | Debug Python: pdb REPL + debugpy remote (DAP). |
+| `requesting-code-review` | Orchestrator | Pre-commit review: security scan, quality gates, auto-fix. |
+| `simplify-code` | Orchestrator | Parallel 4-agent cleanup of recent code changes. |
 | `skills-repo-curator` | Orchestrator | Gestão do repo de skills — ciclos de consolidação, MECE, OKF. |
+| `spike` | Research | Throwaway experiments to validate an idea before build. |
+| `static-spa-vercel` | Orchestrator | Build static SPA prototypes and deploy to Vercel. |
+| `supabase-to-selfhost` | Orchestrator | Use ao abandonar Supabase: backend próprio offline único. |
+| `systematic-debugging` | ToolIntegration | 4-phase root cause debugging: understand bugs before fixing. |
+| `test-driven-development` | Template | TDD: enforce RED-GREEN-REFACTOR, tests before code. |
 
 ## autonomous-ai-agents — Agentes & produto
 
 | Skill | Type | Descrição |
 |---|---|---|
 | `autonomous-ai-agents` | Orchestrator | Delegar tarefas de codificação a agentes AI via Hermes (orquestração). |
+| `claude-code` | ToolIntegration | Delegate coding to Claude Code CLI (features, PRs). |
+| `codex` | ToolIntegration | Delegate coding to OpenAI Codex CLI (features, PRs). |
+| `computer-use` | ToolIntegration | Drive the desktop in the background without stealing focus. |
 | `hermes-agent` | Reference | Configurar/usar o Hermes Agent — setup, profiles, skills, CLI. |
+| `hermes-environment-replication` | Orchestrator | Replicar instância Hermes viva p/ nova VM. |
+| `merge-reconciler` | Orchestrator | Neutral third-party resolution of agent merge conflicts. |
 | `messaging-platforms` | Reference | Mensageria cross-platform — Telegram, IDs, entrega de arquivos. |
+| `opencode` | ToolIntegration | Delegate coding to OpenCode CLI (features, PR review). |
 | `pi-agent-coordination` | ToolIntegration | Invocar Pi Agent localmente via Hermes (hierarquia provider/model). |
 | `product-pipeline` | Orchestrator | Pipeline multi-agente de produto — ideia a MVP via sprints. |
 
@@ -85,13 +117,39 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 
 | Skill | Type | Descrição |
 |---|---|---|
+| `hermes-agent-replication` | Method | Replicar instância Hermes (rama ID) numa VM nova. |
 | `whatsapp-baileys-integration` | ToolIntegration | Integrar WhatsApp em Python via Baileys — lifecycle, QR, enums. |
+
+## cicd-oracle-preview — Deploy & preview
+
+| Skill | Type | Descrição |
+|---|---|---|
+| `cicd-oracle-preview` | Orchestrator | Replicar CI/CD: GHCR arm64, deploy SSH, preview por PR. |
+| `devops-artemishub` | Orchestrator | Operar/deployar o ArtemisHub no Oracle host. |
+
+## devops — Revisão de entrega
+
+| Skill | Type | Descrição |
+|---|---|---|
+| `sdlc-review` | Orchestrator | Review Kanban handoffs and route verified outcomes. |
+
+## github — Workflows GitHub
+
+| Skill | Type | Descrição |
+|---|---|---|
+| `codebase-inspection` | ToolIntegration | Inspect codebases w/ pygount: LOC, languages, ratios. |
+| `github-auth` | ToolIntegration | GitHub auth setup: HTTPS tokens, SSH keys, gh CLI login. |
+| `github-code-review` | ToolIntegration | Review PRs: diffs, inline comments via gh or REST. |
+| `github-issue-to-pr` | Orchestrator | Carry a GitHub issue to a verified PR with honest CI state. |
+| `github-issues` | ToolIntegration | Create, triage, label, assign GitHub issues via gh or REST. |
+| `github-pr-workflow` | Orchestrator | GitHub PR lifecycle: branch, commit, open, CI, merge. |
+| `github-repo-management` | Orchestrator | Clone/create/fork repos; manage remotes, releases. |
 
 ---
 
 ## Relações entre skills (curadoria evolve 2026-08-23)
 
-Relações semânticas reconstruídas após o prune (o catálogo compacto havia zerado as relações). Formato `type` → `alvo` (similar = bidirecional; uses = A usa B).
+Relações semânticas do catálogo. Formato `type` → `alvo` (similar = bidirecional; uses = A usa B).
 
 Similar:
 - `elaboracao-proposta-comercial` → `proposta-comercial-consultoria`
@@ -119,6 +177,10 @@ Similar:
 - `autonomous-ai-agents` → `pi-agent-coordination`
 - `whatsapp-baileys-integration` → `messaging-platforms`
 - `skills-repo-curator` → `hermes-agent`
+- `claude-code` → `codex`
+- `codex` → `opencode`
+- `systematic-debugging` → `test-driven-development`
+- `test-driven-development` → `requesting-code-review`
 
 Uses:
 - `process-augmentation-pipeline` → `deep-research`
@@ -141,6 +203,20 @@ Uses:
 - `process-augmentation-pipeline` → `bpmn-diagram-renderer`
 - `augmentation-process-design` → `augmentacao-query`
 - `augmentacao-query` → `process-augmentation-pipeline`
+- `github-issue-to-pr` → `github-pr-workflow`
+- `github-code-review` → `github-pr-workflow`
+- `github-auth` → `github-pr-workflow`
+- `codex` → `product-pipeline`
+- `opencode` → `product-pipeline`
+- `baas-offline-migration` → `supabase-to-selfhost`
+- `supabase-to-selfhost` → `postgres-dump-restore`
+- `postgres-dump-restore` → `postgres-sandbox-verification`
+- `devops-artemishub` → `cicd-oracle-preview`
+- `cicd-oracle-preview` → `skills-repo-curator`
+- `motor-nfse-id` → `emissao-nfse`
+- `emissao-nfse` → `inter-api-id-consultoria`
+- `md-to-timbrado-id` → `id-papel-timbrado`
+- `md-to-timbrado-id` → `google-docs-formatting`
 
 ---
 
@@ -149,4 +225,4 @@ Uses:
 - **index.md** é território de agente LLM (nunca scripts) — atualizado por `read_file`/`patch`/`write_file`.
 - **log.md** é append-only com prefixos `update|evolve|offload`.
 - Ciclo: `update → log → commit → evolve → log → offload → commit → push`.
-- Fork **não** sincroniza com upstream; evoluir por conta própria nesta rama.
+- Fork real em `idconsultoria/hermes-skills-mercurio` (23/08/2026) — push só para ele; não sincroniza com upstream/canônico.
