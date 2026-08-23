@@ -106,6 +106,20 @@ HTMLs com CSS complexo (grids, animações, @media queries) ou Google Fonts pode
 3. **Timeout de 90s** — usar `timeout 90` (não 60) para HTMLs estilizados.
 4. **Flags extras** — adicionar `--disable-dev-shm-usage` e `--deterministic-mode` se ainda travar.
 
+### Crash SIGTRAP/`core dump` no `--print-to-pdf` (mas `--version`/`--screenshot` funcionam)
+
+Sintoma: `--print-to-pdf` imprime `timeout: the monitored command dumped core` / `exit=133` (SIGTRAP), ainda que `--version` OK e `--screenshot` gere imagem. Em containers ARM64/Debian trixie (chromium extraído de .deb), a causa é o pipeline de compositor do print. **Receita que destrava** (validada em produção 08/2026):
+
+```bash
+CHR=/caminho/chromium; export HOME=/tmp/home; export LD_LIBRARY_PATH=<dir-libs-chromium>
+$CHR --headless=new --no-sandbox --disable-gpu --no-zygote --disable-dev-shm-usage \
+     --use-angle=swiftshader --user-data-dir=/tmp/cd \
+     --no-pdf-header-footer \
+     --print-to-pdf=/tmp/out.pdf "file:///path/input.html"
+```
+
+Combinação crítica: **`--headless=new` + `--no-zygote` + `--use-angle=swiftshader`** + HOME gravável + varrer `/dev/shm`-de-64MB com `--disable-dev-shm-usage`. Sem `--no-zygote`/`--use-angle=swiftshader` o renderer aborta com SIGTRAP mesmo com as libs de sistema (libnss3/libgtk/libgbm) presentes. Também ter `--no-sandbox` (sem root) e um `--user-data-dir` gravável distinto por execução.
+
 ## Verificação
 
 ```bash
