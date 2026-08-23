@@ -13,14 +13,18 @@ OUT_JSON = 'graph_data.json'
 
 idx = open(INDEX).read()
 
-# 1. skills catalogadas: linhas de tabela '| `skill` | Type | desc |'
+# 1. skills catalogadas: linhas de tabela '| `skill` | Type | desc |', capturando a categoria da seção ## corrente
 skills = []
+current_cat = ""
 for line in idx.split('\n'):
+    hm = re.match(r'^## ([a-z0-9_\-]+)', line.strip())
+    if hm:
+        current_cat = hm.group(1)
+        continue
     m = re.match(r'\|\s*`([^`]+)`\s*\|\s*(\w+)\s*\|', line)
     if m:
         name, typ = m.group(1), m.group(2)
-        # pega a categoria em que a linha está (seção ## corrente)
-        skills.append({'name': name, 'type': typ})
+        skills.append({'name': name, 'type': typ, 'category': current_cat})
 allnames = {s['name'] for s in skills}
 print(f"skills catalogadas: {len(skills)}")
 
@@ -57,10 +61,31 @@ for r in rels:
 print(f"  arestas válidas (ambos no catálogo): {edges_ok}; descartadas: {edges_dropped}")
 
 # nós
-nodes = [{
-    'id': s['name'], 'label': s['name'].split('/')[-1],
-    'category': s['name'].split('/')[0], 'type': s['type']
-} for s in skills]
+nodes = []
+for s in skills:
+    # caminho real: <categoria>/<nome>/SKILL.md (o index lista só o nome curto)
+    sk = os.path.join(s['category'], s['name'], 'SKILL.md')
+    if not os.path.exists(sk):
+        # fallback: relativo p/ skill raiz
+        alt = os.path.join(s['name'], 'SKILL.md')
+        sk = alt if os.path.exists(alt) else sk
+    size = os.path.getsize(sk) if os.path.exists(sk) else 0
+    # summary (1ª linha do description) e description do frontmatter
+    summary = ""
+    description = ""
+    if os.path.exists(sk):
+        c = open(sk).read()
+        fm = re.search(r'^---\n(.*?)\n---', c, re.DOTALL)
+        if fm:
+            d = re.search(r'^description:\s*"((?:[^"\\]|\\.)*)', fm.group(1), re.MULTILINE)
+            if d:
+                description = d.group(1).strip()
+                summary = description.split('\n')[0].strip()[:87]
+    nodes.append({
+        'id': s['name'], 'label': s['name'].split('/')[-1],
+        'category': s['category'], 'type': s['type'],
+        'size': size, 'summary': summary, 'description': description
+    })
 
 data = {'nodes': nodes, 'edges': kept}
 
