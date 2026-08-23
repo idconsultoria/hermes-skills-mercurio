@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 82 skills** em 11 categorias.
+**Total: 83 skills** em 11 categorias.
 
 ---
 
@@ -181,6 +181,22 @@ Similar:
 - `codex` → `opencode`
 - `systematic-debugging` → `test-driven-development`
 - `test-driven-development` → `requesting-code-review`
+- `auxiliar-adm-id` → `gestao-financeira-id`
+- `emissao-nfse` → `inter-api-id-consultoria`
+- `id-papel-timbrado` → `md-to-timbrado-id`
+- `dogfood` → `systematic-debugging`
+- `hermes-agent-skill-authoring` → `skills-repo-curator`
+- `node-inspect-debugger` → `python-debugpy`
+- `local-postgres-sandbox` → `postgres-sandbox-verification`
+- `plan` → `spike`
+- `simplify-code` → `requesting-code-review`
+- `hermes-environment-replication` → `hermes-agent-replication`
+- `computer-use` → `autonomous-ai-agents`
+- `merge-reconciler` → `codex`
+- `github-issues` → `github-issue-to-pr`
+- `github-repo-management` → `github-pr-workflow`
+- `codebase-inspection` → `github-code-review`
+- `auxiliar-adm-id` → `google-workspace`
 
 Uses:
 - `process-augmentation-pipeline` → `deep-research`
@@ -217,6 +233,15 @@ Uses:
 - `emissao-nfse` → `inter-api-id-consultoria`
 - `md-to-timbrado-id` → `id-papel-timbrado`
 - `md-to-timbrado-id` → `google-docs-formatting`
+- `inspecting-hermes-desktop-dom` → `hermes-agent`
+- `internal-python-job-executor` → `skills-repo-curator`
+- `static-spa-vercel` → `cicd-oracle-preview`
+- `sdlc-review` → `github-code-review`
+- `hermes-agent-replication` → `hermes-agent`
+- `gestao-financeira-id` → `google-sheets-automation`
+- `inter-api-id-consultoria` → `gestao-financeira-id`
+- `merge-reconciler` → `opencode`
+- `sdlc-review` → `plan`
 
 ---
 
