@@ -1,5 +1,7 @@
 ---
 name: github-repo-management
+type: Orchestrator
+timestamp: 2026-08-23T00:00:00Z
 description: "Clone/create/fork repos; manage remotes, releases."
 version: 1.1.0
 author: Hermes Agent

@@ -1,5 +1,7 @@
 ---
 name: postgres-sandbox-verification
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Verify features really persist against a throwaway Postgres."
 ---
 

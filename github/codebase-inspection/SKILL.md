@@ -1,5 +1,7 @@
 ---
 name: codebase-inspection
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Inspect codebases w/ pygount: LOC, languages, ratios."
 version: 1.0.0
 author: Hermes Agent

@@ -1,5 +1,7 @@
 ---
 name: test-driven-development
+type: Template
+timestamp: 2026-08-23T00:00:00Z
 description: "TDD: enforce RED-GREEN-REFACTOR, tests before code."
 version: 1.1.0
 author: Hermes Agent (adapted from obra/superpowers)

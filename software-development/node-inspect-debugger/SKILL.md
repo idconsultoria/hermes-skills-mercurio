@@ -1,5 +1,7 @@
 ---
 name: node-inspect-debugger
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Debug Node.js via --inspect + Chrome DevTools Protocol CLI."
 version: 1.0.0
 author: Hermes Agent

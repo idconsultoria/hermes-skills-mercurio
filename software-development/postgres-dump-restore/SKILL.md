@@ -1,5 +1,7 @@
 ---
 name: postgres-dump-restore
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Seed Postgres de dump; evita falha 'unsupported version'."
 version: 1.0.0
 platforms: [linux]

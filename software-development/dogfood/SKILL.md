@@ -1,5 +1,7 @@
 ---
 name: dogfood
+type: Research
+timestamp: 2026-08-23T00:00:00Z
 description: "Exploratory QA of web apps: find bugs, evidence, reports."
 version: 1.0.0
 author: Teknium (teknium1), Hermes Agent

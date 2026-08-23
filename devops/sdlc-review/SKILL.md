@@ -1,6 +1,8 @@
 ---
 name: sdlc-review
-description: Review Kanban handoffs and route verified outcomes.
+type: Orchestrator
+timestamp: 2026-08-23T00:00:00Z
+description: "Review Kanban handoffs and route verified outcomes."
 version: 1.1.0
 author: Jakub Wolniewicz (@frizikk) + Hermes Agent
 license: MIT

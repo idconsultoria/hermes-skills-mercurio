@@ -1,5 +1,7 @@
 ---
 name: cicd-oracle-preview
+type: Orchestrator
+timestamp: 2026-08-23T00:00:00Z
 description: "Replicar CI/CD: GHCR arm64, deploy SSH, preview por PR."
 version: 1.0.0
 author: "ID Consultoria (gustavomello9600), Hermes Agent"

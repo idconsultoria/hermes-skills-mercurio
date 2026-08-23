@@ -1,5 +1,7 @@
 ---
 name: github-issues
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Create, triage, label, assign GitHub issues via gh or REST."
 version: 1.1.0
 author: Hermes Agent

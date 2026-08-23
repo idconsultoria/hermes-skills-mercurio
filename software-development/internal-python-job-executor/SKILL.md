@@ -1,5 +1,7 @@
 ---
 name: internal-python-job-executor
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Executor interno Python p/ pipeline no backend FastAPI."
 version: 1.0.0
 author: "ID Consultoria (Hermes Agent)"

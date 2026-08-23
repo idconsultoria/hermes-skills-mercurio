@@ -1,5 +1,7 @@
 ---
 name: supabase-to-selfhost
+type: Orchestrator
+timestamp: 2026-08-23T00:00:00Z
 description: "Use ao abandonar Supabase: backend próprio offline único."
 version: 1.0.0
 author: "ID Consultoria (Mercúrio), Hermes Agent"

@@ -1,5 +1,7 @@
 ---
 name: hermes-agent-skill-authoring
+type: Template
+timestamp: 2026-08-23T00:00:00Z
 description: "Author in-repo SKILL.md files: frontmatter and structure."
 version: 2.0.0
 author: Hermes Agent

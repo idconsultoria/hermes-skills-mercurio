@@ -1,5 +1,7 @@
 ---
 name: inspecting-hermes-desktop-dom
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Read the live Hermes desktop DOM/CSS over CDP."
 version: 1.0.0
 author: Hermes Agent

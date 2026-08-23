@@ -1,5 +1,7 @@
 ---
 name: merge-reconciler
+type: Orchestrator
+timestamp: 2026-08-23T00:00:00Z
 description: "Neutral third-party resolution of agent merge conflicts."
 version: 1.0.0
 author: Hermes Agent

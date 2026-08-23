@@ -1,5 +1,7 @@
 ---
 name: github-code-review
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Review PRs: diffs, inline comments via gh or REST."
 version: 1.1.0
 author: Hermes Agent

@@ -1,5 +1,7 @@
 ---
 name: opencode
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Delegate coding to OpenCode CLI (features, PR review)."
 version: 1.2.0
 author: Hermes Agent

@@ -1,5 +1,7 @@
 ---
 name: requesting-code-review
+type: Orchestrator
+timestamp: 2026-08-23T00:00:00Z
 description: "Pre-commit review: security scan, quality gates, auto-fix."
 version: 2.0.0
 author: Hermes Agent (adapted from obra/superpowers + MorAlekss)

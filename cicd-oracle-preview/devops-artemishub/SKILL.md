@@ -1,5 +1,7 @@
 ---
 name: devops-artemishub
+type: Orchestrator
+timestamp: 2026-08-23T00:00:00Z
 description: "Operar/deployar o ArtemisHub no Oracle host."
 version: 1.0.0
 author: "ID Consultoria (Mercúrio / Hermes), 22/08/2026"

@@ -1,5 +1,7 @@
 ---
 name: github-issue-to-pr
+type: Orchestrator
+timestamp: 2026-08-23T00:00:00Z
 description: "Carry a GitHub issue to a verified PR with honest CI state."
 version: 0.1.0
 author: Ben Barclay (benbarclay), Hermes Agent

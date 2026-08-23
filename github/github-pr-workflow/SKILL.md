@@ -1,5 +1,7 @@
 ---
 name: github-pr-workflow
+type: Orchestrator
+timestamp: 2026-08-23T00:00:00Z
 description: "GitHub PR lifecycle: branch, commit, open, CI, merge."
 version: 1.1.0
 author: Hermes Agent

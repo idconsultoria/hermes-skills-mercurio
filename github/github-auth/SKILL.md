@@ -1,5 +1,7 @@
 ---
 name: github-auth
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "GitHub auth setup: HTTPS tokens, SSH keys, gh CLI login."
 version: 1.1.0
 author: Hermes Agent

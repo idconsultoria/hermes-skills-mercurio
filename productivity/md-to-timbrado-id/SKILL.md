@@ -1,7 +1,8 @@
 ---
 name: md-to-timbrado-id
-description: Gerar Google Doc no timbrado da ID a partir de Markdown.
+description: "Gerar Google Doc no timbrado da ID a partir de Markdown."
 type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 ---
 
 # MD → Google Doc no papel timbrado da ID

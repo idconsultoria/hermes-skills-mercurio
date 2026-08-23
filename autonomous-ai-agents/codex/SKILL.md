@@ -1,5 +1,7 @@
 ---
 name: codex
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Delegate coding to OpenAI Codex CLI (features, PRs)."
 version: 1.0.1
 author: Hermes Agent

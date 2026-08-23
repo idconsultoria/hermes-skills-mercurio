@@ -1,6 +1,8 @@
 ---
 name: plan
-description: Write a markdown plan to .hermes/plans/; no execution.
+type: Template
+timestamp: 2026-08-23T00:00:00Z
+description: "Write a markdown plan to .hermes/plans/; no execution."
 version: 2.0.0
 author: Hermes Agent (writing-craft adapted from obra/superpowers)
 license: MIT

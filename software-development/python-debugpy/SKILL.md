@@ -1,5 +1,7 @@
 ---
 name: python-debugpy
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Debug Python: pdb REPL + debugpy remote (DAP)."
 version: 1.0.0
 author: Hermes Agent

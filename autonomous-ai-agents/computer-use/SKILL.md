@@ -1,5 +1,7 @@
 ---
 name: computer-use
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Drive the desktop in the background without stealing focus."
 version: 2.0.0
 author: Francesco Bonacci (f-trycua), Hermes Agent

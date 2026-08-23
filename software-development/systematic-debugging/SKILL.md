@@ -1,5 +1,7 @@
 ---
 name: systematic-debugging
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "4-phase root cause debugging: understand bugs before fixing."
 version: 1.1.0
 author: Hermes Agent (adapted from obra/superpowers)

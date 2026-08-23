@@ -1,5 +1,7 @@
 ---
 name: spike
+type: Research
+timestamp: 2026-08-23T00:00:00Z
 description: "Throwaway experiments to validate an idea before build."
 version: 1.0.0
 author: Hermes Agent (adapted from gsd-build/get-shit-done)

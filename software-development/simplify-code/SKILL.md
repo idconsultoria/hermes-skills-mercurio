@@ -1,5 +1,7 @@
 ---
 name: simplify-code
+type: Orchestrator
+timestamp: 2026-08-23T00:00:00Z
 description: "Parallel 4-agent cleanup of recent code changes."
 version: 1.1.0
 author: Hermes Agent (inspired by Claude Code /simplify)

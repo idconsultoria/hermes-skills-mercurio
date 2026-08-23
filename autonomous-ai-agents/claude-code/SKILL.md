@@ -1,5 +1,7 @@
 ---
 name: claude-code
+type: ToolIntegration
+timestamp: 2026-08-23T00:00:00Z
 description: "Delegate coding to Claude Code CLI (features, PRs)."
 version: 2.2.1
 author: Hermes Agent + Teknium
