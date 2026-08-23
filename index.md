@@ -89,6 +89,61 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 
 ---
 
+## Relações entre skills (curadoria evolve 2026-08-23)
+
+Relações semânticas reconstruídas após o prune (o catálogo compacto havia zerado as relações). Formato `type` → `alvo` (similar = bidirecional; uses = A usa B).
+
+Similar:
+- `elaboracao-proposta-comercial` → `proposta-comercial-consultoria`
+- `deep-research` → `systematic-research`
+- `deep-research` → `market-research-synthesis`
+- `augmentation-process-design` → `augmentacao-query`
+- `augmentation-process-design` → `process-augmentation-pipeline`
+- `process-augmentation-pipeline` → `dedalo-squad`
+- `pipeline-educacional` → `process-augmentation-pipeline`
+- `product-pipeline` → `backlog-and-sprint`
+- `dedalo-squad` → `bpmn-diagram-renderer`
+- `document-to-action-items` → `meeting-action-items`
+- `pdf` → `pdf-to-html`
+- `html-pdf-fidelity` → `html-to-pdf-chromium`
+- `html-report-hermes` → `relatorio-de-custos`
+- `google-docs-formatting` → `google-sheets-automation`
+- `google-docs-formatting` → `notion`
+- `xlsx` → `google-sheets-automation`
+- `docx` → `xlsx`
+- `valuation-consultivo` → `analise-contratual`
+- `planejamento-estrategico-2h` → `proposta-comercial-consultoria`
+- `competitor-news-monitor` → `deep-research`
+- `user-interview` → `market-research-synthesis`
+- `hermes-agent` → `messaging-platforms`
+- `autonomous-ai-agents` → `pi-agent-coordination`
+- `whatsapp-baileys-integration` → `messaging-platforms`
+- `skills-repo-curator` → `hermes-agent`
+
+Uses:
+- `process-augmentation-pipeline` → `deep-research`
+- `augmentation-process-design` → `deep-research`
+- `document-to-action-items` → `google-docs-formatting`
+- `meeting-action-items` → `google-workspace`
+- `email-inbox-triage` → `google-workspace`
+- `pi-agent-coordination` → `hermes-agent`
+- `product-pipeline` → `backlog-and-sprint`
+- `ideation-drilling` → `product-pipeline`
+- `html-pdf-fidelity` → `html-to-pdf-chromium`
+- `html-report-hermes` → `html-pdf-fidelity`
+- `relatorio-de-custos` → `xlsx`
+- `grounded-citations` → `deep-research`
+- `google-docs-formatting` → `google-workspace`
+- `google-sheets-automation` → `google-workspace`
+- `elaboracao-proposta-comercial` → `planejamento-estrategico-2h`
+- `proposta-comercial-consultoria` → `elaboracao-proposta-comercial`
+- `dedalo-squad` → `bpmn-diagram-renderer`
+- `process-augmentation-pipeline` → `bpmn-diagram-renderer`
+- `augmentation-process-design` → `augmentacao-query`
+- `augmentacao-query` → `process-augmentation-pipeline`
+
+---
+
 ## Relações e manutenção
 
 - **index.md** é território de agente LLM (nunca scripts) — atualizado por `read_file`/`patch`/`write_file`.
