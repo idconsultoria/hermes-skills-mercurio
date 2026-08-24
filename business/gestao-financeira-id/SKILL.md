@@ -95,6 +95,12 @@ registrar_saldo_do_período(str(ini), str(fim))                     # saldo diá
 use `valueRenderOption="FORMULA"` e varra **todas as colunas** (algumas abas têm 200+).
 
 ## Pitfalls
+- **Google Sheets retorna 503 transitório no `append`/`update`** — um único 503 derruba o dia
+  inteiro do cron iData se a chamada `.execute()` não tem retry. O `google_planilhas.py` do repo
+  iData precisa de retry + exponential backoff em 429/5xx (500/502/503/504); erros permanentes
+  (404, auth) devem falhar imediato. Corrigido no commit `9249e87` (wrapping `_executar_com_retry`
+  em `update` e `append`). Diagnóstico rápido: `HttpError 503 ... The service is currently
+  unavailable` = indisponibilidade transitória do Google, NÃO problema de cert/token/config.
 - Não usar `google_token.json` (Gmail-only) para Sheets/Drive — foi o erro que custou passos na
   primeira tentativa de acessar a Symplexis.
 - A skill irmã `inter-api-id-consultoria` cobre a API do Banco Inter em si (consultas/relatórios);
