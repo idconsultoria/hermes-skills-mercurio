@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 83 skills** em 11 categorias.
+**Total: 84 skills** em 11 categorias.
 
 ---
 
@@ -126,6 +126,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 |---|---|---|
 | `cicd-oracle-preview` | Orchestrator | Replicar CI/CD: GHCR arm64, deploy SSH, preview por PR. |
 | `devops-artemishub` | Orchestrator | Operar/deployar o ArtemisHub no Oracle host. |
+| `git-fork-isolation` | Orchestrator | Isolar fork de rama do canônico com push guardado seguro. |
 
 ## devops — Revisão de entrega
 
@@ -197,6 +198,8 @@ Similar:
 - `github-repo-management` → `github-pr-workflow`
 - `codebase-inspection` → `github-code-review`
 - `auxiliar-adm-id` → `google-workspace`
+- `git-fork-isolation` → `cicd-oracle-preview`
+- `git-fork-isolation` → `github-repo-management`
 
 Uses:
 - `process-augmentation-pipeline` → `deep-research`
