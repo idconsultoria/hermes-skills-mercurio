@@ -200,6 +200,11 @@ Similar:
 - `auxiliar-adm-id` → `google-workspace`
 - `git-fork-isolation` → `cicd-oracle-preview`
 - `git-fork-isolation` → `github-repo-management`
+- `claude-code` → `product-pipeline`
+- `email-inbox-triage` → `document-to-action-items`
+- `docx` → `pdf`
+- `dogfood` → `requesting-code-review`
+- `user-interview` → `ideation-drilling`
 
 Uses:
 - `process-augmentation-pipeline` → `deep-research`
