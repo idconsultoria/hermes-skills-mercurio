@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 84 skills** em 11 categorias.
+**Total: 85 skills** em 11 categorias.
 
 ---
 
@@ -88,6 +88,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `postgres-sandbox-verification` | ToolIntegration | Verify features really persist against a throwaway Postgres. |
 | `process-augmentation-pipeline` | Orchestrator | Pipeline da ID: análise de processos, brainstorm e augmentação. |
 | `python-debugpy` | ToolIntegration | Debug Python: pdb REPL + debugpy remote (DAP). |
+| `react-fastapi-debugging` | ToolIntegration | Patch fallback silencioso e bugs de UI em app React+FastAPI. |
 | `requesting-code-review` | Orchestrator | Pre-commit review: security scan, quality gates, auto-fix. |
 | `simplify-code` | Orchestrator | Parallel 4-agent cleanup of recent code changes. |
 | `skills-repo-curator` | Orchestrator | Gestão do repo de skills — ciclos de consolidação, MECE, OKF. |
@@ -188,6 +189,8 @@ Similar:
 - `dogfood` → `systematic-debugging`
 - `hermes-agent-skill-authoring` → `skills-repo-curator`
 - `node-inspect-debugger` → `python-debugpy`
+- `react-fastapi-debugging` → `systematic-debugging`
+- `react-fastapi-debugging` → `dogfood`
 - `local-postgres-sandbox` → `postgres-sandbox-verification`
 - `plan` → `spike`
 - `simplify-code` → `requesting-code-review`
@@ -248,6 +251,7 @@ Uses:
 - `hermes-agent-replication` → `hermes-agent`
 - `gestao-financeira-id` → `google-sheets-automation`
 - `inter-api-id-consultoria` → `gestao-financeira-id`
+- `react-fastapi-debugging` → `devops-artemishub`
 - `merge-reconciler` → `opencode`
 - `sdlc-review` → `plan`
 
