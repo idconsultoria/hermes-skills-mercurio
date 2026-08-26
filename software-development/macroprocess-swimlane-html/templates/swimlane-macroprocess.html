@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE — Interactive HTML swimlane for an ID macroprocess deliverable.
+  Copy and fill the data arrays (LANES, ETAPAS, BOTTLENECKS) from the client's
+  macroprocess Google Doc. No build step — opens in any browser.
+
+  Data model (session-validated with Solution Master Telecom):
+    - LANES[]            : departments (as baias/swimlanes).
+    - ETAPAS[]           : num(1..N, flow order), titulo, dept(lane DONA),
+                           parceiros[](lanes que "participam" — handoffs),
+                           resumo, entrada, saida, falha, consequencia.
+    - Etapa DONA → solid card on own lane; PARCEIRO lane → dashed "participa"
+      cell (clickable, same modal); other cells empty.
+    - Click any cell → modal with Resumo / Entrada / Saída / Tratamento de erros.
+
+  ID identity: teal #14b8a6 on navy #0a1929 gradient, Nunito Sans.
+  Do NOT invent stage data absent from the source doc — leave gaps (e.g. SLA)
+  empty and call them out to the principal.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--navy:#0a1929;--card:#12294a;--card2:#16304f;--teal:#14b8a6;
+    --teal-soft:rgba(20,184,166,.14);--teal-border:rgba(20,184,166,.45);
+    --text:#e6f1fb;--muted:#8aa3c4;--line:rgba(138,163,196,.16);}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Nunito Sans',system-ui,sans-serif;color:var(--text);
+    background:radial-gradient(1200px 700px at 20% -10%,#12304f 0%,transparent 60%),
+               radial-gradient(1000px 600px at 110% 10%,#12304f 0%,transparent 55%),
+               linear-gradient(180deg,#0a1929,#0d1f3a);background-attachment:fixed;min-height:100vh;padding:28px 22px 60px}
+  header{max-width:1480px;margin:0 auto 18px}
+  .brand{display:flex;gap:12px;margin-bottom:14px;font-weight:800;font-size:13px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--teal)} .brand:before{content:"";width:11px;height:11px;border-radius:3px;background:var(--teal)}
+  h1{font-size:clamp(20px,3vw,30px);font-weight:800;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:14px;line-height:1.5;max-width:900px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{background:var(--teal-soft);border:1px solid var(--teal-border);color:var(--teal);
+    font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px}
+  .legend{margin-top:16px;display:flex;gap:22px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .stage-wrap{margin-top:26px;max-width:1480px}
+  .swimlane{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:rgba(10,25,41,.55)}
+  table.sw{width:100%;border-collapse:collapse;min-width:1150px}
+  .sw th,.sw td{border:1px solid var(--line);padding:6px;vertical-align:top}
+  .sw thead th{background:linear-gradient(180deg,#132c4e,#0f2240);color:var(--teal);font-size:11px;
+    font-weight:800;text-align:center;padding:9px 4px;position:sticky;top:0;white-space:nowrap}
+  .sw thead th .step{display:block;font-size:9px;color:var(--muted)}
+  .corner{min-width:150px;text-align:left!important}
+  .sw tbody td.lane{background:#0d1f3a;color:var(--text);font-weight:800;font-size:12px;min-width:150px;
+    position:sticky;left:0;z-index:2} .sw tbody td.lane small{display:block;color:var(--muted);font-size:10px}
+  .cell{min-height:96px;border-radius:10px;padding:8px 9px;background:var(--card);border:1px solid var(--card2);
+    cursor:pointer;transition:.15s;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .cell:hover{transform:translateY(-2px);border-color:var(--teal-border);box-shadow:0 8px 20px -8px rgba(20,184,166,.5)}
+  .cell .tag{font-size:9px;font-weight:800;color:var(--teal);background:var(--teal-soft);
+    border:1px solid var(--teal-border);padding:2px 7px;border-radius:999px;margin-bottom:6px;display:inline-block}
+  .cell h3{font-size:12px;font-weight:800;color:#fff;line-height:1.25}
+  .cell .partners{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;font-size:9px;color:var(--muted)}
+  .cell .partners span{background:rgba(138,163,196,.12);padding:2px 6px;border-radius:5px}
+  .cell.sec{background:transparent;border:1px dashed var(--teal-border);min-height:64px;box-shadow:none}
+  .cell.sec:hover{background:var(--teal-soft)}
+  td.empty{background:transparent}
+  .overlay{position:fixed;inset:0;background:rgba(4,12,24,.78);backdrop-filter:blur(3px);display:none;
+    align-items:center;justify-content:center;padding:20px;z-index:50}
+  .overlay.open{display:flex}
+  .modal{max-width:620px;width:100%;max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,#12294a,#0d1f3a);
+    border:1px solid var(--teal-border);border-radius:16px;padding:24px 26px;box-shadow:0 30px 80px -20px rgba(0,0,0,.9)}
+  .modal .mstep{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--teal);text-transform:uppercase}
+  .modal h2{font-size:20px;font-weight:800;margin:4px 0 2px}
+  .modal .mdept{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:16px}
+  .close{background:none;border:none;color:var(--muted);font-size:26px;cursor:pointer;line-height:1}
+  .block{background:var(--card2);border-radius:10px;padding:13px 15px;margin-top:12px;border-left:3px solid var(--teal)}
+  .block.err{border-left-color:#f59e0b}
+  .block h4{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:5px}
+  .block.err h4{color:#fbbf24}
+  .block p{font-size:13.5px;line-height:1.55}
+  .block .lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-top:8px}
+  .bottlenecks{background:linear-gradient(180deg,#142635,#0f1f36);border:1px solid #f59e0b44;border-radius:14px;
+    padding:18px 22px;margin-top:34px}
+  .bottlenecks h3{color:#fbbf24;font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+  .bottlenecks li{position:relative;padding:8px 0 8px 26px;border-bottom:1px dashed var(--line);font-size:13.5px;list-style:none}
+  .bottlenecks li:before{content:"▲";position:absolute;left:0;top:8px;color:#f59e0b;font-size:10px}
+</style>
+
+<div class="stage-wrap">
+  <div class="swimlane">
+    <table class="sw"><thead id="swHead"></thead><tbody id="swBody"></tbody></table>
+  </div>
+</div>
+<div class="bottlenecks" id="bottlenecks"></div>
+<div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+
+<script>
+/* ===== FILL FROM THE MACROPROCESS GOOGLE DOC ===== */
+const LANES = ["Departamento A","Departamento B"];
+const ETAPAS = [
+  {num:1, titulo:"Nome da etapa", dept:"Departamento A", parceiros:[],
+   resumo:"O que acontece.",
+   entrada:"Entrada principal.",
+   saida:"Saída principal.",
+   falha:"Falha possível.",
+   consequencia:"Consequência da falha."}
+];
+const BOTTLENECKS = ["Gargalo 1 ...","Gargalo 2 ..."];
+/* ===== END DATA ===== */
+
+const LANE_COLORS = {"Departamento A":"#2dd4bf","Departamento B":"#60a5fa"};
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function cardFor(et,primaria){
+  const c=LANE_COLORS[et.dept]||"#14b8a6";
+  const p=et.parceiros.length?`<div class="partners">${et.parceiros.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:"";
+  return primaria
+    ? `<div class="cell" data-etapa="${et.num}" style="border-left:3px solid ${c}"><span class="tag">${String(et.num).padStart(2,"0")} · ${et.dept.split(" · ")[0]}</span><h3>${esc(et.titulo)}</h3>${p}</div>`
+    : `<div class="cell sec" data-etapa="${et.num}" style="border-left:3px solid ${c}"><span class="tag">${String(et.num).padStart(2,"0")}</span><div class="partners">participa → ${esc(et.dept.split(" · ")[0])}</div></div>`;
+}
+function render(){
+  let h="<tr><th class='corner'>Departamento</th>";
+  ETAPAS.forEach(e=>h+=`<th><span class='step'>ETAPA</span>${String(e.num).padStart(2,"0")}</th>`);
+  h+="<th class='corner'>Duração/SLA</th>";
+  document.getElementById("swHead").innerHTML=h;
+  let b="";
+  LANES.forEach(l=>{
+    b+=`<tr><td class='lane'>${esc(l.split(" · ")[0])}<small>${esc(l.split(" · ")[1]||"")}</small></td>`;
+    ETAPAS.forEach(e=>{
+      if(e.dept===l)b+=`<td>${cardFor(e,true)}</td>`;
+      else if(e.parceiros.includes(l))b+=`<td>${cardFor(e,false)}</td>`;
+      else b+="<td class='empty'></td>";
+    });
+    b+="<td class='empty'></td></tr>";
+  });
+  document.getElementById("swBody").innerHTML=b;
+  document.getElementById("bottlenecks").innerHTML="<h3>Gargalos e pontos críticos</h3><ul>"+
+    BOTTLENECKS.map(x=>`<li>${esc(x)}</li>`).join("")+"</ul>";
+  document.querySelectorAll(".cell").forEach(c=>c.addEventListener("click",()=>openModal(c.dataset.etapa)));
+}
+function openModal(n){
+  const et=ETAPAS.find(e=>e.num==n),c=LANE_COLORS[et.dept]||"#14b8a6";
+  document.getElementById("modal").innerHTML=`
+    <div class="mstep">Etapa ${String(et.num).padStart(2,"0")}</div>
+    <h2>${esc(et.titulo)}</h2>
+    <div class="mdept" style="border-left:3px solid ${c};padding-left:8px">${esc([et.dept,...et.parceiros].join(" · "))}</div>
+    <button class="close" onclick="document.getElementById('overlay').classList.remove('open')">×</button>
+    <div class="block"><h4>Resumo da etapa</h4><p>${esc(et.resumo)}</p></div>
+    <div class="block"><h4>Entrada ▸</h4><p>${esc(et.entrada)}</p></div>
+    <div class="block"><h4>Saída ▸</h4><p>${esc(et.saida)}</p></div>
+    <div class="block err"><h4>Tratamento de erros</h4>
+      <div class="lbl">Falha</div><p>${esc(et.falha)}</p>
+      <div class="lbl">Consequência</div><p>${esc(et.consequencia)}</p></div>`;
+  document.getElementById("overlay").classList.add("open");
+}
+document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")document.getElementById("overlay").classList.remove("open")});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")document.getElementById("overlay").classList.remove("open")});
+render();
+</script>

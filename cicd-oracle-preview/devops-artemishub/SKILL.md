@@ -222,6 +222,7 @@ Modelo versionado: `.env.example`. Manual entregue em 22/08/2026 (zip) contém b
 | Proxy host NPM some | INSERT direto no SQLite não persiste | usar API do NPM |
 | `data must NOT have additional properties` no NPM | payload com campo não-schema | payload exato (sem `letsencrypt_agree`) |
 | HTTPS 000 ao testar em localhost | cert cobre só o domínio | testar contra o domínio real resolvido |
+| Preview sobe mas `deploy-preview` falha em `03:00: command not found` | `register-preview.sh` faz `source .env` e a linha `ARTEMISHUB_PIPELINE_SCHEDULE=seg,qua,sex 03:00` é lida como comando | não usar `source` no `.env`; extrair só `NPM_EMAIL`/`NPM_PASSWORD` via `grep`/`cut` (mesmo padrão do fallback manual) |
 
 ## 11. Pendências atuais
 - Conta OpenCode: modelo DeepSeek no `zen/go/v1` requer **opt-in região China**

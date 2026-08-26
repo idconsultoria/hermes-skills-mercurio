@@ -12,6 +12,7 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `inspecting-hermes-desktop-dom` — Read the live Hermes desktop DOM/CSS over CDP.
 - `internal-python-job-executor` — Executor interno Python p/ pipeline no backend FastAPI.
 - `local-postgres-sandbox` — Verify DB behavior via local Postgres sandbox from app dump.
+- `macroprocess-swimlane-html` — Mapa macroprocesso swimlane em HTML interativo p/ clientes da ID (doc do Drive).
 - `motor-nfse-id` — Resume/update o motor NFS-e da ID (living state).
 - `node-inspect-debugger` — Debug Node.js via --inspect + Chrome DevTools Protocol.
 - `pipeline-educacional` — Pipeline de produto educacional — concepção a entrega.

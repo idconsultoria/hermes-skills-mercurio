@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 85 skills** em 11 categorias.
+**Total: 87 skills** em 11 categorias.
 
 ---
 
@@ -21,6 +21,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `elaboracao-proposta-comercial` | Orchestrator | Propostas comerciais da ID — do contexto do cliente à proposta fechada. |
 | `emissao-nfse` | ToolIntegration | Emitir NFS-e/NF-e da ID via motor nfelib (NFS-e Nacional). |
 | `gestao-financeira-id` | Reference | Operar planilhas/Google da ID e fazer backfill de extrato. |
+| `id-comunicacao-multiusuario` | Reference | Ajustar registro do Mercúrio por sócio da ID (identidade por chat_id). |
 | `inter-api-id-consultoria` | ToolIntegration | Consultar extrato/saldo da conta Inter da ID. |
 | `planejamento-estrategico-2h` | Orchestrator | Planejamento estratégico em 2h — EOS V/TO + One-Page Plan. |
 | `proposta-comercial-consultoria` | Orchestrator | Proposta comercial de consultoria — princípios, pricing e estrutura. |
@@ -80,6 +81,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `inspecting-hermes-desktop-dom` | ToolIntegration | Read the live Hermes desktop DOM/CSS over CDP. |
 | `internal-python-job-executor` | ToolIntegration | Executor interno Python p/ pipeline no backend FastAPI. |
 | `local-postgres-sandbox` | ToolIntegration | Verify DB behavior via local Postgres sandbox from app dump. |
+| `macroprocess-swimlane-html` | Orchestrator | Mapa macroprocesso swimlane em HTML interativo p/ clientes da ID (a partir do doc do Drive). |
 | `motor-nfse-id` | Orchestrator | Resume/update the ID NFS-e emission motor (living state). |
 | `node-inspect-debugger` | ToolIntegration | Debug Node.js via --inspect + Chrome DevTools Protocol CLI. |
 | `pipeline-educacional` | Orchestrator | Pipeline de produto educacional — concepção pedagógica a entrega. |
@@ -208,6 +210,9 @@ Similar:
 - `docx` → `pdf`
 - `dogfood` → `requesting-code-review`
 - `user-interview` → `ideation-drilling`
+- `macroprocess-swimlane-html` → `bpmn-diagram-renderer`
+- `macroprocess-swimlane-html` → `process-augmentation-pipeline`
+- `id-comunicacao-multiusuario` → `messaging-platforms`
 
 Uses:
 - `process-augmentation-pipeline` → `deep-research`
@@ -254,6 +259,8 @@ Uses:
 - `react-fastapi-debugging` → `devops-artemishub`
 - `merge-reconciler` → `opencode`
 - `sdlc-review` → `plan`
+- `macroprocess-swimlane-html` → `google-workspace`
+- `id-comunicacao-multiusuario` → `hermes-agent`
 
 ---
 
