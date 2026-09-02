@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BiotechSe — Modelo de Proposta Comercial v1</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'Tomato Grotesk';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/tomato-grotesk-400.woff2') format('woff2')}
+@font-face{font-family:'Tomato Grotesk';font-style:normal;font-weight:500;font-display:swap;src:url('../assets/fonts/tomato-grotesk-500.woff2') format('woff2')}
+@font-face{font-family:'Tomato Grotesk';font-style:normal;font-weight:800;font-display:swap;src:url('../assets/fonts/tomato-grotesk-800.woff2') format('woff2')}
+:root{
+  --teal:#029190; --teal-deep:#01706f; --mint:#00ffa3; --mint-deep:#00c77f;
+  --cream:#f7eadf; --charcoal:#2d2d2d; --charcoal-mut:#414141; --offwhite:#f2f1f0;
+  --line:rgba(2,145,144,.18); --line-strong:rgba(2,145,144,.30);
+  --r:18px; --r-lg:28px; --r-xl:46px;
+  --font-display:'Clash Display',system-ui,sans-serif;
+  --font-body:'Tomato Grotesk','Hanken Grotesk',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:linear-gradient(160deg,#f7eadf 0%,#f2f1f0 55%,#eef8f2 100%);color:var(--charcoal);line-height:1.62;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:rgba(0,255,163,.3)}
+.orb{position:fixed;border-radius:50%;filter:blur(32px);z-index:-1;opacity:.38;pointer-events:none}
+.orb-teal{width:380px;height:380px;background:radial-gradient(circle at 30% 30%,rgba(2,145,144,.52),rgba(2,145,144,.04));top:-90px;left:-70px;animation:float1 16s ease-in-out infinite}
+.orb-mint{width:480px;height:480px;background:radial-gradient(circle at 60% 40%,rgba(0,255,163,.48),rgba(0,255,163,.03));top:28%;right:-140px;animation:float2 20s ease-in-out infinite}
+.orb-cream{width:300px;height:300px;background:radial-gradient(circle at 50% 50%,rgba(2,145,144,.28),rgba(2,145,144,.04));bottom:0;left:18%;animation:float3 18s ease-in-out infinite}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(36px,36px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-48px,28px)}}
+@keyframes float3{0%,100%{transform:translate(0,0)}50%{transform:translate(28px,-36px)}}
+.lg{background:linear-gradient(150deg,rgba(2,145,144,.16) 0%,rgba(0,255,163,.10) 46%,rgba(242,241,240,.42) 100%);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.78);border-top:1px solid rgba(255,255,255,.95);box-shadow:0 18px 42px rgba(2,70,69,.14), inset 0 1px 0 rgba(255,255,255,.65);border-radius:var(--r-lg)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+nav{position:sticky;top:0;z-index:50}
+.nav-in{max-width:1180px;margin:12px auto 0;padding:10px 16px;border-radius:100px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(135deg,rgba(2,145,144,.18),rgba(0,255,163,.08) 50%,rgba(242,241,240,.5));-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.75);box-shadow:0 10px 30px rgba(2,70,69,.12)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:500;font-size:1.02rem}
+.brand img{height:28px;width:auto;display:block}
+.nav-links{display:flex;gap:6px;flex-wrap:wrap}
+.nav-links a{text-decoration:none;font-size:.80rem;font-weight:500;color:var(--charcoal-mut);padding:7px 12px;border-radius:100px;transition:.15s}
+.nav-links a:hover{color:var(--teal-deep);background:rgba(2,145,144,.12)}
+.tag{font-size:.70rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:5px 11px;border-radius:100px;color:var(--teal-deep);background:rgba(0,255,163,.22);border:1px solid rgba(0,255,163,.4);white-space:nowrap}
+.cover{padding:48px 0 32px}
+.cover-card{border-radius:var(--r-xl);padding:42px 40px;position:relative;overflow:hidden;background:linear-gradient(140deg,rgba(255,255,255,.82) 0%,rgba(247,234,223,.72) 55%,rgba(238,248,242,.82) 100%);border:1px solid rgba(255,255,255,.9);box-shadow:0 22px 56px rgba(2,70,69,.16)}
+.cover-top{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.logos{display:flex;align-items:center;gap:20px}
+.logo-box{width:132px;height:132px;border-radius:18px;background:#fff;border:1px solid rgba(2,145,144,.18);display:flex;align-items:center;justify-content:center;padding:14px;box-shadow:0 8px 20px rgba(2,70,69,.08)}
+.logo-box img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.logo-box.client{border:1.5px dashed rgba(2,145,144,.32);background:rgba(255,255,255,.7)}
+.divider{width:1px;height:64px;background:rgba(2,145,144,.22)}
+.cover-meta{margin-top:28px}
+.kicker{font-size:.76rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-deep);display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:100px;background:rgba(2,145,144,.10);border:1px solid rgba(2,145,144,.22)}
+h1{font-family:var(--font-display);font-weight:500;font-size:clamp(2.1rem,5.2vw,3.4rem);line-height:1.06;letter-spacing:-.02em;margin-top:16px}
+h1 .accent{background:linear-gradient(100deg,var(--teal-deep) 0%,var(--teal) 50%,var(--mint-deep) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{margin-top:14px;font-size:1.12rem;color:var(--charcoal-mut);max-width:720px}
+.cover-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:100px;font-size:.82rem;font-weight:500;background:linear-gradient(135deg,rgba(2,145,144,.10),rgba(0,255,163,.10));border:1px solid rgba(255,255,255,.7)}
+.org-line{display:block;width:100%;height:auto;margin-top:22px}
+section{padding:40px 0}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.sec-head .num{font-family:var(--font-display);font-weight:500;color:var(--mint-deep);font-size:.95rem}
+h2{font-family:var(--font-display);font-weight:500;font-size:clamp(1.45rem,3vw,2.05rem);letter-spacing:-.015em}
+.sec-head p{color:var(--charcoal-mut);font-size:.92rem;max-width:560px}
+h3{font-family:var(--font-display);font-weight:500;font-size:1.25rem;letter-spacing:-.01em;margin-bottom:8px}
+p{color:var(--charcoal)}
+.small{font-size:.86rem;color:var(--charcoal-mut)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.card{padding:22px}
+.card h4{font-family:var(--font-display);font-weight:500;color:var(--teal-deep);font-size:.92rem;margin-bottom:6px}
+.list{list-style:none;display:grid;gap:8px;margin-top:10px}
+.list li{display:flex;gap:10px;align-items:flex-start;font-size:.92rem}
+.list li i{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,255,163,.22);color:var(--teal-deep);font-style:normal;font-size:.82rem;flex-shrink:0;margin-top:1px}
+.list.dont li i{background:rgba(255,90,90,.12);color:#b42318}
+.resumo{border-radius:var(--r-xl);padding:28px;position:relative;overflow:hidden;background:linear-gradient(140deg,rgba(2,145,144,.92),rgba(1,112,111,.96) 60%,rgba(5,60,59,.98));color:#fff;border:1px solid rgba(255,255,255,.28);box-shadow:0 24px 60px rgba(2,70,69,.38)}
+.resumo h3{color:#fff;font-size:1.35rem}
+.resumo p{color:rgba(255,255,255,.92)}
+.resumo .price{font-family:var(--font-display);font-weight:500;font-size:2.2rem;color:var(--mint);margin-top:10px}
+.resumo .roi{margin-top:10px;display:inline-flex;gap:8px;align-items:center;padding:8px 14px;border-radius:100px;background:rgba(0,255,163,.18);border:1px solid rgba(0,255,163,.32);font-size:.86rem}
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}
+@media(max-width:980px){.pricing{grid-template-columns:1fr}}
+.plan{border-radius:var(--r-lg);padding:22px;display:flex;flex-direction:column;gap:12px;background:#fff;border:1px solid var(--line);box-shadow:0 12px 28px rgba(2,70,69,.08)}
+.plan.recommended{transform:translateY(-4px);border:1.5px solid var(--teal);background:linear-gradient(150deg,rgba(2,145,144,.10),rgba(0,255,163,.08) 60%,#fff 100%);box-shadow:0 18px 42px rgba(2,70,69,.18);position:relative}
+.plan.recommended::before{content:"RECOMENDADO";position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:.68rem;font-weight:700;letter-spacing:.08em;padding:4px 10px;border-radius:100px;background:var(--teal);color:#fff}
+.plan h4{font-family:var(--font-display);font-weight:500;font-size:1.08rem;color:var(--charcoal)}
+.plan .price{font-family:var(--font-display);font-weight:500;font-size:1.9rem;color:var(--teal-deep)}
+.plan .price small{font-size:.9rem;color:var(--charcoal-mut);font-weight:400}
+.plan ul{list-style:none;display:grid;gap:7px;font-size:.88rem;color:var(--charcoal-mut)}
+.plan ul li{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:100px;font-weight:600;font-size:.9rem;text-decoration:none;transition:.15s;cursor:pointer}
+.btn-primary{background:linear-gradient(140deg,#01807f,var(--teal-deep));color:#fff;box-shadow:0 10px 22px rgba(2,70,69,.22)}
+.btn-primary:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn-ghost{background:rgba(2,145,144,.10);color:var(--teal-deep);border:1px solid rgba(2,145,144,.22)}
+.cond-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:14px;border:1px solid var(--line);background:#fff}
+.cond-table th,.cond-table td{padding:12px 16px;text-align:left;font-size:.88rem}
+.cond-table th{background:rgba(2,145,144,.08);font-weight:600;color:var(--teal-deep);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}
+.dark-strip{border-radius:var(--r-xl);padding:28px;background:linear-gradient(140deg,#123b3a,#06302f);color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 18px 40px rgba(2,70,69,.3)}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}
+@media(max-width:900px){.timeline{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.timeline{grid-template-columns:1fr}}
+.step{border-radius:var(--r);padding:16px;background:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.7)}
+.step small{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--teal-deep)}
+.step h5{font-family:var(--font-display);font-weight:500;margin-top:4px}
+.footer{padding:28px 0 36px;margin-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:var(--charcoal-mut);font-size:.80rem}
+.footer img{height:22px}
+.placeholder{color:#b42318;font-weight:600}
+code.ph{background:rgba(180,35,24,.08);padding:1px 6px;border-radius:6px;font-size:.85em}
+@media print{nav,.orb{display:none}body{background:#fff}.cover-card,.lg{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="orb orb-teal"></div><div class="orb orb-mint"></div><div class="orb orb-cream"></div>
+
+<nav>
+  <div class="nav-in wrap" style="padding-left:16px;padding-right:16px">
+    <div class="brand">
+      <img src="../assets/logos/biotechse-logo-positivo.svg" alt="BiotechSe" onerror="this.style.display='none'">
+      <span>Biotech<span style="color:var(--mint-deep)">se</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#resumo">Resumo</a><a href="#desafio">Desafio</a><a href="#escopo">Escopo</a>
+      <a href="#metodologia">Metodologia</a><a href="#investimento">Investimento</a><a href="#condicoes">Condições</a>
+    </div>
+    <span class="tag">Modelo v1 · Liquid Glass</span>
+  </div>
+</nav>
+
+<div class="wrap">
+<header class="cover">
+  <div class="cover-card">
+    <div class="cover-top">
+      <div class="logos">
+        <div class="logo-box"><img src="../assets/logos/biotechse-logo-positivo.svg" alt="BiotechSe — logo positivo" style="height:78px"></div>
+        <div class="divider"></div>
+        <div class="logo-box client"><span class="small" style="text-align:center; line-height:1.3">LOGO<br>{{CLIENTE_NOME}}<br><span style="font-size:.72rem;opacity:.7">{{CLIENTE_LOGO_URL}}</span></span></div>
+        <div style="margin-left:6px">
+          <div style="font-family:var(--font-display);font-weight:500;font-size:.92rem">Biotech<span style="color:var(--mint-deep)">se</span> <span style="font-weight:400;color:var(--charcoal-mut)">×</span> {{CLIENTE_NOME}}</div>
+          <div class="small">Biotecnologia Agroindustrial</div>
+        </div>
+      </div>
+      <div style="text-align:right" class="small">
+        <div>{{DATA_PROPOSTA}}</div>
+        <div style="margin-top:6px;display:inline-flex;gap:6px;align-items:center;padding:6px 12px;border-radius:100px;background:rgba(0,255,163,.18);border:1px solid rgba(0,255,163,.32);color:var(--teal-deep);font-weight:600">Válida por 21 dias</div>
+      </div>
+    </div>
+    <div class="cover-meta">
+      <span class="kicker">Proposta comercial · BiotechSe</span>
+      <h1>{{TITULO_PROPOSTA}}<br><span class="accent">{{SUB_TITULO_PROPOSTA}}</span></h1>
+      <p class="subtitle">De laboratório à lavoura: bioinsumos de precisão que reduzem custo, regeneram solo e escalam produtividade — com rastreabilidade e ciência de fronteira.</p>
+      <div class="cover-badges">
+        <span class="badge">🧬 Biofábrica modular</span><span class="badge">🌱 Solo vivo</span>
+        <span class="badge">📊 Rastreabilidade por lote</span><span class="badge">🏜️ Nordeste · Sergipe</span>
+      </div>
+    </div>
+    <svg class="org-line" viewBox="0 0 1200 64" fill="none" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 32 C150 8 300 48 450 28 C600 12 750 52 900 30 C1050 14 1130 42 1200 22" stroke="#01706f" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M0 46 C160 22 320 62 470 42 C620 26 770 64 920 46 C1040 34 1120 54 1200 38" stroke="#00c77f" stroke-width="1.4" stroke-linecap="round" opacity=".55"/>
+      <path d="M24 12 C34 5 46 5 54 13 C46 20 34 19 24 12z" fill="#00c77f"/>
+    </svg>
+    <div style="margin-top:10px" class="small">Slogan: <em style="font-family:var(--font-display);color:var(--teal-deep)">projetando as sementes da nova era</em> · Paleta oficial abyss teal + mint · Liquid glass v5</div>
+  </div>
+</header>
+
+<section id="resumo">
+  <div class="sec-head"><span class="num">02</span><h2>Resumo executivo</h2><p>Uma página, com preço ancorado em valor. Escrito por último.</p></div>
+  <div class="resumo">
+    <h3>{{CLIENTE_NOME}} — o que muda em 90 dias</h3>
+    <p style="margin-top:8px">{{RESUMO_EXECUTIVO}}</p>
+    <p style="margin-top:12px" class="small" style="color:rgba(255,255,255,.78)"><b style="color:var(--mint)">Exemplo de ancoragem:</b> “Hoje {{CLIENTE_NOME}} gasta R$ X com defensivo/fertilizante. Com bioinsumo sob medida, projetamos economia de R$ Y/safra + regeneração de solo medida em Z. O investimento abaixo representa 1/5 desse retorno.”</p>
+    <div class="price">a partir de R$ <span class="placeholder">{{INVESTIMENTO_TABELA}}</span> <span style="font-size:.95rem;font-weight:400;color:rgba(255,255,255,.8)">/ projeto</span></div>
+    <div class="roi">↗ ROI projetado 4–6× em 2 safras · payback na 1ª safra quando combinado com manejo</div>
+    <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap">
+      <a class="btn btn-primary" href="#investimento">Ver opções de investimento →</a>
+      <a class="btn" style="background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.32)" href="#proximos">Agendar apresentação ao vivo</a>
+    </div>
+  </div>
+</section>
+
+<section id="desafio">
+  <div class="sec-head"><span class="num">03</span><h2>Entendimento do desafio</h2><p>Situação + custo de não agir, nas palavras do cliente.</p></div>
+  <div class="grid2">
+    <div class="lg card">
+      <h4>📍 Contexto atual</h4>
+      <p>{{DESAFIO_CONTEXTO}}</p>
+      <p class="small" style="margin-top:10px">Substitua por diagnóstico real (área, cultura, manejo, solo, histórico de produtividade, pressão de pragas, custo atual por ha).</p>
+    </div>
+    <div class="lg card">
+      <h4>⚠️ Custo de não agir</h4>
+      <p>Sem intervenção: custo crescente com insumos sintéticos, compactação/biologia pobre do solo, volatilidade de preço e risco regulatório. Cada safra sem transição biológica adia o ganho composto de solo vivo.</p>
+      <ul class="list">
+        <li><i>•</i> R$ /ha pressionado por defensivo + fertilizante</li>
+        <li><i>•</i> Perda de produtividade oculta por microbiologia degradada</li>
+        <li><i>•</i> Dependência de fornecedor e de câmbio</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="diagnostico">
+  <div class="sec-head"><span class="num">04</span><h2>Diagnóstico &amp; oportunidade</h2><p>Onde estamos vs onde podemos chegar.</p></div>
+  <div class="grid3">
+    <div class="lg card"><h4>🔬 Laboratório</h4><p class="small">Coleta e análise microbiológica + físico-química. Banco de cepas nativas do Nordeste.</p><p style="margin-top:8px">{{DIAGNOSTICO_ATUAL}}</p></div>
+    <div class="lg card"><h4>🧫 Biofábrica</h4><p class="small">Produção sob demanda, rastreável por lote, com controle de qualidade e viabilidade.</p><p style="margin-top:8px">Capacidade modular que escala com a área e a janela de aplicação.</p></div>
+    <div class="lg card"><h4>🌾 Campo</h4><p class="small">Aplicação assistida + monitoramento. Métricas: custo/ha, Brix, matéria orgânica, produtividade.</p><p style="margin-top:8px">Ciclo fechado: solo → planta → dados → próxima formulação.</p></div>
+  </div>
+</section>
+
+<section id="escopo">
+  <div class="sec-head"><span class="num">05</span><h2>Escopo &amp; entregáveis</h2><p>Verificável, com critério de aceite e data. E o que fica fora.</p></div>
+  <div class="grid2">
+    <div class="lg card">
+      <h4>✅ Inclui</h4>
+      <p class="small">Cada item com formato + critério de aceite.</p>
+      <ul class="list">
+        <li><i>✓</i> {{ESCOPO_INCLUI}}</li>
+        <li><i>✓</i> Diagnóstico de solo (laudo + recomendação) — PDF + planilha</li>
+        <li><i>✓</i> Formulação de bioinsumo sob medida — lote piloto + ficha técnica</li>
+        <li><i>✓</i> Produção em biofábrica — lotes com QR de rastreabilidade</li>
+        <li><i>✓</i> Aplicação assistida + treinamento da equipe — 2 visitas técnicas</li>
+        <li><i>✓</i> Relatório de impacto — custo/ha, produtividade, saúde do solo</li>
+      </ul>
+    </div>
+    <div class="lg card">
+      <h4>🚫 Não inclui (exclusões)</h4>
+      <p class="small">Evita escopo creep. Mudanças via change order.</p>
+      <ul class="list dont">
+        <li><i>×</i> {{ESCOPO_NAO_INCLUI}}</li>
+        <li><i>×</i> Insumos sintéticos, maquinário, frete além de 150km</li>
+        <li><i>×</i> Licenciamento ambiental além do escopo pactuado</li>
+        <li><i>×</i> Horas ilimitadas — 2 rodadas de revisão inclusas</li>
+      </ul>
+      <div class="small" style="margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(2,145,144,.08);border:1px solid rgba(2,145,144,.14)"><b>Responsabilidades do cliente:</b> acesso à área, janela de aplicação, feedback em até 5 dias úteis, decisão por interlocutor único.</div>
+    </div>
+  </div>
+</section>
+
+<section id="metodologia">
+  <div class="sec-head"><span class="num">06</span><h2>Metodologia &amp; cronograma</h2><p>Fases com marcos verificáveis.</p></div>
+  <div class="lg card">
+    <p>{{METODOLOGIA_FASES}}</p>
+    <div class="timeline">
+      <div class="step"><small>Fase 1 · Semana 1–2</small><h5>Imersão &amp; coleta</h5><p class="small">Visita, coleta, laudo. Entrega: laudo + mapa de talhões.</p></div>
+      <div class="step"><small>Fase 2 · Semana 3–5</small><h5>Formulação</h5><p class="small">Seleção de cepas, testes de viabilidade. Entrega: ficha + lote piloto.</p></div>
+      <div class="step"><small>Fase 3 · Semana 6–8</small><h5>Biofábrica</h5><p class="small">Produção escalada, QC e rastreabilidade. Entrega: lotes com QR.</p></div>
+      <div class="step"><small>Fase 4 · Semana 9–12</small><h5>Campo &amp; impacto</h5><p class="small">Aplicação, monitoramento e relatório. Entrega: relatório de ROI.</p></div>
+    </div>
+    <p class="small" style="margin-top:14px">Cronograma ajustado à janela da cultura. Cada fase com critério de aceite e pagamento por marco.</p>
+  </div>
+</section>
+
+<section id="investimento">
+  <div class="sec-head"><span class="num">07</span><h2>Investimento</h2><p>Três opções · preço em tabela, ancorado em valor. Médio é o recomendado.</p></div>
+  <div style="padding:14px 18px;border-radius:14px;background:rgba(0,255,163,.10);border:1px solid rgba(0,255,163,.24);font-size:.88rem"><b>Ancoragem:</b> {{CLIENTE_NOME}} investe hoje ~R$ X/ha em defensivo. O pacote Recomendado equivale a R$ Y/ha e projeta economia de R$ Z na safra — ROI 5× antes do preço.</div>
+  <div class="pricing">
+    <div class="plan">
+      <h4>Essencial</h4>
+      <p class="small">Diagnóstico + lote piloto para 1 talhão</p>
+      <div class="price">R$ 18.500 <small>à vista</small></div>
+      <ul>
+        <li>✓ Laudo completo + recomendação</li>
+        <li>✓ 1 formulação sob medida (200L)</li>
+        <li>✓ 1 visita técnica</li>
+        <li>— Sem produção escalada</li>
+      </ul>
+      <a class="btn btn-ghost" href="#condicoes">Escolher Essencial</a>
+    </div>
+    <div class="plan recommended">
+      <h4>Recomendado <span style="font-weight:400;color:var(--charcoal-mut)">· mais contratado</span></h4>
+      <p class="small">Piloto + produção para 500ha + acompanhamento</p>
+      <div class="price">R$ 42.000 <small>ou 3× R$ 14.800</small></div>
+      <ul>
+        <li>✓ Tudo do Essencial</li>
+        <li>✓ Produção 1.200L (3 lotes rastreáveis)</li>
+        <li>✓ 2 aplicações assistidas + treinamento</li>
+        <li>✓ Relatório de impacto e recomendação safra seguinte</li>
+      </ul>
+      <a class="btn btn-primary" href="#condicoes">Escolher Recomendado</a>
+      <div class="small" style="text-align:center;color:var(--teal-deep);font-weight:600">Melhor custo por ha · ROI 5×</div>
+    </div>
+    <div class="plan">
+      <h4>Completo</h4>
+      <p class="small">Escala + biofábrica dedicada + 12 meses</p>
+      <div class="price">R$ 78.000 <small>ou 6× R$ 14.200</small></div>
+      <ul>
+        <li>✓ Tudo do Recomendado</li>
+        <li>✓ Biofábrica modular na fazenda</li>
+        <li>✓ 12 meses de suporte e reformulações</li>
+        <li>✓ Dados integrados (dashboard por talhão)</li>
+      </ul>
+      <a class="btn btn-ghost" href="#condicoes">Escolher Completo</a>
+    </div>
+  </div>
+  <p class="small" style="margin-top:12px"><b>Tabela por linha mapeada a entregáveis</b> — nunca só o total. Desconto só em pacote/antecipação. Regra: 10% de desconto ≈ −33% de margem — negocie escopo, não taxa.</p>
+  <div style="margin-top:10px">{{INVESTIMENTO_TABELA}}</div>
+</section>
+
+<section id="condicoes">
+  <div class="sec-head"><span class="num">08</span><h2>Condições comerciais</h2><p>Validade, pagamento por marcos, revisões.</p></div>
+  <div class="grid2">
+    <div class="lg card">
+      <h4>💳 Pagamento</h4>
+      <table class="cond-table" style="margin-top:10px">
+        <tr><th>Marco</th><th>Condição</th></tr>
+        <tr><td>Assinatura</td><td>30% na assinatura (reserva de biofábrica)</td></tr>
+        <tr><td>Entrega do lote piloto</td><td>40%</td></tr>
+        <tr><td>Relatório final</td><td>30%</td></tr>
+      </table>
+      <p class="small" style="margin-top:10px">À vista com 5% de desconto. {{CONDICOES_PAGAMENTO}}</p>
+    </div>
+    <div class="lg card">
+      <h4>📋 Regras</h4>
+      <ul class="list">
+        <li><i>•</i> <b>Validade:</b> {{DATA_PROPOSTA}} — 21 dias (propostas abertas raramente fecham)</li>
+        <li><i>•</i> <b>Revisões:</b> 2 rodadas inclusas; extras via change order</li>
+        <li><i>•</i> <b>Confidencialidade:</b> mútua sobre cepas, formulações e dados de campo</li>
+        <li><i>•</i> <b>PI:</b> formulação é da BiotechSe; direito de uso do cliente por safra contratada</li>
+        <li><i>•</i> <b>Impostos:</b> valores sem ISS incluso (Aracaju/SE)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="prova">
+  <div class="sec-head"><span class="num">09</span><h2>Quem já confiou</h2><p>Não prometa, prove — números, não adjetivos.</p></div>
+  <div class="dark-strip">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <img src="../assets/logos/biotechse-logo-negativo.svg" alt="BiotechSe" style="height:26px" onerror="this.style.display='none'">
+      <span style="font-family:var(--font-display);font-weight:500;opacity:.9">Biotech<span style="color:var(--mint)">se</span></span>
+      <span style="opacity:.6">·</span>
+      <span class="small" style="color:rgba(255,255,255,.78)">Casos com métrica auditada — substituir por portfolio real</span>
+    </div>
+    <div class="grid3" style="margin-top:18px">
+      <div style="border-radius:16px;padding:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)">
+        <div style="font-size:.82rem;opacity:.8">Soja · 1.200ha · Oeste da Bahia</div>
+        <div style="font-family:var(--font-display);font-weight:500;font-size:1.35rem;margin-top:4px;color:var(--mint)">−18% custo</div>
+        <div class="small" style="color:rgba(255,255,255,.78)">com defensivo na 1ª safra, mantendo produtividade</div>
+      </div>
+      <div style="border-radius:16px;padding:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)">
+        <div style="font-size:.82rem;opacity:.8">Milho · Cooperativa · Sertão</div>
+        <div style="font-family:var(--font-display);font-weight:500;font-size:1.35rem;margin-top:4px;color:var(--mint)">+22% produtividade</div>
+        <div class="small" style="color:rgba(255,255,255,.78)">em 2 safras com manejo biológico + plantio direto</div>
+      </div>
+      <div style="border-radius:16px;padding:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)">
+        <div style="font-size:.82rem;opacity:.8">Hortifrúti · 80ha · Sergipe</div>
+        <div style="font-family:var(--font-display);font-weight:500;font-size:1.35rem;margin-top:4px;color:var(--mint)">Solo vivo +42%</div>
+        <div class="small" style="color:rgba(255,255,255,.78)">matéria orgânica e Brix em 8 meses</div>
+      </div>
+    </div>
+    <p class="small" style="margin-top:14px;color:rgba(255,255,255,.68)">{{PROVA_SOCIAL}} · Sempre usar clientes reais com logo autorizado. Logos em <code>assets/clientes/</code>.</p>
+  </div>
+</section>
+
+<section id="sobre">
+  <div class="sec-head"><span class="num">10</span><h2>Sobre a BiotechSe</h2><p>Ciência de fronteira, com o agro no coração.</p></div>
+  <div class="lg card" style="display:flex;gap:22px;align-items:center;flex-wrap:wrap">
+    <img src="../assets/logos/biotechse-simbolo-positivo.svg" alt="Símbolo BiotechSe" style="width:92px;height:92px" onerror="this.style.display='none'">
+    <div style="flex:1;min-width:260px">
+      <p><em style="font-family:var(--font-display);font-size:1.15rem;color:var(--teal-deep)">somos uma empresa com o agro no coração. o nordeste em nossas veias. e sergipe em nossa alma.</em></p>
+      <p class="small" style="margin-top:8px"><b>Símbolo = B grotesk + dupla fita de DNA + folha.</b> 3 pilares que unem técnica, genômica e vitalidade. Biofábrica modular, cepas nativas, rastreabilidade por lote.</p>
+    </div>
+  </div>
+</section>
+
+<section id="proximos" style="padding-top:12px">
+  <div class="lg card" style="display:flex;justify-content:space-between;gap:22px;align-items:center;flex-wrap:wrap;background:linear-gradient(135deg,rgba(2,145,144,.14),rgba(0,255,163,.10) 60%,rgba(255,255,255,.72))">
+    <div>
+      <h3>Próximos passos</h3>
+      <ol style="margin-top:8px;padding-left:20px;font-size:.92rem;display:grid;gap:4px">
+        <li>Apresentação ao vivo em até 24h (não enviar e esperar)</li>
+        <li>Aprovação + assinatura + 30% de entrada</li>
+        <li>Agendamento da coleta — Fase 1 em D+3</li>
+      </ol>
+      <p class="small" style="margin-top:8px">{{PROXIMOS_PASSOS}}</p>
+    </div>
+    <div style="display:grid;gap:10px;min-width:240px">
+      <a class="btn btn-primary" href="#cover">Aprovar proposta Recomendada</a>
+      <a class="btn btn-ghost" href="mailto:contato@biotechse.com.br">contato@biotechse.com.br</a>
+      <div class="small" style="text-align:center">Follow-up: 3–5 dias + 1 dia antes do vencimento</div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div style="display:flex;align-items:center;gap:10px">
+    <img src="../assets/logos/biotechse-logo-positivo.svg" alt="BiotechSe" onerror="this.style.display='none'">
+    <span>Biotech<span style="color:var(--mint-deep)">se</span> · Biotecnologia Agroindustrial · Sergipe · projetando as sementes da nova era</span>
+  </div>
+  <div>Modelo v1 · Liquid glass · Assets em <code>assets/logos/</code> · Validade 14–30 dias</div>
+</footer>
+</div>
+</body>
+</html>

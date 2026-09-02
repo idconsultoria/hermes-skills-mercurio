@@ -83,6 +83,21 @@ Recomputa setas em `resize`, `document.fonts.ready`, `window load`, e mudanças 
 layout via `ResizeObserver` *debounced* (90ms). Fontes carregando tarde desalinham as
 setas se você desenhar só uma vez. Snippet: `references/orthogonal-arrows.md`.
 
+## Ramificação (cisão e junção) — quando a triagem define 1 de N caminhos
+
+Quando o doc de origem descreve **qualificação/triagem que decide a categoria** e cada OS segue **apenas 1 caminho** até convergir no faturamento/pós-venda (caso Solution Master **Safety**), o modelo linear `1..N` não serve.
+
+**Padrão validado (Safety v13, 2026-08 — 4 + 3 paralelos + 5 tarefas):**
+
+- **Estrutura em 3 blocos visuais:** Fase 1 linear (1.1→1.4) → **seção de ramificação** → Fase 3 linear (3.1→3.5). A cisão acontece **após 1.2 Qualificação** (`◈ DECISÃO DE CATEGORIA`); a junção acontece **antes de 3.1 Faturamento** (`⬢ JUNÇÃO`).
+- **Branch grid:** `display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px` dentro de um `.branch-section` (card branco com borda `#cdd7e4`). Cada coluna = 1 caminho, com `branch-label` colorido (Ensaios Elétricos `#2563eb`, Gás/Metrologia `#0f766e`, Linha Vida/NR-35 `#6d28d9`), 1 `cell` macro por caminho (borda-left na cor da categoria) e `ul.steps-mini` com as sub-etapas internas.
+- **Não expandir sub-etapas como colunas do swimlane:** cada categoria vira **um bloco macro** cujo modal lista as sub-etapas (ex.: Ensaios 2.1.1→2.1.4, Gás 2.2.1→2.2.3, Linha Vida 3A + 3B). Evita explosão para 20+ colunas e mantém `1 tarefa macro = 1 bloco`.
+- **Dados:** `FASE1[]`, `BRANCHES[]` (id `2A/2B/2C`, `label`, `sublabel`, `cor`, `detalheSubpassos[]`), `FASE3[]` em vez de um único `ETAPAS[]`. Render separado: `renderFase1()` + `renderBranch()` + `renderFase3()`. Modal unificado resolve `key` em `[...FASE1, ...BRANCHES, ...FASE3]`.
+- **Legenda:** adicionar `◈ Cisão: triagem define 1 dos 3 caminhos` e `⬢ Junção: os 3 caminhos convergem no faturamento` além de `➜ sequência / ↔ parceria`.
+- **Referência viva:** `references/branching-safety.md` + `safety-macroprocesso-v13.html` como exemplo.
+
+**Quando usar:** doc traz "3 categorias de Safety", "2 subfluxos (3A/3B)", ou frase do principal "a partir da triagem haja a cisão dos 3 caminhos e em seguida a junção na área de faturamento". Se o doc for linear (Telecom 11 tarefas, Medical 12 tarefas), manter swimlane linear puro.
+
 ## Validação antes de entregar (nunca entregar artefato visual cego)
 Não depende de screenshot. Checks determinísticos (container pode não ter Chromium;
 o harness `browser_exec` pode falhar com `PermissionError` — é ambiental, não

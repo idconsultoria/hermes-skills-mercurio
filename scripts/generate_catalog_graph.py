@@ -4,7 +4,7 @@ reading skills and relations from index.md, not from disk (which has ~140 untrac
 Writes only skills_graph.html and graph_data.json — never the index.md.
 """
 import os, re, json, sys
-os.chdir('/opt/data/skills')
+os.chdir('/opt/mercurio-data/skills')
 
 INDEX = 'index.md'
 TEMPLATE = 'software-development/skills-repo-curator/templates/graph.html'

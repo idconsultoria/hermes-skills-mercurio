@@ -1,7 +1,7 @@
 ---
 name: auxiliar-adm-id
 description: "Auxiliar admin da ID: contratos, planilhas, NFS-e, Drive."
-version: 1.0.0
+version: 1.1.0
 author: Mercúrio · ID Consultoria
 license: MIT
 platforms: [linux]
@@ -10,7 +10,7 @@ metadata:
     tags: [ID, contratos, planilhas, finanças, NFS-e, Drive, email, admin, administração]
     scopes: [id]
 type: Orchestrator
-timestamp: 2026-08-19T14:00:00Z
+timestamp: 2026-09-01T13:40:00Z
 ---
 
 # Auxiliar Administrativo da ID
@@ -43,25 +43,34 @@ Acionar em demandas que envolvam:
 
 ## 1 · Acesso Google (OAuth) — QUAL token usar
 
-Tokens em `/opt/data/`, usados pelo venv `/opt/data/venvs/google/bin/python`.
+**HERMES_HOME = `/opt/mercurio-data`** (legado `/opt/data` descontinuado desde 27/08/2026). Todos os tokens ficam em `$HERMES_HOME/*.json` e o venv é `$HERMES_HOME/.venv` ou `id-nfse-motor/.venv`.
 
-| Token | Conta | Escopos | Uso |
-|---|---|---|---|
-| `google_token.json` | admin@idconsultoria.ai | Gmail apenas | email (Gmail API) |
-| `google_token.admin_idconsultoria.json` | admin@idconsultoria.ai | Drive+Sheets+Gmail+Calendar+Docs | **Drive/planilhas/contratos** |
-| `google_token.gustavo_idteal.json` | gustavo.idteal@gmail.com | Gmail | email financeiro |
-| `google_token.backup_gustavomelloenciv.json` | gustavomelloenciv@gmail.com | Drive+Sheets+Gmail completos | fallback |
+> **2026-09-01 11:08 UTC — estado real verificado:** `admin@idconsultoria.ai` **RECUPERADO** de `/home/ubuntu/selfhost/hermes/data/google_token_admin.json` no host Oracle (sem ligar contêiner `hermes_mercurio`) e restaurado em `$HERMES_HOME/google_token.json` (+ `.secrets/`). `gustavo.idteal@gmail.com` **RECRIADO via OAuth** em `$HERMES_HOME/google_token.gustavo_idteal.json` (refresh `1//06X0c7...`, validado `gmail.getProfile → gustavo.idteal@gmail.com`). `gustavomelloenciv@gmail.com` permanece **VETADO**.
 
-**CRÍTICO:** o token de produção para Drive/planilhas é `google_token.admin_idconsultoria.json`
-(não o `google_token.json`, que só tem Gmail). Ao carregar um token: **usar os escopos que
-ele já possui** (`d.get("scopes")`), senão o refresh falha com `invalid_scope` (erro já visto).
+| Token esperado | Conta | Escopos | Uso | Estado 01/09/2026 11:08 UTC |
+|---|---|---|---|---|
+| `$HERMES_HOME/google_token.json` (e `.secrets/google_token.json`) | **admin@idconsultoria.ai** | Drive+Sheets+Gmail+Calendar+Docs | **Drive/planilhas/contratos + Gmail admin** | ✅ ATIVO — `admin@idconsultoria.ai` (msgs 1663, refresh `042KPgOStXCe...`, origem Oracle `hermes/data/google_token_admin.json`) |
+| `$HERMES_HOME/google_token.gustavo_idteal.json` (e `.secrets/`) | **gustavo.idteal@gmail.com** | Gmail+Drive+Sheets+Calendar+Docs (8 scopes) | **email financeiro — Nubank/Inter/Mercado Pago (extratos/faturas)** | ✅ ATIVO — `gustavo.idteal@gmail.com` (msgs 3117, refresh `06X0c7_Lvvm...`, recriado via OAuth 01/09/2026) |
+| `gustavomelloenciv@gmail.com` | gustavomelloenciv@gmail.com | Drive+Sheets+Gmail completos | **FALLBACK PROIBIDO** — nunca usar para demandas da ID (determinação do principal 01/09/2026) | ⛔ VETADO — nenhum arquivo ativo o contém (verificado `grep -c gustavomelloenciv = 0`) |
 
-Padrão de carregamento seguro:
+**Regra de ouro (01/09/2026): NUNCA usar `gustavomelloenciv@gmail.com` para demandas da ID.** Usar exclusivamente `admin@idconsultoria.ai` (Drive + Gmail admin) e `gustavo.idteal@gmail.com` (Gmail financeiro). Se o `getProfile()` retornar `gustavomelloenciv`, abortar e pedir re-auth.
+
+**CRÍTICO:** ao carregar um token, **usar os escopos que ele já possui** (`d.get("scopes")`), senão o refresh falha com `invalid_scope`.
+
+Padrão de carregamento seguro (resiliente a HERMES_HOME):
 ```python
-d=json.loads(open('/opt/data/google_token.admin_idconsultoria.json').read())
-if not d.get("type"): d["type"]="authorized_user"
-c=Credentials.from_authorized_user_info(d, d.get("scopes"))
-if c.expired and c.refresh_token: c.refresh(Request())
+import os, json
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
+HH = os.environ.get("HERMES_HOME", "/opt/mercurio-data")
+# admin — Drive
+d=json.loads(open(f"{HH}/google_token.json").read())  # deve ser admin@idconsultoria.ai
+# financeiro — Gmail
+d2=json.loads(open(f"{HH}/google_token.gustavo_idteal.json").read())  # gustavo.idteal@gmail.com
+for d in (d, d2):
+    if not d.get("type"): d["type"]="authorized_user"
+    c=Credentials.from_authorized_user_info(d, d.get("scopes"))
+    if c.expired and c.refresh_token: c.refresh(Request())
 ```
 
 ## 2 · Drive da ID — estrutura e contratos
@@ -104,11 +113,11 @@ Fluxo de coleta mensal (origem: caixas de email → Drive):
    seguinte, com 3 anexos (`*uuid*-AAAA-MM-DD-AAAA-MM-DD.{csv,ofx,pdf}`) → subpasta `Extrato/`.
 3. **Nubank fatura:** email "A fatura do seu cartão Nu Empresas está fechada" (~dia 15) traz anexo
    `Nubank_AAAA-MM-DD.pdf` → subpasta `Fatura/`.
-- **Onde procurar:** esses emails de Nubank/Inter estão em **`gustavo.idteal@gmail.com`** (`google_token.gustavo_idteal.json`),
+- **Onde procurar:** esses emails de Nubank/Inter/Mercado Pago estão em **`gustavo.idteal@gmail.com`** (`$HERMES_HOME/google_token.gustavo_idteal.json`),
   NÃO na caixa admin. A caixa admin não tem Nubank/Inter.
-- Buscar sem restringir `from:` demais — os remetentes variam (`no-reply@inter.co`, `todomundo@novidades.nubank.com.br`).
+- Buscar sem restringir `from:` demais — os remetentes variam (`no-reply@inter.co`, `todomundo@novidades.nubank.com.br`, `no-reply@mercadopago.com.br`).
   Ex.: `q="nubank newer_than:60d"` e `q="inter newer_than:60d"` acham tudo (Pix, fatura, extrato).
-- **Upload usa o token Drive** `google_token.admin_idconsultoria.json`.
+- **Upload usa o token Drive** `$HERMES_HOME/google_token.json` (**admin@idconsultoria.ai**) — nunca o fallback `gustavomelloenciv@gmail.com`.
 
 Detalhes técnicos do Google API (download de anexo + upload) em `references/extratos-mensais-google-api.md`.
 Mapa de IDs das pastas em `references/mapa-pastas-comprovantes.md`.
@@ -173,29 +182,31 @@ Google renderiza o nome do arquivo.
 - Automação diária: cron iData roda o entrypoint "ontem" (extrato + saldo → abas CCI_*
   da Gestão Financeira). Schedule 07:00 BRT (job cron `e60e713b0b62`). Desde 22/08/2026 o
   job é **watchdog silencioso**: `no_agent=true` + script
-  `/opt/data/scripts/watchdog-idata-diario.sh` (que chama `runner-idata-diario.sh`) —
+  `$HERMES_HOME/scripts/watchdog-idata-diario.sh` (que chama `runner-idata-diario.sh`) —
   **só notifica o principal se der ERRO**; sucesso fica mudo (exit 0 + stdout vazio = sem
   entrega). Detalhes do modo watchdog no schema de `cronjob`.
 
 ## 5 · Emails — busca nos dois
 
-- `admin@idconsultoria.ai` (token `google_token.json`): contratos, NFs, financeiro
+- `admin@idconsultoria.ai` (token `$HERMES_HOME/google_token.json`): contratos, NFs, financeiro
   corporativo. Contratos assinados via Clicksign podem vir de `assinatura@clicksign.com`.
-- `gustavo.idteal@gmail.com` (token `google_token.gustavo_idteal.json`): financeiro do
-  Inter (Pix, ISS), comunicações da conta.
+- `gustavo.idteal@gmail.com` (token `$HERMES_HOME/google_token.gustavo_idteal.json`): financeiro —
+  **Nubank (fatura+extrato), Inter (extratos), Mercado Pago (extratos), Pix, ISS**, comunicações da conta.
+  **NUNCA usar `gustavomelloenciv@gmail.com` — fallback vetado 01/09/2026.**
 - Buscar contratos/valores com queries Gmail (from/to/assinad/parcela/valor).
 
 ## 6 · NFS-e
 
-- Ver skills `emissao-nfse` / `motor-nfse-id`. Motor nfelib em `/opt/data/id-nfse-motor`.
+- Ver skills `emissao-nfse` / `motor-nfse-id`. Motor nfelib em `$HERMES_HOME/id-nfse-motor` (legado `/opt/data/id-nfse-motor`).
 - Aracaju usa protocolo NACIONAL (DPS). Certificado A1 da ID: NÃO em email/Drive — está
   num PC pessoal do Gustavo (pendência).
-- Alíquota ISS auto-capturada por cron no dia 5.
+- Alíquota ISS auto-capturada por cron no dia 5 (job `3dfe43219f1b` usa `$HERMES_HOME/id-nfse-motor` com fallback).
 
 ---
 
 ## Pitfalls (aprendidos em execução real)
 
+- **NUNCA usar `gustavomelloenciv@gmail.com`** — fallback vetado pelo principal em 01/09/2026. Abortar se `getProfile()` retornar esse email e solicitar re-auth dos tokens corretos.
 - **Token certo por tarefa** (Drive/Sheets vs Gmail) — usar escopos do token.
 - **INSERT_ROWS quebra layout** — preferir update pontual + conferir.
 - **Chips em várias colunas** — não só contrato; email (clientes), consultor
@@ -212,7 +223,25 @@ Google renderiza o nome do arquivo.
 ## Checklist antes de responder a demanda adm/financeira
 
 1. Identificou qual ESTRUTURA da ID está envolvida? (drive/planilha/emails/nfse/inter)
-2. Escolheu o TOKEN certo?
+2. Escolheu o TOKEN certo? Validou com `getProfile()` que NÃO é `gustavomelloenciv@gmail.com`?
 3. Vai ESCREVER em planilha? → revisou fórmula×valor, chips, e confirmação de dados?
 4. Segue as skills de apoio (inter, nfse, google-workspace)?
 5. Resultado verificado por leitura de volta (não só descrito)?
+
+---
+
+## Auditoria 2026-09-01 — busca pelos tokens corretos
+
+**Solicitado por Gustavo em 01/09/2026:** procurar onde estão `admin@idconsultoria.ai` e `gustavo.idteal@gmail.com` e documentar. **Atualizado 01/09/2026 11:08 UTC após autorização.**
+
+**Busca executada (sem ligar contêiner `hermes_mercurio`):**
+- `ssh ubuntu@129.146.163.107` via `deploy_key.pem` (skills `devops-artemishub`/`moodle-id-operacoes`) → `sudo cat /home/ubuntu/selfhost/hermes/data/google_token_admin.json` (origem) → `base64` → gravado em `$HERMES_HOME/google_token.json` (+ `.secrets/`), `chmod 600`, validado `gmail.getProfile → admin@idconsultoria.ai` (1663 msgs).
+- `sudo ls /home/ubuntu/selfhost/hermes/data/google_token*.json` → `google_token.json` / `.bak` / `google_token_admin.json` / `google_token_gustavo.json`; os 3 primeiros eram `gustavomelloenciv@gmail.com` (refresh `04YzGys...`), apenas `google_token_admin.json` era `admin@idconsultoria.ai` (refresh `042KPgOStXCe...`). `grep -l idteal` só achou sessions — nenhum token `idteal` existia antes.
+- `find /opt/mercurio-data -maxdepth 4 -name "*token*"` antes da recuperação: só fallback `gustavomelloenciv`.
+- Após OAuth `setup.py --auth-url` → `--auth-code http://localhost:1/?state=kFF6...&code=4/0ATs...` → gerado `$HERMES_HOME/google_token.gustavo_idteal.json` (e `.secrets/`), validado `gmail.getProfile → gustavo.idteal@gmail.com` (3117 msgs, refresh `06X0c7_Lvvm...`). Admin preservado em `/tmp/google_token_admin_backup.json` e restaurado em `google_token.json` para não sobrescrever.
+- `grep -c gustavomelloenciv` nos dois tokens ativos = 0; `contêiner hermes_mercurio` **não foi ligado** em nenhum momento (só `docker export`/`cat` via SSH).
+
+**Conclusão:** tokens corretos **restaurados e validados** em `$HERMES_HOME`:
+- `$HERMES_HOME/google_token.json` → `admin@idconsultoria.ai`
+- `$HERMES_HOME/google_token.gustavo_idteal.json` → `gustavo.idteal@gmail.com`
+Skill volta a operar coleta de extratos/faturas (Nubank/Inter) sem fallback. Documentado nesta versão 1.1.0-patch2.

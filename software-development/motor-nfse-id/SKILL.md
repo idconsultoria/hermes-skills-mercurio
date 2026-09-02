@@ -24,12 +24,25 @@ metadata:
   o cron da alíquota ISS, o certificado A1/e-CNPJ, ou retomar a implementação.
 - Ao concluir/avançar uma etapa do motor, atualizar o "ESTADO ATUAL" e as pendências aqui.
 
-## ESTADO ATUAL (2026-08-18) — P A R A D O
-**Status geral: pausado até ter o certificado digital A1 renovado.**
-- Motor (gerador de DPS) construído e **validado localmente**.
-- **Build da imagem Docker: PENDENTE** (não há daemon Docker dentro do container do
-  Mercúrio → quem builda é o **Hermes canônico no Oracle host**, seguindo `DEPLOY.md`).
-- Emissão real depende de **A1 válido** para assinar + transmitir.
+## ESTADO ATUAL (2026-08-30) — RECRIADO (código-fonte perdido na migração)
+**Status geral: motor recriado em `/opt/mercurio-data/id-nfse-motor/` (Fase 1 gera DPS).
+Pausado para emissão em produção até A1 renovado.**
+
+- **Motivo do replay:** na migração `/opt/data → /opt/mercurio-data` o código-fonte do
+  motor (e do iData) NÃO veio — só restaram os `.venv` e `__pycache__`, nos dois lados
+  (container atual e host Oracle). O repo `idconsultoria/iData` existe no GitHub e foi
+  re-clonado; o motor NFS-e **não está em nenhum repo da org** → foi **recriado** a partir
+  desta skill + `emissao-nfse`/`dps-nfelib-mapping.md`.
+- Arquivos recriados: `emitir_nfse.py` (gerador DPS fiel ao binding v1_0), `requirements.txt`
+  (signxml>=4.0.0 — resolvido conflito c/ pynfse-nacional 0.9.5), `Dockerfile`, `DEPLOY.md`,
+  `dados/aliquota_iss.json` (exemplo), `scripts/buscar_aliquota_iss.py` (backend do cron ISS).
+- **Build da imagem Docker: PENDENTE** (daemon Docker não acessível do container → Hermes
+  canônico no Oracle host, `docker build -t id-nfse-motor:1.0.0 .`).
+- Emissão real depende de **A1 válido** para assinar + transmitir (Fase 2, atrás de gate).
+- **Instalação no Termux (aprendido 30/08):** `uv` baixa CPython genérico e compila pandas
+  do sdist (lento, >1000s). Usar o **Python do próprio Termux** (`/data/data/com.termux/
+  files/usr/bin/python`, 3.14) com venv — pega wheels e instala em segundos. Ou `pip` do
+  Termux. Não confiar em wheel manylinux p/ `aarch64-linux-android`.
 
 ## Pendências (ordem de desbloqueio)
 1. **[BLOQUEADOR] Certificado A1 (e-CNPJ):** EXPIrado em 25/04/2026; renovação ~R$180/ano.

@@ -223,6 +223,10 @@ Modelo versionado: `.env.example`. Manual entregue em 22/08/2026 (zip) contém b
 | `data must NOT have additional properties` no NPM | payload com campo não-schema | payload exato (sem `letsencrypt_agree`) |
 | HTTPS 000 ao testar em localhost | cert cobre só o domínio | testar contra o domínio real resolvido |
 | Preview sobe mas `deploy-preview` falha em `03:00: command not found` | `register-preview.sh` faz `source .env` e a linha `ARTEMISHUB_PIPELINE_SCHEDULE=seg,qua,sex 03:00` é lida como comando | não usar `source` no `.env`; extrair só `NPM_EMAIL`/`NPM_PASSWORD` via `grep`/`cut` (mesmo padrão do fallback manual) |
+| Backend entra em **crash-loop** no boot: `No "request" or "websocket" argument on function` | endpoint decorado com `@limiter.limit` (slowapi) **sem** o parâmetro `request: Request` | todo endpoint com `@limiter.limit` deve declarar `request: Request` como primeiro parâmetro (ex.: `def create_empresa(request: Request, emp: EmpresaIn)`) |
+| `POST /api/empresas` / fluxo público (onboarding) retorna 401 | middleware global `enforce_api_key` exige credencial em tudo, exceto `/api/health` e `/api/auth/login` | liberar rotas públicas método-específicas via `_is_public_onboarding(path, method)` (só criação; GET/edição seguem protegidos) |
+| `POST /api/empresas` com `porte=ICT` → `500` + frontend `Unexpected token 'I', "Internal S"... is not valid JSON` | `empresas` aceita `ICT`, `empresas_parque` só aceitava `Média` → `psycopg.errors.CheckViolation: empresas_parque_porte_check` não tratado vira `500 Internal Server Error` texto puro (21B) que `await res.json()` tenta parsear | mapear `ICT → NaoInformado` via `_porte_para_parque()` em `empresa_parque_defaults` + `create_empresa` + migrar `ALTER TABLE empresas_parque DROP/ADD CHECK` incluindo `ICT`; envolver `create_empresa` em `try/except` que devolve `400 {"detail":"Dado inválido: ..."}`; frontend usar `res.text()`+safe `JSON.parse` fallback (ver `references/onboarding-2026-08-31.md`) |
+| `PUT /api/empresas/{id}/complemento` → `500 the connection is closed` ou `invalid input syntax for type integer: "Ate 360 mil"` | após envolver `with db()` em `try`, o corpo das etapas 3-10 ficou **fora** do `with` (indentação) → cursor fechado; `conn.commit()` estava dentro de `if c.etapa9:` apenas | `try` deve envolver o `with` inteiro (indentar `with` 4→8 espaços); `conn.commit()` **fora** dos `if`s; `except HTTPException: raise` antes do genérico; `qtd_colaboradores_aprox` é `integer` — não passar por `_FAIXA_MAP` (detalhe em `references/onboarding-2026-08-31.md`) |
 
 ## 11. Pendências atuais
 - Conta OpenCode: modelo DeepSeek no `zen/go/v1` requer **opt-in região China**
@@ -230,7 +234,9 @@ Modelo versionado: `.env.example`. Manual entregue em 22/08/2026 (zip) contém b
 - Fontes bloqueadas (SEBRAE, Embrapa, FAPERN, FAPEPI, EC Europa...) devolvem
   `SCRAPE_ALL_ENGINES_FAILED` — o pipeline trata como fallback; não é falha.
 
-## 12. Verificação pós-deploy
+## 12. Verificação pós-deploy (+ caso 31/08/2026)
+> Detalhe completo do incidente de onboarding em `references/onboarding-2026-08-31.md` (porte ICT, 500 texto puro, indentação do `with`).
+
 1. `curl -sk https://artemis.idconsultoria.ai/api/health` → `{"status":"ok"}`
 2. Backend nas 3 redes (`app-net`, `proxy_network`, `ai_mesh`).
 3. `Firecrawl` alcançável de dentro do backend.

@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 87 skills** em 11 categorias.
+**Total: 94 skills** em 11 categorias.
 
 ---
 
@@ -26,6 +26,9 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `planejamento-estrategico-2h` | Orchestrator | Planejamento estratégico em 2h — EOS V/TO + One-Page Plan. |
 | `proposta-comercial-consultoria` | Orchestrator | Proposta comercial de consultoria — princípios, pricing e estrutura. |
 | `valuation-consultivo` | Orchestrator | Valuation consultivo de startup early-stage — rNPV, âncoras. |
+| `brand-design-system-html` | Template | Design system de marca de cliente em HTML. |
+| `planejamento-estrategico-8h-id-olimpo` | Orchestrator | Planejamento estratégico da ID em 8h — Visão 1-2 anos + plano mensal. |
+| `proposta-biotechse` | Orchestrator | Propostas comerciais da BiotechSe — HTML v5 + minuta. |
 
 ## research — Pesquisa e augmentação
 
@@ -98,6 +101,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `static-spa-vercel` | Orchestrator | Build static SPA prototypes and deploy to Vercel. |
 | `supabase-to-selfhost` | Orchestrator | Use ao abandonar Supabase: backend próprio offline único. |
 | `systematic-debugging` | ToolIntegration | 4-phase root cause debugging: understand bugs before fixing. |
+| `artemishub-onboarding-patterns` | Orchestrator | Use when ArtemisHub onboarding fails. |
 | `test-driven-development` | Template | TDD: enforce RED-GREEN-REFACTOR, tests before code. |
 
 ## autonomous-ai-agents — Agentes & produto
@@ -115,6 +119,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `opencode` | ToolIntegration | Delegate coding to OpenCode CLI (features, PR review). |
 | `pi-agent-coordination` | ToolIntegration | Invocar Pi Agent localmente via Hermes (hierarquia provider/model). |
 | `product-pipeline` | Orchestrator | Pipeline multi-agente de produto — ideia a MVP via sprints. |
+| `hermes-inference-config` | Reference | Configure Hermes model/provider/fallback; route crons. |
 
 ## infrastructure — Integrações de entrega
 
@@ -122,6 +127,8 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 |---|---|---|
 | `hermes-agent-replication` | Method | Replicar instância Hermes (rama ID) numa VM nova. |
 | `whatsapp-baileys-integration` | ToolIntegration | Integrar WhatsApp em Python via Baileys — lifecycle, QR, enums. |
+| `hermes-cron-script-dispatch` | Reference | Hermes cron scripts resilient to HERMES_HOME path changes. |
+| `moodle-id-operacoes` | Orchestrator | Operar o Moodle da ID: papéis, aulas estilizadas, fórum. |
 
 ## cicd-oracle-preview — Deploy & preview
 
@@ -213,6 +220,14 @@ Similar:
 - `macroprocess-swimlane-html` → `bpmn-diagram-renderer`
 - `macroprocess-swimlane-html` → `process-augmentation-pipeline`
 - `id-comunicacao-multiusuario` → `messaging-platforms`
+- `brand-design-system-html` → `proposta-biotechse`
+- `proposta-biotechse` → `elaboracao-proposta-comercial`
+- `planejamento-estrategico-8h-id-olimpo` → `planejamento-estrategico-2h`
+- `hermes-inference-config` → `hermes-agent`
+- `hermes-cron-script-dispatch` → `hermes-agent`
+- `moodle-id-operacoes` → `devops-artemishub`
+- `artemishub-onboarding-patterns` → `devops-artemishub`
+- `artemishub-onboarding-patterns` → `react-fastapi-debugging`
 
 Uses:
 - `process-augmentation-pipeline` → `deep-research`
@@ -261,6 +276,13 @@ Uses:
 - `sdlc-review` → `plan`
 - `macroprocess-swimlane-html` → `google-workspace`
 - `id-comunicacao-multiusuario` → `hermes-agent`
+- `proposta-biotechse` → `brand-design-system-html`
+- `planejamento-estrategico-8h-id-olimpo` → `planejamento-estrategico-2h`
+- `hermes-inference-config` → `hermes-agent`
+- `hermes-cron-script-dispatch` → `hermes-agent`
+- `moodle-id-operacoes` → `google-workspace`
+- `artemishub-onboarding-patterns` → `devops-artemishub`
+- `brand-design-system-html` → `html-report-hermes`
 
 ---
 
