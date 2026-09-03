@@ -1,10 +1,8 @@
 ---
 name: hermes-inference-config
-description: "Configure Hermes model/provider/fallback; route crons."
+description: "Configure Hermes model/provider/fallback; route crons.
 
 Load this skill when selecting or switching a Hermes model/provider, setting fallback chains, or routing crons. Covers hermes config set/get, provider definition, pin-vs-inherit for crons, and reading model errors from logs."
-
-Load this skill when: selecting/switching a model or provider, setting a fallback chain, making cron jobs follow (or break from) the global model ladder, or diagnosing model/provider failures. Covers `hermes config set/get` for model/provider/fallback_providers, defining providers, the critical pin-vs-inherit rule for crons, and reading model errors from the logs.
 version: 1.0.0
 author: Mercúrio
 license: MIT
