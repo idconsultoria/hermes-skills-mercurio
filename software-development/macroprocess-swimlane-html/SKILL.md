@@ -1,6 +1,6 @@
 ---
 name: macroprocess-swimlane-html
-description: "Mapa macroprocesso swimlane em HTML interativo p/ clientes da ID (a partir do doc do Drive)."
+description: "Mapa macroprocesso swimlane em HTML interativo p/ clientes da ID."
 category: software-development
 type: Orchestrator
 timestamp: 2026-08-26
