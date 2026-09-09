@@ -28,7 +28,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `valuation-consultivo` | Orchestrator | Valuation consultivo de startup early-stage — rNPV, âncoras. |
 | `brand-design-system-html` | Template | Design system de marca de cliente em HTML. |
 | `planejamento-estrategico-8h-id-olimpo` | Orchestrator | Planejamento estratégico da ID em 8h — Visão 1-2 anos + plano mensal. |
-| `proposta-biotechse` | Orchestrator | Propostas comerciais da BiotechSe — HTML v5 + minuta. |
+| `proposta-biotechse` | Orchestrator | Propostas comerciais da BiotechSe — HTML + minuta. |
 
 ## research — Pesquisa e augmentação
 

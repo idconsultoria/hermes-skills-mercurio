@@ -48,5 +48,5 @@ for cid in ["6171996969"]:
 |---|---|---|---|---|
 | 6171996969 | Gustavo | None | private | Gustavo (sócio) |
 | 8600141184 | Cleverton | None | private | Cleverton (Kel) |
-| 8888381551 | (vazio) | None | None | id não-resolvido — **confirmar** (memória diz Maxwell) |
+| 8888381551 | (vazio) | None | None | Maxwell (sócio) — **confirmado via JSON de origem do gateway em DM 1:1** (`chat_id`/`user_id` out-of-band); `getChat` não resolve nome mesmo sendo chat válido |
 | 609921578 | N0ztr | n0ztr | private | Tácio Brito (handle @n0ztr) |

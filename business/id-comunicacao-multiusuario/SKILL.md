@@ -39,6 +39,7 @@ timestamp: 2026-08-25
 
 ## Como identificar o interlocutor com confiança
 
+0. O JSON de origem do gateway (`chat_id`/`user_id` em mensagem out-of-band) é autoritativo para DM 1:1 — prevalece sobre nome de exibição e rótulo do chat.
 1. Ler o bloco **Current Session Context** injetado — `Source` (ex. "DM with Gustavo"),
    `User`, e o Home channel ID. Para DM 1:1 de contato conhecido, basta.
 2. Se o rótulo for ambíguo (grupo, thread compartilhada, apelido), **confirmar na fonte**

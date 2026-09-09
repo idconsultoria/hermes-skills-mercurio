@@ -10,6 +10,7 @@ __pycache__/
 # Temp
 /tmp/
 .curator_backups/
+.curator_ledger.jsonl
 
 # Credenciais locais (NUNCA commit — chaves SSH/segredos)
 **/references/*.pem
