@@ -2,7 +2,7 @@
 name: proposta-biotechse
 description: "Propostas comerciais da BiotechSe — HTML + minuta.
 
-Carregue esta skill quando for elaborar proposta comercial da BiotechSe, do contexto do cliente ao HTML com identidade BiotechSe + minuta. Adaptação da elaboracao-proposta-comercial para a marca BiotechSe (modelo de referência atual: templates/biotechse-proposta-modelo-v8.html)."
+Carregue esta skill quando for elaborar proposta comercial da BiotechSe, do contexto do cliente ao HTML com identidade BiotechSe + minuta. Adaptação da elaboracao-proposta-comercial para a marca BiotechSe (modelo de referência atual: templates/biotechse-proposta-modelo-v9.html)."
 version: 1.0.0
 author: Mercúrio
 license: MIT
@@ -91,7 +91,8 @@ Copiar contrato-modelo para subpasta Minutas (ver `elaboracao-proposta-comercial
 - `references/placeholders.md` — mapa de {{...}} do template
 - `references/portfolio.md` — cases BiotechSe (a preencher com clientes reais da marca)
 - `templates/biotechse-proposta-modelo-v2.html` — variante slide deck 1920×1080 (substituída pela v8).
-- `templates/biotechse-proposta-modelo-v8.html` — **modelo de referência atual** (ver `references/modelo-v8.md`).
+- `templates/biotechse-proposta-modelo-v8.html` — substituída pela v9 (ver `references/modelo-v8.md` p/ histórico).
+- `templates/biotechse-proposta-modelo-v9.html` — **modelo de referência atual**.
 - `assets/logos/` — variantes da marca (positivo/negativo/simbolo/mono)
 
 ## Pitfalls
