@@ -1,6 +1,6 @@
 ---
 name: emissao-nfse
-description: "Emitir NFS-e/NF-e da ID via motor nfelib (NFS-e Nacional)."
+description: "Emitir NFS-e/NF-e da ID via motor nfelib e encaminhá-la ao cliente (cobrança)."
 category: business
 type: ToolIntegration
 timestamp: 2026-08-18T00:00:00Z
@@ -59,7 +59,29 @@ do motor e a lista de pendências fiscais reais.
 4. Gerar DPS → (Fase 2, com A1) assinar via `erpbrasil.assinatura` + transmitir via
    `pynfse-nacional` → arquivar XML autorizado + protocolo.
 
-## Pendências reais (bloqueam a 1ª nota em produção)
+## Envio da NFS-e ao cliente (cobrança) — depois de emitida
+
+O ciclo da nota não termina na emissão: a nota é **encaminhada ao setor de compras do
+cliente com o pedido de pagamento**, replicando o molde dos envios anteriores.
+
+1. **Ler a NFS-e com `pdftotext -layout <pdf> -`** (extração sem `-layout` embaralha o
+   bloco de valores: valor dos serviços, ISS, líquido e total saem fora de ordem).
+2. **Buscar os envios anteriores ao mesmo cliente** (Gmail `admin@idconsultoria.ai`) e
+   copiar assunto, destinatários e o bloco de dados da nota. Queries e padrão por cliente
+   em `references/cobranca-nfse-clientes.md`.
+3. **Parcela vem do histórico de e-mails/contrato, nunca do número da NFS-e** (a numeração
+   da prefeitura é sequencial anual; o envio anterior traz o ordinal e o total, ex. `(2/3)`).
+4. Renomear o anexo no padrão da parcela (`NFS-e_<n>-<total>_<Contrato>.pdf`) e enviar de
+   `admin@idconsultoria.ai`, como thread novo, corpo em texto puro.
+5. **Enviar com anexo via MIME no Python** — o `gapi gmail send` do CLI não tem flag de
+   anexo. Script com `--dry-run` (imprime conta, destinatários, assunto, tamanho do anexo),
+   guardado em `$HERMES_HOME/work/nfse-<ano>/` para reuso na parcela seguinte.
+
+> **Gate:** e-mail a cliente externo só sai com **aprovação explícita do principal sobre o
+> texto final**. Apresente o rascunho completo (assunto + destinatários + corpo + anexo) e
+> espere o ok. Sem resposta (inclusive prompt de aprovação que expira) = **não enviar**.
+
+## Pendências reais (bloqueiam a 1ª nota em produção)
 1. **Certificado A1 (e-CNPJ)**: NÃO está em email/Drive da ID — está num PC pessoal do
    principal. Guardar a **senha** em env/volume seguro, **nunca em chat/texto plano**.
 2. **Inscrição Municipal (IM)** do ISS de Aracaju — não está na base.
@@ -78,6 +100,9 @@ do motor e a lista de pendências fiscais reais.
 - Senha do certificado nunca em arquivo de config versionado nem em relatório.
 
 ## Referências
+- `references/cobranca-nfse-clientes.md` — envio da nota ao cliente: queries Gmail p/ achar
+  o histórico, molde do e-mail de cobrança, clientes/destinatários/padrões e receita de
+  envio com anexo (MIME).
 - `references/dps-nfelib-mapping.md` — árvore de classes/campos do binding NFS-e Nacional
   (`dps_v1_00`, `tipos_complexos_v1_00`) + DPS de exemplo, para estender o motor sem
   redescobrir.

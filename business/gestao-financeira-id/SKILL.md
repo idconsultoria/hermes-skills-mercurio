@@ -59,16 +59,37 @@ antes de chamar a API** — usar o errado dá `invalid_scope`/`403`.
 
 | Arquivo token | Conta | Escopos |
 |---|---|---|
-| `google_token.json` | admin@idconsultoria.ai | **só Gmail** (read/send/modify) — NÃO acessa Sheets/Drive |
+| `google_token.json` | admin@idconsultoria.ai | token admin **atual** das demandas da ID — ao ser restaurado vinha com Gmail + Drive + Sheets + Docs + Calendar |
 | `google_token.admin_idconsultoria.json` | admin@idconsultoria.ai | Gmail + **Drive + documentos** (lê planilha OK) |
 | `google_token.gustavo_idteal.json` | gustavo.idteal@gmail.com | só Gmail |
 | `google_token.backup_gustavomelloenciv.json` | gustavomelloenciv@gmail.com | full (Drive + spreadsheets + docs + gmail) |
 
-- Para Sheets/Drive da ID use **`google_token.admin_idconsultoria.json`** (ou o backup) e o
-  venv `/opt/data/venvs/google/bin/python`. **NÃO** usar `google_token.json` para Sheets.
+- Para Sheets/Drive da ID use **`$HERMES_HOME/google_token.json`** (admin@idconsultoria.ai) e o interpretador **`$HERMES_HOME/id-nfse-motor/.venv/bin/python`** — é o venv deste host com `googleapiclient`/`google-auth` instalados. **Leia `d.get("scopes")` do arquivo antes de chamar a API**: usar escopo a menos dá `invalid_scope` no refresh, e conta sem escopo dá 403 — carregue sempre com `Credentials.from_authorized_user_info(d, d.get("scopes"))`.
 - A service account do repo iData (`service_account.json`, escopo drive) lê a Gestão
   Financeira (compartilhada), mas **não** a Symplexis (404) — a Symplexis exige token admin.
 - Toda entrega visual ao principal ID sai em **HTML** na identidade da ID (skill `id-design-guide`).
+
+## Marcar parcela como recebida na Symplexis (vínculo por transação)
+
+Na aba `recebimentos`, **a coluna `Data efetuada` é fórmula**, não campo de digitação:
+`=IF(ISBLANK(Hn);;VLOOKUP(Hn; '_transações'!$C$2:$D; 2; 0))` — ela resolve a data pelo
+**ID da transação** lançado em `iD.Transação` (coluna H). Para registrar um recebimento:
+
+1. Ache a transação real no extrato (`CCI_extrato` da Gestão Financeira) casando **valor +
+data**; guarde o `iDtransação` **completo** (base64 longo — copiar truncado quebra o VLOOKUP).
+2. Escreva na linha da parcela: `Status` = `Recebido` e `iD.Transação` = o ID da transação.
+3. Se a linha **não** tiver a fórmula em `Data efetuada` (linhas antigas costumam não ter),
+   copie a fórmula de uma linha irmã do mesmo bloco e troque a referência de linha — o
+   separador é `;` (locale pt-BR), não `,`.
+4. Registre a origem em `Observações`: quem informou, quando, e a data da transação.
+5. Confira relendo com `values().get` (valor renderizado): a data efetuada deve aparecer.
+
+Nunca escreva nas colunas de fórmula (`A`, `G`, `J`, `K`, `L` em `recebimentos`) — só
+`Status`, `iD.Transação` e `Observações` são dados. Sem o vínculo, uma parcela marcada como
+recebida continua **sem data** e não entra em nenhum total por ano/mês.
+
+Status possíveis em `recebimentos`: `Recebido` (confirmado por gente), `confirmado por IA`
+(vinculado pela automação, muitas vezes sem data resolvida) e `Por receber` (em aberto).
 
 ## Backfill da planilha (método validado 19/08/2026)
 
@@ -101,7 +122,9 @@ use `valueRenderOption="FORMULA"` e varra **todas as colunas** (algumas abas tê
   (404, auth) devem falhar imediato. Corrigido no commit `9249e87` (wrapping `_executar_com_retry`
   em `update` e `append`). Diagnóstico rápido: `HttpError 503 ... The service is currently
   unavailable` = indisponibilidade transitória do Google, NÃO problema de cert/token/config.
-- Não usar `google_token.json` (Gmail-only) para Sheets/Drive — foi o erro que custou passos na
-  primeira tentativa de acessar a Symplexis.
+- Escopos definem o acesso, não o nome do arquivo: confira `scopes` antes de chamar a API
+  (refresh com escopo a menos = `invalid_scope`; escopo ausente na conta = 403).
+- E-mail de parcelas/NFS-e ao cliente (cobrança) tem molde e histórico próprios — ver a
+  seção "Envio da NFS-e ao cliente" da skill `emissao-nfse`.
 - A skill irmã `inter-api-id-consultoria` cobre a API do Banco Inter em si (consultas/relatórios);
   esta cobre o ecossistema de planilhas e acesso.

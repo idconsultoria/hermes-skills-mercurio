@@ -110,6 +110,56 @@ def edit_footer(docs, doc_id, old, new):
     print("FOOTER_NOT_FOUND")
 
 
+def header_lines(docs, doc_id):
+    """Devolve os textos NAO VAZIOS dos paragrafos do header, em ordem (o header vive
+    dentro de uma TABELA — um walk so de paragrafos de topo devolve vazio)."""
+    r = docs.documents().get(documentId=doc_id, fields="headers").execute()
+    out = []
+    def walk(els):
+        for el in els:
+            if "paragraph" in el:
+                t = full_para(el).strip()
+                if t:
+                    out.append(t)
+            elif "table" in el:
+                for row in el["table"]["tableRows"]:
+                    for cell in row["tableCells"]:
+                        walk(cell["content"])
+    for _fid, fv in r.get("headers", {}).items():
+        walk(fv.get("content", []))
+    return out
+
+
+def edit_header(docs, doc_id, l1, l2):
+    """Troca as 2 linhas do cabecalho herdado do modelo TJSE.
+
+    Pitfall 1: replaceAllText ALCANCA headers (mas nao footers) — logo a troca da capa
+    ('Div\ufffdida Ativa Nao Tributaria') JA reescreveu a 2a linha do header antes de chegarmos
+    aqui. Por isso lemos o texto ATUAL do header e substituimos pelo valor encontrado,
+    em vez de assumir as strings do modelo.
+    Pitfall 2: o header fica dentro de uma tabela — para inspecionar, andar as celulas.
+    Pitfall 3: 'occurrencesChanged' e OMITIDO quando 0 ocorrencias -> KeyError se somar direto.
+    """
+    if not l1 and not l2:
+        print("HEADER_SKIP")
+        return
+    cur = header_lines(docs, doc_id)
+    if len(cur) < 2:
+        print("HEADER_NOT_FOUND", cur)
+        return
+    pairs = [(cur[-2], l1), (cur[-1], l2)]
+    reqs = [{"replaceAllText": {"containsText": {"text": a, "matchCase": True}, "replaceText": b}}
+            for a, b in pairs if a and b and a != b]
+    if not reqs:
+        print("HEADER_OK (ja correto)", repr(cur[-2:]))
+        return
+    res = docs.documents().batchUpdate(documentId=doc_id, body={"requests": reqs}).execute()
+    n = sum(x.get("replaceAllText", {}).get("occurrencesChanged", 0) for x in res.get("replies", []))
+    print("HEADER_OK", n, repr(l1), repr(l2))
+    if n == 0:
+        print("HEADER_WARN nada substituido; header atual:", repr(cur[-2:]))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("md_file")
@@ -119,6 +169,8 @@ def main():
     ap.add_argument("--titulo-l2", default="")
     ap.add_argument("--eyebrow", default="PROPOSTA COMERCIAL  \u00b7  PLANO DE TRABALHO")
     ap.add_argument("--metadata", default="")
+    ap.add_argument("--header-l1", default="", help="1a linha do cabecalho (ex.: PLATAFORMA DO EL NINO)")
+    ap.add_argument("--header-l2", default="", help="2a linha do cabecalho (ex.: Comite X · SEMAC x SergipeTec)")
     args = ap.parse_args()
 
     c = creds()
@@ -145,8 +197,9 @@ def main():
         docs.documents().batchUpdate(documentId=NEW, body={"requests": reqs}).execute()
         print("CAPA_OK")
 
-    # 3) editar footer
+    # 3) editar footer E cabecalho (herdados do modelo TJSE)
     edit_footer(docs, NEW, "Proposta de Plano de Trabalho \u2014 SergipeTec", "Proposta Comercial \u2014 SergipeTec")
+    edit_header(docs, NEW, args.header_l1, args.header_l2)
 
     # 4) remover o corpo do TJSE (começa no parágrafo 'Introdução', el9 startIndex ~236)
     #   localizar pelo texto 'Introdução' para robustez
@@ -186,6 +239,8 @@ def main():
             b.add_code(dados)
         elif tipo == "mermaid":
             b.add_mermaid(dados)
+        elif tipo == "pagebreak":
+            b.add_pagebreak()
         elif tipo == "hr":
             b.insert_text("\n")
     b.finish()

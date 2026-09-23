@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 94 skills** em 11 categorias.
+**Total: 104 skills** em 12 categorias.
 
 ---
 
@@ -29,6 +29,10 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `brand-design-system-html` | Template | Design system de marca de cliente em HTML. |
 | `planejamento-estrategico-8h-id-olimpo` | Orchestrator | Planejamento estratégico da ID em 8h — Visão 1-2 anos + plano mensal. |
 | `proposta-biotechse` | Orchestrator | Propostas comerciais da BiotechSe — HTML + minuta. |
+| `formalizacao-acordo-cliente` | Orchestrator | Formalizar acordo fechado com cliente por escrito (e-mail). |
+| `negotiation` | Orchestrator | Negociar preço, contrato ou objeção (empatia tática, Voss). |
+| `painel-metas-id` | Reference | Painel de metas da ID + slide semanal da Phronesis. |
+| `revisao-de-proposta-existente` | Orchestrator | Revisar proposta já entregue, preservando o resto. |
 
 ## research — Pesquisa e augmentação
 
@@ -63,6 +67,9 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `pdf-to-html` | ToolIntegration | PDF→HTML: gotchas de extração Type3/Figma + rebuild semântico. |
 | `relatorio-de-custos` | Template | Relatórios de custo de projetos multi-agente com tokens reais. |
 | `xlsx` | ToolIntegration | Criar, ler, editar planilhas Excel (.xlsx) e CSVs. |
+| `html-deck-to-pptx` | ToolIntegration | Converter deck HTML em PPTX editável (1920x1080). |
+| `reunioes-diarizadas` | Orchestrator | Extrair encaminhamentos de reuniões diarizadas. |
+| `revisao-entrega-cliente` | Orchestrator | Revisar entrega de cliente antes de apresentar. |
 
 ## email — Correio da ID
 
@@ -103,6 +110,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `systematic-debugging` | ToolIntegration | 4-phase root cause debugging: understand bugs before fixing. |
 | `artemishub-onboarding-patterns` | Orchestrator | Use when ArtemisHub onboarding fails. |
 | `test-driven-development` | Template | TDD: enforce RED-GREEN-REFACTOR, tests before code. |
+| `skills-library-audit` | Research | Triar skills: quais servem em qualquer Hermes. |
 
 ## autonomous-ai-agents — Agentes & produto
 
@@ -129,6 +137,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `whatsapp-baileys-integration` | ToolIntegration | Integrar WhatsApp em Python via Baileys — lifecycle, QR, enums. |
 | `hermes-cron-script-dispatch` | Reference | Hermes cron scripts resilient to HERMES_HOME path changes. |
 | `moodle-id-operacoes` | Orchestrator | Operar o Moodle da ID: papéis, aulas estilizadas, fórum. |
+| `stack2-mesh-failback` | Runbook | Failover/failback da Stack 2 (mesh) sem loop e sem perda. |
 
 ## cicd-oracle-preview — Deploy & preview
 
@@ -155,6 +164,12 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `github-issues` | ToolIntegration | Create, triage, label, assign GitHub issues via gh or REST. |
 | `github-pr-workflow` | Orchestrator | GitHub PR lifecycle: branch, commit, open, CI, merge. |
 | `github-repo-management` | Orchestrator | Clone/create/fork repos; manage remotes, releases. |
+
+## creative — Conteúdo e voz
+
+| Skill | Type | Descrição |
+|---|---|---|
+| `humanizer` | Creative | Humanizar texto: remover AI-isms e dar voz real. |
 
 ---
 
@@ -195,6 +210,10 @@ Similar:
 - `auxiliar-adm-id` → `gestao-financeira-id`
 - `emissao-nfse` → `inter-api-id-consultoria`
 - `id-papel-timbrado` → `md-to-timbrado-id`
+- `negotiation` → `elaboracao-proposta-comercial`
+- `formalizacao-acordo-cliente` → `elaboracao-proposta-comercial`
+- `revisao-de-proposta-existente` → `elaboracao-proposta-comercial`
+- `revisao-entrega-cliente` → `reunioes-diarizadas`
 - `dogfood` → `systematic-debugging`
 - `hermes-agent-skill-authoring` → `skills-repo-curator`
 - `node-inspect-debugger` → `python-debugpy`
@@ -283,6 +302,15 @@ Uses:
 - `moodle-id-operacoes` → `google-workspace`
 - `artemishub-onboarding-patterns` → `devops-artemishub`
 - `brand-design-system-html` → `html-report-hermes`
+- `painel-metas-id` → `gestao-financeira-id`
+- `formalizacao-acordo-cliente` → `google-workspace`
+- `formalizacao-acordo-cliente` → `hermes-cron-script-dispatch`
+- `revisao-de-proposta-existente` → `google-docs-formatting`
+- `reunioes-diarizadas` → `document-to-action-items`
+- `html-deck-to-pptx` → `html-report-hermes`
+- `stack2-mesh-failback` → `hermes-cron-script-dispatch`
+- `skills-library-audit` → `skills-repo-curator`
+- `humanizer` → `process-augmentation-pipeline`
 
 ---
 

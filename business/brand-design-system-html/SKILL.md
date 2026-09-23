@@ -49,6 +49,15 @@ Quando o usuário diz "parece que entrou foi a Bricolage" / "não carrega a Toma
   listando os arquivos exatos esperados, e use um **proxy gratuito rotulado** (ex.: Hanken Grotesk)
   na stack até os arquivos licenciados chegarem. **NÃO hotlink de sites de "download grátis".**
 - Fontes gratuitas (ex.: **Clash Display**, Fontshare/Indian Type Foundry) → CDN ok.
+- **Fonte de marca já embutida num HTML aprovado: extrair, não caçar no disco.** Quando não há
+  arquivo de fonte local mas existe um HTML aprovado com `@font-face` em base64, rodar
+  `scripts/extrair_fontes.py <template.html> <pasta_de_fontes>` e referenciar
+  `url('./fonts/<familia>-<peso>-<estilo>.<ext>')` — o Chromium resolve relativo igual ao
+  `file://` e o pacote sobrevive ao zip. Na ID o par canônico (Neulis Neue Bold + Nunito Sans 400)
+  vive em `business/elaboracao-proposta-comercial/templates/modelo_proposta.html`; serve tanto
+  para identidade de cliente quanto para documento da casa (POP, relatório, carta) que precise
+  sair com a tipografia da ID. Preferir isso a `find` no sistema inteiro, que é lento e costuma
+  não achar nada.
 - Confirme **pesos oficiais**: título pode ser 400/500, e "negrito em texto" pode ser o **ExtraBold**
   da família (ex.: Tomato 800), não um bolder sintético.
 

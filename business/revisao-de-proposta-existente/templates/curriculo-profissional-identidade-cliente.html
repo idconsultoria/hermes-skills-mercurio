@@ -1,0 +1,104 @@
+<!--
+  Modelo de currículo profissional em identidade do CONTRATADO (parque tecnológico, ICT, fundação).
+  Copiar, preencher e renderizar — não redesenhar. Regras:
+  • Identidade: baixar o logo oficial do site da instituição e amostrar a paleta real; preencher
+    --navy/--blue/--green abaixo com os hex dessa fonte. Nada de marca de terceiros ou da ID.
+  • Um arquivo por especialista, TODOS a partir deste mesmo modelo (layout uniforme na equipe).
+  • Seções: Resumo · Formação · Certificações/Prêmios · Atuação profissional · Projetos e produção
+    relevante · Competências (chips) · "Atuação no projeto" (callout) · rodapé com a fonte.
+  • Rodapé obrigatório: fonte do currículo (ID Lattes + data de atualização real) e a menção de que
+    o PDF integral acompanha o processo.
+  • Render: Chromium headless --print-to-pdf (A4). Manter .job{page-break-inside:avoid}.
+  • Não afirmar titulação que a fonte não afirma (data final aberta ≠ curso concluído).
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Currículo — [NOME COMPLETO]</title>
+<style>
+  @page { size: A4; margin: 13mm 15mm 11mm 15mm; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  :root{
+    /* amostrar do site institucional — não inventar */
+    --navy:#111827; --blue:#0048FE; --green:#00d084;
+    --ink:#1c2536; --muted:#5b6879; --line:#e3e8ef; --bg:#f7fafc;
+  }
+  body{ margin:0; font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; color:var(--ink); font-size:9.8pt; line-height:1.4; }
+  .top{ display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid var(--navy); padding-bottom:7px; }
+  .logo{ height:32px; }
+  .top .doc{ text-align:right; font-size:7.4pt; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+  .top .doc b{ display:block; color:var(--navy); font-size:8.4pt; letter-spacing:.1em; }
+  h1{ font-size:19pt; line-height:1.12; color:var(--navy); margin:14px 0 2px; letter-spacing:-.01em; }
+  .role{ font-size:10.6pt; color:var(--blue); font-weight:600; margin-bottom:3px; }
+  .meta{ font-size:8.6pt; color:var(--muted); margin-bottom:10px; }
+  h2{ font-size:8.8pt; letter-spacing:.14em; text-transform:uppercase; color:var(--navy);
+      margin:12px 0 5px; padding-bottom:3px; border-bottom:1px solid var(--line); }
+  p{ margin:0 0 5px; }
+  ul{ margin:0 0 5px; padding-left:14px; }
+  li{ margin-bottom:2px; }
+  .job{ margin-bottom:7px; page-break-inside:avoid; break-inside:avoid; }
+  .job .h{ display:flex; justify-content:space-between; gap:10px; }
+  .job .t{ font-weight:700; color:var(--navy); }
+  .job .when{ font-size:8.4pt; color:var(--muted); white-space:nowrap; }
+  .job .d{ font-size:9.2pt; }
+  .chips span{ display:inline-block; border:1px solid var(--line); background:var(--bg);
+      border-radius:3px; padding:2px 6px; margin:0 4px 4px 0; font-size:8.4pt; color:var(--navy); }
+  .callout{ border-left:3px solid var(--green); background:var(--bg); padding:7px 9px; margin-top:5px; }
+  .callout b{ color:var(--navy); }
+  .foot{ margin-top:10px; border-top:1px solid var(--line); padding-top:5px; font-size:7.6pt; color:var(--muted); }
+</style>
+</head>
+<body>
+  <div class="top">
+    <img class="logo" src="[logo-do-contratado].png" alt="[Instituição contratada]">
+    <div class="doc"><b>[Instituição]</b>[Sigla] · Currículo profissional</div>
+  </div>
+
+  <h1>[NOME COMPLETO]</h1>
+  <div class="role">[Cargo/função principal]</div>
+  <div class="meta">[Cidade — Estado] · Currículo Lattes: lattes.cnpq.br/[ID]</div>
+
+  <h2>Resumo</h2>
+  <p>[3–5 linhas: área, o que faz na prática, credenciais verificáveis em negrito, aderência ao objeto do projeto.]</p>
+
+  <h2>Formação</h2>
+  <!-- um bloco .job por titulação, da mais alta para a mais baixa; sem afirmar o que a fonte não afirma -->
+  <div class="job">
+    <div class="h"><div class="t">[Titulação — curso não concluído, se for o caso]</div><div class="when">[Instituição · período]</div></div>
+    <div class="d">[Tema/área, bolsa, distinção relevante.]</div>
+  </div>
+
+  <h2>Certificações e prêmios</h2>
+  <ul>
+    <li>[Credencial com órgão e ano]</li>
+    <li>Idiomas.</li>
+  </ul>
+
+  <h2>Atuação profissional</h2>
+  <!-- vínculos em ordem cronológica inversa; instituição · período -->
+  <div class="job">
+    <div class="h"><div class="t">[Cargo]</div><div class="when">[Instituição · período]</div></div>
+    <div class="d">[Escopo em uma ou duas linhas.]</div>
+  </div>
+
+  <h2>Projetos e produção relevante</h2>
+  <ul>
+    <li>[Projeto/patente/publicação — números só se contados por chave única.]</li>
+  </ul>
+
+  <h2>Competências</h2>
+  <div class="chips">
+    <span>[Competência 1]</span>
+    <span>[Competência 2]</span>
+  </div>
+
+  <h2>Atuação no projeto — [Nome do projeto]</h2>
+  <div class="callout">
+    <b>[Papel no projeto].</b> [O que entrega, alinhado à seção de equipe técnica da proposta.]
+  </div>
+
+  <div class="foot">Síntese curricular elaborada a partir do Currículo Lattes de [Nome] — ID Lattes [ID],
+atualizado em [DD/MM/AAAA]. O PDF integral do currículo acompanha o processo como documento anexo.</div>
+</body>
+</html>

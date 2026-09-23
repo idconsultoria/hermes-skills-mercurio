@@ -197,10 +197,27 @@ Google renderiza o nome do arquivo.
 
 ## 6 · NFS-e
 
+### Envio de NFS-e de parcela ao SergipeTec (contrato Artemishub)
+
+Padrão consolidado (jul/ago/set 2026). Ao receber o PDF da NFS-e da parcela:
+
+- **Remetente:** `admin@idconsultoria.ai` (token `$HERMES_HOME/google_token.json`) — como "Principal ID Consultoria".
+- **Destinatários:** `compra@sergipetec.org.br` **e** `asplan.sergipetec.org.br` (Érica Santos é a interlocutora de compras).
+- **Assunto:** `Nota Fiscal de <ordinal> parcela do contrato Artemishub` (1ª, 2ª, 3ª...).
+- **Anexo:** renomear a NF para `NFS-e_<n>-<total>_Artemishub.pdf` antes de anexar.
+- **Corpo:** bloco "Dados da Nota Fiscal" (Parcela, Valor, Competência, Serviço = código 0802 · CNAE 6204-0/00, Município, Emitente com CNPJ) + "Dados para pagamento: Chave Pix (CNPJ) 54.569.818/0001-59" + assinatura ID.
+- **Script pronto:** `$HERMES_HOME/work/nfse-2026/enviar_nfse_3-3_artemishub.py` (roda `--dry-run` primeiro; `$HERMES_HOME/google_token.json`). Serve de molde para as próximas parcelas — só trocar texto, valor, competência e o PDF.
+- **CND Municipal NÃO vai por padrão** — o setor de compras pede depois, se quiser (determinação do Gustavo, 18/09/2026).
+- **Aprovar o texto com o Gustavo antes de enviar** e, após o envio, ler a mensagem de volta (`messages.get` na thread) para confirmar SENT + anexo, não confiar só no retorno do `send`.
+- `gws`/`google_api.py gmail send` **não anexa arquivos** — usar MIME (`MIMEApplication` + `messages.send` com `raw`), como no script acima.
+
+### Geral
+
 - Ver skills `emissao-nfse` / `motor-nfse-id`. Motor nfelib em `$HERMES_HOME/id-nfse-motor` (legado `/opt/data/id-nfse-motor`).
 - Aracaju usa protocolo NACIONAL (DPS). Certificado A1 da ID: NÃO em email/Drive — está
   num PC pessoal do Gustavo (pendência).
 - Alíquota ISS auto-capturada por cron no dia 5 (job `3dfe43219f1b` usa `$HERMES_HOME/id-nfse-motor` com fallback).
+- Atenção: o motor nfelib (`id-nfse-motor/.venv`) é o venv que tem `googleapiclient` instalado neste host — usar `/opt/mercurio-data/id-nfse-motor/.venv/bin/python` para os scripts de Gmail/Drive.
 
 ---
 

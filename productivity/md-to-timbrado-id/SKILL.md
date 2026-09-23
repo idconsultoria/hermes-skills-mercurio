@@ -69,8 +69,72 @@ Motor: `/opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py`
    **inserir uma linha em branco DEPOIS** de cada tabela (`insertText "\n"` no endIndex, em
    ordem reversa num único batch).
 
+## Variante SergipeTec (timbrado do parceiro)
+
+`scripts/md_to_timbrado_sergipetec.py` — gera o mesmo tipo de doc, mas no **modelo SergipeTec**
+(`1R8PCezBW8QtjHA1g4Qi6fZulxJkIBQ62IesN3Uqx3bM`), cujo corpo é o do TJSE (parceria anterior).
+O fluxo é outro: **copia o modelo**, troca capa/cabeçalho/rodapé por `replaceAllText`,
+**deleta o corpo inteiro** (âncora: parágrafo "Introdução") e reinjeta o novo corpo no fim.
+
+```bash
+python3 md_to_timbrado_sergipetec.py corpo.md --folder <FOLDER_ID> \
+  --doc-name "Proposta ... — vN" \
+  --titulo-l1 "Proposta Comercial — Plataforma de" \
+  --titulo-l2 "Mitigação do El Niño / Comitê SEMAC" \
+  --metadata "Parceria estratégica entre ..." \
+  --header-l1 "PLATAFORMA DE MITIGAÇÃO DO EL NIÑO" \
+  --header-l2 "Comitê Intersetorial El Niño · SEMAC × SergipeTec"
+```
+
+O `corpo.md` deve conter **só o corpo** (começar em `# Resumo Executivo`): a capa vem do modelo.
+
+### Pitfall do cabeçalho (SergipeTec)
+
+- **`replaceAllText` alcança headers, mas NÃO footers.** O rodapé exige a rota dedicada
+  (`edit_footer`), e o **cabeçalho herda o texto do TJSE** — sem `--header-l1/--header-l2`
+  a proposta do cliente sai com **"MUTIRÃO DE CONCILIAÇÃO" / "Dívida Ativa · TJSE"** no topo
+  de todas as páginas. Sempre passar as duas linhas e conferir na renderização.
+- Números de referência do modelo: header `kix.hf0` (tabela r0c1, 2 parágrafos), footer `kix.hf1`.
+- O `d` + glifo no 1º parágrafo da capa é âncora do modelo (invisível no render) — **não apagar**;
+  ao extrair o texto do doc ele aparece como uma letra solta, e isso **não** é defeito do doc.
+- Após gerar, **conferir por API**: links (`textRun.textStyle.link`), ocorrências de strings do
+  modelo antigo ("Mutirão", "TJSE", "Dívida Ativa") e as 2 linhas do header/footer (que vivem
+  DENTRO de uma tabela — um walk só de parágrafos do header devolve vazio e dá falso negativo).
+- **Render de conferência:** `pdftoppm -png -r 70 -f <p> -l <p>` + inspeção visual; export PDF do
+  modelo SergipeTec reproduz a capa corretamente (ao contrário do modelo ID de fundo preto).
+- **Quebra de página: `<!-- pagebreak -->` (ou `\pagebreak`) numa linha isolada do markdown.**
+  O Google Docs **não** mantém tabela junta sozinho: uma tabela de fechamento ("Valor total
+  anual", "Total geral") parte entre duas páginas e a linha de TOTAL cai sozinha na página
+  seguinte — feio e fácil de passar batido. Insira o marcador ANTES do título da seção e
+  confira a página renderizada: a tabela tem de aparecer inteira. O marcador é reconhecido por
+  `parse_md` e vira `insertPageBreak` (`DocBuilder.add_pagebreak`), sem sobrar texto no doc.
+  Depois, confirme que os hyperlinks do corpo sobreviveram (contar `textStyle.link` via API:
+  um doc El Niño saudável tem 7).
+- **Largura de tabela = largura ÚTIL da seção (não 560pt).** O motor usava orçamento FIXO de
+  560pt; o corpo do modelo SergipeTec tem margens de 55pt (útil **485pt**) e o do modelo ID 72pt
+  (útil **451pt**) → toda tabela invadia a margem direita; quando a última coluna era estreita
+  (ex. célula `R$ 153.753,25`), o texto **saía da página e o último dígito saía cortado** no PDF.
+  Corrigido em `md-to-gdoc.py`: `DocBuilder.content_width_pt` (pageSize − margens da seção do
+  corpo = a do `sectionBreak NEXT_PAGE`) + **piso por coluna** = maior token inquebrável da
+  coluna ×7pt + 12pt de padding, com redistribuição do excedente. Checar sempre com
+  `pdftotext -bbox`: em A4 (595pt) nenhuma palavra pode passar de **~540pt**.
+- `occurrencesChanged` é **omitido** quando o `replaceAllText` dá 0 ocorrências → somar direto
+  dá `KeyError`. E a troca da capa já reescreve a 2ª linha do header (replaceAllText alcança
+  headers): `edit_header` por isso **lê o texto atual do header** e substitui o que encontrou,
+  em vez de assumir as strings do modelo.
+
 ## Pitfalls operacionais
 
+- **Tabela que quebra de página perde o cabeçalho.** O Docs API não repete a linha de cabeçalho
+  por padrão: numa tabela longa (plano operacional, matriz de riscos), a continuação na página
+  seguinte aparece sem os títulos das colunas. Fix pós-build: `pinTableHeaderRows`
+  (`tableStartLocation: {index: <startIndex da tabela>}`, `pinnedHeaderRowsCount: 1`) para CADA
+  tabela do documento, num único batch. Obs.: o campo `pinnedHeaderRowsCount` **não volta** na
+  leitura do doc — confirme o efeito no PDF renderizado (a linha de cabeçalho reaparece no topo
+  da página de continuação), não pela API.
+- **Validar tabela grande é olhar a página renderizada**, não só o texto: `pdftotext -layout`
+  mostra a paginação (útil para achar em que página cada tabela caiu) e `pdftoppm`+visão confirma
+  se a tabela estourou a margem ou partiu em duas.
 - **Rate limit de escrita do Docs** (`WriteRequestsPerMinutePerUser` = 60/min). O build do
   PRD inteiro já chega perto; NÃO rodar o script em rajada (2+ builds seguidos estouram a
   cota e quebram no meio). Quando estourar: aguardar ~60-70s e refazer, e manter os

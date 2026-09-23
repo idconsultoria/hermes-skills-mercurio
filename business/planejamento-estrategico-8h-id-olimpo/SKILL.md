@@ -128,6 +128,43 @@ Antes da Sessão 1, o facilitador compila **4 relatórios** (1 página cada, com
 3. **Enviar resumo em 24h:** decisões, Visão, 3 Winning Metrics, roadmap OKRs, WWW, riscos, datas de follow-up.
 4. **Ativar ritual:** Phronesis semanal revisa WWW (15–30'); 1x/mês revisa roadmap mensal com gráfico de barras do avanço.
 
+## Consolidação do artefato (depois das sessões)
+
+O ciclo termina com **um artefato de referência** que serve a dois usos ao mesmo tempo: consulta
+do ciclo e plano operacional do trimestre corrente. Estrutura aprovada pelo dono (21/09/2026):
+
+1. **A tese** — macro para micro, com o **racional de cada meta, visão, métrica e ambição**.
+   Não basta listar "R$ 125 mil": diga por que esse número existe (no caso: meta de
+   sobrevivência que cria a condição do ciclo de 2 anos), e derive os outros números dele
+   (125k ÷ 15k ≈ 9 contratos).
+2. **Como o ciclo é medido e conduzido** — uma tabela de medidas com métrica e fonte, o sistema
+   de metas (regra do ciclo: só contratos novos; exceção do caixa), e as **iniciativas
+   estratégicas**, cada uma com a meta que move e o indicador de sucesso.
+3. **Plano do trimestre** — em ordem de execução, com **número, dono, prazo e gate** por entrega,
+   checkpoint ao fim de cada mês e pré-mortem do próprio plano.
+4. **Anexos das sessões** — diagnóstico, riscos pontuados, decisões registradas e itens em aberto,
+   para referência.
+
+Regras de escrita que o dono cobrou:
+
+- **Nada de encanamento no documento:** sem caminhos de arquivo, sem estado de infraestrutura
+  (cron, scripts, discos), sem nota de confiabilidade de diarização, sem narração da sessão do
+  agente. É peça de gestão, não log de trabalho.
+- Todo número de meta **vem do painel** (`painel_metas.py`), com data de leitura; simulação tem
+  **premissa declarada** e é rotulada como derivada.
+- Dono sem base em decisão registrada entra como **(a ratificar)**, com legenda de alocação
+  proposta — nunca "a confirmar" espalhado pelo plano inteiro, que deixa o documento inutilizável.
+- **O ponto que decide o trimestre:** a meta de faturamento conta por **vencimento da parcela
+dentro do ano** — contrato assinado em dezembro que vence em janeiro conta zero. Rode a
+  simulação de 3 assinaturas/mês por forma de pagamento (4x desde a assinatura ≈ 54% da meta;
+  2x ≈ 90%; à vista ≈ 108%) e leve a **decisão de política de pagamento** como item de sócios:
+  sem ela, a meta pode ser declarada cumprida com metade do dinheiro fora do ano.
+- Entrega no **Google Doc timbrado** (skill `md-to-timbrado-id`), na pasta
+  `ID > 1. Gestão > 1.8. Planejamento Estratégico`, com versão no nome.
+- Depois de gerar o doc, confira de verdade: **pinar a linha de cabeçalho das tabelas**
+  (tabela que quebra de página perde o cabeçalho), exportar PDF, contar páginas e olhar capa,
+  contracapa e as tabelas grandes.
+
 ## Common Pitfalls — 8h
 
 1. **Estourar timebox.** Com 4h, 5' de atraso em cada bloco = 30' perdidos. Timekeeper corta sem piedade; pendência → Issues List.

@@ -28,7 +28,12 @@ from googleapiclient.discovery import build
 
 HERMES_HOME = os.environ.get("HERMES_HOME", "/opt/data")
 TOKEN = Path(HERMES_HOME) / "google_token.json"
-SCRIPT = "/opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py"
+# Motor md->gdoc: resolver pelo HERMES_HOME (as skills vivem dentro dele) em vez de
+# caminho absoluto fixo — o host muda de /opt/data para /opt/mercurio-data e o
+# caminho fixo quebrava o script sem aviso.
+SCRIPT = os.environ.get("MD_TO_GDOC") or str(
+    Path(HERMES_HOME) / "skills/productivity/google-workspace/scripts/md-to-gdoc.py"
+)
 # Modelo de Doc [Fundo Preto] — capa + masthead + contracapa da ID
 MODEL_TIMBRADO = "1dFY0Mb0X0OAS8TjnIW6rqAP3A-dhA1nTMS3HETht5To"
 

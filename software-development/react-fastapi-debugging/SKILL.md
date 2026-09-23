@@ -103,6 +103,18 @@ reset explícito por mudança de `id`. Não confiar no "remount".
 **Correção:** conferir o **schema real** da API antes de mapear (não assumir). Fallbacks
 gratuitos: "Minha Receita" (`minhareceita.org/<cnpj>`) e ViaCEP (`viacep.com.br/ws/<cep>/json`).
 
+### 9. Rota de SPA "não existe" quando sondada à mão
+**Sintoma:** testar a URL de uma rota à mão (ex.: `/cadastro-empresa`, `/empresas/nova`)
+devolve a tela de login, uma tela vazia ou 404 do nginx — e a conclusão precipitada é
+"essa rota não existe".
+**Causa:** rota **protegida** renderiza login e rota **inexistente** renderiza vazio: os dois
+casos são visualmente iguais. Somado a isso, os chunks são **lazy** — ler o DOM logo após o
+`load` devolve vazio mesmo numa rota que existe.
+**Correção:** **não sondar caminho à mão.** Baixar o HTML, localizar o chunk do router no
+bundle e casar os `path:`/`Route` ali (a tabela de rotas vive no bundle, não no DOM); ao
+navegar, **aguardar o chunk** antes de ler a tela. Rota pública de cadastro de empresa do
+ArtemisHub = `/cadastro-empresa` (sem login) — ver `references/public-onboarding-rate-limit.md`.
+
 ## Fluxo de diagnóstico recomendado
 1. **Confira os logs do backend** (401 vs 500 vs timeout) antes de tudo — separa bug de
    auth/header de bug de config.
@@ -120,3 +132,6 @@ gratuitos: "Minha Receita" (`minhareceita.org/<cnpj>`) e ViaCEP (`viacep.com.br/
 ## Referência
 - `references/artemis-2026-08-24.md` — caso real que originou estes padrões (diagnóstico
   do ArtemisHub: auth IA, tarja de rodapé, modal portal, autofill CNPJ).
+- `references/public-onboarding-rate-limit.md` — recurso público sem login
+  (`/cadastro-empresa`): allowlist método-por-método no middleware, rate-limit com slowapi,
+  `ROTAS_PUBLICAS` no front e como achar a rota sem sondar URL.

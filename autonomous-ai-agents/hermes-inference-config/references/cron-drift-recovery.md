@@ -1,7 +1,7 @@
-# Cron drift recovery — 2026-09-01 session (Mercúrio)
+# Cron drift recovery
 
-Despining cures `HTTP 401` and `drift_skip` after model renames. Session verified on
-`8a7f5f65ed76` (Ciclo de Consolidação) and `3dfe43219f1b` (Alíquota ISS).
+Despining cures `HTTP 401` and `drift_skip` after model renames (verified on the
+Ciclo de Consolidação and Alíquota ISS jobs).
 
 ## Symptoms observed
 
@@ -58,6 +58,19 @@ cat $HERMES_HOME/cron/jobs.json | python3 -c "import json; print([(j['id'], j['m
 
 - Unpinning recalculates `model_snapshot`/`provider_snapshot` → drift guard (#44585) clears.
 - Gateway must be running: `hermes cron status` / `hermes gateway start`. Without it, unpinned jobs still won't tick.
+
+## Verificação pós-correção — o que prova e o que não prova
+
+- `hermes cron list` / `hermes cron doctor` seguem exibindo o `last_error` **histórico**
+  (`drift_skip`, 401) depois do conserto: é passado, não estado atual. A prova é o snapshot —
+  `$HERMES_HOME/cron/jobs.json` → `model_snapshot`/`provider_snapshot` iguais ao `hermes config get model`
+  atual (`cron_model_drift_axes(job, current_provider=..., current_model=...) == []`).
+- Se o job já estava despinado e o snapshot continuar defasado, force mudança real de eixo:
+  `hermes cron edit <id> --model <default-atual> --provider <provider-atual>` e depois
+  `--model "" --provider ""` — é a segunda chamada que recalcula os snapshots.
+- O guarda anuncia o skip **uma vez** e continua pulando em silêncio. Job cujo valor é alertar
+  (monitor de resposta de e-mail, watcher) que falha fechado simplesmente nunca grita — reconfira
+  o snapshot depois de pausar/retomar o job e de toda troca de modelo/provider.
 
 ## When to re-pin instead
 

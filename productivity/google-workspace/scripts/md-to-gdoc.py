@@ -111,6 +111,12 @@ def parse_md(text):
     while i < len(lines):
         line = lines[i].rstrip()
 
+        # Quebra de página explícita: <!-- pagebreak --> ou \pagebreak
+        if re.match(r"^\s*(<!--\s*pagebreak\s*-->|\\pagebreak)\s*$", line, re.I):
+            blocks.append(("pagebreak", None))
+            i += 1
+            continue
+
         # Tabela
         if line.startswith("|") and i + 1 < len(lines) and re.match(r"^\|[\s\-:|]+\|?$", lines[i + 1]):
             header = [c.strip() for c in line.strip("|").split("|")]
@@ -390,6 +396,14 @@ class DocBuilder:
         if len(self.buffer) >= BATCH_SIZE:
             self.flush()
 
+    def add_pagebreak(self):
+        """Quebra de página — marcador `<!-- pagebreak -->` (ou `\\pagebreak`) numa linha
+        isolada do markdown. Usado para impedir que uma tabela/quadro final se PARTE entre
+        duas páginas: o Google Docs não mantém tabela junta sozinho.
+        A quebra ocupa 1 unidade de índice — por isso self.cur += 1."""
+        self._add({"insertPageBreak": {"location": {"index": self.cur}}})
+        self.cur += 1
+
     def flush(self):
         if not self.buffer:
             return
@@ -550,6 +564,67 @@ class DocBuilder:
                 },
                 "fields": "shading,borderLeft,indentStart,spaceBelow,spaceAbove"}})
 
+    # Larguras relativas de caractere (fração do corpo da fonte), para estimar texto em pt.
+    _NARROW = set("iljtfrI.,;:'\"|!()[]{}/\\-–—")
+    _WIDE = set("mwMW@%&")
+
+    def _text_w_pt(self, text, size=10.0):
+        """Largura aproximada do TEXTO em pt (uma linha). Substitui a contagem de
+        caracteres no dimensionamento de coluna: 60 caracteres de prosa e 60 de
+        algarismos não ocupam a mesma largura. Em link markdown `[rótulo](url)`,
+        conta-se só o rótulo — no Doc ele vira chip, e a URL não ocupa a célula."""
+        s = str(text)
+        s = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", s)   # [rótulo](url) -> rótulo
+        s = re.sub(r"[*`\[\]]", "", s)                  # demais marcadores não contam
+        w = 0.0
+        for ch in s:
+            if ch in self._NARROW:
+                w += 0.30 * size
+            elif ch in self._WIDE:
+                w += 0.82 * size
+            elif ch.isdigit():
+                w += 0.56 * size
+            elif ch.isupper():
+                w += 0.66 * size
+            else:
+                w += 0.50 * size
+        return w
+
+    def content_width_pt(self, doc=None):
+        """Largura ÚTIL (pt) da área imprimível da seção onde a tabela entra.
+
+        Pitfall: o orçamento fixo antigo (560pt) estourava: o modelo ID/SergipeTec tem
+        margens de 50-72pt, então a área útil é 451-485pt. Tabela de 560pt invadia a
+        margem direita (~75pt) e, quando a última coluna era estreita, o texto saía
+        da PÁGINA e o último dígito era cortado no PDF.
+        A seção do corpo é a do sectionBreak NEXT_PAGE (observável: o texto do corpo
+        começa na margem dela); sem NEXT_PAGE, valem as margens do documentStyle.
+        """
+        if doc is None:
+            doc = api_request(f"https://docs.googleapis.com/v1/documents/{self.doc_id}", "GET")
+        def mag(d, k, default=None):
+            v = (d or {}).get(k)
+            return v.get("magnitude") if isinstance(v, dict) else default
+        ds = doc.get("documentStyle", {})
+        page = mag(ds.get("pageSize", {}), "width", 595.3) or 595.3
+        mL = mag(ds, "marginLeft", 72) or 0
+        mR = mag(ds, "marginRight", 72) or 0
+        style = None
+        for el in doc.get("body", {}).get("content", []):
+            ss = el.get("sectionBreak", {}).get("sectionStyle")
+            if not ss:
+                continue
+            if ss.get("sectionType") == "NEXT_PAGE":
+                style = ss  # última seção NEXT_PAGE = corpo
+            elif style is None and (ss.get("marginLeft") or ss.get("marginRight")):
+                style = ss
+        if style:
+            mL = mag(style, "marginLeft", mL) or mL
+            mR = mag(style, "marginRight", mR) or mR
+        usable = page - mL - mR
+        # rede de segurança: valor absurdo (metadado incompleto) cai no orçamento histórico
+        return usable if 200 < usable < 800 else 560
+
     def add_table(self, header, rows):
         self.clear_bullet()
         self.flush()  # garantir que o buffer anterior foi aplicado antes de reler o doc
@@ -569,20 +644,62 @@ class DocBuilder:
         table = table_elem["table"]
         table_start = table_elem["startIndex"]
 
-        # Largura inteligente das colunas: proporcional ao conteúdo (header + células)
+        # Largura das colunas: estimada em PONTOS (não em contagem de caracteres).
+        # Contar caracteres erra feio em tabela mista (uma coluna de prosa longa come a
+        # página e uma coluna numérica curta fica apertada). Aqui: mede-se o texto em pt,
+        # respeita-se o piso do maior token inquebrável ("R$ 153.753,25") e a sobra vai
+        # para quem tem mais texto para acomodar.
         cell_texts = [header] + rows
-        max_lens = [0] * n_cols
-        for row in cell_texts:
-            for ci in range(n_cols):
-                if ci < len(row):
-                    max_lens[ci] = max(max_lens[ci], len(row[ci]))
-        total_len = sum(max_lens) or 1
-        total_width = 560  # orçamento total (mesmo da versão anterior — layout já validado)
-        widths = []
-        for ln in max_lens:
-            w = int(total_width * ln / total_len)
-            w = max(60, min(300, w))
-            widths.append(w)
+        usable = self.content_width_pt(doc)  # largura ÚTIL da seção (nunca > área imprimível)
+        PAD = 14.0        # padding interno da célula (≈7pt de cada lado)
+        MIN_COL = 34.0    # nenhuma coluna abaixo disso
+
+        ideais, pisos, massas = [], [], []
+        for ci in range(n_cols):
+            celulas = [str(row[ci]) for row in cell_texts if ci < len(row)]
+            ideal = max((self._text_w_pt(c) for c in celulas), default=0.0) + PAD
+            tokens = [t for c in celulas for t in c.split()]
+            piso = max((self._text_w_pt(t) for t in tokens), default=0.0) + PAD
+            massas.append(max(sum(self._text_w_pt(c) for c in celulas), 1.0))
+            ideais.append(max(MIN_COL, min(ideal, 0.62 * usable)))
+            pisos.append(max(MIN_COL, min(piso, 0.55 * usable)))
+
+        soma_ideal = sum(ideais)
+        if soma_ideal <= usable:
+            # Cabe em uma linha: a sobra vai para quem tem mais massa de texto (2 passadas,
+            # com teto de 1,7× o ideal para nenhuma coluna virar deserto).
+            larguras = list(ideais)
+            sobra = usable - soma_ideal
+            for _ in range(2):
+                tetos = [w * 1.7 for w in ideais]
+                livres = [ci for ci in range(n_cols) if larguras[ci] < tetos[ci] - 0.5]
+                if not livres:
+                    break
+                peso = sum(massas[ci] for ci in livres) or 1.0
+                add_total = 0.0
+                for ci in livres:
+                    add = sobra * massas[ci] / peso
+                    novo = min(tetos[ci], larguras[ci] + add)
+                    add_total += novo - larguras[ci]
+                    larguras[ci] = novo
+                sobra -= add_total
+                if sobra <= 0.5:
+                    break
+        else:
+            # Não cabe: tira o excesso de quem tem folga acima do piso.
+            excedente = soma_ideal - usable
+            folgas = [ideais[ci] - pisos[ci] for ci in range(n_cols)]
+            tot_folga = sum(folgas)
+            if tot_folga > 0:
+                larguras = [max(pisos[ci], ideais[ci] - excedente * folgas[ci] / tot_folga)
+                            for ci in range(n_cols)]
+            else:
+                f = usable / soma_ideal
+                larguras = [w * f for w in ideais]
+        if sum(larguras) > usable:   # rede de segurança: nunca fora da página
+            f = usable / sum(larguras)
+            larguras = [w * f for w in larguras]
+        widths = [int(max(MIN_COL, round(w))) for w in larguras]
         # Um request por coluna (cada uma com largura própria), tudo num único batch
         col_reqs = [{"updateTableColumnProperties": {
             "tableStartLocation": {"index": table_start},
@@ -764,6 +881,8 @@ def main():
             b.add_code(dados)
         elif tipo == "mermaid":
             b.add_mermaid(dados)
+        elif tipo == "pagebreak":
+            b.add_pagebreak()
         elif tipo == "hr":
             b.insert_text("\n")
     b.finish()
