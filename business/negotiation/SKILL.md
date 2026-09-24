@@ -8,7 +8,7 @@ metadata:
   hermes:
     tags: [negotiation, sales, contracts, pricing, empathy, voss]
     category: business
-    related_skills: [proposta-comercial-consultoria, elaboracao-proposta-comercial]
+    related_skills: [elaboracao-proposta-comercial]
 type: Orchestrator
 timestamp: 2026-09-11T00:00:00Z
 ---

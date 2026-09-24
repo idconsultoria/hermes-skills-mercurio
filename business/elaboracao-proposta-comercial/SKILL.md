@@ -8,10 +8,10 @@ author: Hermes Agent
 license: MIT
 metadata:
   hermes:
-    tags: [proposta, consultoria, comercial, contrato, minuta, drive, docs, pdf]
-    related_skills: [analise-contratual, google-workspace, research-report-standards]
+    tags: [proposta, consultoria, comercial, contrato, minuta, drive, docs, pdf, pricing, brand]
+    related_skills: [analise-contratual, google-workspace, research-report-standards, html-pdf-fidelity, deep-research]
 type: Orchestrator
-timestamp: 2026-08-14T06:30:00Z
+timestamp: 2026-09-24T02:00:00Z
 ---
 
 # Elaboração de Proposta Comercial
@@ -111,6 +111,7 @@ PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright npx playwright install chromium
 ## References
 
 - `references/guia-principios.md` — 12 princípios de elaboração (baseado em pesquisa: HBR, RAIN, McKinsey SCR, GBB, etc.). **Conteúdo deve seguir este guia.**
+- `references/precificacao-e-design-modelo.md` — precificação por valor (buffer 1,3-1,5x, Good-Better-Best 1,4-1,8x/2,0-3,0x, desconto só em troca), estrutura SCR slide a slide, decisões de design do modelo (capa/diamond teal/transição/final) e pitfalls de verificação (absovido de proposta-comercial-consultoria, merge 24/09/2026).
 - `references/placeholders.md` — mapa completo dos placeholders do modelo HTML.
 - `references/contratos-drive.md` — pasta do Drive, IDs dos contratos-modelo, subpasta Minutas, instruções de cópia e edição.
 - `references/portfolio.md` — cases, serviços e **clientes reais** da ID (site + apresentação Pazion) para prova social e seção "Quem já confiou".

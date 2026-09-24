@@ -10,7 +10,7 @@ metadata:
   hermes:
     tags: [valuation, consultoria, startups, biotech, agritech, planilha, rnpv]
     category: business
-    related_skills: [xlsx, research-report-standards, proposta-comercial-consultoria, deep-research]
+    related_skills: [xlsx, research-report-standards, elaboracao-proposta-comercial, deep-research]
 type: Orchestrator
 timestamp: 2026-08-15T03:00:00Z
 ---

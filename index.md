@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 104 skills** em 12 categorias.
+**Total: 103 skills** em 12 categorias.
 
 ---
 
@@ -24,7 +24,6 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `id-comunicacao-multiusuario` | Reference | Ajustar registro do Mercúrio por sócio da ID (identidade por chat_id). |
 | `inter-api-id-consultoria` | ToolIntegration | Consultar extrato/saldo da conta Inter da ID. |
 | `planejamento-estrategico-2h` | Orchestrator | Planejamento estratégico em 2h — EOS V/TO + One-Page Plan. |
-| `proposta-comercial-consultoria` | Orchestrator | Proposta comercial de consultoria — princípios, pricing e estrutura. |
 | `valuation-consultivo` | Orchestrator | Valuation consultivo de startup early-stage — rNPV, âncoras. |
 | `brand-design-system-html` | Template | Design system de marca de cliente em HTML. |
 | `planejamento-estrategico-8h-id-olimpo` | Orchestrator | Planejamento estratégico da ID em 8h — Visão 1-2 anos + plano mensal. |
@@ -178,7 +177,6 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 Relações semânticas do catálogo. Formato `type` → `alvo` (similar = bidirecional; uses = A usa B).
 
 Similar:
-- `elaboracao-proposta-comercial` → `proposta-comercial-consultoria`
 - `deep-research` → `systematic-research`
 - `deep-research` → `market-research-synthesis`
 - `augmentation-process-design` → `augmentacao-query`
@@ -196,7 +194,7 @@ Similar:
 - `xlsx` → `google-sheets-automation`
 - `docx` → `xlsx`
 - `valuation-consultivo` → `analise-contratual`
-- `planejamento-estrategico-2h` → `proposta-comercial-consultoria`
+- `planejamento-estrategico-2h` → `elaboracao-proposta-comercial`
 - `competitor-news-monitor` → `deep-research`
 - `user-interview` → `market-research-synthesis`
 - `hermes-agent` → `messaging-platforms`
@@ -264,7 +262,6 @@ Uses:
 - `google-docs-formatting` → `google-workspace`
 - `google-sheets-automation` → `google-workspace`
 - `elaboracao-proposta-comercial` → `planejamento-estrategico-2h`
-- `proposta-comercial-consultoria` → `elaboracao-proposta-comercial`
 - `dedalo-squad` → `bpmn-diagram-renderer`
 - `process-augmentation-pipeline` → `bpmn-diagram-renderer`
 - `augmentation-process-design` → `augmentacao-query`

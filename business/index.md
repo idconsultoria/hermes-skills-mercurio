@@ -10,5 +10,4 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `id-comunicacao-multiusuario` — Ajustar registro do Mercúrio por sócio da ID (identidade por chat_id).
 - `inter-api-id-consultoria` — Consultar extrato/saldo da conta Inter da ID.
 - `planejamento-estrategico-2h` — Planejamento estratégico em 2h (EOS V/TO + One-Page Plan).
-- `proposta-comercial-consultoria` — Proposta comercial de consultoria (princípios, pricing).
 - `valuation-consultivo` — Valuation consultivo de startup early-stage (rNPV, âncoras).
