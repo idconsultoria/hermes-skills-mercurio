@@ -164,3 +164,9 @@ Save the report to `{output_dir}/report.md`.
 - **Check responsive behavior** by noting any layout issues visible in screenshots.
 - **Don't forget edge cases**: empty states, very long text, special characters, rapid clicking.
 - When reporting screenshots to the user, include `MEDIA:<screenshot_path>` so they can see the evidence inline.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN e p5.js): usar o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não instalar outro browser.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual. Não usar o renderer local como substituto da navegação web.
+

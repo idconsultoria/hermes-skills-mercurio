@@ -92,7 +92,7 @@ the owner block + empty cells (since 1 task = 1 block), so arrows never cross a 
    parity — short Python regex scripts.
 3. Visual proof via local headless Chromium (Playwright ships one):
    ```bash
-   CHROME=/opt/data/.playwright/chromium-1234/chrome-linux/chrome
+   CHROME=/opt/data/.playwright/chromium-1117/chrome-linux/chrome
    "$CHROME" --headless=new --disable-gpu --no-sandbox --hide-scrollbars \
      --window-size=1700,1400 --virtual-time-budget=6000 \
      --screenshot=/opt/data/page.png "file:///opt/data/f-html"

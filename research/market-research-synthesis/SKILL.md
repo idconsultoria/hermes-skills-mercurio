@@ -159,3 +159,9 @@ When the task is competitor/market analysis for a Brazilian vertical:
 
 See `references/brazilian-agricultural-saas-landscape.md` for the full competitor data from the agricultural SaaS session (July 2026) as a reference template.
 See `references/brazilian-fintech-personal-finance-landscape.md` for the fintech/personal-finance-app vertical (July 2026) with competitor pricing data and market sizing.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN e p5.js): usar o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não instalar outro browser.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual. Não usar o renderer local como substituto da navegação web.
+

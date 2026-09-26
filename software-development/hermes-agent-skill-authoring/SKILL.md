@@ -212,3 +212,9 @@ A skill exists to make the agent's process more predictable — the agent reliab
 - [ ] Tests at `tests/skills/test_<skill>_skill.py` pass under `scripts/run_tests.sh`
 - [ ] Docs regenerated with scope discipline; sidebar has exactly one entry for the slug
 - [ ] `git add` + commit on the intended branch; PR opened
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN e p5.js): usar o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não instalar outro browser.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual. Não usar o renderer local como substituto da navegação web.
+

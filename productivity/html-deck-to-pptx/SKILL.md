@@ -47,3 +47,10 @@ timestamp: 2026-09-13T00:00:00Z
 ## Reuso
 
 Os scripts desta classe ficaram em `/opt/mercurio-data/work/proposta_famosa/`: `extrair_geo.py` (HTML → JSON), `rasterizar_fundos.py`, `rasterizar_svgs.py`, `gerar_pptx.py` (JSON → PPTX). O JSON é a interface entre eles: adapte os extratores para um deck novo e reaproveite o emissor inteiro.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e decks): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

@@ -12,7 +12,7 @@ documentos.**
 
 NÃO tente mermaid.ink (API mudou — 400 "Unknown diagram error" até para
 diagramas simples) nem kroki.io para flowcharts grandes (500). Use o
-mermaid-cli local com o Chromium do Hermes:
+mermaid-cli local com o Chromium compartilhado:
 
 1. **Instalar mermaid-cli com `--ignore-scripts`** (pula o download do browser,
    que falha em ARM64 sem unzip/root):
@@ -21,21 +21,21 @@ mermaid-cli local com o Chromium do Hermes:
    npm init -y >/dev/null 2>&1
    npm install @mermaid-js/mermaid-cli --no-audit --no-fund --ignore-scripts
    ```
-2. **Chromium headless do Hermes** — o ÚNICO Chromium ARM funcional no ambiente:
-   `/opt/hermes/.playwright/chromium_headless_shell-1234/chrome-linux/headless_shell`
+2. **Chromium compartilhado** — o ÚNICO Chromium ARM funcional no ambiente:
+   `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`
    - ⚠️ O chrome do cache puppeteer
      (`~/.cache/puppeteer/chrome/linux-131.0.6778.204/...`) é x64 → `Exec format
      error` em ARM. O Chromium do host é snap com AppArmor que bloqueia o
-     puppeteer. Usar SEMPRE o headless_shell do Hermes.
+     puppeteer. Usar SEMPRE o Chromium compartilhado.
    - ⚠️ **NUNCA rodar `snap remove chromium` nem instalar browser no host** —
      o Chromium snap do host é INFRA COMPARTILHADA entre sessões/skills (IAF
      PDF etc.); remover derruba outras sessões no meio do trabalho.
-   - Warnings de dbus/vaapi no headless_shell: ignorar (renderiza ok).
+   - Warnings de dbus/vaapi no Chromium headless: ignorar (renderiza ok).
 3. **Puppeteer config** `/opt/data/mmdc/puppeteer-config.json`:
    ```json
    {
      "args": ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
-     "executablePath": "/opt/hermes/.playwright/chromium_headless_shell-1234/chrome-linux/headless_shell"
+     "executablePath": "/opt/data/.playwright/chromium-1117/chrome-linux/chrome"
    }
    ```
 4. **Renderizar** — fundo TRANSPARENTE (`-b transparent`, RGBA confirmado por

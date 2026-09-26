@@ -12,41 +12,30 @@ cards, tabelas, callouts, footer).
 | Paginação | 1 página exata, design para caber | Fluxo contínuo; Chromium quebra páginas |
 | Margens | `@page { margin: 0 }` + padding no wrap | Igual — `@page { margin: 0 }` e padding lateral no `.wrap` |
 | Fontes | EB Garamond/Playfair/Cinzel embutidas via `@font-face` file:// | Font stack de sistema (SF Mono/Consolas/monospace para code) — remover Google Fonts, NÃO remapear |
-| Verificação | pymupdf: 1 página + fontes | Screenshot do HTML (não do PDF) via Chromium do host + `vision_analyze` |
+| Verificação | pymupdf: 1 página + fontes | Screenshot do HTML (não do PDF) via Chromium ARM64 compartilhado do proot + `vision_analyze` |
 
-## Fluxo completo (cat → host → chromium → cat back)
+## Fluxo completo (local, sem host remoto)
 
-```bash
-# 1. HTML → host (o snap do Chromium não lê /tmp; usar /home/ubuntu)
-cat /opt/data/reports/pi-harness-report.html | ssh oracle-host 'cat > /home/ubuntu/pi-harness-report.html'
-
-# 2. Converter — o `--no-pdf-header-footer` remove data/URL/nº de página
-ssh oracle-host 'timeout 120 chromium-browser --headless --no-sandbox --disable-gpu \
-  --disable-software-rasterizer --no-pdf-header-footer \
-  --print-to-pdf=/home/ubuntu/pi-harness-report.pdf "file:///home/ubuntu/pi-harness-report.html" 2>&1 | tail -3; \
-  ls -la /home/ubuntu/pi-harness-report.pdf'
-
-# 3. Trazer de volta para /opt/data (write-safe root para MEDIA)
-ssh oracle-host 'cat /home/ubuntu/pi-harness-report.pdf' > /opt/data/reports/pi-harness-report/pi-harness-report-v1.pdf
-
-# 4. Limpar temporários do host
-ssh oracle-host 'rm -f /home/ubuntu/pi-harness-report.html /home/ubuntu/pi-harness-report.pdf'
-```
-
-## Verificação sem pymupdf/pdftoppm no container
+Use o Chromium ARM64 compartilhado no próprio proot. Não copie para o Oracle, não use SSH e não use Chromium do Snap.
 
 ```bash
-# Screenshot do HTML com o MESMO renderer do PDF (Chromium do host)
-ssh oracle-host 'timeout 90 chromium-browser --headless --no-sandbox --disable-gpu \
-  --screenshot=/home/ubuntu/preview.png --window-size=1240,1750 "file:///home/ubuntu/pi-harness-report.html" 2>&1 | tail -1'
-ssh oracle-host 'cat /home/ubuntu/preview.png' > /opt/data/reports/pi-harness-report/preview-p1.png
-# depois: vision_analyze no PNG local — conferir hero, alinhamento de KPI cards,
-# headers de tabela azuis, ausência de texto cortado
+CHROMIUM=/opt/data/.playwright/chromium-1117/chrome-linux/chrome
+INPUT=/caminho/absoluto/relatorio.html
+OUTPUT=/caminho/absoluto/relatorio-v1.pdf
+
+"$CHROMIUM" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \
+  --no-pdf-header-footer --print-to-pdf="$OUTPUT" "file://$INPUT"
 ```
 
-- `--window-size=1240,1750` ≈ 1 página A4 em ~70 DPI.
-- Para seções abaixo do fold, subir o height (ex.: `1240,3500`).
-- Erros de DBus/UPower no stderr do snap são normais — ignorar.
+Para gerar preview com o mesmo renderer:
+
+```bash
+"$CHROMIUM" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \
+  --hide-scrollbars --window-size=1240,1750 \
+  --screenshot=/caminho/preview.png "file://$INPUT"
+```
+
+Validar com `pdfinfo`/`stat` e `vision_analyze`; limpar apenas os arquivos temporários criados pela tarefa. Para websites externos, usar `browser_exec`.
 
 ## Pontos que o vision_analyze deve confirmar
 

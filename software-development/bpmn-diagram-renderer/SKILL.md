@@ -21,30 +21,21 @@ Renderiza diagramas BPMN 2.0 (arquivos `.bpmn`) em SVG e PNG usando **bpmn-js** 
 
 ## Setup (uma vez por workspace)
 
-### Via setup.sh (Dédalo Squad)
+O runtime compartilhado já contém Playwright e `bpmn-js`. Não instalar browser.
 
 ```bash
-cd render && bash setup.sh
+cd render
+npm install --ignore-scripts --no-save bpmn-js
 ```
 
-### Manual
+O renderer usa `/opt/data/.playwright/chromium-1117/chrome-linux/chrome` via Playwright.
 
-```bash
-cd /tmp/bpmn-test
-npm init -y
-PUPPETEER_SKIP_DOWNLOAD=true npm install bpmn-js puppeteer
-```
+## Chromium compartilhado
 
-`PUPPETEER_SKIP_DOWNLOAD=true` evita baixar outro Chromium quando já existe um funcional.
-
-## Detecção de Chromium
-
-O script `render_bpmn.js` auto-detecta nesta ordem:
-1. `$PUPPETEER_EXECUTABLE_PATH` ou `$CHROMIUM_PATH` (env var)
-2. `/tmp/chromium-extracted/usr/lib/chromium/chromium` (Debian extraído, aarch64)
-3. Puppeteer built-in (baixado no `npm install`)
-
-Em **aarch64** (Oracle ARM, Raspberry Pi): o built-in do Puppeteer é x86_64 e não funciona. O Debian extraído é obrigatório. O script resolve isso automaticamente na ordem de detecção e injeta `LD_LIBRARY_PATH` via `puppeteer.launch({ env: ... })`:
+- Browser: `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`
+- Runtime Playwright: `/opt/mercurio-data/node_modules/playwright`
+- Bundle bpmn-js: `/opt/mercurio-data/node_modules/bpmn-js/dist/bpmn-viewer.production.min.js`
+- Cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`
 
 ## Renderizar um BPMN
 
@@ -78,7 +69,7 @@ with open('diagram.bpmn', 'w') as f:
 Usar `scripts/render_bpmn.js`.
 
 ```javascript
-const puppeteer = require('puppeteer');
+const { chromium } = require('/opt/mercurio-data/node_modules/playwright');
 const fs = require('fs');
 
 const bpmnXML = fs.readFileSync('diagram.bpmn', 'utf8');
@@ -113,8 +104,8 @@ const html = `<!DOCTYPE html>
 fs.writeFileSync('diagram.html', html);
 
 (async () => {
-  const browser = await puppeteer.launch({
-    executablePath: '/tmp/chromium-extracted/usr/lib/chromium/chromium',
+  const browser = await chromium.launch({
+    executablePath: '/opt/data/.playwright/chromium-1117/chrome-linux/chrome',
     args: ['--no-sandbox', '--disable-gpu', '--disable-software-rasterizer'],
     headless: true
   });
@@ -151,7 +142,7 @@ node render_bpmn.js diagram.bpmn diagram.png
 cat diagram.bpmn | node render_bpmn.js - output.png
 ```
 
-O Chromium e `LD_LIBRARY_PATH` são resolvidos automaticamente pelo script.
+O Chromium compartilhado e o `bpmn-js` são resolvidos pelo runtime canônico do Mercúrio.
 
 ## Output
 
@@ -164,8 +155,8 @@ Ambos com fidelidade Camunda: fontes, espaçamento, bordas, conectores, swimlane
 
 - **ES modules (`import ... from 'bpmn-js'`) não funcionam no browser.** Usar SEMPRE o bundle UMD (`bpmn-viewer.production.min.js`) com tag `<script>` inline.
 - **`LD_LIBRARY_PATH` ausente** → Chromium aborta com `libopenh264.so.8: cannot open shared object file`. O script `render_bpmn.js` resolve isso automaticamente setando `env.LD_LIBRARY_PATH` no `puppeteer.launch()`.
-- **`PUPPETEER_SKIP_DOWNLOAD=true`** é obrigatório no `npm install` para não tentar baixar outro Chromium (o Debian extraído já cobre).
-- **Chromium Puppeteer x86_64 em aarch64** — `qemu-x86_64: Could not open '/lib64/ld-linux-x86-64.so.2'`. Usar o Debian extraído, que o script prioriza na detecção.
+- **Não baixar browser:** o runtime compartilhado já fornece Chromium ARM64; instalar apenas bibliotecas com `--ignore-scripts`.
+- **Não usar Chromium x86_64 em aarch64** — `qemu-x86_64: Could not open '/lib64/ld-linux-x86-64.so.2'`. Usar sempre o Chromium ARM64 compartilhado.
 - **Viewport maior que o diagrama** → usar `canvas.zoom('fit-viewport')` para ajustar automaticamente.
 - **BPMN com colaboração (pools)** → bpmn-js lida nativamente; não requer configuração extra.
 - **Timeout de 15s** no `waitForFunction` é suficiente para BPMNs de até ~200 elementos. Diagramas maiores podem precisar de 30s.
@@ -184,17 +175,17 @@ Ambos com fidelidade Camunda: fontes, espaçamento, bordas, conectores, swimlane
 
 > **Mapa completo de colunas da planilha:** `references/sergipetec-planilha-colunas.md` — use para diagnóstico e limpeza cirúrgica em retries.
 
-> **Mermaid (flowcharts) → PNG transparente:** `references/mermaid-rendering.md` — mmdc + headless_shell do Hermes para blocos ```mermaid``` de markdown (inserção em Google Docs via md-to-gdoc). Mesma classe de diagrama→imagem.
+> **Mermaid (flowcharts) → PNG transparente:** `references/mermaid-rendering.md` — mmdc + Chromium compartilhado para blocos ```mermaid``` de markdown (inserção em Google Docs via md-to-gdoc). Mesma classe de diagrama→imagem.
 
 O renderizador está integrado ao pipeline em `dedalo_squad/render/`:
 
 ```
 render/
   .gitignore          # node_modules/
-  package.json        # bpmn-js + puppeteer
+  package.json        # bpmn-js (sem browser)
   package-lock.json
   render_bpmn.js      # node render_bpmn.js <input.bpmn> [output.png]
-  setup.sh            # npm install + detecção de Chromium
+  setup.sh            # instalar bpmn-js sem browser + renderer compartilhado
 ```
 
 ### Python wrapper
@@ -221,3 +212,10 @@ Em `elaboracao_de_pops_e_diagramas.py`, após gerar os XMLs BPMN, o pipeline aut
 3. Preenche as colunas `url_diag_estrategico` e `url_diag_operacional` na planilha
 
 Tudo orquestrado pelo `run_one.py`, que usa exponential backoff (`agemini/backoff.py`) para lidar com rate limits da Gemini.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

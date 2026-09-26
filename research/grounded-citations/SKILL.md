@@ -234,3 +234,9 @@ lists exactly the cited ids with the ledger's URLs, and the cited share of
 source-bearing sentences meets the threshold. Read the warnings even when the
 exit code is 0 — uncited registered sources usually mean a claim lost its
 attribution during editing.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN e p5.js): usar o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não instalar outro browser.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual. Não usar o renderer local como substituto da navegação web.
+

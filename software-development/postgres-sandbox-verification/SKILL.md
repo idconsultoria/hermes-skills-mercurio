@@ -2,7 +2,9 @@
 name: postgres-sandbox-verification
 type: ToolIntegration
 timestamp: 2026-08-23T00:00:00Z
-description: "Verify features really persist against a throwaway Postgres."
+description: "Verify features really persist against a throwaway Postgres.
+
+Load this skill when checking real database behavior with a disposable PostgreSQL 17 built from extracted .debs."
 ---
 
 # Postgres Sandbox Verification

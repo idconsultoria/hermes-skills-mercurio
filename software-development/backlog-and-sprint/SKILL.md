@@ -3,8 +3,6 @@ name: backlog-and-sprint
 description: "Backlog management and Sprint execution for product iteration (Fase 5) —
 
 Load this skill during the execution phase (Fase 5) of the product pipeline. Covers maintaining an unstructured backlog of improvement requests and orchestrating complete Sprints from PM and UX/UI through Engineering, Review, and Close."
-
-Load this skill during the execution phase (Fase 5) of the product pipeline. Covers maintaining an unstructured backlog of improvement requests and orchestrating complete Sprints from PM and UX/UI through Engineering, Review, and Close."
 category: software-development
 type: Orchestrator
 timestamp: 2026-06-12T02:23:22Z
@@ -1547,3 +1545,10 @@ Workarounds que funcionam:
    **Nota:** `@mcp.tool()/prompt()/resource()` são do `fastmcp` (v2+). Não confundir com decoradores de outras libs MCP. Verificar a versão do fastmcp no `pyproject.toml`.
 
 ⚠️ **Reattempt sprint: `PHASE_COMPLETE: design` não significa design completo — o gate é o `ACORDO` do agy.** Pi best marca `<!-- PHASE_COMPLETE: design -->` ao terminar de gerar wireframes/user-flows/prototype. Isso é a conclusão da **geração Pi**, não da **fase de design**. A fase de design só termina quando o agy revisa e registra `ACORDO: AVANÇAR PARA ENGENHARIA` no `feedbacks_sprint_N.md`. Numa reattempt, é comum encontrar `PHASE_COMPLETE` sem `ACORDO` — a Sprint anterior pulou o agy review. Neste caso, **rodar agy review antes de qualquer engineering**, mesmo que os designs já existam.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

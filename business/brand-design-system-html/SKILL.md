@@ -58,8 +58,45 @@ Quando o usuário diz "parece que entrou foi a Bricolage" / "não carrega a Toma
   para identidade de cliente quanto para documento da casa (POP, relatório, carta) que precise
   sair com a tipografia da ID. Preferir isso a `find` no sistema inteiro, que é lento e costuma
   não achar nada.
+  **Segundo vetor de extração: qualquer HTML *já renderizado* da casa que use a tipografia da ID**
+  (um painel, um relatório, uma carta exportada) carrega as fontes embutidas em base64 e serve
+  de fonte canônica sem depender do Drive. O truque é o regex que pega os dois formatos:
+  ```python
+  re.findall(r'@font-face\s*\{[^}]*\}', html, re.S)   # não use @font-face\{ — o espaço importa
+  re.search(r"url\(data:font/(otf|woff2);base64,([A-Za-z0-9+/=]+)\)", bloco)
+  ```
+- **Antes de declarar a tipografia resolvida, teste a COBERTURA DE GLIFOS, não o nome da família.**
+  Uma fonte pode carregar o nome certo (`fc-scan` devolve `Nunito Sans 12pt ExtraLight 12pt`)
+  e ainda assim faltar `ã`, `ç`, `R$`, `×` ou `·` — o que quebra exatamente o texto de marca
+  (R$ na tabela de preços é o caso mais comum). Parseie `%{charset}` do `fc-query` e teste as
+  letras e os símbolos que o documento realmente usa, incluindo acentuação portuguesa completa:
+  ```bash
+  fc-query --format "%{charset}" fonte.ttf | # expande os pares hex->caracteres
+  # verifica: á à â ã é ê í ó ô õ ú ü ç Á É Í Ó Ú Ç $ 0-9 × · — º ª
+  ```
+  Se faltar glifo e a fonte "irmã" de mesmo desenho estiver disponível (Nunito ↔ Nunito Sans,
+  Hanken Grotesk ↔ Hanken), use a irmã **declarando a diferença no relatório de entrega** — o
+  usuário decide se a aproximação basta.
 - Confirme **pesos oficiais**: título pode ser 400/500, e "negrito em texto" pode ser o **ExtraBold**
   da família (ex.: Tomato 800), não um bolder sintético.
+
+## Auditoria de paginação (PDF multi-página, antes de entregar)
+
+Relatório HTML→PDF com N páginas falha por **espaço morto**, não por estética. Meça, não julgue
+pelo olho: com `pymupdf`, para cada página, some o `y1` de todos os spans e subtraia da altura
+útil; o que sobra é espaço morto. Regras:
+
+- **Alvo: menos de ~20 mm livres no rodapé de cada página.** Acima disso, a página está furada.
+- **Página com >80 mm livres** = conteúdo atômico grande demais (um cartão que não cabe) sendo
+  empurrado inteiro. Solva em duas frentes: permitir quebra interna do bloco
+  (`page-break-inside: auto` + `page-break-after: avoid` nos títulos/dd, para não deixar órfão de
+  cabeçalho) **e** reordenar seções para o bloco grande não abrir a página.
+- **A tabela grande é a melhor âncora final.** Mova-a para antes das seções curtas: ela preenche
+  a página inteira, evita a página órfã do fim e (bônus) é o que o leitor consulta por último.
+- `thead { display: table-header-group }` + `tr { page-break-inside: avoid }` repetem o cabeçalho
+  da tabela e impedem que uma linha se parta ao meio.
+- Ajuste tipográfico é o último recurso, nesta ordem: padding de célula → line-height → corpo.
+  Nunca encolher texto abaixo de ~8.4pt em tabela: o leitor é humano, não o medidor de margem.
 
 ## Auditoria de contraste (fazer ANTES de entregar)
 Calcule **WCAG programaticamente** para cada par texto/fundo realmente usado no sistema:
@@ -82,6 +119,17 @@ Calcule **WCAG programaticamente** para cada par texto/fundo realmente usado no 
 
 ## Entrega
 - Arquivo versionado `v<N>` e `assets/fonts/` junto quando houver fonte licenciada.
+- **Todo link de documento num artefato entregue é verificado antes do envio, um a um.** Confirme
+  por API que o ID existe, tem o nome que você citou no texto e **não está na lixeira**
+  (`trashed`); documento superado que ainda aparece na busca é o erro mais comum aqui — pesquise
+  pelo nome exato e escolha a versão **vigente**, não a primeira que sai. No PDF, confira que os
+  links saíram clicáveis (`page.get_links()` lista os `uri` do render).
+- **Texto longo em português: escrever o HTML em pedaços, nunca de uma vez.** Um `write_file` de
+  25 KB de texto corrido introduz vocabulário de outro idioma no meio (verbo em espanhol no lugar
+  do substantivo) sem erro de sintaxe — passa pelo `html.parser` e só aparece na leitura. Gere por
+  seções com `patch`, e rode um grep de termos do idioma errado antes de renderizar; verbos
+  curtos (`el`, `com`, `para`, `que`) são falso-positivo — mire nos **substantivos e adjetivos**
+  da língua errada.
 - Se não der para renderizar visualmente (browser sem headless / localhost bloqueado), valide por
   Python: tags balanceadas (html.parser), `@font-face` presentes, todos os hex da paleta no arquivo.
 
@@ -89,3 +137,10 @@ Calcule **WCAG programaticamente** para cada par texto/fundo realmente usado no 
 - Não assumir que o manual tem grid/área-de-proteção; se não tem, diz isso e padroniza.
 - Não fabricar a tipografia da marca; confirmar pesos e nomes (verificar via CDN + usuário).
 - Não entregar texto/"palavras" onde o usuário espera HTML visual — sempre página HTML.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e decks): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

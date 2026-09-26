@@ -464,3 +464,10 @@ For extracting config from a legacy Z-API Cloud Run job and mapping to the `ASSE
 | `references/baileys-bridge-server.js` | Full Node.js bridge server (Z-API compatible REST API) |
 | `references/whatsapp_client.py` | Python client class with phone-exists, send-text, send-pdf-and-text |
 | `references/multi_assessor_config.py` | Multi-instance config loader with prefixed env vars |
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

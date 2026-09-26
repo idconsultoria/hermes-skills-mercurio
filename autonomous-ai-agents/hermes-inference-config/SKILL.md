@@ -163,6 +163,27 @@ stop a global switch from silently sending a paid model.
 | Cron must always use a specific reliable model | pin: `--model X --provider Y` |
 | Confirm current pin state | read `jobs.json` under `$HERMES_HOME/cron/` (fields `model`, `provider`, `model_snapshot`, `provider_snapshot`) |
 
+## Rascunho interno entregue como conteúdo — não é flag de reasoning
+
+Sintoma: a pessoa lê, na mensagem final, o planejamento do modelo em vez da resposta — metacomentário
+(\"Wait I must avoid…\", \"não devo alucinar\", \"deixa eu verificar\"), caracteres de outro idioma, ou a
+mesma frase reescrita em caixa alta sem querer. No Telegram isso chega como texto corrompido, e o
+usuário lê como erro de tom ou bug de produto.
+
+**Não é o canal de reasoning vazando.** `show_reasoning: false`, `verbose: false` e
+`reasoning_effort` governam o canal de reasoning; não seguram texto que o modelo escreve dentro do
+próprio corpo da mensagem final. Antes de caçar flag, leia a mensagem exata na conversa: se o
+metacomentário está no corpo entregue, a hipótese \"config de reasoning\" está morta.
+
+Procedimento: (1) localizar a mensagem e ler o texto bruto; (2) confirmar o estado real das flags no
+perfil (`hermes config get model`, ou o `config.yaml` do perfil); (3) concluir que a correção é no
+modelo/route ou no script que governa aquela resposta — não na config de reasoning. Registrar como
+pitfall de qualidade do modelo no perfil evita que o próximo diagnóstico gaste tempo procurando flag.
+
+Achado associado: o mesmo defeito aparecendo em conversa diferente (DM e grupo) numa janela curta
+indica falha do modelo naquele momento, não evento isolado do interlocutor. Quando coincide com
+troca recente de modelo/route, olhar o histórico de trocas antes de atribuir ao interlocutor.
+
 ## Diagnosing model errors from logs
 
 Logs at `$HERMES_HOME/logs/errors.log` and `agent.log`.
@@ -314,8 +335,19 @@ Log literal com timestamp e segredos mascarados; **provado** separado de **hipó
 pedir simples; e, para teste que ele faz no Telegram, passos numerados + como cada desfecho será
 lido, um teste por vez, aguardando o retorno. Intervenção que altera estado só com ok explícito.
 
+## Forense de turno: "parou sem entregar o artefato"
+
+Um pedido que "está há 30 minutos sem responder" quase nunca está rodando: o `response ready` no
+`gateway.log` mostra que o turno **terminou** e o que faltou foi o artefato. Antes de dizer que está
+em andamento, leia `references/turn-forensics.md` — limites do turno em `gateway.log`/`agent.log`,
+estado real em `state.db` (`session_turn_leases`, `async_delegations`, `delivery_obligations`),
+prova do artefato por mtime, e a lista de chamarizes (ruído de rede do Telegram, 503 retentado,
+deadline de uma ferramenta) que não são causa.
+
 ## References
 
+- `references/turn-forensics.md` — diagnosticar turno de gateway parado/terminado-sem-entregar:
+  logs, `state.db` em read-only, prova por mtime, chamarizes, formato do relatório.
 - `references/credential-failure-diagnosis.md` — checklist de eliminação de `401`/"Provider
   authentication failed": classificar o 401, provar a credencial fora do gateway, ler `auth.json`,
   chamarizes que custam tempo e como reportar.

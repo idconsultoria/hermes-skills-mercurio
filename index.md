@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 103 skills** em 12 categorias.
+**Total: 106 skills** em 12 categorias.
 
 ---
 
@@ -32,6 +32,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `negotiation` | Orchestrator | Negociar preço, contrato ou objeção (empatia tática, Voss). |
 | `painel-metas-id` | Reference | Painel de metas da ID + slide semanal da Phronesis. |
 | `revisao-de-proposta-existente` | Orchestrator | Revisar proposta já entregue, preservando o resto. |
+| `roteiro-de-qualificacao` | Orchestrator | Montar roteiro de perguntas de qualificação: descoberta ou sabatina. |
 
 ## research — Pesquisa e augmentação
 
@@ -127,16 +128,18 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `pi-agent-coordination` | ToolIntegration | Invocar Pi Agent localmente via Hermes (hierarquia provider/model). |
 | `product-pipeline` | Orchestrator | Pipeline multi-agente de produto — ideia a MVP via sprints. |
 | `hermes-inference-config` | Reference | Configure Hermes model/provider/fallback; route crons. |
+| `facilitacao-grupo-agentes` | Orchestrator | Facilitar reuniões de agentes: pauta, turnos e devolução. |
+| `peer-session-audit` | Reference | Auditar sessão ruim de um agente par: conversa real, defeitos, postmortem. |
 
 ## infrastructure — Integrações de entrega
 
 | Skill | Type | Descrição |
 |---|---|---|
-| `hermes-agent-replication` | Method | Replicar instância Hermes (rama ID) numa VM nova. |
+| `hermes-agent-replication` | Orchestrator | Replicar instância Hermes (rama ID) numa VM nova. |
 | `whatsapp-baileys-integration` | ToolIntegration | Integrar WhatsApp em Python via Baileys — lifecycle, QR, enums. |
 | `hermes-cron-script-dispatch` | Reference | Hermes cron scripts resilient to HERMES_HOME path changes. |
 | `moodle-id-operacoes` | Orchestrator | Operar o Moodle da ID: papéis, aulas estilizadas, fórum. |
-| `stack2-mesh-failback` | Runbook | Failover/failback da Stack 2 (mesh) sem loop e sem perda. |
+| `stack2-mesh-failback` | Orchestrator | Failover e failback da Stack 2 (mesh) sem loop e sem perda. |
 
 ## cicd-oracle-preview — Deploy & preview
 
@@ -177,6 +180,9 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 Relações semânticas do catálogo. Formato `type` → `alvo` (similar = bidirecional; uses = A usa B).
 
 Similar:
+- `facilitacao-grupo-agentes` → `reunioes-diarizadas`
+- `peer-session-audit` → `hermes-inference-config`
+- `roteiro-de-qualificacao` → `user-interview`
 - `deep-research` → `systematic-research`
 - `deep-research` → `market-research-synthesis`
 - `augmentation-process-design` → `augmentacao-query`
@@ -308,6 +314,8 @@ Uses:
 - `stack2-mesh-failback` → `hermes-cron-script-dispatch`
 - `skills-library-audit` → `skills-repo-curator`
 - `humanizer` → `process-augmentation-pipeline`
+- `facilitacao-grupo-agentes` → `messaging-platforms`
+- `roteiro-de-qualificacao` → `elaboracao-proposta-comercial`
 
 ---
 

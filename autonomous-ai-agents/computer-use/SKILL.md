@@ -388,3 +388,9 @@ do differently.
 Hermes autodetection is a planned follow-up in trycua/cua. For now, the command
 installs the pack under `~/.cua-driver/skills/cua-driver`; point Hermes at that
 directory or symlink it into the user's skill space.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN e p5.js): usar o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não instalar outro browser.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual. Não usar o renderer local como substituto da navegação web.
+

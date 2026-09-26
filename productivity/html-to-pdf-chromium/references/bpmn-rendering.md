@@ -10,26 +10,26 @@ Found in `/opt/data/dedalo_squad/render/`:
 
 ```
 render/
-  package.json        # deps: bpmn-js + puppeteer
+  package.json        # bpmn-js; browser vem do Chromium compartilhado
   render_bpmn.js      # node render_bpmn.js <input.bpmn> [output.png]
   setup.sh            # cd render && bash setup.sh
 ```
 
 After `git clone`, run:
 ```bash
-cd render && bash setup.sh    # installs bpmn-js + puppeteer, detects Chromium
+cd render && bash setup.sh    # instala somente bpmn-js; o browser é compartilhado
 ```
 
-## Chromium Detection Order
+## Chromium compartilhado
 
-The render script auto-detects Chromium in this order:
-1. `$PUPPETEER_EXECUTABLE_PATH` or `$CHROMIUM_PATH` env var
-2. `/tmp/chromium-extracted/usr/lib/chromium/chromium` (Debian-extracted, aarch64 compatible)
-3. Puppeteer's built-in Chromium (downloaded during `npm install`)
+O renderer usa exclusivamente o Chromium ARM64 compartilhado e o runtime Playwright do Mercúrio:
 
-On aarch64 (Oracle ARM, Raspberry Pi): the Debian-extracted Chromium is required
-because Puppeteer's default is x86_64. The script sets `LD_LIBRARY_PATH` to include
-the extracted libs automatically in the `puppeteer.launch({ env: ... })` call.
+- Browser: `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`
+- Runtime: `/opt/mercurio-data/node_modules/playwright`
+- Biblioteca: `/opt/mercurio-data/node_modules/bpmn-js/dist/bpmn-viewer.production.min.js`
+- Cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`
+
+Não baixar, instalar ou selecionar browser por perfil. Para sites externos com internet, usar `browser_exec`; este renderer é local.
 
 ## Python Wrapper
 
@@ -74,12 +74,9 @@ q=f"'{folder_id}' in parents and trashed=false"
 ES module imports (`import BpmnJS from '...'`) don't work from `file://` pages.
 Use `bpmn-viewer.production.min.js` from the dist/ folder inlined as a `<script>` tag.
 
-### Chromium on aarch64
+### Chromium no ARM64
 
-Puppeteer downloads x86_64 Chrome by default. On ARM machines, use the Debian-extracted
-Chromium from this skill's setup. The render script sets `LD_LIBRARY_PATH` automatically
-in `puppeteer.launch({ env: { LD_LIBRARY_PATH: ... } })` to include
-`/tmp/chromium-extracted/usr/lib/chromium` and `/tmp/chromium-extracted/usr/lib/aarch64-linux-gnu`.
+O Chromium local é ARM64 e compartilhado. Não instalar browser, não usar Chromium remoto, Snap, `headless_shell` ou cache Puppeteer separado. O script fixa `executablePath=/opt/data/.playwright/chromium-1117/chrome-linux/chrome` e usa Playwright.
 
 ## Exponential Backoff for Gemini API (Dédalo Squad)
 

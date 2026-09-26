@@ -17,12 +17,12 @@ mkdir -p /opt/data/mmdc && cd /opt/data/mmdc
 npm init -y >/dev/null && npm install @mermaid-js/mermaid-cli --no-audit --no-fund --ignore-scripts
 ```
 
-`/opt/data/mmdc/puppeteer-config.json` — aponta para o Chromium do próprio Hermes
+`/opt/data/mmdc/puppeteer-config.json` — aponta para o Chromium compartilhado
 (nunca tocar no browser do host):
 ```json
 {
   "args": ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
-  "executablePath": "/opt/hermes/.playwright/chromium_headless_shell-1234/chrome-linux/headless_shell"
+  "executablePath": "/opt/data/.playwright/chromium-1117/chrome-linux/chrome"
 }
 ```
 
@@ -66,8 +66,8 @@ em modo Pages normal.
 
 ## ⚠️ NUNCA `snap remove`/instalar browser no oracle-host
 
-O Chromium snap do host é **infraestrutura compartilhada entre sessões** (IAF
+O Chromium remoto legado é **infraestrutura compartilhada entre sessões** (IAF
 PDF etc.). Acidente real: um agente rodou `sudo snap remove chromium` durante
 setup do mmdc → outra sessão perdeu o browser subitamente e reinstalou (o `snap
 changes` mostrou Remove 21:13 / Install 21:21 UTC). Para renderização local usar
-SEMPRE o `headless_shell` do Hermes — não tocar no host.
+SEMPRE o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não tocar no browser do host.

@@ -2,7 +2,9 @@
 name: local-postgres-sandbox
 type: ToolIntegration
 timestamp: 2026-08-23T00:00:00Z
-description: "Verify DB behavior via local Postgres sandbox from app dump."
+description: "Verify DB behavior via local Postgres sandbox from app dump.
+
+Load this skill when backend features must be proven against a real database without touching production, Docker, or sudo."
 ---
 
 # Local Postgres sandbox verification (no Docker daemon, no sudo)

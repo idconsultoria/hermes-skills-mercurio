@@ -1,4 +1,4 @@
-# Mermaid → PNG transparente com mmdc + headless_shell do Hermes
+# Mermaid → PNG transparente com mmdc + Chromium compartilhado
 
 Pipeline validado (CFP IA, ago/2026): renderizar blocos ` ```mermaid ```` (flowcharts) de documentos
 markdown como PNG para inserção em Google Docs. Mesma classe do BPMN → imagem: diagrama em código/XML →
@@ -13,11 +13,11 @@ renderização via headless browser. Fundo **transparente** + escala **2x**.
   ```
   `--ignore-scripts` evita o postinstall do puppeteer (baixa Chrome x64 quebrado em ARM64 e falha sem
   `unzip` instalado no container). O executável do browser vem do puppeteer-config.
-- **Browser: usar o headless_shell do próprio Hermes** — nunca instalar/remover chromium no host:
+- **Browser: usar o Chromium compartilhado** — nunca instalar/remover chromium no host:
   ```
-  /opt/hermes/.playwright/chromium_headless_shell-1234/chrome-linux/headless_shell
+  /opt/data/.playwright/chromium-1117/chrome-linux/chrome
   ```
-  É ARM64 nativo e funciona (Chromium 151). O chrome x64 do cache do puppeteer (`~/.cache/puppeteer/...`)
+  É ARM64 nativo e funciona (Chromium 125). O chrome x64 do cache do puppeteer (`~/.cache/puppeteer/...`)
   dá `Exec format error` em ARM.
   ⚠️ **O chromium snap do oracle-host é INFRA COMPARTILHADA** (IAF PDF, outras skills/sessões) — NUNCA
   rodar `snap remove`/instalar browser no host (erro real ago/2026: `sudo snap remove chromium` quebrou
@@ -28,7 +28,7 @@ renderização via headless browser. Fundo **transparente** + escala **2x**.
 ```json
 {
   "args": ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
-  "executablePath": "/opt/hermes/.playwright/chromium_headless_shell-1234/chrome-linux/headless_shell"
+  "executablePath": "/opt/data/.playwright/chromium-1117/chrome-linux/chrome"
 }
 ```
 

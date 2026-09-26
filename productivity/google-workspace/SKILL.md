@@ -433,3 +433,10 @@ $GSETUP --revoke
 | 2026-08-11 | Adicionado `scripts/md-to-gdoc.py` + `references/md-to-gdoc.md` — conversor markdown → Google Docs com formatação correta (headings, bold inline, bullets, tabelas nativas com largura inteligente, callouts, code blocks, espaçamento entre parágrafos). Modo batch para evitar 429; documentados 10 pitfalls reais (style bleeding por `\n`, herança de fonte/bullet, `tableCellLocation` inexistente, `weightedFontFamily`, etc.). |
 | 2026-06-21 | Adicionado `references/gmail-large-file-delivery.md` — Gmail 25 MB attachment limit, Drive sharing workaround, and Kindle manga delivery edge case. Added pitfall and reference pointer in SKILL.md. |
 | 2026-06-19 | Adicionados pitfalls: `drive search` parent queries exigem `--raw-query` (400 Invalid Value sem ele); Drive IDs case-sensitive; Docs precisam de `--export-mime text/plain` para download como texto. |
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e decks): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

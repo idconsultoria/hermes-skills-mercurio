@@ -279,7 +279,7 @@ def _fix_mermaid(code):
 
 
 def _render_mermaid_png(code, out_path):
-    """Renderiza mermaid → PNG transparente 2x via mmdc + headless_shell do Hermes."""
+    """Renderiza mermaid → PNG transparente 2x via mmdc + Chromium ARM64 compartilhado."""
     import subprocess
     tmp = out_path + ".mmd"
     with open(tmp, "w", encoding="utf-8") as f:

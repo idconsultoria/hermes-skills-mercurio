@@ -357,3 +357,9 @@ Organize final report by sub-topic, not by source. Each section should include:
 | Reliability | High (simple HTTP) | Medium (subagent timeout risk) |
 | Coverage | Focused (known domains) | Broad (multiple channels) |
 | Time | 10-30 min | 20-60+ min |
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN e p5.js): usar o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não instalar outro browser.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual. Não usar o renderer local como substituto da navegação web.
+

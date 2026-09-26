@@ -1,8 +1,10 @@
 ---
 name: stack2-mesh-failback
-description: "Use ao mexer no failover/failback da Stack 2 (mesh)."
+description: "Failover e failback da Stack 2 (mesh) sem loop e sem perda.
+
+Carregue esta skill ao mexer no failover ou failback da Stack 2 mesh — litestream, minio, termux, oracle."
 category: infrastructure
-type: Runbook
+type: Orchestrator
 version: "1.0.0"
 timestamp: 2026-09-18T00:00:00Z
 metadata:

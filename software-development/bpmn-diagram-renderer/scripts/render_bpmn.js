@@ -5,11 +5,11 @@
  * Uso: node render_bpmn.js <input.bpmn> [output.png]
  *      ou pipe: cat diagram.bpmn | node render_bpmn.js - output.png
  *
- * Chromium: auto-detecta (Debian extraído → Puppeteer built-in → env vars).
- * Dependências: npm install bpmn-js puppeteer
+ * Chromium: usa o runtime ARM64 compartilhado em /opt/data/.playwright.
+ * Dependências: bpmn-js + Playwright no runtime compartilhado do Mercúrio.
  */
 
-const puppeteer = require('puppeteer');
+const { chromium } = require('/opt/mercurio-data/node_modules/playwright');
 const fs = require('fs');
 const path = require('path');
 
@@ -36,23 +36,8 @@ if (process.argv.length >= 4) {
 
 // --- Resolve Chromium ---
 function findChromium() {
-  if (process.env.PUPPETEER_EXECUTABLE_PATH && fs.existsSync(process.env.PUPPETEER_EXECUTABLE_PATH)) {
-    return process.env.PUPPETEER_EXECUTABLE_PATH;
-  }
-  if (process.env.CHROMIUM_PATH && fs.existsSync(process.env.CHROMIUM_PATH)) {
-    return process.env.CHROMIUM_PATH;
-  }
-  const debianPath = '/tmp/chromium-extracted/usr/lib/chromium/chromium';
-  if (fs.existsSync(debianPath)) {
-    return debianPath;
-  }
-  try {
-    const builtin = puppeteer.executablePath();
-    if (builtin && fs.existsSync(builtin)) {
-      return builtin;
-    }
-  } catch (e) { /* fallthrough */ }
-  return null;
+  const canonicalPath = '/opt/data/.playwright/chromium-1117/chrome-linux/chrome';
+  return fs.existsSync(canonicalPath) ? canonicalPath : null;
 }
 
 // --- Read input ---
@@ -73,9 +58,9 @@ if (!bpmnXML || bpmnXML.trim().length === 0) {
 }
 
 // --- Locate bpmn-js ---
-const bpmnJSPath = path.join(__dirname, 'node_modules', 'bpmn-js', 'dist', 'bpmn-viewer.production.min.js');
+const bpmnJSPath = '/opt/mercurio-data/node_modules/bpmn-js/dist/bpmn-viewer.production.min.js';
 if (!fs.existsSync(bpmnJSPath)) {
-  console.error('bpmn-js não encontrado. Execute: npm install');
+  console.error('bpmn-js não encontrado no runtime compartilhado: /opt/mercurio-data/node_modules/bpmn-js');
   process.exit(1);
 }
 const bpmnJS = fs.readFileSync(bpmnJSPath, 'utf8');
@@ -117,40 +102,24 @@ fs.writeFileSync(htmlPath, html);
 (async () => {
   const chromiumPath = findChromium();
   if (!chromiumPath) {
-    console.error('Chromium não encontrado. Instale: apt-get install chromium-browser');
+    console.error('Chromium compartilhado não encontrado: /opt/data/.playwright/chromium-1117/chrome-linux/chrome');
     process.exit(1);
   }
 
   console.error(`Chromium: ${chromiumPath}`);
 
-  const browser = await puppeteer.launch({
-    executablePath: chromiumPath,
-    args: [
-      '--no-sandbox',
-      '--disable-gpu',
-      '--disable-software-rasterizer',
-      '--disable-dev-shm-usage'
-    ],
+  const browser = await chromium.launch({
+    executablePath: findChromium(),
     headless: true,
-    env: {
-      ...process.env,
-      LD_LIBRARY_PATH: [
-        process.env.LD_LIBRARY_PATH,
-        '/tmp/chromium-extracted/usr/lib/chromium',
-        '/tmp/chromium-extracted/usr/lib/aarch64-linux-gnu',
-      ].filter(Boolean).join(':')
-    }
+    args: ['--no-sandbox', '--disable-gpu', '--disable-software-rasterizer', '--disable-dev-shm-usage']
   });
 
-  const page = await browser.newPage();
-  await page.setViewport({
-    width: VIEWPORT_WIDTH,
-    height: VIEWPORT_HEIGHT,
-    deviceScaleFactor: SCALE_FACTOR
+  const page = await browser.newPage({
+    viewport: { width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT, deviceScaleFactor: SCALE_FACTOR }
   });
 
   const fileUrl = 'file://' + htmlPath;
-  await page.goto(fileUrl, { waitUntil: 'networkidle0', timeout: 20000 });
+  await page.goto(fileUrl, { waitUntil: 'networkidle', timeout: 20000 });
 
   try {
     await page.waitForFunction('window.__BPMN_READY__ === true', { timeout: 10000 });

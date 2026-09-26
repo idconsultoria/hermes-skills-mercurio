@@ -1,8 +1,8 @@
 ---
 name: pi-agent-coordination
-description: "Invoke Pi Agent locally from Hermes — provider/model hierarchy and session recovery
+description: "Invoke Pi Agent locally from Hermes — provider/model hierarchy and session recovery.
 
-Load this skill for running Pi Coder Agent as a local npm binary — no Docker, no SSH."
+Load this skill when running Pi Coder Agent as a local npm binary — no Docker, no SSH."
 category: autonomous-ai-agents
 metadata:
   hermes:
@@ -1115,3 +1115,9 @@ que elementos 3D renderizam e textos aparecem.
 
 - `references/fastmcp-testability-pattern.md` — Como testar MCP tools com FastMCP
 - `references/zero-byte-recovery.md` — Recuperação de arquivos JS/CSS zerados (0 bytes) após Pi Agent + verificação de sanidade pós-restauração
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN e p5.js): usar o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não instalar outro browser.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual. Não usar o renderer local como substituto da navegação web.
+

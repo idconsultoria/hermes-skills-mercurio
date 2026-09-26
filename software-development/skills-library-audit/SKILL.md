@@ -97,6 +97,16 @@ tabela longa; nada de parágrafo explicando o método.
   resposta. Refino posterior que não muda o aceite (renormalizar texto, reauditar o já auditado,
   redocumentar) é ruído: o sócio corta com "está complicando, simplifique". Entregar o arquivo e o
   resultado em poucas linhas — a descrição do processo só se for pedida.
+- **Redefinir o portão depois de fechá-lo reinicia o trabalho sem autorização.** Tendo o aceite
+  atingido, um receio novo (formatação, estética do frontmatter, "e se o YAML não parsear?") não abre
+  fase: pergunta se aquilo muda o que o destinatário recebe. Se não muda, vai para a lista do que não
+  foi feito, não para outra rodada de script.
+- **Cada script de batch-edit roda o validador de aceite na mesma rodada, antes do próximo script.**
+  Script corretivo escrito sobre o output do anterior sem revalidar quebra o que o anterior
+  consertou, e a pilha de scripts cresce enquanto o arquivo fica pior. O ciclo que trava é sempre o
+  mesmo: um validador (o portão de poluição, `yaml.safe_load`, a checagem de referência) executado
+  depois de cada escrita, não só no fim da fase. Se a validação já estava no script anterior, ela
+  precisa estar no próximo também.
 
 ## Pitfalls
 
@@ -138,3 +148,10 @@ passe de reparo depois do dicionário e um portão de artefato (regex dos defeit
 consertar só o que ela acusa; separar quebra nova de herdada comparando com a árvore do doador.
 - **Nunca reconstruir de memória a lista de marcadores do dono:** ela vive em
 `references/portability-markers.md` — reler antes de varrer.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

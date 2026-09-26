@@ -15,7 +15,7 @@ apenas no espelhamento).
 
 ## Pipeline (validado CFP IA, ago/2026)
 
-1. **Renderizar PNG** com mermaid-cli + headless_shell do Hermes (NÃO usar o Chromium
+1. **Renderizar PNG** com mermaid-cli + Chromium compartilhado (NÃO usar o Chromium
    snap do host — infraestrutura compartilhada, nunca mexer nele):
    ```bash
    MMDC=/opt/data/mmdc/node_modules/.bin/mmdc
@@ -23,7 +23,7 @@ apenas no espelhamento).
      -p /opt/data/mmdc/puppeteer-config.json
    ```
    `puppeteer-config.json` aponta `executablePath` para
-   `/opt/hermes/.playwright/chromium_headless_shell-1234/chrome-linux/headless_shell`
+   `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`
    com args `--no-sandbox --disable-setuid-sandbox --disable-gpu --disable-dev-shm-usage`.
    Instalar o mermaid-cli com `--ignore-scripts` (não baixa browser).
 
@@ -61,5 +61,4 @@ O modo pageless (sem páginas) **não é exposto pela API pública do Google Doc
   fidelidade real é visual. Para conferir no browser do Hermes, o servidor Next deve
   rodar no container (porta 3001, `npm start -- -p 3001`) — o browser do Hermes não
   alcança o servidor do host via rede Docker.
-- Screenshots via `chromium-browser --headless --screenshot` no host saem **sem CSS**
-  (AppArmor bloqueia) — não usar como verificação visual de layout.
+- Para conferir visual, usar o renderer Chromium compartilhado local ou `browser_exec` para sites externos; não usar screenshots do renderer remoto.

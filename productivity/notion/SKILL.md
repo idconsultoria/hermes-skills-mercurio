@@ -3,8 +3,6 @@ name: notion
 description: "Notion API plus ntn CLI — pages, databases, markdown import, Workers integration.
 
 Load this skill for Notion automation. Covers the Notion API for creating and updating pages and databases, the ntn CLI for markdown import/export, database query and filtering, and Cloudflare Workers integration for serverless Notion automations."
-
-Load this skill for Notion automation. Covers the Notion API for creating and updating pages and databases, the ntn CLI for markdown import/export, database query and filtering, and Cloudflare Workers integration for serverless Notion automations."
 version: 2.0.0
 author: community
 license: MIT
@@ -479,3 +477,10 @@ mcp_servers:
 ```
 
 Full setup guide, tool catalog, breaking changes (v2.0 data_source migration), paste-back from inside a session (PTY+background workflow), and troubleshooting: `skill_view(name="notion", file_path="references/notion-mcp-server.md")`.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

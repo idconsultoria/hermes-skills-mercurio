@@ -550,6 +550,26 @@ curl -s -o /dev/null -w "connect=%{time_connect}s total=%{time_total}s\n" \
 
 Full methodology, per-platform baselines, and interpretation guide: `references/platform-latency-diagnostics.md`.
 
+## Telegram — Mention Someone by ID in a Document Caption
+
+When sending a document to a group where one person must be called out by name, build the mention in the caption with `parse_mode: HTML` and a `tg://user?id=<USER_ID>` anchor. Telegram converts the anchor into a real `text_mention` entity on delivery — the recipient gets a clickable name and gets notified, even without typing `@` or a username.
+
+```python
+caption = (
+    '<a href="tg://user?id=609921578">Tácio</a>, terminei a entrega: '
+    'o briefing em PDF com os links do que você tem que aprovar.'
+)
+# sendDocument multipart: chat_id, caption, parse_mode="HTML", document=@file.pdf
+```
+
+The user ID comes from the gateway transcript (`messages.content` carries `[Name|123456789]`) or from `TELEGRAM_ALLOWED_USERS`. A display name is not enough — a nickname like `@nosterv` does not resolve to a mention entity; the numeric ID does.
+
+**Read the response, not the wrong key.** The returned message has the entities under `caption_entities` for a document caption; the top-level `entities` key is for text messages and will be `null` on a `sendDocument` even when the mention worked. Printing `entities` makes a working mention look broken.
+
+If you then try to "fix" the mention with `editMessageCaption` and pass the same caption, Telegram answers `400 Bad Request: message is not modified: specified new message content and reply markup are exactly the same` — that rejection is proof the first send was already correct. Check `caption_entities` before re-editing.
+
+**Prefer one profile's token per bot.** When a multiplexed gateway runs several profiles, each profile's `.env` holds its own `TELEGRAM_BOT_TOKEN`. To post as a specific persona, read the token from that profile's `.env` (e.g. `/opt/mercurio-data/profiles/<profile>/.env`) and call the Bot API directly — do not use the `send_message` tool, which always sends as the active profile's bot. The group chat ID comes from `gateway.log` (`inbound message: ... chat=-100...`) or from the group session row in the profile's `state.db`.
+
 ## Related Files
 
 | File | Purpose |
@@ -559,3 +579,10 @@ Full methodology, per-platform baselines, and interpretation guide: `references/
 | `references/telegram-bot-api-file-delivery.md` | Direct Bot API file delivery from TUI (when MEDIA: can't route to Telegram) |
 | `references/json-payload-newlines.md` | JSON newline handling for multi-line text |
 | `references/platform-latency-diagnostics.md` | Per-platform API latency measurement and troubleshooting |
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

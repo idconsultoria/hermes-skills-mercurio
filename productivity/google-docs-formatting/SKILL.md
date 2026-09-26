@@ -86,7 +86,7 @@ bullets, native tables, clickable checkboxes, smart chips, callouts.
   `parents` no body, 403; DELETE corpo vazio; fundir pastas duplicadas; dry-run). Scripts:
   `/opt/data/igor-docs-md/espelho_extra.py`, `organizar_drive.py`, `verificar_mermaid_drive.py`.
 - `references/mermaid-rendering.md` — render mermaid/flowchart notation to
-  **transparent-background PNGs** (mermaid-cli + Hermes Chromium headless_shell,
+  **transparent-background PNGs** (mermaid-cli + Chromium ARM64 compartilhado,
   `-b transparent -s 2` ≈192 DPI) and swap code blocks for images in Docs.
   Includes the quote+parenthesis parse-error fix, image sizing to fit the
   page, and the pageless-via-API limitation. `.md` sources stay text-only;
@@ -129,3 +129,10 @@ silently dropped (docs looked empty). The fix: recursive walk over
 paragraphs + tables → cells → runs, plus `doc["lists"]` map to distinguish
 real checklists (`BULLET_CHECKBOX`: nestingLevels without `glyphSymbol`)
 from normal bullets (`●`). See `references/md-to-gdoc-pitfalls.md` #21.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e decks): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

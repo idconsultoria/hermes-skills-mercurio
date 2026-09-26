@@ -58,7 +58,7 @@ shoot fast without the virtual-time flag.
 # 1) make a screenshot-only variant: null out the ResizeObserver
 sed 's/if(window.ResizeObserver){/if(false){/'  map-v7.html > /tmp/map_screenshot.html
 # 2) capture (this Chromium lives under the Playwright cache)
-CH=/opt/data/.playwright/chromium-1234/chrome-linux/chrome
+CH=/opt/data/.playwright/chromium-1117/chrome-linux/chrome
 "$CH" --headless=new --disable-gpu --no-sandbox --disable-dev-shm-usage \
   --user-data-dir=/tmp/cf-shot --hide-scrollbars \
   --window-size=1700,1400 --virtual-time-budget=5000 \

@@ -254,7 +254,7 @@ Após o loop (Pi → agy → ACORDO), o protótipo precisa de verificação visu
 1. **Verificação visual = browser do Hermes no CONTAINER, não no host.** O browser do Hermes não
    alcança o servidor do host (redes separadas). Subir o Next.js no container em porta ALTERNATIVA
    (ex.: `npm start -- -p 3001`) e usar browser_navigate + browser_vision em `http://localhost:3001/...`.
-2. **NUNCA confiar em screenshot do chromium snap do host** (`chromium-browser --headless --screenshot`):
+2. **NUNCA confiar em screenshot do renderer Chromium remoto legado** (`Chromium compartilhado --headless --screenshot`):
    sob AppArmor o CSS não carrega → screenshot vem "quebrado" (ícones gigantes, sem header) — é artefato
    do sandbox, não bug do app. Usar apenas o browser do Hermes para julgar visual.
 3. **EADDRINUSE na porta default**: o next-server do host é visível no namespace do container via rede

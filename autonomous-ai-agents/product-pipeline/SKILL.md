@@ -488,7 +488,7 @@ When F2 research needs both source documents (.md) and polished deliverables (.h
 - **Sem metadados irrelevantes:** Não incluir nomes de consultoria, fases, confidencialidade ou datas na capa a menos que o usuário peça.
 
 **PDF generation (post-HTML, opcional):**
-- Usar Chromium headless: `LD_LIBRARY_PATH=.../chromium .../chromium --headless --no-sandbox --disable-gpu --print-to-pdf-no-header --print-to-pdf="output.pdf" "file://input.html"`
+- Usar Chromium headless: `CHROMIUM=/opt/data/.playwright/chromium-1117/chrome-linux/chrome "$CHROMIUM" --headless --no-sandbox --disable-gpu --print-to-pdf-no-header --print-to-pdf="output.pdf" "file://input.html"`
 - Adicionar `@page { margin: 0; }` no CSS para remover margens padrão de impressão
 - Google Drive upload opcional: `$GAPI drive upload file.pdf --name "file.pdf" --parent FOLDER_ID`
 
@@ -1476,7 +1476,7 @@ Quando "casos completos" de usuários são insumo para um especialista humano (C
 
 ### Entregáveis para parceiro não-técnico (Google Docs/Sheets/PDF, nunca .md)
 
-> 📖 **Flowcharts mermaid → imagens no Google Docs:** quando o espelhamento para o Drive exige substituir blocos ```` ```mermaid ```` por imagens renderizadas, ver `references/mermaid-flowcharts-to-docs.md` — render via mmdc + headless_shell do Hermes, fundo transparente 2x, upload Drive público, `insertInlineImage` com dimensionamento para caber (pageless não existe na API), e a regra de NUNCA tocar no browser do host.
+> 📖 **Flowcharts mermaid → imagens no Google Docs:** quando o espelhamento para o Drive exige substituir blocos ```` ```mermaid ```` por imagens renderizadas, ver `references/mermaid-flowcharts-to-docs.md` — render via mmdc + Chromium ARM64 compartilhado, fundo transparente 2x, upload Drive público, `insertInlineImage` com dimensionamento para caber (pageless não existe na API), e a regra de NUNCA tocar no browser do host.
 
 > 📖 **Auditoria de rastreabilidade (protótipo vs user flows/stories):** quando o usuário pergunta se as US/fluxos estão contemplados no protótipo, ver `references/prototype-traceability-audit.md` — prompt Pi Cost auto-contido, validação com pi-session-audit, estrutura do relatório (matrizes US/fluxo, gaps, backend pronto para conectar).
 
@@ -1487,7 +1487,7 @@ Quando um parceiro do projeto (ex: CFP certificado, especialista de domínio) te
 - Todo contexto de apoio deve estar **na pasta do Google Drive do projeto, propriamente formatado** — o parceiro não vai abrir o repo.
 - Casos completos montados por você (ex: dados completos dos 3 perfis) viram insumo para o parceiro escrever recomendações em texto corrido; depois você gamifica/estrutura.
 - **Organização no Drive em subpastas numeradas por entrega (01..N)** com templates preenchíveis, PDFs de docs ricos (tom, casos) via WeasyPrint com o design system, guia mestre com links diretos, e move de arquivos via PATCH na API (GET parents → PATCH addParents/removeParents com token de `google_token.json`). Padrão completo e pitfalls (search sem `trashed=false` inclui lixeira; `drive delete` → trashed reversível): `skill_view(name='product-pipeline', file_path='references/partner-drive-deliverable-package.md')`.
-- **Flowcharts mermaid → imagem nos Google Docs:** `.md` ficam só texto; o espelhamento renderiza ` ```mermaid ` como PNG transparente 2x (mmdc + headless_shell do Hermes — NUNCA o Chromium snap do host) e insere via `insertInlineImage` dimensionado para caber. Pageless NÃO é possível via API (issue 227875469). Ver `skill_view(name='product-pipeline', file_path='references/mermaid-to-docs-images.md')`.
+- **Flowcharts mermaid → imagem nos Google Docs:** `.md` ficam só texto; o espelhamento renderiza ` ```mermaid ` como PNG transparente 2x (mmdc + Chromium ARM64 compartilhado — não usar browsers remotos) e insere via `insertInlineImage` dimensionado para caber. Pageless NÃO é possível via API (issue 227875469). Ver `skill_view(name='product-pipeline', file_path='references/mermaid-to-docs-images.md')`.
 
 ### AGENTS.md na raiz do repo (governança de documentos)
 
@@ -1522,3 +1522,9 @@ Resumo rápido:
 3. Output: `gap-report.md` com gaps mapeados por módulo, severidade e linha
 4. Decidir: deploy direto (se aprovado) ou execução de correções (se gaps críticos)
 5. O gap report se torna o plano de ação: fases de correção com estimativas por lote
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN e p5.js): usar o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não instalar outro browser.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual. Não usar o renderer local como substituto da navegação web.
+

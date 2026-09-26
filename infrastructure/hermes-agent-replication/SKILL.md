@@ -1,8 +1,10 @@
 ---
 name: hermes-agent-replication
-description: "Replicar instância Hermes (rama ID) numa VM nova."
+description: "Replicar instância Hermes (rama ID) numa VM nova.
+
+Carregue esta skill quando o principal pedir para copiar, portar ou subir um agente Hermes numa máquina virtual diferente."
 category: infrastructure
-type: Method
+type: Orchestrator
 timestamp: 2026-08-22T00:00:00Z
 ---
 

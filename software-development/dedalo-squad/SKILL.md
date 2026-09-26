@@ -461,7 +461,7 @@ Verificar o POP detalhado — se for placeholder genérico, limpar e reexecutar.
 
 ### Renderização PNG falhou
 
-1. `which chromium-browser || which google-chrome-stable` → Chromium instalado?
+1. `/opt/data/.playwright/chromium-1117/chrome-linux/chrome --version` → Chromium ARM64 compartilhado disponível?
 2. `node --version` → Node.js 18+?
 3. `ls render/node_modules/bpmn-js` → `setup.sh` foi executado?
 
@@ -527,3 +527,10 @@ O modelo é configurável por agente em `agemini/agentes/*.py` (constante `MODEL
 | Renderizador BPMN | `render/` |
 | Service account | `agemini/conectores/credenciais/service_account.json` |
 | Env vars | `.env` |
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e decks): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

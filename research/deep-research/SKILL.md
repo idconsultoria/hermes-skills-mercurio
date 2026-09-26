@@ -513,3 +513,9 @@ When one or more subagents timeout, follow this sequence — **do not jump strai
 - delegate_task goal 参数不能用 XML 属性语法（`goal">text`），必须用正常 JSON key
 - delegate_task API 不能同时传 `goal` 和 `tasks` 参数
 - Subagent model availability can fail at runtime (`model_not_supported`). When this happens, **don't retry subagents** — fall back to running directly.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN e p5.js): usar o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não instalar outro browser.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual. Não usar o renderer local como substituto da navegação web.
+

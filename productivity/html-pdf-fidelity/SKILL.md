@@ -33,22 +33,40 @@ Garantir que um PDF exportado de HTML seja **idêntico ao que o usuário vê no 
 - **1 página é alcançada no DESIGN** (texto conciso + escala tipográfica equilibrada, preenchimento ~90-99% da altura A4), nunca por compactação no print.
 - Se sobrar espaço: aumente fontes/espaçamentos (ex.: corpo 15.5→17.5px, nome 30→34px, labels ~11px, line-height 1.55). Se estourar: encurte o texto.
 
-## Renderer: Chromium headless no HOST (não WeasyPrint)
+## Renderer: Chromium compartilhado do proot (não WeasyPrint)
 
-WeasyPrint **degrada CSS moderno** (drop caps com float, chips, ornamentos, gradientes). O padrão fiel é Chromium headless via SSH no host Oracle (padrão da IAF newsletter):
+WeasyPrint degrada CSS moderno (drop caps com float, chips, ornamentos e gradientes). Para fidelidade máxima, usar a única cópia ARM64 do Chromium:
 
 ```bash
-ssh oracle-host 'chromium-browser --headless --no-sandbox --disable-gpu --no-pdf-header-footer \
-  --print-to-pdf=/home/ubuntu/out.pdf "file:///home/ubuntu/in.html" 2>/dev/null'
+CHROMIUM=/opt/data/.playwright/chromium-1117/chrome-linux/chrome
+PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright
+NODE_PATH=/opt/mercurio-data/node_modules
 ```
 
+Renderização local via Playwright:
+
+```js
+import { chromium } from 'playwright';
+process.env.PLAYWRIGHT_BROWSERS_PATH = '/opt/data/.playwright';
+const browser = await chromium.launch({ headless: true, executablePath: '/opt/data/.playwright/chromium-1117/chrome-linux/chrome' });
+```
+
+Renderização local direta:
+
+```bash
+"$CHROMIUM" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \
+  --no-pdf-header-footer --print-to-pdf=/caminho/out.pdf "file:///caminho/in.html"
+```
+
+- Para arquivos, PDFs, screenshots e diagramas locais, use sempre o Chromium compartilhado acima.
+- Para sites externos com internet, prefira `browser_exec`.
+- Não usar caminhos legados de browser, caches por perfil ou Chromium remoto.
+
 Pitfalls do renderer:
-- **Snap do Chromium tem fontconfig ISOLADO** — instalar fontes em `~/.local/share/fonts` ou `/usr/share/fonts` NÃO funciona (confinamento). A solução é injetar `@font-face` com `src: url("file:///home/ubuntu/fonts/X.ttf")` — o snap lê `/home/ubuntu`. Verificar se as fontes foram usadas extraindo o PDF: `pymupdf` mostra fontes embutidas como `Type3 (N 0 R)` (nome vazio) — se aparecer `DejaVuSerif`, caiu em fallback.
-- **Chromium não imprime backgrounds sem `print-color-adjust: exact`** — o fix de impressão mínimo é: `* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }`. Sem isso, fundo creme e chips ficam brancos no PDF.
-- **NÃO remapear `font-family` para DejaVu no caminho Chromium** — só remover links/@import do Google Fonts. Remapear muda as métricas das fontes e infla o layout (pode estourar a página).
-- **WeasyPrint 69 crasha com `::first-letter { float }`** (AssertionError em float_layout) — usar Chromium, ou converter o drop cap para inline (`float: none`).
-- **Snap pode sumir do host**: reinstalar com `sudo snap install chromium`. O snap tem `/tmp` privado — HTML de entrada deve ficar em `/home/ubuntu/`, não `/tmp`.
-- **Divisores grossos no PDF**: `border-top+bottom 1px` com `height: 3px` vira barra de 5px — reduzir `height` para 1px.
+- **Chromium não imprime backgrounds sem `print-color-adjust: exact`** — usar `* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }`.
+- **Não remapear `font-family` para DejaVu** — remover apenas links/@import remotos ou usar `@font-face` local; remapear altera métricas e paginação.
+- **WeasyPrint pode falhar com `::first-letter { float }`** — manter Chromium nesse caso.
+- **Divisores grossos no PDF**: `border-top+bottom 1px` com `height: 3px` vira barra de 5 px; reduzir para 1 px.
 
 ## Fontes: embutir para fidelidade em qualquer máquina
 
@@ -76,20 +94,18 @@ Se o usuário exportar do telefone, configurar no diálogo de impressão:
 2. Preenchimento: `ymax` do conteúdo ≈ 90-99% da área útil (A4 842pt − 2×margem).
 3. Render de preview (dpi 140) + `vision_analyze` para conferir visual antes de entregar.
 
-### Fallback de preview quando pymupdf/pdftoppm não existem no container
+### Preview local com o mesmo renderer do PDF
 
-Se `pymupdf` e `pdftoppm` não estão instalados localmente, o Chromium do host renderiza um screenshot direto do HTML (mesmo renderer do PDF — é o que valida o visual de verdade):
+Se `pymupdf`/`pdftoppm` não estiverem disponíveis, gerar o preview diretamente do HTML com o mesmo Chromium compartilhado:
 
 ```bash
-ssh oracle-host 'timeout 90 chromium-browser --headless --no-sandbox --disable-gpu \
-  --screenshot=/home/ubuntu/preview.png --window-size=1240,1750 "file:///home/ubuntu/in.html" 2>&1 | tail -1'
-ssh oracle-host 'cat /home/ubuntu/preview.png' > /opt/data/reports/preview.png
-# depois: vision_analyze no PNG local
+CHROMIUM=/opt/data/.playwright/chromium-1117/chrome-linux/chrome
+"$CHROMIUM" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \
+  --hide-scrollbars --window-size=1240,1750 \
+  --screenshot=/caminho/preview.png "file:///caminho/in.html"
 ```
 
-- `--window-size=1240,1750` ≈ 1 página A4 em ~70 DPI — suficiente para conferir hero, cards e tabelas.
-- Para seções abaixo do fold, subir o height (ex.: `1240,3500`) e inspecionar o screenshot inteiro com `vision_analyze`.
-- Erros de DBus/UPower no stderr do snap são normais em servidor sem desktop — ignorar; conferir o arquivo PNG gerado.
+Depois inspecionar o PNG com `vision_analyze`. Para seções abaixo do fold, aumentar o height (ex.: `1240,3500`). DBus/UPower no stderr são normais em modo headless; o PNG gerado é a evidência.
 
 ## PDF → HTML (fluxo inverso): replicar um deck/PDF como HTML com assets originais
 
@@ -102,3 +118,10 @@ Pitfalls de processo que o usuário corrigiu:
 - **Ajustar um slide de cada vez com validação do usuário** — nunca refazer o deck inteiro numa tacada; cada slide aprovado vira referência.
 - **"Qual a logo/asset correto?" → olhar o arquivo de referência (deck v3) e extrair dele** (ex.: slides padrão usam o símbolo diamond teal, não a logo completa com tagline; a tagline fica só na capa/final).
 - Cores/posições: seguir o deck de referência por inspeção programática das posições reais (left/top/size), não por achismo.
+
+## Browser policy — Mercúrio proot
+
+- **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
+- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
+- **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.
