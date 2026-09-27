@@ -3,7 +3,7 @@ name: emissao-nfse
 description: "Emitir NFS-e/NF-e da ID via motor nfelib e encaminhá-la ao cliente (cobrança)."
 category: business
 type: ToolIntegration
-timestamp: 2026-08-18T00:00:00Z
+timestamp: 2026-09-27T02:00:00Z
 ---
 
 # Emissão de NFS-e / NF-e (ID Consultoria)
@@ -81,6 +81,14 @@ cliente com o pedido de pagamento**, replicando o molde dos envios anteriores.
 > texto final**. Apresente o rascunho completo (assunto + destinatários + corpo + anexo) e
 > espere o ok. Sem resposta (inclusive prompt de aprovação que expira) = **não enviar**.
 
+### Cobrança de parcela vencida
+
+Depois que a nota foi aceita e o prazo passou, a demanda muda de natureza: não é reenvio de
+NFS-e, é cobrança. Os passos, a trava do extrato, o molde do texto e o agendamento com cron
+estão em `references/cobranca-nfse-clientes.md` (seção 5). Regra que não se negocia: **só
+cobra depois de confirmar, no extrato, que o valor não entrou** — e se a consulta ao banco
+falhar, reporta ao principal em vez de concluir que o cliente não pagou.
+
 ## Pendências reais (bloqueiam a 1ª nota em produção)
 1. **Certificado A1 (e-CNPJ)**: NÃO está em email/Drive da ID — está num PC pessoal do
    principal. Guardar a **senha** em env/volume seguro, **nunca em chat/texto plano**.
@@ -97,12 +105,24 @@ cliente com o pedido de pagamento**, replicando o molde dos envios anteriores.
   `cfg.get("x") or default` (ou `"" if not ...`). Padrão recorrente ao montar objetos
   xsdata a partir de dict.
 - **Simples Nacional**: `opSimpNac=2`; não preencher na confiança de default genérico.
+- **Assinatura de e-mail a cliente**: `ID Consultoria` e nada mais (sem "— Principal", sem
+  nome do sócio). O principal corrige esse ponto: a assinatura aprovada é a que vai.
+- **Cobrança exige trava no extrato**: e-mail de cobrança disparado sem conferir o banco
+  chega pedindo dinheiro já recebido. Falha de leitura do extrato → não cobra, reporta.
 - Senha do certificado nunca em arquivo de config versionado nem em relatório.
 
 ## Referências
 - `references/cobranca-nfse-clientes.md` — envio da nota ao cliente: queries Gmail p/ achar
   o histórico, molde do e-mail de cobrança, clientes/destinatários/padrões e receita de
-  envio com anexo (MIME).
+  envio com anexo (MIME); **§5** traz a cobrança de parcela vencida (trava no extrato, texto
+  aprovado, agendamento com cron).
 - `references/dps-nfelib-mapping.md` — árvore de classes/campos do binding NFS-e Nacional
   (`dps_v1_00`, `tipos_complexos_v1_00`) + DPS de exemplo, para estender o motor sem
   redescobrir.
+
+## Scripts
+- `$HERMES_HOME/scripts/sm_verificar_pagamento.py` — o cliente pagou? (`PAGO` / `NAO_PAGO` / `ERRO` na
+  primeira linha, read-only, sem side effects). Rodar antes de qualquer cobrança a cliente.
+  Padrão 26/09 (caso Solution Master SM1): verificador separado do script que envia
+  (`enviar_cobranca_sm.py`) + orquestrador do cron (`cobranca-sm-parcela3.sh`); ver
+  `references/cobranca-nfse-clientes.md` §5 e skill `auxiliar-adm-id` (Pitfalls).

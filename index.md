@@ -19,7 +19,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `analise-contratual` | Reference | Análise de contratos/minutas — subcontratação, LGPD, compliance. |
 | `auxiliar-adm-id` | Orchestrator | Auxiliar admin da ID: contratos, planilhas, NFS-e, Drive. |
 | `elaboracao-proposta-comercial` | Orchestrator | Propostas comerciais da ID — do contexto do cliente à proposta fechada. |
-| `emissao-nfse` | ToolIntegration | Emitir NFS-e/NF-e da ID via motor nfelib (NFS-e Nacional). |
+| `emissao-nfse` | ToolIntegration | Emitir NFS-e/NF-e da ID via motor nfelib e encaminhá-la ao cliente (cobrança). |
 | `gestao-financeira-id` | Reference | Operar planilhas/Google da ID e fazer backfill de extrato. |
 | `id-comunicacao-multiusuario` | Reference | Ajustar registro do Mercúrio por sócio da ID (identidade por chat_id). |
 | `inter-api-id-consultoria` | ToolIntegration | Consultar extrato/saldo da conta Inter da ID. |

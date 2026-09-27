@@ -10,7 +10,7 @@ metadata:
     tags: [ID, contratos, planilhas, finanças, NFS-e, Drive, email, admin, administração]
     scopes: [id]
 type: Orchestrator
-timestamp: 2026-09-01T13:40:00Z
+timestamp: 2026-09-27T02:00:00Z
 ---
 
 # Auxiliar Administrativo da ID
@@ -222,6 +222,29 @@ Padrão consolidado (jul/ago/set 2026). Ao receber o PDF da NFS-e da parcela:
 ---
 
 ## Pitfalls (aprendidos em execução real)
+
+- **`email.message` neste host NÃO tem `set_content`/`ContentManager`** (Python 3.11.16 arm64
+  empacotado): use `msg.attach(MIMEText(corpo, "plain", "utf-8"))`, nunca `msg.set_content(...)`.
+  Erro real: `AttributeError: 'MIMEMultipart' object has no attribute 'set_content'`.
+- **Cobrança de parcela em atraso a cliente — padrão de 3 scripts** em
+  `$HERMES_HOME/scripts/` (criado 26/09/2026 no caso Solution Master SM1 parcela 3/6):
+  - `sm_verificar_pagamento.py` — lê o extrato do Inter e imprime `PAGO <data> <valor> <desc>` /
+    `NAO_PAGO` / `ERRO <motivo>`. Só imprime; nunca envia.
+  - `enviar_cobranca_sm.py --parcela N --thread <id> [--dry-run]` — monta e envia a cobrança em
+    **resposta à thread da NFS-e** (`In-Reply-To`/`References`), destinatários herdados do e-mail
+    original. Confere `getProfile()` == admin@idconsultoria.ai antes de enviar.
+  - `cobranca-sm-parcela3.sh` — orquestrador do cron: verifica → só envia se `NAO_PAGO`; com
+    `ERRO` **não cobra** (evita cobrança dupla por falha de leitura). `COBRANCA_SM_DRYRUN=1`
+    força modo teste. Devolve uma linha `RESULTADO:` para o agente do cron relatar.
+  - Regra de ouro: **nunca** disparar cobrança de cliente sem a trava do extrato. Se a consulta
+    ao banco falhar, reportar ao Gustavo e deixar a decisão com ele.
+- **Ao localizar a thread de uma NFS-e**: `messages.get` com `format="metadata"` +
+  `metadataHeaders=[...]` (sem isso os headers vêm vazios); data real de envio via
+  `internalDate` (ms); conversa via `threadId`. Padrão declarado pelos clientes: "pagamos no dia
+  25 de cada mês" — a data da NF e a data prevista em `recebimentos` são o marco da cobrança.
+- **Fuso do cron**: o host roda em **UTC** e `config.yaml` tem `timezone: ''`, então `0 11 * * *`
+  = 08h BRT. Para one-shot, prefira ISO com offset explícito
+  (`2026-09-28T08:00:00-03:00`) — evita depender da resolução de fuso do agendador.
 
 - **NUNCA usar `gustavomelloenciv@gmail.com`** — fallback vetado pelo principal em 01/09/2026. Abortar se `getProfile()` retornar esse email e solicitar re-auth dos tokens corretos.
 - **Token certo por tarefa** (Drive/Sheets vs Gmail) — usar escopos do token.

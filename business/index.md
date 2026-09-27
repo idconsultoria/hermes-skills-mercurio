@@ -5,7 +5,7 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `analise-contratual` — Análise de contratos/minutas (subcontratação, LGPD, compliance).
 - `auxiliar-adm-id` — Auxiliar admin da ID: contratos, planilhas, NFS-e, Drive.
 - `elaboracao-proposta-comercial` — Proposta comercial da ID (contexto → proposta fechada).
-- `emissao-nfse` — Emitir NFS-e/NF-e da ID via motor nfelib (NFS-e Nacional).
+- `emissao-nfse` — Emitir NFS-e/NF-e da ID via motor nfelib e encaminhá-la ao cliente (cobrança).
 - `gestao-financeira-id` — Operar planilhas/Google da ID e backfill de extrato.
 - `id-comunicacao-multiusuario` — Ajustar registro do Mercúrio por sócio da ID (identidade por chat_id).
 - `inter-api-id-consultoria` — Consultar extrato/saldo da conta Inter da ID.
