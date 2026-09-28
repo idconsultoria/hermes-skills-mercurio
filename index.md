@@ -316,6 +316,7 @@ Uses:
 - `humanizer` → `process-augmentation-pipeline`
 - `facilitacao-grupo-agentes` → `messaging-platforms`
 - `roteiro-de-qualificacao` → `elaboracao-proposta-comercial`
+- `macroprocess-swimlane-html` → `static-spa-vercel`
 
 ---
 

@@ -98,6 +98,34 @@ Quando o doc de origem descreve **qualificação/triagem que decide a categoria*
 
 **Quando usar:** doc traz "3 categorias de Safety", "2 subfluxos (3A/3B)", ou frase do principal "a partir da triagem haja a cisão dos 3 caminhos e em seguida a junção na área de faturamento". Se o doc for linear (Telecom 11 tarefas, Medical 12 tarefas), manter swimlane linear puro.
 
+## Contadores do cabeçalho — NUNCA hardcodar (bug real, set/2026)
+
+Os chips do topo ("N Blocos de Trabalho", "N Baias Departamentais") divergiam do array:
+o mapa de Safety anunciava **16** e tinha **18** cards no `CARDS[]`. Erro de cliente — ele
+conta a tabela e o número errado fica na tela, na frente do cliente.
+
+**Regra:** o contador é preenchido por JS a partir do próprio dado:
+```html
+<span class="chip" id="chip-blocos"></span><span class="chip" id="chip-baias"></span>
+<script>document.getElementById('chip-blocos').textContent = CARDS.length + ' Blocos de Trabalho';
+document.getElementById('chip-baias').textContent = LANES.length + ' Baias Departamentais';</script>
+```
+Injetar DEPOIS das declarações de `LANES`/`CARDS` (o script roda em ordem).
+
+Check de verificação: no Playwright, `allTextContents()` dos `.chip` e comparar com
+`CARDS.length`/`LANES.length` — não confiar no HTML à olho. Também contar os paths do
+overlay SVG (`svg path`) como proxy das setas desenhadas: Safety 18 cards → 20 paths,
+Medical 14 → 15, Telecom 14 → 13. Zero `pageerror` nos três é o piso aceitável.
+
+## Site-índice para publicar os mapas (entregável encadeado)
+
+Quando o pedido for "um site com os mapas" (não só o mapa), a entrega é um site estático
+próprio: `index.html` com um cartão por segmento (nome, resumo, nº de etapas / blocos /
+baias, lista de etapas em `<details>`) + `mapas/<segmento>.html` + `vercel.json`.
+Hospedar com a skill `static-spa-vercel` (projeto estático puro, sem `package.json` na
+pasta do deploy). Subir também os arquivos na pasta do cliente no Drive — o link público
+sozinho não sobrevive a quem não tem a URL.
+
 ## Validação antes de entregar (nunca entregar artefato visual cego)
 Não depende de screenshot. Checks determinísticos (container pode não ter Chromium;
 o harness `browser_exec` pode falhar com `PermissionError` — é ambiental, não

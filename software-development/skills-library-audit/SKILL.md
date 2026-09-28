@@ -10,11 +10,15 @@ timestamp: 2026-09-13T00:00:00Z
 
 **Quando:** o usuário quer selecionar o que é universal ("quais dessas skills servem para
 qualquer Hermes?", "gostaria de selecionar as que seriam universalmente boas"), montar um
-pacote portátil para outra instalação/cliente, ou saber por que uma skill existe no disco e
-não no catálogo ativo.
+pacote portátil para outra instalação/cliente, saber por que uma skill existe no disco e
+não no catálogo ativo, ou **consolidar o acervo de skills de um perfil** — herdar, deduplicar,
+purgar de escopo e dar estrutura de gerenciamento a um acervo que nunca foi curado.
 
 **Princípio:** classificar por **evidência lida**, nunca por nome de skill. Varra o conteúdo
 real de cada `SKILL.md` e dos arquivos de apoio — a contagem sozinha mente.
+
+Para a receita completa de consolidação de acervo alheio (dossiê, herança, purga de escopo,
+cluster que parece duplicata e não é) ver `references/consolidacao-de-acervo-alheio.md`.
 
 ## Procedimento
 
@@ -49,7 +53,9 @@ zip contra a lista entregue antes de declarar pronto.
 
 A tabela de marcadores, os falsos positivos e as receitas de empacotamento estão em
 `references/portability-markers.md`; o plano de transferência completo (fases, portões, ordem de
-execução) em `references/skill-transfer-pop.md`; o portão reutilizável em
+execução) em `references/skill-transfer-pop.md`; a receita de consolidação de acervo alheio
+(dossiê de evidências, herança, purga de escopo, dissolução de pasta) em
+`references/consolidacao-de-acervo-alheio.md`; o portão reutilizável em
 `scripts/portao_poluicao.py` (`<pasta> --termos termos.txt`, exit 1 se achar resíduo).
 
 ## POP de transferência (plano antes do pacote)
@@ -107,6 +113,13 @@ tabela longa; nada de parágrafo explicando o método.
   mesmo: um validador (o portão de poluição, `yaml.safe_load`, a checagem de referência) executado
   depois de cada escrita, não só no fim da fase. Se a validação já estava no script anterior, ela
   precisa estar no próximo também.
+- **Snapshot antes de qualquer remoção em árvore sem controle de versão.** Se o alvo não tem git,
+  `git init` + um commit de baseline é o que torna a rodada reversível; sem ele, apagar diretório
+  de skill é irreversível e a única saída passa a ser reconstruir. Ignorar o diretório de
+  versionamento (locks, cache, telemetria de uso, blob de backup) no primeiro commit, ou o
+  baseline carrega lixo e ruído de diff. Guardar o commit de baseline **antes** do primeiro merge:
+  restore posterior devolve também as pastas de origem, criando duplicatas nos destinos — a
+  correção é reaplicar os movimentos logo depois do restore, não tentar dissolver o estado à mão.
 
 ## Pitfalls
 
@@ -139,6 +152,23 @@ kanban). `skill_view(name)` devolve `readiness_status` e `missing_*`; conferir o
 certa: descrição multilinha entre aspas é YAML válido, não defeito. Passes de "normalização"
 redistribuem texto e **corrompem arquivo que estava bom** — o conserto vira mais trabalho que o
 problema. Sintoma de frontmatter quebrado é a skill existir no disco e sumir do catálogo.
+- **Campo YAML multilinha: parseia, não aplica patch por linha.** O modo de falha que corrompe
+  catálogo inteiro é editar só a linha da chave: as linhas de continuação do valor antigo ficam
+  órfãs e o arquivo quebra com `while scanning a simple key`. O caminho seguro é
+  `yaml.safe_load` → alterar o **valor** no dict → reemitir o frontmatter → `yaml.safe_load` do
+  texto novo **na mesma rodada**. Dois modos específicos que custam a rodada: (a) em
+  `^description:[ \t]*(.*)$` o indicador `|-` cai em `group(1)`, não no resto do match — testar
+  block scalar sobre `match.end()` nunca casa e a conversão roda sem efeito; (b) recarregar o
+  próprio output do passo anterior e reparsear faz o sumario absorver o parágrafo no ciclo
+  seguinte, porque o valor já foi alterado quando é lido de volta.
+- **Validador que reprova uma categoria inteira de uma vez é o suspeito, não o acervo.**
+  Antes de agir em lote sobre a saída do validador, reproduza **um** caso à mão. Três
+  verificadores recorrentes que fabricam falha onde o arquivo está bom: conferir presença de
+  campo só nos primeiros N chars do frontmatter (o `type:` de um frontmatter longo passa
+  despercebido), ancorar a captura de descrição exigindo `\n` + letra seguinte (quebra quando a
+  chave é a última do bloco) e contar skills percorrendo a árvore sem excluir o diretório de
+  arquivo (conta o que você acabou de retirar). Confirmar por leitura antes de reescrever: versão
+  restaurada de um campo é trabalho jogado fora.
 - **Substituição mecânica quebra a gramática.** Trocar o termo do dono pelo genérico gera
 "da a consultoria", artigo duplo e citação órfã de skill/arquivo que ficou fora do pacote. Rodar um
 passe de reparo depois do dicionário e um portão de artefato (regex dos defeitos, não só dos termos)
@@ -147,7 +177,35 @@ passe de reparo depois do dicionário e um portão de artefato (regex dos defeit
 `related_skills` e linha do índice. Depois de qualquer renome, re-rodar a checagem de referência e
 consertar só o que ela acusa; separar quebra nova de herdada comparando com a árvore do doador.
 - **Nunca reconstruir de memória a lista de marcadores do dono:** ela vive em
-`references/portability-markers.md` — reler antes de varrer.
+  `references/portability-markers.md` — reler antes de varrer.
+
+## Ferramenta de edição e o guard do gateway
+
+- **`rm -rf` em lote e `git clean` exigem autorização explícita.** O guard bloqueia e a
+  rodada para; o silêncio não é consentimento. Peça autorização antes, e **não reformule o
+  comando para contornar** — a tentativa alternativa é a mesma ação. Quando o usuário já
+  autorizou uma vez, a autorização vale para o comando **exatamente como ele pediu**;
+  qualquer variação precisa de nova autorização.
+- **Edição de conteúdo é sempre `read_file`/`patch`/`write_file`, um arquivo por vez.** O
+  usuário pede isso explicitamente quando o acervo é grande: revisar N skills por script é
+  rápido e cego, e arquivo por arquivo a revisão é o que produz merge com justificativa.
+  Script fica para o que é mecânico e conferível (hash, contagem, varredura) — nunca para
+  decidir o que entra e o que sai.
+- **Apagar pasta tem alternativa que não apaga nada:** esvaziar o `SKILL.md` com `write_file`
+  tira a skill do catálogo com o mesmo efeito, deixa a pasta presente para inspeção e não
+  dispara o guard. Ofereça as duas e deixe a escolha com o usuário.
+
+## Quando o pedido é "instale a estrutura e o cron"
+
+- **Consolidação recorrente é executada por quem é dona do acervo**, não por quem está
+  ajudando. O pedido de "ciclo disparado por cron" para o perfil de outra agente significa
+  cron **no perfil dela**, com prompt que a faça rodar com a identidade dela. Instalar o
+  cron no perfil errado cria dois donos do mesmo acervo.
+- **Estrutura mínima antes do cron:** `AGENTS.md` (regras do acervo), `index.md` (catálogo
+  com relações), `log.md` (diário append-only), `scripts/` de auditoria. Sem isso o cron
+  roda às cegas e o acervo volta a inflar.
+- **`consolidate: false` no config do perfil desliga a curadoria nativa** — verificar antes
+  de instalar ciclo próprio, para não haver duas agendas brigando pelo mesmo acervo.
 
 ## Browser policy — Mercúrio proot
 

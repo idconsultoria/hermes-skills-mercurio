@@ -58,3 +58,44 @@ opencode/merge-reconciler/computer-use, software-development×16: baas/dogfood/s
 postgres/debug/etc.). **NÃO** incluir genéricas de plataforma do canônico (apple, creative,
 smart-home, mlops, media, note-taking, social-media) — violam o prune/isolamento ID. Adicionar
 por nome via `git add <path>` explícito, nunca `git add -A`.
+
+## 5. Triagem de duplicatas: quatro assinaturas, quatro decisões
+
+Classificar por **assinatura medida**, nunca por semelhança de nome. A mesma skill pode
+cair em três ou quatro dos casos abaixo ao mesmo tempo; decidir por categoria (e não por skill)
+é o que mantém a contagem reconciliada.
+
+| Assinatura | Como medir | Decisão |
+|---|---|---|
+| Corpo idêntico após normalizar whitespace | hash do corpo sem frontmatter | remove a cópia; leva o arquivo de proveniência para o sobrevivente |
+| Mesmo nome, corpos diferentes (1–99% de similaridade) | `difflib` no corpo + inventário de apoio dos dois lados | **fusão de mão dupla**: corpo de uma + apoio da outra; colisão de nome com conteúdo diferente vai para `_divergencia/`, nunca se escolhe |
+| Mesmo domínio, um é subconjunto do outro | headings exclusivos do menor + linhas substantivas ausentes no maior | absorve no maior; o que fica de pé do menor é escrito como aprendizado, não copiado |
+| Skill de outro agente / de outra plataforma | campo `author` + `platforms` + domínio do SOUL.md | retira para `_fora-do-escopo/`, preservando a `SKILL.md` e um README de reativação |
+
+**Inventário de apoio antes de qualquer remoção.** A versão adaptada costuma ser a que tem
+`type`/`timestamp`/proveniência, mas perde os scripts e references do upstream — fundir só o
+corpo destrói a ferramenta. Listar os dois lados e levar o que falta é o que evita a regressão
+silenciosa (a skill continua no catálogo, mas o comando dela parou de existir).
+
+**A favor da fusão só quando os fluxos são realmente distintos.** Cluster temático ≠ duplicata.
+Skills de um domínio com **fronteira declarada por escrito no corpo** ("isto aqui não
+duplica a regra que pertence a tal skill") foram desenhadas para ficar separadas — fundi-las
+apaga a fronteira que o dono construiu. Pack grande vindo de um repo público, com
+`evals/evals.json` em todas as skills e sem escopo do dono no corpo, é lacuna de curadoria a
+corrigir (precedência no catálogo), não motivo para dissolver.
+
+**Heterogeneidade de proveniência é sinal, não ruído.** Categoria que guarda "versão adaptada"
+de várias origens e carrega um arquivo de proveniência como marcador nasceu de curadoria, não
+de domínio. Um `find` por todas as categorias lê isso na hora e evita tratar o resíduo como
+se fosse um domínio legítimo.
+
+## 6. Referências herdadas de outro repo não são todas o mesmo defeito
+
+`related_skills` apontando para skill inexistente é comum em pacote importado, mas **o nome
+morto indica o que fazer**: se existe skill local que cobre o mesmo terreno, repontar; se o
+alvo era de outro repo e não tem equivalente aqui, remover a entrada. Remover tudo às cegas
+perde a informação; repontar às cegas cria ciclo.
+
+Só o campo `related_skills` conta como referência entre skills. Casar `` `termo` `` no corpo
+gera centenas de falsos positivos (flag de shell, nome de campo, palavra em prosa) e leva a
+reescrever arquivo que está bom.
