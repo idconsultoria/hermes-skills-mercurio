@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 106 skills** em 12 categorias.
+**Total: 107 skills** em 12 categorias.
 
 ---
 
@@ -33,6 +33,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `painel-metas-id` | Reference | Painel de metas da ID + slide semanal da Phronesis. |
 | `revisao-de-proposta-existente` | Orchestrator | Revisar proposta já entregue, preservando o resto. |
 | `roteiro-de-qualificacao` | Orchestrator | Montar roteiro de perguntas de qualificação: descoberta ou sabatina. |
+| `proposta-sergipetec-documento` | Orchestrator | Proposta do SergipeTec p/ órgão público (P,D&I) — documento A4, não deck ID. |
 
 ## research — Pesquisa e augmentação
 
@@ -245,6 +246,8 @@ Similar:
 - `id-comunicacao-multiusuario` → `messaging-platforms`
 - `brand-design-system-html` → `proposta-biotechse`
 - `proposta-biotechse` → `elaboracao-proposta-comercial`
+- `proposta-sergipetec-documento` → `elaboracao-proposta-comercial`
+- `proposta-sergipetec-documento` → `analise-contratual`
 - `planejamento-estrategico-8h-id-olimpo` → `planejamento-estrategico-2h`
 - `hermes-inference-config` → `hermes-agent`
 - `hermes-cron-script-dispatch` → `hermes-agent`
@@ -299,6 +302,8 @@ Uses:
 - `macroprocess-swimlane-html` → `google-workspace`
 - `id-comunicacao-multiusuario` → `hermes-agent`
 - `proposta-biotechse` → `brand-design-system-html`
+- `proposta-sergipetec-documento` → `html-to-pdf-chromium`
+- `proposta-sergipetec-documento` → `auxiliar-adm-id`
 - `planejamento-estrategico-8h-id-olimpo` → `planejamento-estrategico-2h`
 - `hermes-inference-config` → `hermes-agent`
 - `hermes-cron-script-dispatch` → `hermes-agent`
