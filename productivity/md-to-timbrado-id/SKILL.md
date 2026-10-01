@@ -125,6 +125,95 @@ O `corpo.md` deve conter **só o corpo** (começar em `# Resumo Executivo`): a c
 
 ## Pitfalls operacionais
 
+- **Preencher tabela pela API: `insertText` desloca TODOS os indices seguintes.** Num
+  `batchUpdate` com várias células, os índices pré-calculados ficam *stale* e **todo o texto
+  cai na primeira célula** (sintoma: a linha 0 fica com o texto de todas, as demais vazias).
+  **Preencha de trás para frente** — dentro de cada linha, colunas em ordem inversa, e as
+  linhas em ordem inversa. Aí cada insert só afeta o que já foi processado.
+
+- **Os índices da tabela seguinte ficam *stale* mesmo em ordem reversa** se as duas forem
+  lidas do **mesmo snapshot** do documento. Preencha **uma tabela por execução**: releia o
+  documento, localize a tabela pelos índices atuais, preencha, e só então vá à próxima. Foi
+  o que estragou a coluna "Data a definir" com fragmentos da tabela seguinte
+  ("A 4ªdeR$ 798,00fiDia 20 do mês seguinteir em conjunto").
+
+- **Não existe `deleteTableAtRange` nem `updateTableCellProperties` na Docs API.** Para
+  remover tabela, use `deleteContentRange` no intervalo completo (após zerar as células);
+  para largura, `updateTableColumnProperties` (ou deixe o Docs calcular). Os `DocumentRequest`
+  válidos de tabela são: `insertTable`, `insertTableColumn`, `insertTableRow`,
+  `deleteTableColumn`, `deleteTableRow`, `mergeTableCells`, `unmergeTableCells`,
+  `pinTableHeaderRows`, `updateTableCellStyle`, `updateTableColumnProperties`,
+  `updateTableRowStyle`.
+
+- **`insertTable` herda o estilo do parágrafo onde foi inserida.** Se a âncora for um
+  heading, a tabela nasce com aparência de heading. Coloque sempre uma âncora em
+  `NORMAL_TEXT` antes da tabela.
+
+- **Style loop sem janela de alcance estraga o documento inteiro.** Um
+  `for el in body['content']: if estilo == 'HEADING_1': normalizar` sem limitar ao trecho
+  atingiu o título, a capa e o Anexo I. **Toda varredura de estilo precisa de janela**:
+  casar o parágrafo de referência e iterar só até o próximo marco (ou por posição).
+
+- **Números para Discovering nummeros:** ver a receita abaixo.
+
+- **Token expirado derruba `md_to_timbrado_id.py`** (`TypeError` do motor). O script usa
+  `Credentials.from_authorized_user_file(...)` e falha se o token passou. Envolver em um runner
+  que renove antes (`from_authorized_user_info` + `c.refresh(Request())`) e faça
+  `from_authorized_user_file = lambda path, scopes=None: c` — o motor chama com **um** argumento.
+  Sem o `scopes=None` o lambda estoura `missing 1 required positional argument: 'scopes'`.
+  Venv com `googleapiclient`: `$HERMES_HOME/id-nfse-motor/.venv/bin/python`.
+
+- **Editar um trecho de doc via API: NUNCA apague caractere a caractere em cascata.**
+  `deleteContentRange` (ex.: para tirar o "- " de um bullet) muda todos os índices seguintes.
+  Em 3 bullets seguidos isso corrompeu o texto real — "Pesquisa" virou "Pesuisa", "Governança"
+  virou "Gvernança", "Engenharia" virou "Engeharia" — e, pior, o estilo do parágrafo contíguo
+  é herdado. **Reciproca:** apagar a faixa INTEIRA de uma vez (`ANEXO I` → `ANEXO II`) e
+  reinserir o texto **já sem os hifens**, aplicando o bullet só com `createParagraphBullets`.
+  É mais barato e não há chance de corromper.
+
+- **Estilo é aplicado por CASAMENTO de texto, não por índice guardado.** Depois do
+  `insertText`, reler o doc e casar `t.rstrip("\n")` com a lista de blocos; só então gerar
+  `updateParagraphStyle`. Índice guardado antes do insert aponta para o parágrafo errado.
+
+- **`namedStyleType` inválido derruba o batch inteiro.** `BULLET` não é um NamedStyleType —
+  passar isso como estilo faz o `batchUpdate` falhar com `Invalid value at
+  'requests[N].update_paragraph_style...'` e **nenhuma** requisição do lote é aplicada.
+  Valores válidos: `NORMAL_TEXT`, `HEADING_1..4`, `TITLE`, `SUBTITLE`.
+
+- **Parágrafo vazio no meio da lista buga o casamento.** O Docs nem sempre remove o
+  parágrafo em branco ao final de uma tabela; ao varrer por texto, pule `if not t.strip()`
+  **antes** de decidir estilo/bullet, senão o índice contador sai do lugar.
+
+- **`createParagraphBullets` não é idempotente por texto.** Rode uma varredura que já
+  reporte `bool(p.get("bullet"))` e só aplique onde falta — reexecutar cego duplica o efeito.
+
+## Receita: editar um anexo inteiro num doc já gerado (ex.: reescrever a ementa de um contrato)
+
+1. Ler o doc e localizar os índices de `ANEXO I` e `ANEXO II` pelos **textos**.
+2. `deleteContentRange(start, end)` + `insertText(start, novo_texto)` num único batch.
+3. Reler o doc; para cada parágrafo da faixa, casar o texto exato:
+   - `HEADING_1/2/3` → `updateParagraphStyle`
+   - item de lista → `createParagraphBullets` (só se `not p.get("bullet")`)
+   - parágrafo corrido → `NORMAL_TEXT`, **sem** bullet
+4. `updateTextStyle` com `weightedFontFamily: Nunito Sans` **sem** `weight:400` na faixa.
+5. Exportar PDF e conferir por visão: hierarquia de títulos, bullets, margem, sem corte.
+
+Rolar em lotes de 20 requisições por `batchUpdate` — o `WriteRequestsPerMinutePerUser` = 60/min
+estoura com o lote inteiro de uma vez.
+
+## Compartilhar doc com papel de comentário
+
+```python
+dr.permissions().create(fileId=DOC, sendNotificationEmail=True,
+    body={"type": "user", "role": "commenter", "emailAddress": EMAIL}).execute()
+```
+
+- `commenter` = leitura **e** comentário — é o que o cliente precisa para marcar o texto;
+  `reader` deixa só ler. Papel `owner`/`writer` no cliente é erro de segurança.
+- Confira **depois** com `permissions().list(fields="permissions(emailAddress,role,type)")` —
+  o `sendNotificationEmail=True` responde mesmo se o convite falhar silenciosamente para
+  e-mail sem conta Google.
+
 - **Tabela que quebra de página perde o cabeçalho.** O Docs API não repete a linha de cabeçalho
   por padrão: numa tabela longa (plano operacional, matriz de riscos), a continuação na página
   seguinte aparece sem os títulos das colunas. Fix pós-build: `pinTableHeaderRows`

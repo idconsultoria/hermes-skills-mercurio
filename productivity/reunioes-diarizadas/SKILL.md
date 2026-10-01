@@ -83,6 +83,22 @@ Subagente tem teto de relógio (~10 min) e **perde tudo** no estouro, inclusive 
 4. **Depois de um timeout, nunca redespache o mesmo escopo grande** — divida mais.
 5. **Antes de delegar, tente o pré-filtro determinístico** (dedupe + regex) no processo pai: resolve a maior parte da extração sem subagente nenhum.
 
+## Transcrever um áudio curto de briefing (não é reunião diarizada)
+
+Áudio de feedback/briefing (5–15 min) não tem ata nem diarização: é uma fonte única que o usuário manda
+para o agente interpretar. Receita:
+
+- Ler a chave e o modelo de STT de `$HERMES_HOME/.secrets/gemini.env` (`GOOGLE_API_KEY`/`GEMINI_STT_MODEL`)
+  e chamar `generativelanguage.googleapis.com/v1beta/models/<modelo>:generateContent` com o áudio **inline
+  em base64** (`inline_data.mime_type: audio/ogg`) e um prompt pedindo transcrição literal, sem resumo.
+- Salvar a transcrição em arquivo antes de trabalhar sobre ela (a fonte bruta sobrevive a timeout).
+- **O modelo barato deforma nomes próprios e siglas** (fenômeno climático virou nome de universidade,
+  contatos saíram como siglas de duas letras). Cruze todo nome de pessoa/órgão citado com a KB antes de
+  usar; o que não fechar, vai ao usuário em um bloco só.
+- O valor do áudio está no que o documento escrito não diz: queixa sobre o nível de detalhe de um artefato,
+  pedido de troca de vocabulário, recorte de escopo. Extraia isso como **pedido acionável**, com o trecho
+  da transcrição como evidência.
+
 ## Pitfalls
 
 - **Ler a transcrição inteira "para não perder nada" é o erro que custa o contexto.** Minerar por candidatos + ler o fechamento cobre mais que a leitura linear e sobrevive ao limite de tempo.

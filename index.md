@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 107 skills** em 12 categorias.
+**Total: 113 skills** em 13 categorias.
 
 ---
 
@@ -34,6 +34,15 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `revisao-de-proposta-existente` | Orchestrator | Revisar proposta já entregue, preservando o resto. |
 | `roteiro-de-qualificacao` | Orchestrator | Montar roteiro de perguntas de qualificação: descoberta ou sabatina. |
 | `proposta-sergipetec-documento` | Orchestrator | Proposta do SergipeTec p/ órgão público (P,D&I) — documento A4, não deck ID. |
+
+## legal — Direito brasileiro e contratos ID
+
+| Skill | Type | Descrição |
+|---|---|---|
+| `contratos-justos-id` | Orchestrator | Use ao redigir contrato justo que beneficie a ID. |
+| `direito-civil-brasileiro` | Reference | Direito civil brasileiro — análise, redline de minutas e peças sob o CC/2002. |
+| `direito-do-consumidor` | Reference | Direito do consumidor brasileiro (Lei 8.078/90 — CDC) — revisão de contratos e peças. |
+| `direito-empresarial-brasileiro` | Reference | Use ao revisar/redigir contrato B2B sob direito brasileiro. |
 
 ## research — Pesquisa e augmentação
 
@@ -71,6 +80,8 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `html-deck-to-pptx` | ToolIntegration | Converter deck HTML em PPTX editável (1920x1080). |
 | `reunioes-diarizadas` | Orchestrator | Extrair encaminhamentos de reuniões diarizadas. |
 | `revisao-entrega-cliente` | Orchestrator | Revisar entrega de cliente antes de apresentar. |
+| `edicao-incremental-de-gdoc` | Orchestrator | Use when editar/versionar um Google Doc existente. |
+| `google-docs-mirroring` | Orchestrator | Use when reescrever um Google Doc no padrão do anterior. |
 
 ## email — Correio da ID
 
@@ -322,6 +333,35 @@ Uses:
 - `facilitacao-grupo-agentes` → `messaging-platforms`
 - `roteiro-de-qualificacao` → `elaboracao-proposta-comercial`
 - `macroprocess-swimlane-html` → `static-spa-vercel`
+- `edicao-incremental-de-gdoc` → `google-docs-formatting`
+- `edicao-incremental-de-gdoc` → `google-workspace`
+- `google-docs-mirroring` → `google-docs-formatting`
+- `google-docs-mirroring` → `md-to-timbrado-id`
+- `formalizacao-acordo-cliente` → `edicao-incremental-de-gdoc`
+- `md-to-timbrado-id` → `edicao-incremental-de-gdoc`
+- `google-docs-mirroring` → `html-to-pdf-chromium`
+- `contratos-justos-id` → `analise-contratual`
+- `contratos-justos-id` → `direito-empresarial-brasileiro`
+- `contratos-justos-id` → `formalizacao-acordo-cliente`
+- `direito-civil-brasileiro` → `direito-do-consumidor`
+- `direito-empresarial-brasileiro` → `direito-civil-brasileiro`
+- `direito-empresarial-brasileiro` → `analise-contratual`
+- `direito-do-consumidor` → `direito-civil-brasileiro`
+- `direito-do-consumidor` → `analise-contratual`
+- `negotiation` → `contratos-justos-id`
+- `negotiation` → `direito-empresarial-brasileiro`
+- `analise-contratual` → `direito-civil-brasileiro`
+- `revisao-de-proposta-existente` → `contratos-justos-id`
+- `elaboracao-proposta-comercial` → `edicao-incremental-de-gdoc`
+- `proposta-sergipetec-documento` → `edicao-incremental-de-gdoc`
+- `proposta-sergipetec-documento` → `google-docs-mirroring`
+- `proposta-biotechse` → `edicao-incremental-de-gdoc`
+- `revisao-entrega-cliente` → `edicao-incremental-de-gdoc`
+- `reunioes-diarizadas` → `edicao-incremental-de-gdoc`
+- `md-to-timbrado-id` → `google-docs-mirroring`
+- `proposta-sergipetec-documento` → `direito-empresarial-brasileiro`
+- `auxiliar-adm-id` → `contratos-justos-id`
+- `painel-metas-id` → `contratos-justos-id`
 
 ---
 
