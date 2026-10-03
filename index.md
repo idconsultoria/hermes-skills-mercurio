@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 113 skills** em 13 categorias.
+**Total: 114 skills** em 13 categorias.
 
 ---
 
@@ -34,6 +34,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `revisao-de-proposta-existente` | Orchestrator | Revisar proposta já entregue, preservando o resto. |
 | `roteiro-de-qualificacao` | Orchestrator | Montar roteiro de perguntas de qualificação: descoberta ou sabatina. |
 | `proposta-sergipetec-documento` | Orchestrator | Proposta do SergipeTec p/ órgão público (P,D&I) — documento A4, não deck ID. |
+| `organizacao-drive-id` | Orchestrator | Use ao organizar pastas e docs de cliente no Drive da ID. |
 
 ## legal — Direito brasileiro e contratos ID
 
@@ -360,8 +361,14 @@ Uses:
 - `reunioes-diarizadas` → `edicao-incremental-de-gdoc`
 - `md-to-timbrado-id` → `google-docs-mirroring`
 - `proposta-sergipetec-documento` → `direito-empresarial-brasileiro`
+- `organizacao-drive-id` → `auxiliar-adm-id`
+- `organizacao-drive-id` → `formalizacao-acordo-cliente`
+- `organizacao-drive-id` → `contratos-justos-id`
 - `auxiliar-adm-id` → `contratos-justos-id`
 - `painel-metas-id` → `contratos-justos-id`
+- `organizacao-drive-id` → `google-workspace`
+- `organizacao-drive-id` → `md-to-timbrado-id`
+- `organizacao-drive-id` → `formalizacao-acordo-cliente`
 
 ---
 

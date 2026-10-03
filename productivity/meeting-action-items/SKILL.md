@@ -30,6 +30,28 @@ Don't use for: retrieving meeting recordings or transcripts (use `teams-meeting-
 
 ## Procedure
 
+### 0. Fixar "hoje" ANTES de listar qualquer tarefa (regra do dono, set/2026)
+
+O Mercúrio errou duas vezes do mesmo jeito: Listou tarefas **já passadas** como se
+fossem previstas (a agenda da semana de 28/09 foi entregue em 02/10) e ainda **inventou uma
+data** que não existia em fonte nenhuma (o encontro do Maxwell em SP foi mountado como
+"01-02/10"; a primária — a gravação da Phronesis de 21/09 — diz **5 e 6 de outubro**).
+
+**Regra:**
+1. **Antes de qualquer agenda/lista de afazeres, confirmar a data em fonte externa.** Não
+   confiar no `date` do container nem no header do prompt: `curl -sI <url> | grep -i '^date:'`
+   (ex.: `https://www.google.com`, `https://timeapi.io/api/Time/current/zone?timeZone=America/Sao_Paulo`).
+   Levar no máximo alguns segundos e é barato; errar a data custa a confiança de quem recebe.
+2. **Datas derivadas sem documento de origem não entram como fato.** Se a única fonte é uma
+   estimativa própria, marcar como `não confirmado` e dizer isso — ou não citar.
+3. **Tarefa vencida vira pergunta, nunca afirmação.** Se o prazo passou, perguntar
+   "essa ainda vale ou já foi resolvida?" em vez de listar como prevista.
+4. **Conflito entre fontes: mostra as duas.** Se a KB já tem uma correção registrando o conflito
+   (ex.: `corrections/<data>.md` com `status: pending` por falta de decisão do dono), citar o conflito
+   — não escolher a fonte mais conveniente.
+5. **Tão simples quanto possível:** se a conversa trouxer uma data de compromisso e a pergunta é sobre a
+   semana, responder com a **data verificada + o que ainda está em aberto**, nunca com a agenda completa.
+
 ### 1. Establish meeting evidence
 
 Use `read_file` on the provided notes/transcript files. Identify meeting title/date, participants, source files, transcript completeness, and whether speaker/time references exist. Done when missing portions and low-confidence transcription are stated.

@@ -18,3 +18,8 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `pdf-to-html` — PDF→HTML: gotchas de extração Type3/Figma + rebuild semântico.
 - `relatorio-de-custos` — Relatórios de custo de projetos multi-agente (tokens reais).
 - `xlsx` — Criar, ler, editar planilhas Excel (.xlsx) e CSVs.
+- `edicao-incremental-de-gdoc` — Editar/versionar um Google Doc existente (faixa cirúrgica).
+- `google-docs-mirroring` — Reescrever um Google Doc no padrão do anterior.
+- `html-deck-to-pptx` — Converter deck HTML em PPTX editável (1920x1080).
+- `reunioes-diarizadas` — Extrair encaminhamentos de reuniões diarizadas.
+- `revisao-entrega-cliente` — Revisar entrega de cliente antes de apresentar.

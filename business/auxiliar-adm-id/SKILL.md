@@ -122,6 +122,117 @@ Fluxo de coleta mensal (origem: caixas de email → Drive):
 Detalhes técnicos do Google API (download de anexo + upload) em `references/extratos-mensais-google-api.md`.
 Mapa de IDs das pastas em `references/mapa-pastas-comprovantes.md`.
 
+### Automação: `symplexis_conferir_parcelas.py` (cron diário `c073c0ae3ad2`)
+
+Confere as parcelas da aba `recebimentos` contra o extrato do Inter e grava as que caíram
+mas seguem em aberto. Agenda `25 7 * * *` (= 04h25 BRT, **depois** do iData das 07:00 UTC
+que popula `_transações`), `no_agent` + watchdog `watchdog-symplexis-parcelas.sh`
+(HERMES_HOME/scripts, dispatcher em `~/.hermes/scripts/`): **calado quando nada muda**.
+
+Regras que o script impõe (não negociar):
+- Casa crédito x parcela por **valor** (tolerância R$ 0,01) + janela de data, em ordem
+  cronológica e **sem reaproveitar o mesmo crédito** — as 6 parcelas iguais de R$ 2.500
+  da SM1 não se cruzam.
+- Só grava quando o `iD.Transação` **já existe** na aba `_transações`; senão deixa para a
+  rodada do dia seguinte (o VLOOKUP de "Data efetuada" ficaria sem data).
+- Grava **só** E (Status), H (iD.Transação) e I (Observações). Colunas de fórmula (A/G/J/K/L)
+  são intocáveis.
+- **Trava de layout**: confere o cabeçalho (comparando sem acento) antes de gravar; coluna
+  renomeada/movida = falha explícita, não gravação em coluna errada.
+- Relê e exige `Status=Recebido` **e** `Data efetuada` preenchida — vínculo sem data é o
+  defeito que a planilha não perdoa.
+- `SYMX_DRY_RUN=1` simula e imprime o casamento sem gravar.
+
+Pitfalls reais (encontrados 01/10/2026 ao criar o script):
+- **`parse_valor` pt-BR**: `'R$ 3.446,99'` — Presence de vírgula é o que define o separador
+  decimal. A versão ingênua (trocar vírgula por ponto) lia `3446.99` como `3.44699` e o
+  script **saiu em silêncio fingindo que não havia parcela casada**. Regra: silêncio só
+  quando houve leitura de verdade; linha aberta com valor ilegível = `falha()`.
+- **Releitura de verificação deve começar na coluna A**: ler de `E1:M` e continuar usando
+  os índices `C_*` (absolutos desde A) desalinha tudo e produz falso "vínculo sem data".
+- `drv.files().list` logo após upload pode **não devolver o item recém-criado** (latência de
+  indexação) — o OFX "sumiu" da verificação e estava lá, íntegro. Confirmar com
+  `files.get(fileId)` + busca global por nome antes de reenviar (senão duplica).
+- `brl()` para formatar: `{valor:,.2f}` sai em en-US (`R$ 3,446.99`); a planilha e os
+  relatórios são pt-BR.
+
+### Automação: conferência de parcelas (cron `c073c0ae3ad2`, 07:25 UTC)
+
+Confere as parcelas da aba `recebimentos` contra o extrato do Inter e grava as que caíram
+mas seguiam em aberto. **MODO AGENTE com gate de mudança** (`monitor` =
+`coletar-symplexis-parcelas.sh`, `no_agent=false`, toolsets só `terminal`).
+
+Desenho (escolha do Gustavo 02/10/2026 — "quero o agente, mas uso mínimo, sem gastar
+tool call"):
+- O cruzamento crédito×parcela é **aritmética, não interpretação** → fica no script. O
+  agente recebe o cruzamento já pronto no prompt e só **decide e relata**.
+- Dia sem novidade: o script imprime **uma linha constante** → hash igual → o gate
+  **suprime o agente** (zero token). O agente nem é chamado.
+- Com parcela: N linhas `SYMPLEXIS_PARCELA …` → hash muda → agente acorda com 1 tool call
+  (`--registrar`) e 1 linha de resposta.
+- `enabled_toolsets=["terminal"]`: o agente não tem nem Sheets nem web. O que ele precisa
+  já veio no prompt.
+
+**A armadilha que quase mordeu:** o gate compara o hash em bytes. Se a saída tiver
+**timestamp** (`gerado_em: 2026-10-02`), o hash muda todo dia → o agente dispara todo dia
+com nada para fazer. Saída de gate precisa ser **estável**: sem data, sem contagem que
+oscile, ordem determinística. Conversely, com evento, uma linha por evento.
+
+**Falha SEMPRE notifica — e é por isso que falha vira LINHA, não exit != 0:** com
+`monitor`, `exit != 0` faz o gate tratar como erro de fonte, **preservar o hash antigo e
+suprimir o run** — exatamente a falha silenciosa que o principal não aceita. Então:
+- coleta: qualquer erro → `SYMPLEXIS_FALHA motivo=…` em stdout, **exit 0**;
+- `--registrar`: erro → stderr + **exit 1** (aqui a falha DEVE ser barulhenta, porque o
+  agente já está acordado e vai reportar).
+
+Classes: `SymplexisErro` para falha operacional com motivo legível; nada de `SystemExit`
+dentro do fluxo do coletor.
+
+Regras que o registro impõe (não negociar):
+- Casa crédito x parcela por **valor** (±R$ 0,01) + janela de data, em ordem cronológica
+  e **sem reaproveitar o mesmo crédito** — as 6 parcelas iguais de R$ 2.500 da SM1 não se
+  cruzam.
+- Só grava quando o `iD.Transação` **já existe** na aba `_transações`; senão recusa
+  (o VLOOKUP de "Data efetuada" ficaria sem data).
+- Grava **só** E (Status), H (iD.Transação) e I (Observações). Colunas de fórmula
+  (A/G/J/K/L) são intocáveis.
+- **Trava de layout**: confere o cabeçalho (comparando sem acento) antes de gravar;
+  coluna renomeada/movida = recusa, não gravação em coluna errada.
+- Relê a partir da **coluna A** e exige `Status=Recebido` **e** `Data efetuada` preenchida.
+
+**O Inter aceita no máximo 90 DIAS CORRIDOS** entre `dataInicio` e `dataFim` — 90 já dá
+`400 Período inválido` (medido 02/10/2026: 89d passa, 90d falha). O script trava em 89.
+
+Ambiente: `/opt/mercurio-data/work/idata/.venv/bin/python` (tem `requests` +
+`googleapiclient`; o `id-nfse-motor` **não** tem pandas, e `api_inter` não precisa dele).
+
+**Juros/mora (decisão do Gustavo, 02/10/2026):** parcela liquidada **acima** do previsto não
+é falha de casamento — é registro. O `cruzar()` faz **duas passadas**, nesta ordem:
+
+1. **exato** (mesmo valor, ±centavos) — o caso normal, calado;
+2. **com juros/mora** — crédito acima do previsto, dentro de `min(10% da parcela, R$ 500)`
+   (`SYMX_JUROS_PCT` / `SYMX_JUROS_TETO`).
+
+A ordem é obrigatória: se uma parcela tem crédito exato e outra tem crédito com juros, passar
+por todos os exatos primeiro evita que a parcela errada capture o crédito cheio. Dentro de
+cada passada: ordem cronológica e **sem reaproveitar crédito** — 6 parcelas iguais de
+R$ 2.500 casam na sequência certa (coberto por teste).
+
+Limites que **não** casam, de propósito: pagamento **a menos** (parcial/adiantamento) e
+juros **acima do teto**. Ambos ficam para decisão humana.
+
+Ao registrar com divergência, o `--registrar` recebe `LINHA:ID:PAGO_VALOR` e escreve em
+Observações: "recebido R$ X — diferença de R$ Y, provavelmente juros/mora". O valor
+previsto (coluna D) **não** muda: juros vivem na camada financeira (transação/extrato).
+
+**Armadilha real do teto:** `faixa_juros` devolvia `None` para "não casou" e o chamador
+testava `is not None` — então `False` (acima do teto) contornava a faixa. Devolve
+**booleano** e teste por verdade. `None` como sentinela + `is not None` é armadilha.
+
+Teste-guardião: `scripts/tests/test_symplexis_cruzamento.py` (8 casos: exato, juros, teto,
+a menos, precedência, não-reuso, 6 parcelas iguais, data anterior). Rodar antes de mexer no
+`cruzar`.
+
 ## 3 · Planilhas financeiras — as 2 principais
 
 ### A) [ID] Gestão Financeira (`1cOMQM2B1ircEdFJ5iiAGiUO7-Mx_qSo51uWDRtAV_gE`)

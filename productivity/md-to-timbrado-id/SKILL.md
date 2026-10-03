@@ -62,7 +62,15 @@ Motor: `/opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py`
    a imagem pós-título entre a capa e o corpo, e insere **quebra de página antes do 1º
    parágrafo do corpo** (senão o corpo cai na página da capa).
 
-6. **Linha em branco antes de cada tabela = limitação do Docs API.** O `insertTable` cria
+6. **Markdown com quebra de linha suave vira um parágrafo por linha.** O motor trata
+   cada linha como parágrafo: o texto datilografado a ~80 colunas sai no PDF com linhas
+   curtas fragmentadas no meio da frase, e a revisão por visão acusa "texto quebrado".
+   Rode `scripts/prepara_md.py` antes do motor — ele junta as continuações, converte
+   lista numerada em bullet com número explícito (senão `createParagraphBullets` imprime
+   `1. 1. 1.`) e quebra o callout por palavra (fonte monoespaçada estoura a margem).
+   Detalhes e checklist de conferência: `references/md-to-gdoc-prep-md.md`.
+
+7. **Linha em branco antes de cada tabela = limitação do Docs API.** O `insertTable` cria
    obrigatoriamente um parágrafo antes da tabela, e o API **REJEITA apagá-lo**
    (`Cannot delete the requested range`). Workaround: **zerar a altura** desse parágrafo
    (`fontSize:1pt` + `spaceAbove/Below:0`) → gap invisível, tabela colada ao heading; e
@@ -123,6 +131,14 @@ O `corpo.md` deve conter **só o corpo** (começar em `# Resumo Executivo`): a c
   headers): `edit_header` por isso **lê o texto atual do header** e substitui o que encontrou,
   em vez de assumir as strings do modelo.
 
+## Regra do dono: documento novo sempre em Google Docs nativo
+
+Ao subir qualquer documento no Drive da ID, **sempre criar como Google Docs** (`application/vnd.google-apps.document`) via `docs.documents().create()` + `batchUpdate` — nunca como `.docx`, `.odt` ou upload de arquivo. Depois de criar: aplicar `namedStyleType` (HEADING_1/2/3), fonte `Nunito Sans` sem `weight:400`, links clicáveis via `updateTextStyle` com `textStyle.link`, e conferir por export PDF + `pdftotext -layout`.
+
+Se um doc foi criado errado (.docx): criar o equivalente nativo, conferir, e só então **apagar o errado** — `dr.files().delete(fileId=...)`.
+
+> Decisão do Gustavo em 01/10/2026: "Sempre que subir um doc no drive, suba como Google Docs, usando sua skill de Google Workspace."
+
 ## Pitfalls operacionais
 
 - **Preencher tabela pela API: `insertText` desloca TODOS os indices seguintes.** Num
@@ -148,6 +164,14 @@ O `corpo.md` deve conter **só o corpo** (começar em `# Resumo Executivo`): a c
 - **`insertTable` herda o estilo do parágrafo onde foi inserida.** Se a âncora for um
   heading, a tabela nasce com aparência de heading. Coloque sempre uma âncora em
   `NORMAL_TEXT` antes da tabela.
+
+- **`updateTableColumnProperties` não aceita `columnIndex`** — erro 400 `Unknown name
+  "columnIndex"`. Para largura de coluna use `updateTableCellStyle` (por
+  `tableCellLocation`) ou deixe o Docs distribuir; o `DocBuilder.add_table` do motor
+  já calcula a largura útil sozinho.
+
+- **`docs.documents().create(...)` retorna `HttpRequest`, não dict** — precisa de
+  `.execute()` explícito antes de ler `["documentId"]` (TypeError: not subscriptable).
 
 - **Style loop sem janela de alcance estraga o documento inteiro.** Um
   `for el in body['content']: if estilo == 'HEADING_1': normalizar` sem limitar ao trecho

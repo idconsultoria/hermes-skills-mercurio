@@ -91,6 +91,41 @@ recebida continua **sem data** e não entra em nenhum total por ano/mês.
 Status possíveis em `recebimentos`: `Recebido` (confirmado por gente), `confirmado por IA`
 (vinculado pela automação, muitas vezes sem data resolvida) e `Por receber` (em aberto).
 
+## Reconciliação automática: cron de parcelas pagas
+
+O passo a passo acima virou rotina automática — `symplexis_conferir_parcelas.py` +
+watchdog `watchdog-symplexis-parcelas.sh` em `$HERMES_HOME/scripts` (dispatcher em
+`~/.hermes/scripts/`), agenda `25 7 * * *` em `no_agent`: **calado quando nada muda**.
+
+Use o script, não a mão, para conferir parcelas abertas. Para alterar a regra de casamento
+ou o layout, leia o script antes de mudar — estas invariantes existem por motivo:
+
+- **A ordem dos dois crons não é arbitrária.** A reconciliação roda **depois** do iData
+  porque só grava o vínculo quando o `iD.Transação` já existe na aba `_transações`;
+  adiantar deixaria a fórmula de "Data efetuada" sem data — vínculo sem data não entra em
+  nenhum total por ano/mês.
+- **Casamento por valor + janela de data, cronológico e sem reaproveitar o crédito.** Sem
+  o "sem reaproveitar", parcelas repetidas de mesmo valor (as 6× R$ 2.500 da SM1) se
+  cruzam e marcam a parcela errada como paga.
+- **Gravação restrita a colunas de dado** (E Status, H iD.Transação, I Observações) —
+  nunca em coluna de fórmula.
+- **Trava de layout:** compara o cabeçalho sem acento/caixa antes de gravar; coluna
+  renomeada ou movida precisa dar falha explícita, não gravação na coluna errada.
+- `SYMX_DRY_RUN=1` imprime o casamento sem gravar — rode antes de qualquer mudança de regra.
+
+### Armadilhas ao escrever/leitura de valores e índices (validadas em produção)
+
+- **Valor pt-BR:** `'R$ 3.446,99'` traz o separador decimal na **vírgula**. Trocar vírgula
+  por ponto cegamente lê `3.44699` e o casamento silenciosamente não acha nada. Use a
+  presença da vírgula para decidir o separador. E conversely: um valor ilegível numa linha
+  em aberto é **falha explícita**, nunca "nada a fazer" — silêncio em rotina de conferência
+  esconde o defeito.
+- **Releitura de verificação começa na coluna A.** Se os índices de coluna são absolutos
+  desde A (é o caso), reler de `E1:M` e continuar usando-os desalinha tudo e produz falso
+  "vínculo sem data" em linha que gravou certo.
+- **Formate valor em pt-BR com helper próprio.** O formato `{:,.2f}` do Python sai em
+  en-US (`R$ 3,446.99`) e suja observação e relatório.
+
 ## Backfill da planilha (método validado 19/08/2026)
 
 O `entrypoint_ingestão_inter.py` alimenta só **"ontem"**. Para cobrir atrasos:

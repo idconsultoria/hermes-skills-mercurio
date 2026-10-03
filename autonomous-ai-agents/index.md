@@ -13,3 +13,6 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `opencode` — Delegate coding to OpenCode CLI (features, PR review).
 - `pi-agent-coordination` — Invocar Pi Agent localmente via Hermes.
 - `product-pipeline` — Pipeline multi-agente de produto — ideia a MVP via sprints.
+- `facilitacao-grupo-agentes` — Facilitar reuniões de agentes: pauta, turnos e devolução.
+- `hermes-inference-config` — Configure Hermes model/provider/fallback; route crons.
+- `peer-session-audit` — Auditar sessão ruim de um agente par (postmortem).

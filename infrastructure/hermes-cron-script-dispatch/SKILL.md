@@ -51,6 +51,15 @@ Para jobs `no_agent=true` (o script roda e não chama LLM):
 O wrapper pode implementar isso: captura a saída; se RC=0 e vazia, `exit 0` (mudo); senão
 `echo "$OUT"; exit $RC` (grita).
 
+**O silêncio tem de ser merecido — nunca conquistado por defeito do script.** O watchdog
+transforma qualquer `exit 0` mudo em silêncio permanente, então um script que engole erro
+de parsing e sai limpo some justamente quando falhou. Regra: todo caminho de erro real
+precisa sair com `exit != 0` e diagnóstico; sucesso só é `exit 0` depois de uma leitura de
+verdade. Sinais de que o silêncio está mascarando defeito: comparação/casamento que
+nunca encontra nada, lista que volta vazia, contagem zero em campo que deveria ter itens.
+Ao criar um watchdog novo, exercite-o com um caso que **deve** casar e outro que **deve**
+falhar — silêncio validado só no caso mudo não prova nada.
+
 ## Verificação (produção)
 No job `e60e713b0b62` (iData diário) o teste manual retornou `exit 4` com:
 `ERRO: runner-idata-diario.sh não encontrado em /opt/mercurio-data/scripts/runner-idata-diario.sh /opt/data/scripts/runner-idata-diario.sh`
@@ -86,6 +95,62 @@ linha do evento, a resposta seja exatamente `[SILENT]` — o scheduler usa `_is_
 e **não entrega** nada (`[SILENT]`, `SILENT`, `NO_REPLY`, `NO REPLY`, sozinhos na resposta ou na
 primeira/última linha). Sem isso, o diff de formato do próprio script (quando você o reescreve)
 vira notificação.
+
+## "Sempre ative o agente" ≠ "gaste tokens" — quem economiza é o gate
+
+P有时 o principal pede para tirar o `no_agent` achando que o modo sem LLM economiza token.
+Ao contrário: o que zera o custo no dia sem evento é o **gate de mudança** — com saida
+estável, o agente nem é chamado. Então a resposta certa **não** é reduzir o escopo da
+tarefa (isso seria entregar menos), e sim manter a tarefa inteira e o gate.
+
+## `None` como sentinela + `is not None` = armadilha
+
+Funcao que devolve `None` para "não casou" e `True`/`False` para o resto, testada com
+`is not None`, deixa `False` passar como se fosse sucesso. Em casamento financeiro isso é
+a diferenca entre registrar uma parcela errada e nao registrar nada. Devolva **booleano** e
+teste por verdade.
+
+## O gate hasheia a saída SEM o `\n` final — não compare `stdout` cru
+
+O arquivo `cron/output/<job_id>/monitor_last_output.txt` guarda a saída com o **newline
+final removido** (26 bytes para `SYMPLEXIS_NADA_A_REGISTRAR`). Se você conferir o estado
+do gate calculando `sha256(subprocess.stdout)`, dá **hash diferente com conteúdo
+idêntico** e você conclui, errado, que o agente vai acordar todo dia.
+
+- Hash do gate = `sha256(saida.rstrip("\n"))` — o `monitor_last_output.txt` é a fonte da
+  verdade do que foi realmente gravado.
+- **Prova do comportamento, não do detalhe interno:** dispare o job duas vezes seguidas e
+  veja o segundo tick. Se o gate funciona, o segundo run sai `no_change` (sem run de
+  agente, `API calls: 0`). Confirmar por execução real evita usar a forma do hash como
+  proxy — detalhe de implementação muda entre versões.
+- Se o `\n` for removido e o conteúdo for o mesmo, o run é suprimido: `last_run_at` avança,
+  `last_status: ok`, mas **sem** arquivo novo em `cron/output/<job_id>/` e sem entrega.
+
+## Falha SEMPRE notificar num job com `monitor` — a inversão do exit code
+
+Com `monitor` (gate de mudança), a semântica do exit code é **invertida** em relação ao
+watchdog `no_agent`:
+
+| Situação | `no_agent` | `monitor` |
+|---|---|---|
+| sucesso mudo | exit 0 + stdout vazio | stdout **igual** ao anterior → run suprimido |
+| **falha** | exit ≠ 0 → entrega o erro | **exit ≠ 0 → hash preservado + run suprimido** =Somega-se |
+
+Ou seja: num job com `monitor`, `exit ≠ 0` é a forma de **engolir** a notificação. Se o
+principal exige saber de toda falha, a falha tem de virar **linha de stdout com exit 0**:
+
+```
+SYMPLEXIS_FALHA motivo=token Google ausente: /caminho/google_token.json
+```
+
+Assim o hash muda, o gate vê “mudança”, o agente acorda e reporta — e continua sendo uma
+linha estável quando o problema é o mesmo (não vira chuva de notificação a cada tick).
+Contraste: no passo de **registro** (executado pelo agente já acordado), a falha DEVE ser
+`exit ≠ 0` — ali o ruído é o comportamento correto.
+
+Nunca misture os dois mundos no mesmo script sem pensar: saída estável é para o **gate**;
+`raise SystemExit` no meio do fluxo do coletor engole o erro em vez de reportá-lo —
+use exceção própria (`SymplexisErro`) e converta em linha.
 
 ## Verificar entrega a um usuário nomeado (@handle)
 

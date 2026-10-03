@@ -91,6 +91,21 @@ Ler de volta a lista de arquivos da pasta-alvo (`files.list` com `'<id>' in pare
 e conferir nome x quantidade, em vez de confiar no retorno do `create` (que confirma só
 o upload, não a localização).
 
+**Não confunda latência com arquivo perdido (01/10/2026):** logo após o upload, o
+`files.list` da pasta **pode não devolver o item recém-criado** — o OFX de agosto/setembro
+"sumiu" da verificação e estava lá, com os bytes corretos. Antes de reenviar (o que criaria
+duplicata), confirme com `files.get(fileId, fields="id,name,size,parents,trashed")` e
+busca global `name = '<nome>' and trashed=false`.
+
+**Verificação forte: SHA-256 email vs Drive.** Baixe o que está no Drive
+(`files.get_media`) e compare com os bytes do anexo (`sha256`) — garante integridade, não
+só presença. Foi assim que os 12 arquivos de agosto/setembro (Inter + Nubank) foram
+aprovados byte a byte.
+
+- `drv.about().get(fields="user")` devolve o e-mail da conta Drive. `drv.users()` **não
+  existe** na API do Drive v3 (`AttributeError: 'Resource' object has no attribute
+  'users'`) — é bug de script, não token ruim.
+
 ## Auditoria 01/09/2026
 
 Tokens corretos não encontrados no disco — apenas fallback `gustavomelloenciv@gmail.com` em `$HERMES_HOME/google_token.json`. Procedimento vetado até recriar OAuth para `admin@idconsultoria.ai` e `gustavo.idteal@gmail.com`.

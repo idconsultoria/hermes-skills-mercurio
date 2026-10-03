@@ -417,6 +417,10 @@ For programmatic Google Drive and Sheets patterns (folder trees, batch populatio
 | `$GAPI gmail send` has no `--attach` flag | The CLI wrapper `gmail send` does not support file attachments. For sending emails with attachments (e.g. EPUB manga files), use the Python Gmail API directly with MIMEBase — see kindle-manga's `references/gmail-kindle-delivery.md` for the complete script. |
 | `docs create --body` produces plain text without formatting (no bold/headings/tables) | Use `scripts/md-to-gdoc.py` instead — converts markdown with real headings, bold, bullets, native tables, callouts. See `references/md-to-gdoc.md`. |
 | Google Doc "todo em fonte mono" ou "tudo com bullet" após conversão | Style bleeding: um `updateTextStyle`/`updateParagraphStyle` cujo range inclui o `\n` final propaga o estilo ao próximo parágrafo em cascata. O `md-to-gdoc.py` lida com isso (ranges `end-1` + `_normalize_font`), mas se você estiver editando via batchUpdate manual, nunca inclua o `\n` no range de estilo. |
+| `.md` gravado com um heading repetido centenas de vezes ou lixo multibyte | Degeneração da geração de texto longo, não bug do `write_file`. Regrave em partes menores (ver item 10b em `references/md-to-gdoc.md`) e valide antes de converter. |
+| `sheets get` devolve erro não-JSON ao ler uma aba com acento ou espaço | Nome de aba precisa de aspas DUPLAS no shell: `sheets get ID "'Roadmap 8 Semanas'!G1:G9"`. Com aspas simples o shell quebra o comando e a saída não é JSON. |
+| Chip de um doc aponta para a versão v1 antiga depois de criar o v2 | O `.md` ainda referenciava o ID do v1. Atualize o ID no `.md` e rode o conversor de novo com `--doc-id` (mesmo doc, sem criar duplicata). |
+| Sheet: sempre releia a célula depois de `update` | `sheets update` responde `updatedCells: 1` mesmo quando o texto tem acento/símbolo. Confirme com um `sheets get` da célula alterada. |
 
 ## Revoking Access
 

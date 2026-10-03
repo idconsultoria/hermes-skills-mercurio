@@ -29,3 +29,6 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `supabase-to-selfhost` — Use ao abandonar Supabase: backend próprio offline único.
 - `systematic-debugging` — 4-phase root cause debugging: understand bugs before fixing.
 - `test-driven-development` — TDD: enforce RED-GREEN-REFACTOR, tests before code.
+- `artemishub-onboarding-patterns` — Padrões quando o onboarding do ArtemisHub falha.
+- `react-fastapi-debugging` — Patch fallback silencioso e bugs de UI em React+FastAPI.
+- `skills-library-audit` — Triar skills: quais servem em qualquer Hermes.

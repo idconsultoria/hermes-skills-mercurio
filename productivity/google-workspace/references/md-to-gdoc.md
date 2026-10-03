@@ -102,6 +102,14 @@ Parágrafos normais recebem `spaceBelow: 8pt` para respiro de leitura.
     retornada pela API pode mostrar "células vazias" que na verdade estão
     preenchidas (depende de como se lê `tableRows`). Confiar na inspeção visual
     do usuário, não em leituras parciais da API.
+10b. **Docs longos: escreva o `.md` em PARTES, nunca num `write_file` só.** Acima
+    de ~4 KB, uma geração de texto longa pode degenerar em repetição do mesmo
+    fragmento (ex.: `## Tries` centenas de vezes) ou lixo multibyte, e o
+    `write_file` grava isso como se estivesse correto — o `verified: true` só
+    confirma o hash do arquivo, não o conteúdo. Grave a prosa em arquivos de 2 a
+    4 KB e concatene com `open(dest,"w").write("\n\n".join(parts))`. Antes de
+    converter, valide: contagem de headings igual à esperada, `t.count("Tries") == 0`,
+    ausência de `\ufffd` e ausência de caracteres CJK.
 11. **Células vazias em tabelas (400 "must specify text to insert"):** se uma
     célula de tabela estiver vazia no markdown (ex.: tabela de preenchimento
     `| 1 | | | |`), NÃO chamar `insertText` com `text: ""` — a API rejeita com
@@ -158,6 +166,24 @@ Parágrafos normais recebem `spaceBelow: 8pt` para respiro de leitura.
     Ao adicionar diagramas mermaid em markdown, NUNCA colocar mais de um node
     por linha se quiser compatibilidade total com o renderer antigo — com o fix
     atual, múltiplos nodes por linha são suportados.
+20. **`xychart-beta` quebra por causa do `_fix_mermaid()` (corrigido 2026-10-01):** o limpador
+    remove ASPAS e PARÊNTESES de toda linha com `[]`/`{}`/`-->`. Em `xychart-beta` esses
+    caracteres são sintaxe OBRIGATÓRIA:
+    - `x-axis ["A", "B"]` → vira `x-axis [A, B]` (sem aspas) → **lexer error**
+    - `y-axis "HH (horas)" 0 --> 3` → vira `y-axis HH (horas) 0 --> 3` → **lexer error**
+    Sintoma: `⚠️ mmdc falhou` + `Lexical error on line N. Unrecognized text.` no
+    `xychartDiagram`; `_render_mermaid_png()` retorna False e `add_mermaid()` cai no
+    fallback `add_code()` — o gráfico vira texto cru. **Fix:** `_fix_mermaid()` detecta
+    `xychart` e faz early-return por linha, preservando o gráfico intacto. Ao escrever
+    `xychart-beta`, use SEMPRE aspas em `title`, `x-axis` e `y-axis`.
+    Teste rápido de um gráfico isolado:
+    `mmdc -i b.mmd -o b.png -b transparent -s 2 -p /opt/data/mmdc/puppeteer-config.json`
+21. **Renderize os mermaid ANTES de criar o doc:** um bloco que falha NÃO impede a
+    criação do Google Doc — ele sai com aquele gráfico substituído por texto cru (fallback
+    `add_code`) e a falha só aparece como aviso no log. Para não entregar doc com buraco,
+    renderize todos os blocos isoladamente (aplicando `_fix_mermaid()`), confirme que
+    existe 1 PNG por bloco e só então rode o conversor completo. Não rode vários `mmdc`
+    em paralelo no mesmo host — derrubam o Chromium compartilhado; rode sequencial.
 
 ## Tabelas com largura inteligente
 

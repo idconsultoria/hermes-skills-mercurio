@@ -220,8 +220,14 @@ def _fix_mermaid(code):
     - em sequenceDiagram: ; e | em mensagens (quebram o parser)
     Mantém apenas o par de colchetes mais externo de CADA label na linha."""
     is_sequence = "sequenceDiagram" in code or "sequence" in code.lower()
+    # xychart-beta EXIGE aspas em title/x-axis/y-axis e nao aceita parenteses
+    # soltos: "y-axis HH (horas) 0 --> 3" quebra o lexer. Nao mexer nesquetes linhas.
+    is_xychart = "xychart" in code.lower()
     lines = []
     for line in code.split("\n"):
+        if is_xychart:
+            lines.append(line)
+            continue
         if is_sequence and re.search(r"->>|->|-->>", line):
             # Linha de mensagem em sequence: remove ; e | (separadores do parser)
             line = line.replace(";", ",").replace("|", " e ")
