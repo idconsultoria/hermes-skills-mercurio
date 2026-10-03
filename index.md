@@ -231,6 +231,7 @@ Similar:
 - `formalizacao-acordo-cliente` → `elaboracao-proposta-comercial`
 - `revisao-de-proposta-existente` → `elaboracao-proposta-comercial`
 - `revisao-entrega-cliente` → `reunioes-diarizadas`
+- `reunioes-diarizadas` → `meeting-action-items`
 - `dogfood` → `systematic-debugging`
 - `hermes-agent-skill-authoring` → `skills-repo-curator`
 - `node-inspect-debugger` → `python-debugpy`
@@ -246,6 +247,7 @@ Similar:
 - `github-repo-management` → `github-pr-workflow`
 - `codebase-inspection` → `github-code-review`
 - `auxiliar-adm-id` → `google-workspace`
+- `auxiliar-adm-id` → `inter-api-id-consultoria`
 - `git-fork-isolation` → `cicd-oracle-preview`
 - `git-fork-isolation` → `github-repo-management`
 - `claude-code` → `product-pipeline`
@@ -272,6 +274,7 @@ Uses:
 - `augmentation-process-design` → `deep-research`
 - `document-to-action-items` → `google-docs-formatting`
 - `meeting-action-items` → `google-workspace`
+- `meeting-action-items` → `document-to-action-items`
 - `email-inbox-triage` → `google-workspace`
 - `pi-agent-coordination` → `hermes-agent`
 - `product-pipeline` → `backlog-and-sprint`
@@ -307,6 +310,7 @@ Uses:
 - `sdlc-review` → `github-code-review`
 - `hermes-agent-replication` → `hermes-agent`
 - `gestao-financeira-id` → `google-sheets-automation`
+- `gestao-financeira-id` → `xlsx`
 - `inter-api-id-consultoria` → `gestao-financeira-id`
 - `react-fastapi-debugging` → `devops-artemishub`
 - `merge-reconciler` → `opencode`
@@ -360,6 +364,7 @@ Uses:
 - `revisao-entrega-cliente` → `edicao-incremental-de-gdoc`
 - `reunioes-diarizadas` → `edicao-incremental-de-gdoc`
 - `md-to-timbrado-id` → `google-docs-mirroring`
+- `md-to-timbrado-id` → `html-to-pdf-chromium`
 - `proposta-sergipetec-documento` → `direito-empresarial-brasileiro`
 - `organizacao-drive-id` → `auxiliar-adm-id`
 - `organizacao-drive-id` → `formalizacao-acordo-cliente`
