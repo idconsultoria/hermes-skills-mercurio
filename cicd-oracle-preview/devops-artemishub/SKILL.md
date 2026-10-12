@@ -116,6 +116,29 @@ Formatos:
 docker exec artemishub-backend sh -c "cd /app/backend && python test_pipeline.py federal-nucleo --rule-based"
 ```
 `test_pipeline.py` está em `backend/` (utilitário de diagnóstico versionado no repo).
+Roda um batch e mostra no log os registros de qualidade gravados.
+
+### 5.1 Qualidade da extração e retenção (09/10/2026)
+
+- `backend/pipeline/descartes.py` — sinais de qualidade (título que é só
+  `Fonte: domínio`, órgão/url ausente, valor improvável, prazo ilegível/fora da
+  janela) e **registro mínimo** em `public.pipeline_descartes` (sem conteúdo
+  bruto: motivo, batch, método, título, url, órgão, prazo, valor, `sinais[]`).
+  Motivos: `qualidade_entrada`, `reprovado_na_validacao`, `duplicado_no_batch`,
+  `retencao_fora_da_janela`.
+- **Retenção:** edital com prazo fechado há mais de `ARTEMISHUB_RETENCAO_MESES`
+  (padrão 2) sai da base; item com candidatura em andamento é preservado. Roda
+  no fim de cada execução do pipeline e sob demanda.
+- Endpoints: `GET /api/pipeline/descartes` (resumo por motivo) e
+  `POST /api/pipeline/limpar-expirados?meses=2` (só master).
+- DDL versionado em `db/migrations/2026-10-09-pipeline-descartes.sql` (o backend
+  também garante em runtime via `ensure_schema`) — aplicar é idempotente:
+  `docker exec -i artemishub-db psql -U app -d artemishub < db/migrations/<arquivo>.sql`.
+- `ARTEMISHUB_VALOR_MAX_PLAUSIVEL` (padrão R$ 5 bi) define o corte de valor
+  absurdo.
+- **Antes de rodar a retenção, tirar dump** (`pg_dump -Fc` em `/home/ubuntu/backups`).
+  Primeira execução (09/10/2026): 55 de 182 editais fora da janela → removidos,
+  55 registros gravados; sem preservados (candidaturas = 0).
 
 **Pitfall Firecrawl self-hosted:** a detecção de self-hosted considera a **base custom**
 (não só `localhost`/`127.0.0.1`). Se `FIRECRAWL_BASE_URL=http://firecrawl_api:3002/v2`,
@@ -227,6 +250,19 @@ Modelo versionado: `.env.example`. Manual entregue em 22/08/2026 (zip) contém b
 | `POST /api/empresas` / fluxo público (onboarding) retorna 401 | middleware global `enforce_api_key` exige credencial em tudo, exceto `/api/health` e `/api/auth/login` | liberar rotas públicas método-específicas via `_is_public_onboarding(path, method)` (só criação; GET/edição seguem protegidos) |
 | `POST /api/empresas` com `porte=ICT` → `500` + frontend `Unexpected token 'I', "Internal S"... is not valid JSON` | `empresas` aceita `ICT`, `empresas_parque` só aceitava `Média` → `psycopg.errors.CheckViolation: empresas_parque_porte_check` não tratado vira `500 Internal Server Error` texto puro (21B) que `await res.json()` tenta parsear | mapear `ICT → NaoInformado` via `_porte_para_parque()` em `empresa_parque_defaults` + `create_empresa` + migrar `ALTER TABLE empresas_parque DROP/ADD CHECK` incluindo `ICT`; envolver `create_empresa` em `try/except` que devolve `400 {"detail":"Dado inválido: ..."}`; frontend usar `res.text()`+safe `JSON.parse` fallback (ver `references/onboarding-2026-08-31.md`) |
 | `PUT /api/empresas/{id}/complemento` → `500 the connection is closed` ou `invalid input syntax for type integer: "Ate 360 mil"` | após envolver `with db()` em `try`, o corpo das etapas 3-10 ficou **fora** do `with` (indentação) → cursor fechado; `conn.commit()` estava dentro de `if c.etapa9:` apenas | `try` deve envolver o `with` inteiro (indentar `with` 4→8 espaços); `conn.commit()` **fora** dos `if`s; `except HTTPException: raise` antes do genérico; `qtd_colaboradores_aprox` é `integer` — não passar por `_FAIXA_MAP` (detalhe em `references/onboarding-2026-08-31.md`) |
+| Pipeline roda mas **`DeepSeek extraiu 0`** em todos os batches (resultado sai só do rule-based, com títulos-lixo tipo `Fonte: worldbank.org`) | o OpenCode Go passou a exigir o header **`x-opencode-session`** para rotear a chamada; sem ele a API responde `400 MissingSessionID`, `call_deepseek` devolve `None` e o runner cai no rule-based **em silêncio** (139 batches assim entre ~11/09 e 09/10/2026) | enviar `x-opencode-session: <uuid4>` em TODA chamada ao OpenCode — `backend/pipeline/llm.py` (`call_deepseek`) e `backend/main.py` (`_llm_headers()`, usado pelo proxy `/api/ia/chat`, pelo enriquecimento e por `POST /api/config/testar-llm`); logar a falha total (`[llm] falha total ...`) em vez de devolver `None` mudo; `testar-llm` com `max_tokens=8` sempre falha em modelo de reasoning → usar ≥1024 |
+| `POST /api/pipeline/run` → `{"detail":"API key inválida ou ausente"}` usando a chave do `.env` | `ARTEMISHUB_API_KEY` está **vazia** em produção; com `API_KEY=""` nenhum `X-API-Key` casa e o caminho máquina-a-máquina fica morto (só sessão de usuário passa) | disparar a busca sem sessão rodando o runner **dentro do container** (não mexe no estado do processo do servidor): `docker cp` de um script que chama `start_run()` e imprime `RUNNER.state`, depois `docker exec -d artemishub-backend sh -c 'cd /app/backend && python -u /tmp/run_pipeline.py > /tmp/pipeline_run.log 2>&1 < /dev/null'`; a saída vai para o arquivo, **não** para `docker logs` |
+| Deploy pelo CI **reverteria produção** | a cópia de produção no host (`/home/ubuntu/selfhost/artemishub`) tem arquivos que **não existem no GitHub main** (trabalho aplicado direto no host, ex. hotfix ICT do onboarding, `src/lib/report/*`, `src/lib/cadastro-hints.ts`, `src/lib/config.ts`, `InfoTooltip`, `ExportEmpresaMatchReportButton`) | **sempre diffar antes de qualquer deploy**: `find src backend -type f ! -path "*/__pycache__/*" -exec md5sum {} +` no host contra o clone do main; se divergir, NÃO deixar o CI deployar (push em branch + deploy manual no host) e levar a reconciliação ao principal |
+
+## 10.1 Deploy manual no host quando produção diverge do main (padrão de 09/10/2026)
+
+1. `scp` do arquivo do host para `/tmp/host_*` e aplicar o patch **localmente** (preserva o que só existe no host).
+2. `python3 -m py_compile` / conferir o diff; no host `cp arquivo arquivo.bak.$(date +%Y%m%d_%H%M%S)`.
+3. `scp` de volta → `docker compose build <serviço> && docker compose up -d <serviço>` (~1 min backend, ~3 min frontend).
+4. Verificar pelo lado do servidor (o container do agente pode não resolver o domínio): `curl -sk --resolve artemis.idconsultoria.ai:443:127.0.0.1 https://artemis.idconsultoria.ai/` e comparar o hash do asset servido com o do container (`docker exec artemishub-frontend ls /usr/share/nginx/html/assets/`).
+5. Registrar o fix no GitHub em **branch** (nunca em `main` enquanto a divergência existir).
+
+Detalhes de UI/escala e a técnica de QA visual sem login: `references/ui-escala-global-e-qa-visual-2026-10-09.md`.
 
 ## 11. Pendências atuais
 - Conta OpenCode: modelo DeepSeek no `zen/go/v1` requer **opt-in região China**

@@ -30,7 +30,7 @@ timestamp: 2026-07-26T05:20:00Z
 └───────────────────────────────────────────────────────┘
 ```
 
-O ciclo é executado periodicamente (diariamente via cron às 02:00). Ele inicia os updates — não o contrário.
+O ciclo é executado periodicamente (**SEMANALMENTE, toda segunda via cron `0 2 * * 1`** — 02:00 UTC / 23h BRT de domingo, job `8a7f5f65ed76`). Antes de 03/10/2026 era diário (`0 2 * * *`); o Gustavo reduziu para semanal porque o diff diário já nascia pequeno. Consequência prática: o diff acumulado por run é maior — audite descrições em LOTE (script de análise em arquivo `.py` + correções via patch/write_file) e não deixe merges/órfãos pendentes de uma semana para a outra. Ele inicia os updates — não o contrário.
 
 ### Protocolo obrigatório antes de executar o ciclo (validado 12/08/2026)
 
@@ -38,7 +38,7 @@ O usuário corrigiu explicitamente quando o ciclo foi executado manualmente sem 
 
 1. `skill_view(name='skills-repo-curator')` — a skill completa (etapas, passos, pitfalls)
 2. `read_file('/opt/data/skills/AGENTS.md')` — regras do repo (index.md é território LLM, convenções de commit, estrutura)
-3. O prompt do cron: `cronjob(action='list')` ou `/opt/data/cron/jobs.json` → job `ciclo-consolidacao-diario` — etapas exatas + formato de resposta final `REPORT:/GRAPH:/SUMMARY:`
+3. O prompt do cron: `cronjob(action='list')` ou `/opt/mercurio-data/cron/jobs.json` → job `Ciclo de Consolidação de Skills (Mercúrio)` (id `8a7f5f65ed76`, skill `skills-repo-curator`, semanal `0 2 * * 1`) — etapas exatas + formato de resposta final `REPORT:/GRAPH:/SUMMARY:/PUSH:`
 
 Sem isso, NÃO começar o ciclo. Ter lido a skill "mais cedo na sessão" não basta — a skill evolui entre sessões e o AGENTS.md é a regra vigente do repo.
 
@@ -132,7 +132,7 @@ skills/
 - Usuário pergunta sobre OKF, progressive disclosure, ou formato de conhecimento agent-ready
 - Usuário pede para adicionar/resumir/corrigir descrições de skills (summary >85 chars, trigger ausente, blank line separator faltando)
 - Ao final de uma sessão com múltiplas correções de workflow
-- Execução automática via cron diário
+- Execução automática via cron **semanal** (segunda 02:00 UTC)
 
 ## Regra Absoluta: index.md é Território de Agente LLM
 
@@ -575,7 +575,7 @@ else:
    1. **Diagnóstico** — `cronjob(action='list')` → ver `last_status: error`. O campo `last_error` no `jobs.json` (`/opt/data/cron/jobs.json`) tem a mensagem de erro completa. O output do cron está em `/opt/data/cron/output/<job_id>/<timestamp>.md` — contém o prompt completo + a seção `## Error` com o trace.
    2. **Avaliação** — `git status` + `git diff --stat` mostra quais skills foram tocadas. `git diff <file>` pra ver se as mudanças são válidas ou corrompidas.
    3. **Se válido** — complete o ciclo manualmente: `git add -A`, escreva entrada no `log.md`, atualize `index.md`, `git commit -m "update: ..."`, `git push`.
-   4. **Se corrompido** — `git restore .` pra limpar o working directory. O próximo cron (02:00) recomeça do zero.
+   4. **Se corrompido** — `git restore .` pra limpar o working directory. O próximo cron (segunda 02:00 UTC) recomeça do zero.
    5. **Causas raiz comuns:**
       - **Cota de ferramentas estourada** na auditoria de descrições (passo 4 do update: varre TODAS as SKILL.md). Ciclo com muitas skills precisa de paralelismo ou timeout maior.
       - **Provider fallback com quota free tier esgotada.** O cron pinou `model: null, provider: null` no momento da criação → usa o provider ativo na época. Se o provider principal falha (429 rate limit), cai no `fallback_providers` do config.yaml. Gemini free tier tem limite de 250k input tokens — ao varrer 83+ SKILL.md o ciclo estoura a cota e recebe HTTP 429. **Diagnóstico:** `last_error` contém `HTTP 429` + `quota exceeded` + nome do modelo Gemini. **Prevenção:** (a) setar `model` e `provider` explicitamente no cron job via `cronjob(action='update', job_id=..., model={"model": "...", "provider": "..."})` para bypassar o fallback; (b) adicionar `context_length: 250000` ao fallback Gemini no config.yaml para conter a janela dentro do limite free tier.

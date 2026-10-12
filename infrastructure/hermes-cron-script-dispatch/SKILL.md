@@ -162,6 +162,56 @@ Quando perguntarem "o cron X enviou para @fulano?", seguir nesta ordem:
 4. Em jobs em MODO AGENTE, distinguir falha do script coletor de falha da entrega: o bloco "Script Error" no prompt indica que o `script` quebrou, mas o agente pode ter concluído por fallback (ex.: API REST direta) — o veredito está na mensagem final, não no bloco de erro.
 5. `last_delivery_error: null` significa sem falha registrada pelo scheduler nos canais de `deliver`; citar os destinos verificados e os links entregues.
 
+## Diagnosticar um cron que "falhou" — o veredito está no arquivo de output
+
+`cronjob_manage action=list` mostra `last_status`/`last_error` do **agendamento e da entrega**,
+não da coleta. Job que coletou errado mas redactou o relatório de falha aparece como `ok`.
+Nunca conclua "funcionou" (nem "quebrou") por esse campo.
+
+Ordem da evidência:
+1. `cron/output/<job_id>/<data>_<hh-mm-ss>.md` — transcript real. Leia `## Run Context` (o
+   diff/bloco do monitor = o que o script devolveu) e `## Response` (o que foi entregue).
+2. `## Mode: no_change (agent run suppressed)` = gate funcionou, nada foi entregue.
+   `## Mode: no_agent (script)` = quem decidiu foi o script, não o agente.
+3. O motivo vindo do coletor (`X_FALHA motivo=…` no bloco do monitor) é o dado, não o
+   comentário do agente — mesmo com `last_status: ok` no `list`.
+
+Distinga sempre **"o cron falhou"** de **"o cron reportou uma falha"**: num job com monitor a
+segunda é o comportamento correto, e é o que o principal pediu.
+
+## Script de cron que depende da rede: retry e credencial renovada em disco
+
+Um job que lê planilha/Gmail/API depende de (a) resolver nome e (b) token válido. Com token
+expirado, **cada disparo faz uma chamada de rede só para renovar** — exatamente a janela em
+que o DNS cai. Duas correções matam a classe da falha, não o episódio:
+
+- **Retry com backoff** no ponto de rede: 3 tentativas, 2s/5s/15s. Sem isso, uma queda de 30s
+  de DNS custa o dia inteiro de conferência.
+- **Gravar a credencial renovada em disco** após o refresh bem-sucedido. Sem isso o arquivo
+  fica expirado para sempre e a exposição vira uma chamada de rede por disparo, em vez de
+  uma por dia.
+
+Em cron não há ninguém para aprovar timeout nem retry: o script tem de se defender sozinho.
+
+Para provar que a falha é transitória e não de credencial: N resoluções seguidas + N refreshs
+seguidos. N/N ok com erro de resolução no meio **fecha o diagnóstico**. Use
+`scripts/probe-rede-token.sh`.
+
+Depois de uma coleta que falhou, **rode de novo com a janela alargada** (`SYMX_JANELA=4` para a
+Symplexis, cujo padrão é 2) e veja se aparece registro que ficou sem tratar. Sem essa rodada
+você só sabe que "deu erro" — não se algo se perdeu.
+
+## "O job irmão passou" NÃO é prova de que a rede está de pé
+
+Antes de culpar o script, confira se o job que passou depende do **mesmo** recurso. Job que
+autentica por certificado no banco e não toca Sheets passa mesmo com o Google fora do ar —
+foi assim que o iData (07:00 UTC) sobreviveu ao dia em que a conferência de parcelas (07:25,
+via `googleapiclient`) caiu. "A rede funciona porque o outro rodou" é inferência inválida.
+
+Resolvendo DNS: se `/etc/resolv.conf` aponta para `100.64.0.0/10`, é MagicDNS de malha
+(Tailscale) e pode falhar transitório. Num erro de resolução, o primeiro dado é **quem é o
+resolver** — e se vários jobs caíram no mesmo minuto, é o resolver, não cada script.
+
 ## Pitfalls
 - Nunca mapear destinatário por @handle ou nome de exibição — o Telegram permite nickname divergente e o erro vira falso "não entregue"; casar sempre pelo `telegram:<chat_id>` do campo `deliver`.
 - Nunca passar caminho absoluto no campo `script` — o scheduler recusa com erro claro.

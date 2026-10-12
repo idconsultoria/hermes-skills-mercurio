@@ -13,8 +13,14 @@ timestamp: 2026-06-21T05:11:49Z
 
 # Pi Agent (Local)
 
-> Pi Coder Agent v0.78.1 instalado como npm global LOCALMENTE no Hermes.
-> Nada de Docker, SSH hops, split filesystem ou quoting hell.
+> Pi Coder Agent **v0.73.1** (`@mariozechner/pi-coding-agent`) instalado como npm
+> global LOCALMENTE no Hermes. Nada de Docker, nada de SSH.
+>
+> ⚠️ **A 0.78.1 citada nesta skill não existe mais em lugar público** (registry vai
+> até 0.73.1) e o pacote está **deprecado** (sucessor: `@earendil-works/pi-coding-agent`).
+> **Lê `references/pi-neste-no.md` antes de seguir qualquer comando desta página:**
+> é onde estão o provider que de fato funciona, a flag `--name` que não existe, e
+> o motivo de nunca instalar dentro do proot.
 >
 > **Hierarquia:** agy (consultor externo) → Pi best (eng. sênior) → Pi cost (dev júnior)
 

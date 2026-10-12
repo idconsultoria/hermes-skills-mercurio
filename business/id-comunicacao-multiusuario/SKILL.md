@@ -72,6 +72,42 @@ timestamp: 2026-08-25
 2. Se o rótulo for ambíguo (grupo, thread compartilhada, apelido), **confirmar na fonte**
    via Telegram Bot API `getChat` (leitura não intrusiva — não consome updates). Receita
    em `references/telegram-identity-verification.md`.
+3. **Rótulo que não bate com ninguém da tabela** (nickname exibido ≠ nome do perfil — foi o
+   caso do Tácio aparecendo como outro apelido): resolver pelo log antes de responder:
+
+   ```bash
+   grep '<trecho da mensagem>' <HERMES_HOME>/logs/gateway.log | tail -3
+   # → inbound message: platform=telegram user=<nome exibido> chat=<ID> msg='...'
+   python3 -c "import json;d=json.load(open('<HERMES_HOME>/channel_directory.json'));print(d['platforms']['telegram'])"
+   ```
+
+   DM = `chat=` positivo de 9–10 dígitos; grupo = `chat=-1...`. Com o id, aplicar o registro
+   **daquela pessoa** — nunca o do rótulo, e nunca tratar sócio conhecido como pessoa nova.
+
+## Repassar mensagem para outro sócio (relay)
+
+Pedido do tipo "passe uma mensagem para o Gustavo mencionando X":
+
+1. Identificar o destinatário pelo **chat_id** da tabela acima (não pelo nome de memória).
+2. Escrever a mensagem no nível de detalhe **do destinatário** (técnico à vontade para o
+   Gustavo; resultado sem encanamento para os demais).
+3. Enviar com o helper do Hermes, que reusa as credenciais do gateway, aceita o id direto e
+   devolve o `message_id`:
+
+   ```bash
+   hermes send --to telegram:<chat_id-do-destinatario> --json "mensagem curta"
+   hermes send --to telegram:<chat_id-do-destinatario> --file /caminho/mensagem.txt  # longo/multilinha
+   ```
+
+   (Fallback sem o helper: Bot API `sendMessage` com `--data-urlencode "text@/caminho/mensagem.txt"`.)
+
+4. Conferir o retorno **antes** de dizer que foi entregue: `"success": true`, `message_id`
+   presente e `chat_id` igual ao do destinatário pretendido. Entrega ok no destinatário
+   errado continua sendo entrega errada.
+5. Escopo do relay: passar o recado pedido, no registro do destinatário. Pendência **do
+   próprio destinatário** diretamente ligada ao assunto cabe em uma linha final (é ele quem
+   age); o resto espera pedido explícito.
+6. Responder a quem pediu em 1–2 linhas, no registro dele: o que foi passado e que saiu.
 
 ## Pitfalls
 

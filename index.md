@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 114 skills** em 13 categorias.
+**Total: 118 skills** em 13 categorias.
 
 ---
 
@@ -34,6 +34,8 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `revisao-de-proposta-existente` | Orchestrator | Revisar proposta já entregue, preservando o resto. |
 | `roteiro-de-qualificacao` | Orchestrator | Montar roteiro de perguntas de qualificação: descoberta ou sabatina. |
 | `proposta-sergipetec-documento` | Orchestrator | Proposta do SergipeTec p/ órgão público (P,D&I) — documento A4, não deck ID. |
+| `agenda-id` | Reference | Use ao criar ou ajustar reunião na agenda da ID. |
+| `proposta-ente-publico` | Orchestrator | Use ao elaborar proposta/documento para órgão público. |
 | `organizacao-drive-id` | Orchestrator | Use ao organizar pastas e docs de cliente no Drive da ID. |
 
 ## legal — Direito brasileiro e contratos ID
@@ -153,6 +155,8 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `hermes-cron-script-dispatch` | Reference | Hermes cron scripts resilient to HERMES_HOME path changes. |
 | `moodle-id-operacoes` | Orchestrator | Operar o Moodle da ID: papéis, aulas estilizadas, fórum. |
 | `stack2-mesh-failback` | Orchestrator | Failover e failback da Stack 2 (mesh) sem loop e sem perda. |
+| `dns-dominios-id` | Reference | Use quando um nome/domínio da ID não resolve no DNS. |
+| `telegram-group-bot-diagnosis` | Reference | Use quando um bot do Telegram não responde em grupo. |
 
 ## cicd-oracle-preview — Deploy & preview
 
@@ -193,6 +197,13 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 Relações semânticas do catálogo. Formato `type` → `alvo` (similar = bidirecional; uses = A usa B).
 
 Similar:
+- `agenda-id` → `reunioes-diarizadas`
+- `agenda-id` → `meeting-action-items`
+- `proposta-ente-publico` → `proposta-sergipetec-documento`
+- `proposta-ente-publico` → `elaboracao-proposta-comercial`
+- `dns-dominios-id` → `devops-artemishub`
+- `telegram-group-bot-diagnosis` → `messaging-platforms`
+- `telegram-group-bot-diagnosis` → `id-comunicacao-multiusuario`
 - `facilitacao-grupo-agentes` → `reunioes-diarizadas`
 - `peer-session-audit` → `hermes-inference-config`
 - `roteiro-de-qualificacao` → `user-interview`
@@ -270,6 +281,13 @@ Similar:
 - `artemishub-onboarding-patterns` → `react-fastapi-debugging`
 
 Uses:
+- `agenda-id` → `google-workspace`
+- `auxiliar-adm-id` → `agenda-id`
+- `proposta-ente-publico` → `html-to-pdf-chromium`
+- `proposta-ente-publico` → `revisao-entrega-cliente`
+- `proposta-ente-publico` → `organizacao-drive-id`
+- `dns-dominios-id` → `stack2-mesh-failback`
+- `telegram-group-bot-diagnosis` → `peer-session-audit`
 - `process-augmentation-pipeline` → `deep-research`
 - `augmentation-process-design` → `deep-research`
 - `document-to-action-items` → `google-docs-formatting`

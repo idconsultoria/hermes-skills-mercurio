@@ -106,6 +106,12 @@ para o agente interpretar. Receita:
 - **Confiar no timestamp** para reconstruir a ordem da conversa: inviável no fechamento das sessões, onde o timestamp é constante.
 - **Tratar a ata como completa.** A ata sistematicamente omite metas numéricas, valores e acordos comerciais; e às vezes contradiz a transcrição ou a decisão de outra sessão (ex.: nome do supervisor de vendas). Divergência se reporta, não se resolve sozinha.
 - **Atribuir dono por proximidade.** Falante mal diarizado não é dono da ação; sem nome citado, o dono é "não atribuído".
+- **Nome que já mora na KB e o dono desconhece.** Quando um interlocutor citado na transcrição já
+  virou fato/página na KB e o dono declara que não conhece a pessoa, não basta concordar na
+  conversa: registre `kb_correct` (page que carrega o nome, severity alta, marcando-o como ruído de
+  transcrição e **preservando** o registro histórico da ata) e confirme na mesma resposta quem é o
+  interlocutor real. A KB é o que vaza para os próximos materiais — sem a correção o nome fantasma
+  volta na próxima peça do mesmo cliente.
 - **Deixar a dúvida de quem é quem se espalhar pelo artefato.** Quando a ambiguidade de nomes
   trava a atribuição de donos, faça **uma pergunta ao usuário, em bloco** (os nomes duvidosos +
   as divergências de dono/regra que você encontrou na fonte), em vez de marcar "a confirmar" item

@@ -8,7 +8,7 @@ platforms: [linux]
 metadata:
   hermes:
     tags: [proposta, sergipetec, parque-tecnologico, contratacao-publica, PD&I, parecer, HTML, PDF]
-    related_skills: [analise-contratual, html-to-pdf-chromium, elaboracao-proposta-comercial, auxiliar-adm-id]
+    related_skills: [proposta-ente-publico, analise-contratual, html-to-pdf-chromium, elaboracao-proposta-comercial, auxiliar-adm-id]
     scopes: [id]
 type: Orchestrator
 timestamp: 2026-09-29T23:30:00Z
@@ -27,6 +27,10 @@ documento precisa atender ao art. 72 da Lei nº 14.133/2021 antes de ser elegant
 - Proposta em que o contratado é o **SergipeTec** (OS sem fins lucrativos, art. 75, XV) e a ID/parceiros
   aparecem como empresas residentes que executam.
 - Resposta a **parecer técnico** de órgão público (devolução de proposta).
+
+**Não é esta skill** quando o **contratado é a ID** e a peça vai ao órgão como documento de
+soluções/proposta da casa: aí é `proposta-ente-publico` (A4 light mode, frentes de demanda, sem
+preço). Esta skill vale quando o proponente é o Parque e o que passa pelo crivo é o parecer jurídico.
 
 ## Identidade e pipeline
 

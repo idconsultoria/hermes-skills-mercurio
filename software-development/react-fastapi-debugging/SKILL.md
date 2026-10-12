@@ -20,8 +20,10 @@ metadata:
 ## When to Use
 
 Carregue quando, num app **React (frontend) + FastAPI (backend)** da ID, um recurso
-**"sempre cai no modo genérico/fallback"** (ex.: IA mostra um mock, um form não autopreenche)
-ou um bug de UI reaparece ("modal piscando", "rodapé vira tarja", "análise vaza entre telas").
+**"sempre cai no modo genérico/fallback"** (ex.: IA mostra um mock, um form não autopreenche),
+um bug de UI reaparece ("modal piscando", "rodapé vira tarja", "análise vaza entre telas"), ou
+quando **o usuário diz que a mudança publicada não apareceu** / que o app está sem dados
+(triagem DNS → proxy → asset → cache, itens 10 e 11).
 Estes padrões **não são exclusivos do ArtemisHub** — reaparecem em qualquer serviço
 FastAPI+React com middleware de auth e animações de layout. Cada item abaixo é um padrão
 de classe com a causa raiz e a correção testada.
@@ -87,6 +89,13 @@ navegação; rodapé/créditos **rolam com o conteúdo** (fim de cada página). 
 não sobrepor o conteúdo (ex.: chat) = **token global de padding** (`.pb-pillnav`) em vez de
 hardcode espalhado.
 
+**Segunda face do mesmo bug (faixa *transparente*):** esse token de padding cria uma faixa que
+a página **não pinta** — ela mostra o fundo do shell. Se o shell tem cor sólida (`bg-surface`) e
+as páginas pintam mesh com `background-attachment: fixed`, aparece uma **barra clara** embaixo
+da pill. Correção: o shell pinta o **mesmo mesh** (`.bg-mesh-shell`, sem `fixed`). Regra geral:
+diante de "faixa que não acompanha o conteúdo", procurar `background-attachment: fixed` — é a
+mesma família que já apareceu atrás do header, no root e no token de padding.
+
 ### 7. Análise/estado "vaza" do registro anterior ao trocar de rota `:id`
 **Sintoma:** navega entre itens (ex.: editais) e dados (análise, chat, favorito) do item
 anterior permanecem.
@@ -115,6 +124,38 @@ bundle e casar os `path:`/`Route` ali (a tabela de rotas vive no bundle, não no
 navegar, **aguardar o chunk** antes de ler a tela. Rota pública de cadastro de empresa do
 ArtemisHub = `/cadastro-empresa` (sem login) — ver `references/public-onboarding-rate-limit.md`.
 
+### 10. "Suas mudanças não aparecem no app" ou "o banco parece vazio" depois de um deploy
+**Sintoma:** o usuário abre a URL conhecida e vê o build antigo (sem a mudança) e/ou a tela
+sem dados; conclui que a base se perdeu.
+**Causa:** quase nunca é cache nem banco. Investigar nesta ordem e **parar no primeiro
+achado**:
+1. **DNS público do nome** — `https://dns.google/resolve?name=<dominio>&type=A` (`Status:3` =
+   NXDOMAIN) e enumeração da zona (`https://api.hackertarget.com/hostsearch/?q=<zona>`).
+   Domínio sem registro = ninguém chega no servidor; o que o usuário vê vem do cache do
+   navegador (shell antigo, API falhando) — e é isso que parece "banco perdido".
+2. **Log de acesso do proxy reverso** (NPM: `/data/logs/proxy-host-<id>_access.log`) — se não
+   houver tráfego real (só curls seus e varreduras de bot), o usuário não está chegando no host.
+3. **Hash do asset servido pelo domínio** vs o do container que você deployou
+   (`docker exec <frontend> ls /usr/share/nginx/html/assets/`).
+4. **Contagem por tabela** (`psql -tAc "select count(*) from ..."`) para atestar a integridade
+   do banco — atestado com número, nunca "deve estar tudo lá".
+
+### 11. Build antigo (ou app em branco) depois de publicar
+**Causa:** o HTML cacheado aponta para assets com hash que **já não existem** no servidor — o
+build novo troca os nomes dos arquivos.
+**Correção (fazer parte da publicação):** bump da versão do cache do service worker
+(`CACHE = 'app-vN'` em `public/sw.js`; o `activate` apaga os caches antigos) + `location =
+/index.html` com `Cache-Control "no-cache, must-revalidate"` no nginx. No cliente, pedir
+reload forçado (PWA: fechar/reabrir ou limpar dados do site uma vez).
+
+### 12. Reduzir a escala da interface inteira (pedido de design, "-1,5x")
+`html { zoom: var(--ui-scale) }` é o **único** caminho que encolhe tudo — inclusive px
+absolutos em classes arbitrárias (`text-[44px]`, `w-[22px]`). `transform: scale()` não reflui
+(quebra scroll, `fixed` e blur) e mexer só em tokens `rem` deixa os px fora de escala.
+Contrapartida obrigatória: o `zoom` também escala as medidas de viewport — shell/botão de tela
+cheia precisa de `calc(100vh / var(--ui-scale))`. Bloco CSS pronto, semântica medida e como
+provar o resultado visual: `references/ui-scale-and-visual-qa.md`.
+
 ## Fluxo de diagnóstico recomendado
 1. **Confira os logs do backend** (401 vs 500 vs timeout) antes de tudo — separa bug de
    auth/header de bug de config.
@@ -128,8 +169,19 @@ ArtemisHub = `/cadastro-empresa` (sem login) — ver `references/public-onboardi
 - `curl` real contra o endpoint autenticado retorna 200 e dados reais (não fallback).
 - Log do backend sem 401/500 inesperado após a correção.
 - `tsc` / build do frontend limpo após edições de portal/reset.
+- Antes de dizer a alguém que "a mudança está no ar": conferir DNS do domínio, tráfego real no
+  log do proxy e o hash do asset servido (itens 10/11) — cache do cliente tem cara de bug de
+  deploy.
+- Para ver a tela autenticada ou chamar a API sem senha: sessão efêmera na tabela de sessões do
+  app (token opaco), TTL curto, **apagada no fim** — receita em
+  `references/ui-scale-and-visual-qa.md`. Nunca digitar senha em formulário: usar as
+  ferramentas de vault quando a senha for inevitável.
 
 ## Referência
+- `references/ui-scale-and-visual-qa.md` — escala global com `zoom` (semântica de viewport no
+  Chrome, bloco CSS, o que não fazer), como provar mudança visual com o CSS do build real
+  (HTML injetado por `document.write` + medição por `elementFromPoint`/PIL + `vision_analyze`) e
+  como abrir a superfície autenticada sem senha.
 - `references/artemis-2026-08-24.md` — caso real que originou estes padrões (diagnóstico
   do ArtemisHub: auth IA, tarja de rodapé, modal portal, autofill CNPJ).
 - `references/public-onboarding-rate-limit.md` — recurso público sem login

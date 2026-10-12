@@ -347,6 +347,21 @@ Padrão consolidado (jul/ago/set 2026). Ao receber o PDF da NFS-e da parcela:
   - `cobranca-sm-parcela3.sh` — orquestrador do cron: verifica → só envia se `NAO_PAGO`; com
     `ERRO` **não cobra** (evita cobrança dupla por falha de leitura). `COBRANCA_SM_DRYRUN=1`
     força modo teste. Devolve uma linha `RESULTADO:` para o agente do cron relatar.
+  - `cobrar_sm_parcela3_2aviso.py` (08/10/2026) — molde de **2º aviso**: mesma trava
+    (`sm_verificar_pagamento.py` = `NAO_PAGO` **antes**), roda `--dry-run` primeiro, corpo
+    citando NF + 1º lembrete + dias de atraso reais (calculados, nunca escritos à mão).
+- **Thread da NFS-e: `References` NÃO basta — o `send` precisa de `threadId`.** O lembrete de
+  28/09/2026 usou `In-Reply-To`/`References` corretos, mas mudou o assunto
+  (`… — parcela 3/6 em atraso`) e o Gmail criou **thread nova**: a cobrança ficou fora da
+  conversa da NF, exatamente onde o cliente olha. Para cair na thread: (1) assunto = `Re: ` +
+  assunto **original, sem sufixo**; (2) `users().messages().send(body={"raw": raw,
+  "threadId": <id da thread da NF>})`; (3) conferir depois com `threads().get` que a thread
+  ganhou +1 mensagem e que o `threadId` do enviado é o mesmo (o NF-e 3/6 da SM é
+  `1a0d578e7af161bf`).
+- **Destinatários: herdar os da mensagem da NF**, não inventar. Na NF da SM o `To` é
+  `financeiro@solutionmaster.com.br` e o `Cc` é `matheus@solutionmaster.com.br` (o "Matheus"
+  do corpo) — o `Cc` só aparece se você ler o header da **primeira** mensagem da thread.
+  Escalar para `junior@`/`elenaldo@` é decisão do Gustavo, não do agente.
   - Regra de ouro: **nunca** disparar cobrança de cliente sem a trava do extrato. Se a consulta
     ao banco falhar, reportar ao Gustavo e deixar a decisão com ele.
 - **Ao localizar a thread de uma NFS-e**: `messages.get` com `format="metadata"` +
