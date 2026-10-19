@@ -32,7 +32,7 @@ Entrega principal: **HTML modelo editável** que segue o design system v5 e cons
 - **WCAG**: charcoal sobre cream ≈11:1 (AAA). Nunca usar teal puro como cor de texto corrido — use teal-deep.
 
 ## Assets oficiais
-Todos em `assets/logos/` (copiados de `/opt/mercurio-data/deliverables/biotechse-assets/logos/`):
+Todos em `assets/logos/` (copiados de `/data/data/com.termux/files/home/capitolium/deliverables/biotechse-assets/logos/`):
 - `biotechse-logo-positivo.svg` — fundo claro (padrão para propostas, que são documento claro)
 - `biotechse-logo-negativo.svg` — fundo escuro
 - `biotechse-logo-principal.svg` — equivalente ao PNG enviado
@@ -61,9 +61,9 @@ Seguir `references/guia-principios.md` (12 princípios): storytelling problema�
 
 ### Passo 2 — Editar o HTML como agente
 ```bash
-mkdir -p /opt/data/work/proposta_<cliente>
+mkdir -p /data/data/com.termux/files/home/capitolium/work/proposta_<cliente>
 cp skills/business/proposta-biotechse/templates/biotechse-proposta-modelo.html \
-   /opt/data/work/proposta_<cliente>/Proposta_<cliente>_BiotechSe.html
+   /data/data/com.termux/files/home/capitolium/work/proposta_<cliente>/Proposta_<cliente>_BiotechSe.html
 ```
 - O template é **referência de marca/estrutura**, não retrato final — edite como agente, adapte narrativa, troque blocos conforme o cliente.
 - Substitua `{{...}}` (mapa em `references/placeholders.md`).
@@ -73,8 +73,8 @@ cp skills/business/proposta-biotechse/templates/biotechse-proposta-modelo.html \
 ### Passo 3 — PDF (opcional)
 ```bash
 node skills/business/elaboracao-proposta-comercial/scripts/render_pdf.mjs \
-  /opt/data/work/proposta_<cliente>/Proposta_<cliente>_BiotechSe.html \
-  /opt/data/work/proposta_<cliente>/Proposta_<cliente>_BiotechSe.pdf
+  /data/data/com.termux/files/home/capitolium/work/proposta_<cliente>/Proposta_<cliente>_BiotechSe.html \
+  /data/data/com.termux/files/home/capitolium/work/proposta_<cliente>/Proposta_<cliente>_BiotechSe.pdf
 ```
 Usar `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright` (ver skill original).
 
@@ -105,6 +105,6 @@ Copiar contrato-modelo para subpasta Minutas (ver `elaboracao-proposta-comercial
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e decks): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

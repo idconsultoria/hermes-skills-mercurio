@@ -24,7 +24,7 @@ Pitfalls embutidos:
 - `--replay` precisa ser filtrado antes do path posicional (senão vira argv[1]).
 
 Exemplo de invocação do host Oracle (PowerShell):
-    ssh ubuntu@<host> "docker exec hermes_agent python3 /opt/data/scripts/pi_follow.py --replay"
+    ssh ubuntu@<host> "docker exec hermes_agent python3 /data/data/com.termux/files/home/capitolium/scripts/pi_follow.py --replay"
 """
 import json
 import os

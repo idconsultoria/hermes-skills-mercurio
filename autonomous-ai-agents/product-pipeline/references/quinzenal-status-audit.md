@@ -13,7 +13,7 @@
 ## 2. Extração de Google Docs (`docs get` retorna JSON)
 
 ```bash
-GAPI="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/google_api.py"
+GAPI="/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/google_api.py"
 $GAPI docs get <DOC_ID> > /opt/data/<projeto>/doc.json
 # retorna {"title": ..., "documentId": ..., "body": "..."}
 python3 - <<'EOF'

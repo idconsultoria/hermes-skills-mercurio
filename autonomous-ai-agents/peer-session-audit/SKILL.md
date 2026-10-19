@@ -42,7 +42,7 @@ acontece com o dono e no perfil dono, ou via `hermes curator adopt <skill>`.
 isolada. Entao audite direto o SQLite do perfil e tire **varias fotografias** do mesmo intervalo:
 
 ```bash
-sqlite3 /opt/mercurio-data/profiles/<perfil>/state.db "
+sqlite3 /data/data/com.termux/files/home/capitolium/profiles/<perfil>/state.db "
 SELECT id, source, chat_type, display_name,
        datetime(started_at,'unixepoch'), datetime(COALESCE(ended_at,0),'unixepoch'),
        end_reason, message_count, tool_call_count

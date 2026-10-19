@@ -8,7 +8,7 @@
 
 | Agente | Fonte | Formato | Localização |
 |--------|-------|---------|-------------|
-| **Hermes** | state.db (SQLite) | `sessions` table | `/opt/data/state.db` |
+| **Hermes** | state.db (SQLite) | `sessions` table | `/data/data/com.termux/files/home/capitolium/state.db` |
 | **Pi Agent** | Session .jsonl files | `message.usage` objects | `/home/pi/.pi/agent/sessions/{workspace}/*.jsonl` |
 | **Antigravity** | Plano Google One | Free tier | — |
 | **MiniMax M3** | OpenRouter free | Free tier | — |

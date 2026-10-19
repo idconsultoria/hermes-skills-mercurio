@@ -91,4 +91,4 @@ Every agricultural SaaS in Brazil offers:
 - Aegro demo page: conhecimento.aegro.com.br/contato-demonstracao-aegro (HubSpot landing page, worked)
 - AGRO365 features: agro365.app/software/ (full feature list, very detailed)
 - Embrapa AGRO365 project: embrapa.br/busca-de-projetos/-/projeto/220327 (government source, worked)
-- Output report: /opt/data/relatorio-concorrentes-vero.md (the full competitor analysis from this session)
+- Output report: /data/data/com.termux/files/home/capitolium/relatorio-concorrentes-vero.md (the full competitor analysis from this session)

@@ -61,7 +61,7 @@
 
 Via `gws`/`google_api.py` (skill google-workspace):
 ```bash
-GAPI="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/google_api.py"
+GAPI="/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/google_api.py"
 $GAPI drive get <FILE_ID>
 $GAPI docs get <DOC_ID>
 ```

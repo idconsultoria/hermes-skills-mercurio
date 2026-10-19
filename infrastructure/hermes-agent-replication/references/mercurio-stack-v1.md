@@ -13,7 +13,7 @@ Fonte: recon do ambiente vivo durante a replicação v1. Use como BOM para cópi
 - Oracle Cloud ARM64 (kernel 6.17), Ubuntu.
 - Python 3.13.5, Node v26.5.1, npm 11.17.0.
 - Hermes em `/opt/hermes` (binário `/opt/hermes/bin/hermes`); state em `/opt/data`.
-- tirith: `/opt/data/bin/tirith`.
+- tirith: `/data/data/com.termux/files/home/capitolium/bin/tirith`.
 
 ## Modelo / provider
 - default `deepseek-v4-flash` via `opencode-go`. Fallbacks (ordem):
@@ -52,14 +52,14 @@ html-to-pdf-chromium · xlsx · docx.
   Ferramentas kb_search/kb_read/kb_status/kb_map, filtro `scope:id` no load, consumo passivo.
 
 ## Venvs / scripts
-- `/opt/data/venvs/google` — Google (google-api-python-client 2.198.0, google-auth 2.56.3,
+- `/data/data/com.termux/files/home/capitolium/venvs/google` — Google (google-api-python-client 2.198.0, google-auth 2.56.3,
   google-auth-oauthlib 1.4.0, httplib2, protobuf, requests, cryptography, Pillow).
-- `/opt/data/scripts/` — hermes-tts-mercurio.py (TTS), buscar_aliquota_iss.sh/.py (ISS),
+- `/data/data/com.termux/files/home/capitolium/scripts/` — hermes-tts-mercurio.py (TTS), buscar_aliquota_iss.sh/.py (ISS),
   check_inter_api.py, inter_api_detail.py, runner/watchdog-idata-diario.sh (Banco Inter→planilha),
   whatsapp-bridge/ (Baileys, node).
 
 ## Motor NFS-e
-- `/opt/data/id-nfse-motor` — Aracaju (2800308) = protocolo NFS-e NACIONAL → DPS via nfelib.
+- `/data/data/com.termux/files/home/capitolium/id-nfse-motor` — Aracaju (2800308) = protocolo NFS-e NACIONAL → DPS via nfelib.
 - Multi-stage Docker (ARM64), runtime não-root `idmotor`, TPAMB=2. Imagem: `id-nfse-motor`.
 - requirements: nfelib==2.5.2, pynfse-nacional==0.9.5, erpbrasil.edoc==3.1.1,
   erpbrasil.transmissao==1.1.0, erpbrasil.assinatura==1.8.0, erpbrasil.base==2.4.2,

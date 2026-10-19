@@ -13,7 +13,7 @@ When F2 research produces .md files (interviews, reports), mirror them as Google
 ## Example
 
 ```bash
-GAPI="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/google_api.py"
+GAPI="/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/google_api.py"
 
 # Step 1: Create doc
 result=$($GAPI docs create --title "Interview — Profile A" --body "First 3500 chars...")
@@ -26,7 +26,7 @@ tail -c +3501 input.md | head -c 15000 | xargs -0 $GAPI docs append "$doc_id" --
 python3 -c "
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-creds = Credentials.from_authorized_user_file('/opt/data/google_token.json')
+creds = Credentials.from_authorized_user_file('/data/data/com.termux/files/home/capitolium/google_token.json')
 service = build('drive', 'v3', credentials=creds)
 service.files().update(fileId='$doc_id', addParents='FOLDER_ID', removeParents='root').execute()
 "
@@ -37,5 +37,5 @@ service.files().update(fileId='$doc_id', addParents='FOLDER_ID', removeParents='
 - `docs create` does NOT support `--parent` flag — movedocs must happen as a separate step
 - The `google_api.py` CLI doesn't have a `drive update` command — use Python Drive API directly for folder moves
 - Body is truncated at ~3500 chars — always append remaining content
-- Token path: `/opt/data/google_token.json` (Hermes-specific)
-- Venv: `/opt/data/venvs/google/bin/python3` (has googleapiclient installed)
+- Token path: `/data/data/com.termux/files/home/capitolium/google_token.json` (Hermes-specific)
+- Venv: `/data/data/com.termux/files/home/capitolium/venvs/google/bin/python3` (has googleapiclient installed)

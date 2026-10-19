@@ -108,6 +108,6 @@ Ver `references/ciclo-consolidacao-fork-pitfalls.md` para a tabela de triagem de
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

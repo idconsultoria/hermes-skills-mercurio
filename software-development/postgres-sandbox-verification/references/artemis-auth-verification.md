@@ -4,7 +4,7 @@ Reprodução real (2026-08-20, Oracle host ARM64, ambiente sem docker-daemon e s
 Prova de conceito do fluxo do skill `postgres-sandbox-verification`.
 
 ## Stack do projeto
-- Repo `artemishub` (`/opt/data/artemishub`): frontend React/Vite + backend **FastAPI**
+- Repo `artemishub` (`/data/data/com.termux/files/home/capitolium/artemishub`): frontend React/Vite + backend **FastAPI**
   (`backend/main.py`) + **PostgreSQL 17** (restaurado de `db/artemishub.dump`).
 - Auth NÃO usa schema `auth` do Supabase: as tabelas vivem no **schema `public`**
   (`public.usuarios`, `public.sessoes`, `public.perfil_usuarios`) — dump do Supabase.
@@ -46,6 +46,6 @@ com `permissoes` jsonb `{"modulos":{"usuarios":"gerir",...}}`.
   de affordance com "apagar"; não há exclusão real.
 
 ## Diretórios de entrega
-- Relatório: `/opt/data/entregas/artemis-usuarios-verificacao-v1.html` (identidade ID).
-- `/opt/data/deliverables` é root-owned e **sem permissão de escrita** do worker — usar
-  `/opt/data/entregas` para versões nomeadas de entregas.
+- Relatório: `/data/data/com.termux/files/home/capitolium/entregas/artemis-usuarios-verificacao-v1.html` (identidade ID).
+- `/data/data/com.termux/files/home/capitolium/deliverables` é root-owned e **sem permissão de escrita** do worker — usar
+  `/data/data/com.termux/files/home/capitolium/entregas` para versões nomeadas de entregas.

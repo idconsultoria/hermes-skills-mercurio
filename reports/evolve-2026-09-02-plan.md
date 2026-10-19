@@ -40,4 +40,4 @@ Nenhum par candidato a merge (workflows distintos, artefatos diferentes).
 
 ## Riscos
 - Mass deletion guard → usar shutil python incremental
-- generate_catalog_graph.py path hardcoded /opt/data → patch para /opt/mercurio-data
+- generate_catalog_graph.py path hardcoded /opt/data → patch para /data/data/com.termux/files/home/capitolium

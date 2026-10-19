@@ -10,16 +10,16 @@ Banco Inter. Consolidado em 24/08/2026 ao diagnosticar a falha do dia.
 - **Semântica de entrega (watchdog):**
   - Sucesso (exit 0 + stdout vazio) → **silêncio total** (não incomoda o principal).
   - Falha (exit ≠ 0) → entrega só o erro (`tail -n 25` da execução) + aponta o log.
-- **Cadeia de scripts** (em `/opt/data/scripts/`):
+- **Cadeia de scripts** (em `/data/data/com.termux/files/home/capitolium/scripts/`):
   1. `watchdog-idata-diario.sh` — decide mudo vs. grito; reaproveita o runner.
   2. `runner-idata-diario.sh` — autentica no Inter primeiro (exit 2 se cert falhar),
      depois chama o entrypoint. Processa **sempre "ontem"** (`date -d yesterday`).
-  3. `entrypoint_ingestão_inter.py` no repo `/opt/data/work/idata`.
+  3. `entrypoint_ingestão_inter.py` no repo `/data/data/com.termux/files/home/capitolium/work/idata`.
 
 ## Onde estão os logs (diagnóstico)
 
 - **Cron:** `~/cron/output/e60e713b0b62/<YYYY-MM-DD_HH-MM-SS>.md`
-- **Runner:** `/opt/data/work/idata/logs/idata_<stamp>.log`
+- **Runner:** `/data/data/com.termux/files/home/capitolium/work/idata/logs/idata_<stamp>.log`
 - Sequência de diagnóstico: ler o `.md` do dia (mostra exit code + tail), depois o log
   apontado ali para o traceback real.
 
@@ -49,5 +49,5 @@ Cenários validados: 2×503 + sucesso → sucesso na 3ª; 503 persistente → es
   runner manualmente para recuperar fora do horário.
 - Se um **503 persistente** reaparecer (mesmo com retry), não é backoff que resolve — é a
   API do Google fora do ar; reportar como incidente externo.
-- Repo `/opt/data/work/idata` é git local; commits de correção não sobem automaticamente ao
+- Repo `/data/data/com.termux/files/home/capitolium/work/idata` é git local; commits de correção não sobem automaticamente ao
   remote e **precisam de push explícito** (confirmar com o principal — não é rotina).

@@ -32,7 +32,7 @@ from datetime import datetime, timezone
 day_start = int(datetime(2026, 6, 15, tzinfo=timezone.utc).timestamp())
 day_end   = int(datetime(2026, 6, 15, 23, 59, 59, tzinfo=timezone.utc).timestamp())
 
-conn = sqlite3.connect('/opt/data/state.db')
+conn = sqlite3.connect('/data/data/com.termux/files/home/capitolium/state.db')
 rows = conn.execute('''
   SELECT id, source, model,
          input_tokens, output_tokens,
@@ -171,7 +171,7 @@ GROUP BY m.role;
 import sqlite3
 from datetime import datetime, timezone
 
-conn = sqlite3.connect('/opt/data/state.db')
+conn = sqlite3.connect('/data/data/com.termux/files/home/capitolium/state.db')
 
 day_start = int(datetime(2026, 6, 15, tzinfo=timezone.utc).timestamp())
 day_end   = int(datetime(2026, 6, 15, 23, 59, 59, tzinfo=timezone.utc).timestamp())

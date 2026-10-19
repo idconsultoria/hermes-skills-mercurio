@@ -31,7 +31,7 @@ num sandbox PG17 e consultar `public.usuarios`:
 source pgenv.txt   # PGBIN, LD_LIBRARY_PATH, PGDATA=data, PGHOST=sock, PGUSER=app, PGPORT=55432
 "$PGBIN/createdb" -h 127.0.0.1 -p 55432 -U app artemishub
 "$PGBIN/pg_restore" --no-owner --role=app -h 127.0.0.1 -p 55432 -U app \
-  -d artemishub /opt/data/artemishub/db/artemishub.dump
+  -d artemishub /data/data/com.termux/files/home/capitolium/artemishub/db/artemishub.dump
 "$PGBIN/psql" -h 127.0.0.1 -p 55432 -U app -d artemishub \
   -c "SELECT email,nome,papel,ativo FROM public.usuarios ORDER BY criado_em;"
 ```

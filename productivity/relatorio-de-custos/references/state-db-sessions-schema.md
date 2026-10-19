@@ -1,6 +1,6 @@
 # state.db — Tabela `sessions` (Schema Descoberto via PRAGMA)
 
-Fonte: `/opt/data/state.db` (canonical Hermes session store, SQLite + FTS5)
+Fonte: `/data/data/com.termux/files/home/capitolium/state.db` (canonical Hermes session store, SQLite + FTS5)
 
 ## Colunas da Tabela `sessions`
 

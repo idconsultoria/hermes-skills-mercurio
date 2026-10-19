@@ -2,9 +2,9 @@
 
 Resultado de deep-research (14/08/2026, 3 agents paralelos, 40+ fontes: HBR, VeraSage/Ron Baker, RAIN Group, Win Without Pitching, Consulting Success, Slideworks, Qwilr, Proposify, Paperbell). Artefatos em disco:
 
-- Guia completo: `/opt/data/Guia_Principios_Propostas_Comerciais.md`
-- Template HTML com marca ID: `/opt/data/Modelo_Proposta_Comercial_ID.html` (15 slides, 87 placeholders `{{NOME}}`, fontes/logo/fundos embutidos)
-- Dados brutos da pesquisa: `/opt/data/propostas_consultoria_pesquisa.json`, `/opt/data/relatorio_precificacao_consultoria.json`
+- Guia completo: `/data/data/com.termux/files/home/capitolium/Guia_Principios_Propostas_Comerciais.md`
+- Template HTML com marca ID: `/data/data/com.termux/files/home/capitolium/Modelo_Proposta_Comercial_ID.html` (15 slides, 87 placeholders `{{NOME}}`, fontes/logo/fundos embutidos)
+- Dados brutos da pesquisa: `/data/data/com.termux/files/home/capitolium/propostas_consultoria_pesquisa.json`, `/data/data/com.termux/files/home/capitolium/relatorio_precificacao_consultoria.json`
 
 ## Os 12 princípios (resumo)
 
@@ -25,4 +25,4 @@ Resultado de deep-research (14/08/2026, 3 agents paralelos, 40+ fontes: HBR, Ver
 
 - 15 slides: Capa (bloco central: logo cliente + divisor + logo ID; título 96; subtítulo 36; meta 4 colunas) → Resumo Executivo (com preço) → Desafio (com "Custo de não agir") → Escopo → Prova → Metodologia → ROI → **Transição teal** (fundo dos slides de transição do deck, título 96) → Investimento (3 tiers GBB + racional + chip de desconto) → Garantia → Condições → Responsabilidades → Sobre a ID → Próximos passos (assinatura) → Final (logo + validade teal `#1AAEBD` + disclaimer).
 - Slides padrão: símbolo/mark da ID no canto superior esquerdo, título 60 + subtítulo 24, ícones Lucide-style teal nos títulos de coluna, bullets brancos.
-- Logo ID vetorial extraído do deck em `/opt/data/work/minuzzo/logo_id.svg`; mark (sem tagline) em `logo_id_mark.svg`.
+- Logo ID vetorial extraído do deck em `/data/data/com.termux/files/home/capitolium/work/minuzzo/logo_id.svg`; mark (sem tagline) em `logo_id_mark.svg`.

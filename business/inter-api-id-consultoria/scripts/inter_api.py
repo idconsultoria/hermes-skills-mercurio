@@ -5,8 +5,8 @@ inter_api.py — Consultas e relatórios da conta PJ do Banco Inter da ID Consul
 Instru: python inter_api.py <saldo|extrato|relatorio> [--inicio YYYY-MM-DD] [--fim YYYY-MM-DD]
         [--resumo] [--o saida.html] [--repo /caminho/idata]
 
-Atalho padrão (venv + repo clonados em /opt/data/work/idata):
-    PY=/opt/data/work/idata/.venv/bin/python
+Atalho padrão (venv + repo clonados em /data/data/com.termux/files/home/capitolium/work/idata):
+    PY=/data/data/com.termux/files/home/capitolium/work/idata/.venv/bin/python
     $PY inter_api.py saldo
     $PY inter_api.py extrato --inicio 2026-06-01 --fim 2026-06-30 --resumo
     $PY inter_api.py relatorio --inicio 2026-06-01 --fim 2026-06-30 --o rel_v1.html
@@ -17,12 +17,12 @@ import argparse, os, sys, json, datetime
 from pathlib import Path
 
 # Ambiente: repo e interpretador do motor podem ser sobrescritos por env var.
-REPO = Path(os.environ.get("IDATA_REPO", "/opt/data/work/idata"))
-PCA = Path(os.environ.get("IDATA_PY", "/opt/data/work/idata/.venv/bin/python"))
+REPO = Path(os.environ.get("IDATA_REPO", "/data/data/com.termux/files/home/capitolium/work/idata"))
+PCA = Path(os.environ.get("IDATA_PY", "/data/data/com.termux/files/home/capitolium/work/idata/.venv/bin/python"))
 
 def load_motor():
     """Importa as funções já validadas do repo idconsultoria/iData."""
-    repo = Path(os.environ.get("IDATA_REPO", "/opt/data/work/idata"))
+    repo = Path(os.environ.get("IDATA_REPO", "/data/data/com.termux/files/home/capitolium/work/idata"))
     sys.path.insert(0, str(repo))
     try:
         from etl.extratores.api_inter import obter_token, obter_saldo, obter_extrato
@@ -148,7 +148,7 @@ def main():
     ap.add_argument("--inicio")
     ap.add_argument("--fim")
     ap.add_argument("--resumo", action="store_true")
-    ap.add_argument("--o", default="/opt/data/work/id-inter-relatorio_v1.html")
+    ap.add_argument("--o", default="/data/data/com.termux/files/home/capitolium/work/id-inter-relatorio_v1.html")
     ap.add_argument("--repo", default=str(REPO))
     args = ap.parse_args()
     if args.repo:

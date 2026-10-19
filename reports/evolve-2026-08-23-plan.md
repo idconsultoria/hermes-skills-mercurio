@@ -2,7 +2,7 @@
 
 ## Contexto (diagnóstico pré-execução)
 - Fork `idconsultoria/hermes-skills-mercurio`, master em `46a214d` (prune 122→41, PII removida, index regenerado em tabela compacta — **sem** blocos `###`, sem `Tamanho`, sem `**Relações:**`).
-- **Git rastreia 41 skills; disco tem 140.** O ambiente re-populou `/opt/data/skills` com o conjunto completo (~99 dirs untracked, maior que qualquer estado pré-prune → overflow do canônico ressemeado).
+- **Git rastreia 41 skills; disco tem 140.** O ambiente re-populou `/data/data/com.termux/files/home/capitolium/skills` com o conjunto completo (~99 dirs untracked, maior que qualquer estado pré-prune → overflow do canônico ressemeado).
 - WIP legítimo trackado: `.gitignore` (+ignore `*.pem/*.key/*_deploy_key` — segredos) e `productivity/html-to-pdf-chromium/SKILL.md` (workaround SIGTRAP ARM64 validado em produção 08/2026).
 - `skills_graph_template.html`/`graph_data.json`/`skills_graph.html` ausentes do disco e não trackados (prune removeu infra de grafo da raiz). Template D3 completo existe em `software-development/skills-repo-curator/templates/graph.html` (placeholder `__DATA_PLACEHOLDER__`).
 - `generate_graph.py` padrão varre o DISCO (140 nós) — não serve para o catálogo-41.

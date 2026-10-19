@@ -1,7 +1,7 @@
 # Render e verificação destes HTML (painel e slide)
 
 Vale para os artefatos da ID gerados como HTML: painel de metas, slide da Phronesis, decks em
-geral. Pipeline usado: **WeasyPrint** (via `PYTHONPATH=/opt/mercurio-data/work/pylibs python3`)
+geral. Pipeline usado: **WeasyPrint** (via `PYTHONPATH=/data/data/com.termux/files/home/capitolium/work/pylibs python3`)
 e **pymupdf** para rasterizar e conferir com visão.
 
 ## Regra de verificação

@@ -2,7 +2,7 @@
 """Generate skills_graph.html from all SKILL.md files in the skills repo.
 
 Usage:
-  cd /opt/data/skills
+  cd /data/data/com.termux/files/home/capitolium/skills
   python3 scripts/generate_graph.py          # writes skills_graph.html
   python3 scripts/generate_graph.py --json   # writes graph_data.json only
 """
@@ -40,7 +40,7 @@ def parse_index_relations():
     # If index.md has no relations, fall back to LLM-inferred JSON
     total = sum(len(v) for v in relations.values())
     if total == 0:
-        llm_path = '/opt/data/skills_relations_merged.json'
+        llm_path = '/data/data/com.termux/files/home/capitolium/skills_relations_merged.json'
         if os.path.exists(llm_path):
             print("index.md has no relations — using LLM-inferred JSON fallback")
             with open(llm_path) as f:

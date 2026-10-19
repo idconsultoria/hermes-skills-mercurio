@@ -212,7 +212,7 @@ Quando web_search retorna lixo (resultados off-topic) e você já conhece os ve�
 - **Startupi** (`startupi.com.br/?s=<termo>`) — rodadas e investimento em startups BR.
 - **Não funciona (não perca tempo):** Globo Rural (busca é JS — extract volta vazio), InfoMoney (JS), Exame (`/busca/` → 404), Forbes BR (antibot). WordPress busca por palavra-chave — use `?s=superbac` e `?s=simbiose` separados, não `?s=superbac+receita` (multi-termo pode retornar vazio).
 
-Fluxo validado: (1) web_extract na lista de resultados do `?s=`; (2) web_extract nos 2–4 artigos principais (máx. 5 URLs por call); (3) artigo truncado no meio → ler o arquivo cache completo (`Full text saved to: /opt/data/cache/web/<dominio>-<hash>.md`) com read_file offset/limit — é onde ficam os números-chave (ex.: receita da Biotrop 2021 estava no meio do artigo da NeoFeed); (4) **conflito entre artigos** (ex.: Biotrop 2023 = R$ 618 mi em 03/2024 vs R$ 550 mi em retrospectiva de 07/2025 vs R$ 650 mi dito pelo CEO em 11/2023) → preferir a afirmação contemporânea ao fato e reportar o conflito explicitamente no relatório; (5) números com declaração de CEO/fundador = confiança MÉDIA (não auditado), números de balanço/veículo = ALTA.
+Fluxo validado: (1) web_extract na lista de resultados do `?s=`; (2) web_extract nos 2–4 artigos principais (máx. 5 URLs por call); (3) artigo truncado no meio → ler o arquivo cache completo (`Full text saved to: /data/data/com.termux/files/home/capitolium/cache/web/<dominio>-<hash>.md`) com read_file offset/limit — é onde ficam os números-chave (ex.: receita da Biotrop 2021 estava no meio do artigo da NeoFeed); (4) **conflito entre artigos** (ex.: Biotrop 2023 = R$ 618 mi em 03/2024 vs R$ 550 mi em retrospectiva de 07/2025 vs R$ 650 mi dito pelo CEO em 11/2023) → preferir a afirmação contemporânea ao fato e reportar o conflito explicitamente no relatório; (5) números com declaração de CEO/fundador = confiança MÉDIA (não auditado), números de balanço/veículo = ALTA.
 
 ### APIs acadêmicas sem auth (validado 15/08/2026)
 
@@ -230,14 +230,14 @@ curl -s 'https://api.openalex.org/works/doi:<doi>?select=display_name,publicatio
 - **GitHub API** para descoberta de repos: `https://api.github.com/search/repositories?q=<q>&sort=stars&order=desc&per_page=5` — responde rápido e sem rate-limit para volumes moderados (8 queries em ~5s).
 - Receita completa com comandos testados → `references/academic-api-fallbacks.md`.
 
-**Subagentes timeout → live transcripts.** Cada subagente do deep-research grava um log append-only em `/opt/data/cache/delegation/live/<delegation_id>/task-<N>.log` com o trace completo de tools (resultados de web_extract às vezes inteiros, caminhos de cache `/opt/data/cache/web/*.md`, outputs de execute_code). Ler com read_file ANTES de caçar no state.db — é a fonte mais rápida de achados parciais e mostra exatamente onde o agente parou (validado 15/08/2026: 3 subagentes timeout → 100+ achados recuperados dos logs em 2 leituras).
+**Subagentes timeout → live transcripts.** Cada subagente do deep-research grava um log append-only em `/data/data/com.termux/files/home/capitolium/cache/delegation/live/<delegation_id>/task-<N>.log` com o trace completo de tools (resultados de web_extract às vezes inteiros, caminhos de cache `/data/data/com.termux/files/home/capitolium/cache/web/*.md`, outputs de execute_code). Ler com read_file ANTES de caçar no state.db — é a fonte mais rápida de achados parciais e mostra exatamente onde o agente parou (validado 15/08/2026: 3 subagentes timeout → 100+ achados recuperados dos logs em 2 leituras).
 
 ### Blog-index mining for article slugs
 
 When a blog index page extracts successfully (can be 200K+ chars, saved to cache), grep the cached file for your topic keywords to discover exact article URLs — no search engine needed:
 
 ```bash
-search_files(pattern="proposal", path="/opt/data/cache/web/raingroup.com-*.md", output_mode="content")
+search_files(pattern="proposal", path="/data/data/com.termux/files/home/capitolium/cache/web/raingroup.com-*.md", output_mode="content")
 ```
 
 Returns matching lines WITH the `[Read More](url)` links — extract the real article slugs, then web_extract the top 2-3 posts directly. This turned one RAIN Group blog listing into three cited articles in one pass.
@@ -286,7 +286,7 @@ curl -s -m 25 "http://web.archive.org/cdx/search/cdx?url=<dominio>/<prefixo>*&fi
 `web_extract` truncates at ~15KB. Encyclopedia-style pages (Wikipedia, BehavioralEconomics.com index) are routinely 50K-280K chars. The footer of the truncated output tells you where the full file was saved:
 
 ```
-Full text saved to: /opt/data/cache/web/<domain>-<hash>.md
+Full text saved to: /data/data/com.termux/files/home/capitolium/cache/web/<domain>-<hash>.md
 To read the omitted middle: read_file(path="...", offset=N, limit=200)
 ```
 

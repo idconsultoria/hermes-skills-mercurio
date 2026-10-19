@@ -231,7 +231,7 @@ docker exec -it --user hermes hermes_agent \
 
 # ✅ Se HOME não for herdado, passar explicitamente
 docker exec -it --user hermes \
-  -e HOME=/opt/data/home \
+  -e HOME=/data/data/com.termux/files/home/capitolium/home \
   -e DEEPSEEK_API_KEY=$(docker exec --user hermes hermes_agent \
     python3 -c "import json; print(json.load(open('/opt/data/home/.pi/agent/auth.json'))['deepseek']['key'])") \
   hermes_agent \
@@ -958,7 +958,7 @@ skill_view(name='pi-agent-coordination', file_path='references/deploy-host-ssh.m
 
 **⚠️ Cuidado com o path correto.** O volume montado no container é:
 ```
-host:/home/ubuntu/selfhost/shared/code/ → container:/opt/data/code/
+host:/home/ubuntu/selfhost/shared/code/ → container:/data/data/com.termux/files/home/capitolium/code/
 host:/home/ubuntu/selfhost/hermes/data/ → container:/opt/data/
 ```
 
@@ -995,11 +995,11 @@ ssh oracle-host 'sudo find /home/ubuntu/selfhost/shared/code/workstation/taskflo
 destino. Com UID 1001, o `Permission denied` impede a deleção — mas o arquivo some
 mesmo assim (git tenta unlink e, falhando, o arquivo fica em estado inconsistente).
 
-**Recuperação:** se existe um clone (`/opt/data/taskflow-pr/`) com os commits, copiar
+**Recuperação:** se existe um clone (`/data/data/com.termux/files/home/capitolium/taskflow-pr/`) com os commits, copiar
 de lá:
 
 ```bash
-cd /opt/data/taskflow-pr
+cd /data/data/com.termux/files/home/capitolium/taskflow-pr
 git diff --name-only origin/master HEAD --diff-filter=A | \
   while IFS= read -r f; do
     ssh oracle-host "mkdir -p /home/ubuntu/selfhost/taskflow/\$(dirname \"$f\")" 2>/dev/null

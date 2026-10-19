@@ -16,7 +16,7 @@ tabelas, código JetBrains Mono, callouts) e a **contracapa nativa do modelo** n
 `scripts/md_to_timbrado_id.py` — uso:
 
 ```bash
-/opt/data/venvs/google/bin/python md_to_timbrado_id.py arquivo.md \
+/data/data/com.termux/files/home/capitolium/venvs/google/bin/python md_to_timbrado_id.py arquivo.md \
   --folder <FOLDER_ID> --doc-name "Nome do Doc vN" \
   --tipo "DOCUMENTO DE REQUISITOS (PRD)" \
   --titulo-exp "Título expandido (capa)" \
@@ -25,7 +25,7 @@ tabelas, código JetBrains Mono, callouts) e a **contracapa nativa do modelo** n
   --cliente "Cliente"
 ```
 
-Motor: `/opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py`
+Motor: `/data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/md-to-gdoc.py`
 (importado como `mdg` e **monkeypatchado**).
 
 ## Estrutura da receita

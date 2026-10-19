@@ -21,7 +21,7 @@ import os
 import sys
 from pathlib import Path
 
-HERMES = Path(os.environ.get("HERMES_HOME", "/opt/mercurio-data"))
+HERMES = Path(os.environ.get("HERMES_HOME", "/data/data/com.termux/files/home/capitolium"))
 SCRIPTS = HERMES / "skills" / "productivity" / "google-workspace" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 

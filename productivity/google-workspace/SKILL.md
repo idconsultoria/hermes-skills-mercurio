@@ -30,8 +30,8 @@ Gmail, Calendar, Drive, Contacts, Sheets, and Docs — through Hermes-managed OA
 On this host (Oracle Linux, Hermes container), the scripts and credentials live at:
 
 ```bash
-GSETUP="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/setup.py"
-GAPI="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/google_api.py"
+GSETUP="/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/setup.py"
+GAPI="/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/google_api.py"
 ```
 
 Always verify auth before first use:
@@ -359,7 +359,7 @@ $GAPI docs append DOC_ID --text "Additional content to append"
 
 # Create/update a Doc WITH correct formatting (headings, bold, bullets,
 # native tables, callouts) from markdown — preferred over --body (plain text):
-MD2DOC="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py"
+MD2DOC="/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/md-to-gdoc.py"
 $MD2DOC documento.md --title "Título" --parent FOLDER_ID     # create + move to folder
 $MD2DOC documento.md --title "Título" --doc-id DOCUMENT_ID  # update existing (preserves ID)
 # See references/md-to-gdoc.md for supported markdown, pitfalls, and batch mode.
@@ -441,6 +441,6 @@ $GSETUP --revoke
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e decks): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

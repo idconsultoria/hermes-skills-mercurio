@@ -27,25 +27,25 @@ Load this skill when checking real database behavior with a disposable PostgreSQ
 ## Passos (menos de 2 minutos de setup; Debian/APT)
 ```bash
 # 1) Baixar e extrair postgres (não instala no sistema)
-mkdir -p /opt/data/pgtest/debs && cd /opt/data/pgtest/debs
+mkdir -p /data/data/com.termux/files/home/capitolium/pgtest/debs && cd /data/data/com.termux/files/home/capitolium/pgtest/debs
 apt-get download postgresql-17 postgresql-client-17 libpq5 postgresql-common postgresql-client-common libicu76 liblz4-1 libzstd1
-mkdir -p /opt/data/pgtest/ext && cd /opt/data/pgtest
+mkdir -p /data/data/com.termux/files/home/capitolium/pgtest/ext && cd /data/data/com.termux/files/home/capitolium/pgtest
 for d in debs/*.deb; do dpkg -x "$d" ext/; done
 
-PGBIN=/opt/data/pgtest/ext/usr/lib/postgresql/17/bin
-export LD_LIBRARY_PATH=/opt/data/pgtest/ext/usr/lib/aarch64-linux-gnu:/opt/data/pgtest/ext/usr/lib/postgresql/17/lib
-export PGDATA=/opt/data/pgtest/data PGHOST=/opt/data/pgtest/sock PGUSER=app PGPORT=55432
+PGBIN=/data/data/com.termux/files/home/capitolium/pgtest/ext/usr/lib/postgresql/17/bin
+export LD_LIBRARY_PATH=/data/data/com.termux/files/home/capitolium/pgtest/ext/usr/lib/aarch64-linux-gnu:/data/data/com.termux/files/home/capitolium/pgtest/ext/usr/lib/postgresql/17/lib
+export PGDATA=/data/data/com.termux/files/home/capitolium/pgtest/data PGHOST=/data/data/com.termux/files/home/capitolium/pgtest/sock PGUSER=app PGPORT=55432
 
 # 2) initdb NÃO roda como root — rode como usuário comum.
-mkdir -p "$PGDATA" /opt/data/pgtest/sock
+mkdir -p "$PGDATA" /data/data/com.termux/files/home/capitolium/pgtest/sock
 "$PGBIN/initdb" -D "$PGDATA" -U app --auth=trust --encoding=UTF8 --no-locale
 
 # 3) sobe o servidor + cria o banco
-"$PGBIN/pg_ctl" -D "$PGDATA" -l /opt/data/pgtest/pg.log -o "-p 55432 -k /opt/data/pgtest/sock" start
-"$PGBIN/createdb" -h /opt/data/pgtest/sock -p 55432 -U app artemishub
+"$PGBIN/pg_ctl" -D "$PGDATA" -l /data/data/com.termux/files/home/capitolium/pgtest/pg.log -o "-p 55432 -k /data/data/com.termux/files/home/capitolium/pgtest/sock" start
+"$PGBIN/createdb" -h /data/data/com.termux/files/home/capitolium/pgtest/sock -p 55432 -U app artemishub
 
 # 4) restaura o dump do projeto (formato custom) com o BINÁRIO NATIVO
-"$PGBIN/pg_restore" --no-owner --role=app -h /opt/data/pgtest/sock -p 55432 -U app -d artemishub db/artemishub.dump
+"$PGBIN/pg_restore" --no-owner --role=app -h /data/data/com.termux/files/home/capitolium/pgtest/sock -p 55432 -U app -d artemishub db/artemishub.dump
 ```
 5) Suba o backend real contra o banco (ex.: `ARTEMISHUB_DB_URL=postgresql://app@127.0.0.1:55432/artemishub uvicorn main:app --app-dir backend --port 18000`).
 6) Para exercitar fluxos que exigem login (ex. master), **injete direto um usuário com

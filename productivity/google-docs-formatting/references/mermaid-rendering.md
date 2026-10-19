@@ -17,7 +17,7 @@ mermaid-cli local com o Chromium compartilhado:
 1. **Instalar mermaid-cli com `--ignore-scripts`** (pula o download do browser,
    que falha em ARM64 sem unzip/root):
    ```bash
-   mkdir -p /opt/data/mmdc && cd /opt/data/mmdc
+   mkdir -p /data/data/com.termux/files/home/capitolium/mmdc && cd /data/data/com.termux/files/home/capitolium/mmdc
    npm init -y >/dev/null 2>&1
    npm install @mermaid-js/mermaid-cli --no-audit --no-fund --ignore-scripts
    ```
@@ -41,7 +41,7 @@ mermaid-cli local com o Chromium compartilhado:
 4. **Renderizar** — fundo TRANSPARENTE (`-b transparent`, RGBA confirmado por
    pixel alpha=0) + escala 2x (`-s 2`, ~192 DPI efetivo — legível ampliado):
    ```bash
-   cd /opt/data/mmdc
+   cd /data/data/com.termux/files/home/capitolium/mmdc
    node_modules/.bin/mmdc -i /tmp/fluxo.mmd -o /tmp/fluxo.png \
      -b transparent -s 2 -p puppeteer-config.json
    ```

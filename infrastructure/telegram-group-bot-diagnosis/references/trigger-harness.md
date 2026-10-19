@@ -35,7 +35,7 @@ from unittest.mock import AsyncMock
 from gateway.config import Platform, PlatformConfig
 from plugins.platforms.telegram.adapter import TelegramAdapter
 
-cfg = yaml.safe_load(open("/opt/mercurio-data/profiles/<perfil>/config.yaml"))
+cfg = yaml.safe_load(open("/data/data/com.termux/files/home/capitolium/profiles/<perfil>/config.yaml"))
 extra = dict(cfg.get("telegram") or {})
 
 a = object.__new__(TelegramAdapter)
@@ -74,6 +74,6 @@ do SKILL.md.
 
 ## Varrer os bots do gateway multiplex
 
-Cada perfil tem token próprio em `/opt/mercurio-data/profiles/<perfil>/.env` (o perfil raiz usa
-`/opt/mercurio-data/.env`). `getMe` + `getChatMember` de cada token responde **quais** bots estão
+Cada perfil tem token próprio em `/data/data/com.termux/files/home/capitolium/profiles/<perfil>/.env` (o perfil raiz usa
+`/data/data/com.termux/files/home/capitolium/.env`). `getMe` + `getChatMember` de cada token responde **quais** bots estão
 no grupo — o que descarta na hora o cenário "quem postou foi outro agente".

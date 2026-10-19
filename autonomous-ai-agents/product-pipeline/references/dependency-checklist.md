@@ -16,7 +16,7 @@
 - [~] Modelo best: `opencode-go/minimax-m3` — cota semanal estourada (reset ~7 Jun)
 - [x] Modelo fallback: `deepseek/deepseek-v4-pro` — validado para PM work (F3), funcionou sem timeout
 - [x] Modelo cost: `deepseek/deepseek-v4-flash` — funcional para escrita simples
-- [x] Shared volume: `/opt/data/code/` = `/workspace/code/`
+- [x] Shared volume: `/data/data/com.termux/files/home/capitolium/code/` = `/workspace/code/`
 
 ### Shared Volume — UID Mismatch (Fonte #1 de bugs)
 - [x] Pi escreve como uid 1001, Hermes escreve como uid 10000

@@ -8,7 +8,7 @@ e pushes da rama caíam no master do canônico.
 ## 1. Verificar o remote ANTES de qualquer push (obrigatório)
 
 ```bash
-git -C /opt/data/skills remote -v
+git -C /data/data/com.termux/files/home/capitolium/skills remote -v
 # DEVE mostrar:  origin  → https://github.com/idconsultoria/hermes-skills-mercurio.git
 ```
 Se `remote.origin.url` for qualquer outra coisa (incl. `gustavomello9600/...`, o repo do
@@ -50,7 +50,7 @@ no `git remote -v`).
 
 ```bash
 TOK=$(grep '^GITHUB_TOKEN=' /opt/data/.env | cut -d= -f2 | tr -d '"' | tr -d ' \n\r' | head -1)
-cd /opt/data/skills
+cd /data/data/com.termux/files/home/capitolium/skills
 git remote set-url origin "https://${TOK}@github.com/idconsultoria/hermes-skills-mercurio.git"
 git push origin master; RC=$?
 git remote set-url origin "https://github.com/idconsultoria/hermes-skills-mercurio.git"   # SEMPRE restaurar
@@ -63,7 +63,7 @@ grep -c gho_ <(git remote -v)   # deve ser 0 → confirmar que não vazou
 
 ## 4. Encapsulamento em produção
 
-O push é encapsulado no script `/opt/data/scripts/push-skills-mercurio.sh`, que:
+O push é encapsulado no script `/data/data/com.termux/files/home/capitolium/scripts/push-skills-mercurio.sh`, que:
 1. valida `remote.origin.url` antes (aborta com exit 3 se não for o fork `idconsultoria`);
 2. lê o `GITHUB_TOKEN` do `.env`;
 3. faz o push com URL autenticada e **restaura a URL limpa**;
@@ -84,4 +84,4 @@ em `MEMORY.md.bak.<ts>`). Sintoma: `error ... wouldn't round-trip`.
 - **Limite:** 2.200 chars. Se um `add` estourar, fazer um único batch
   `operations=[{action:replace/remove...}]` que comprime entradas antigas antes de adicionar
   a nova (all-or-nothing — resolve no mesmo turno).
-- Referência de formato saudável: `/opt/data/memories/MEMORY.md` reescrito em 22/08/2026.
+- Referência de formato saudável: `/data/data/com.termux/files/home/capitolium/memories/MEMORY.md` reescrito em 22/08/2026.

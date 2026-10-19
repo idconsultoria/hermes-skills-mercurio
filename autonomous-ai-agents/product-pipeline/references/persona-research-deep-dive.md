@@ -245,7 +245,7 @@ O LLM que gera o clone digital **vai inventar características**. É esperado �
 | AboutCompany | ✅ Sócio ID.TEAL desde 04/2024 |
 | Google Sites | ✅ Portfolio "Brito Designer" — design desde os 10 anos |
 | Facebook (TB Estudio) | ✅ Estúdio de design em Itabaiana/SE |
-| **Clone Digital** | ✅ Consolidado em `/opt/data/tacio-brito-digital-clone.md` |
+| **Clone Digital** | ✅ Consolidado em `/data/data/com.termux/files/home/capitolium/tacio-brito-digital-clone.md` |
 
 O clone digital gerou dados que elevaram o nível da persona de **CRÍTICO (sem dados)** para **ALTO (completo)** — e serviu como referência para o Pi gerar documentos de produto alinhados com o perfil real.
 

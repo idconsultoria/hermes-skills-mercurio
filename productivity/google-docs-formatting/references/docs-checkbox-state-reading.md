@@ -18,7 +18,7 @@ baseada no JSON da API vai falhar silenciosamente.
 
 ```python
 import json, urllib.request, importlib.util
-spec = importlib.util.spec_from_file_location("md_to_gdoc", "/opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py")
+spec = importlib.util.spec_from_file_location("md_to_gdoc", "/data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/md-to-gdoc.py")
 md = importlib.util.module_from_spec(spec); spec.loader.exec_module(md)
 tok = md.get_token()
 url = f"https://www.googleapis.com/drive/v3/files/{DOC_ID}/export?mimeType=application/pdf"
@@ -30,7 +30,7 @@ open("/tmp/guia.pdf", "wb").write(pdf)
 2. **Renderizar as páginas com PyMuPDF** (já instalado no venv google — `fitz`):
 
 ```bash
-/opt/data/venvs/google/bin/python -c "
+/data/data/com.termux/files/home/capitolium/venvs/google/bin/python -c "
 import fitz
 doc = fitz.open('/tmp/guia.pdf')
 for i in range(min(2, len(doc))):

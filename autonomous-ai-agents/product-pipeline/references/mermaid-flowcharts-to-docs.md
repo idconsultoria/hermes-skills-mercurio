@@ -13,7 +13,7 @@ Google Docs** — nunca substituir o bloco mermaid no `.md` por referência a im
 
 ```bash
 # Instalação única (--ignore-scripts: pula download do browser que falha sem unzip)
-mkdir -p /opt/data/mmdc && cd /opt/data/mmdc
+mkdir -p /data/data/com.termux/files/home/capitolium/mmdc && cd /data/data/com.termux/files/home/capitolium/mmdc
 npm init -y >/dev/null && npm install @mermaid-js/mermaid-cli --no-audit --no-fund --ignore-scripts
 ```
 

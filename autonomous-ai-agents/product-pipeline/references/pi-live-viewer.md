@@ -17,7 +17,7 @@ O Pi tem `pi --export <jsonl> <out.html>` que renderiza a sessão com **a interf
 (mesmos componentes: assistant message, tool execution, bash execution, diff, thinking; tema `#8abeb7`).
 Não reimplementar a TUI — o export já é fiel.
 
-Fluxo (scripts em `/opt/data/scripts/`):
+Fluxo (scripts em `/data/data/com.termux/files/home/capitolium/scripts/`):
 
 1. **`pi_follow.py`** — modo espectador no terminal (cores): faz `tail -f` do JSONL e formata cada
    evento (fala do Pi em ciano, tool calls em verde, resultados truncados, thinking em dim).
@@ -27,7 +27,7 @@ Fluxo (scripts em `/opt/data/scripts/`):
 
 ```bash
 # no container (serve na 8100)
-python3 /opt/data/scripts/pi_follow_web.py 8100
+python3 /data/data/com.termux/files/home/capitolium/scripts/pi_follow_web.py 8100
 ```
 
 ## Por que polling com re-render (e não meta-refresh)

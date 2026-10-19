@@ -4,7 +4,7 @@
 
 **Repo:** nexu-io/open-design · 60.9k ★ · Apache-2.0
 **Type:** External CLI + daemon + web UI (NOT a Hermes skill)
-**CLI:** `od` at `/opt/data/bin/od` (wrapper script)
+**CLI:** `od` at `/data/data/com.termux/files/home/capitolium/bin/od` (wrapper script)
 **Daemon:** http://127.0.0.1:7456
 **Location:** `/tmp/open-design-repo/`
 **Node:** v24.16.0 via nvm (`/opt/data/home/.nvm/versions/node/v24.16.0/bin/node`)

@@ -47,7 +47,7 @@ Use the correct regex with `re.MULTILINE`:
 
 ```python
 import re
-with open('/opt/data/skills/index.md') as f:
+with open('/data/data/com.termux/files/home/capitolium/skills/index.md') as f:
     idx = f.read()
 
 # CRITICAL: re.MULTILINE is REQUIRED. Without it, findall returns 0 matches

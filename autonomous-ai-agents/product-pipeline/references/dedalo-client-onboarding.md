@@ -179,7 +179,7 @@ $GAPI drive share <spreadsheet_id> --email <sa_email> --role writer
 
 ### Background execution pattern
 ```bash
-cd /opt/data/dedalo_squad && source .venv/bin/activate && python run_one.py CVT-001
+cd /data/data/com.termux/files/home/capitolium/dedalo_squad && source .venv/bin/activate && python run_one.py CVT-001
 ```
 Run with `terminal(background=True, notify_on_complete=True, timeout=600)`.
 

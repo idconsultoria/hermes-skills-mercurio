@@ -73,7 +73,7 @@ Contract is just files. Neither knows about the other.
 
 | OKF Concept | Hermes Equivalent |
 |---|---|
-| Bundle | `/opt/data/skills/` (root) |
+| Bundle | `/data/data/com.termux/files/home/capitolium/skills/` (root) |
 | Concept | SKILL.md |
 | Concept ID | `category/skill-name` |
 | `type` (required) | `type:` in frontmatter (8-value taxonomy) |

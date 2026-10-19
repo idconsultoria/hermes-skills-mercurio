@@ -41,6 +41,16 @@ investigar aplicação, banco ou deploy.
 - Zona `idconsultoria.ai` na **Hostinger** (`ns1/ns2.dns-parking.com`). O Mercúrio **não tem
   acesso** ao painel: o entregável é o **pedido exato** ao dono da conta.
 - Apex e `www` apontam para a **Vercel** — não mexer.
+- **Apex na Vercel em OUTRO escopo:** o nome resolve para a Vercel (cabeçalho `X-Vercel-Id` no
+  `curl -I https://<apex>/`), mas o domínio pertence a outra conta: `vercel domains add
+  <sub>.<apex> <projeto>` responde `403 Not authorized to use …`. Subdomínio só se anexa a
+  projeto da conta que controla o domínio. Antes de prometer URL bonita, rode `vercel domains ls`
+  para ver o que o escopo atual controla. Saídas: (a) anexar o domínio na conta dona, (b) ser
+  convidado para essa conta / mover o projeto para ela, (c) usar a URL
+  `<projeto>-<hash>.vercel.app`. O nome do projeto também é global: nome já usado por outra conta
+  vira `<projeto>-<sufixo>.vercel.app` e a URL limpa não pode ser reivindicada.
+- Subdomínio apontando para a Vercel (quando o domínio é do dono): **CNAME · nome `sub` · valor
+  `cname.vercel-dns.com` · TTL 300**.
 - Nomes que já apareceram em certificados (`atlas`, `dashboard`, `evento`, `manifesto`) **não
   são** registros vivos por isso; só recriar se alguém confirmar que o serviço existe.
 
@@ -95,6 +105,11 @@ investigar aplicação, banco ou deploy.
   não a zona. Só a resolução limpa fecha o caso.
 - **Cache do usuário mascara o resultado** — sem recarga forçada/relançar o app, o "ainda está
   quebrado" pode ser PWA.
+- **Atualizar a URL de deploy "daquele" projeto exige credencial do escopo que publicou.**
+  Projeto publicado por CLI pertence à conta que rodou o comando: de outro escopo nem aparece em
+  `vercel project ls`, e o deploy novo vai para um projeto novo (URL nova). Para manter a URL
+  antiga, reconecte o repositório na conta dona do projeto e redeploye de lá, ou traga o projeto
+  para o escopo atual. Diga isso ao usuário como bloqueio com caminho, não como "não dá".
 
 ## 6. Arquivos de apoio
 

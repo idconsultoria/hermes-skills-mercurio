@@ -43,7 +43,7 @@ Acionar em demandas que envolvam:
 
 ## 1 · Acesso Google (OAuth) — QUAL token usar
 
-**HERMES_HOME = `/opt/mercurio-data`** (legado `/opt/data` descontinuado desde 27/08/2026). Todos os tokens ficam em `$HERMES_HOME/*.json` e o venv é `$HERMES_HOME/.venv` ou `id-nfse-motor/.venv`.
+**HERMES_HOME = `/data/data/com.termux/files/home/capitolium`** (legado `/opt/data` descontinuado desde 27/08/2026). Todos os tokens ficam em `$HERMES_HOME/*.json` e o venv é `$HERMES_HOME/.venv` ou `id-nfse-motor/.venv`.
 
 > **2026-09-01 11:08 UTC — estado real verificado:** `admin@idconsultoria.ai` **RECUPERADO** de `/home/ubuntu/selfhost/hermes/data/google_token_admin.json` no host Oracle (sem ligar contêiner `hermes_mercurio`) e restaurado em `$HERMES_HOME/google_token.json` (+ `.secrets/`). `gustavo.idteal@gmail.com` **RECRIADO via OAuth** em `$HERMES_HOME/google_token.gustavo_idteal.json` (refresh `1//06X0c7...`, validado `gmail.getProfile → gustavo.idteal@gmail.com`). `gustavomelloenciv@gmail.com` permanece **VETADO**.
 
@@ -62,7 +62,7 @@ Padrão de carregamento seguro (resiliente a HERMES_HOME):
 import os, json
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
-HH = os.environ.get("HERMES_HOME", "/opt/mercurio-data")
+HH = os.environ.get("HERMES_HOME", "/data/data/com.termux/files/home/capitolium")
 # admin — Drive
 d=json.loads(open(f"{HH}/google_token.json").read())  # deve ser admin@idconsultoria.ai
 # financeiro — Gmail
@@ -203,7 +203,7 @@ Regras que o registro impõe (não negociar):
 **O Inter aceita no máximo 90 DIAS CORRIDOS** entre `dataInicio` e `dataFim` — 90 já dá
 `400 Período inválido` (medido 02/10/2026: 89d passa, 90d falha). O script trava em 89.
 
-Ambiente: `/opt/mercurio-data/work/idata/.venv/bin/python` (tem `requests` +
+Ambiente: `/data/data/com.termux/files/home/capitolium/work/idata/.venv/bin/python` (tem `requests` +
 `googleapiclient`; o `id-nfse-motor` **não** tem pandas, e `api_inter` não precisa dele).
 
 **Juros/mora (decisão do Gustavo, 02/10/2026):** parcela liquidada **acima** do previsto não
@@ -324,11 +324,11 @@ Padrão consolidado (jul/ago/set 2026). Ao receber o PDF da NFS-e da parcela:
 
 ### Geral
 
-- Ver skills `emissao-nfse` / `motor-nfse-id`. Motor nfelib em `$HERMES_HOME/id-nfse-motor` (legado `/opt/data/id-nfse-motor`).
+- Ver skills `emissao-nfse` / `motor-nfse-id`. Motor nfelib em `$HERMES_HOME/id-nfse-motor` (legado `/data/data/com.termux/files/home/capitolium/id-nfse-motor`).
 - Aracaju usa protocolo NACIONAL (DPS). Certificado A1 da ID: NÃO em email/Drive — está
   num PC pessoal do Gustavo (pendência).
 - Alíquota ISS auto-capturada por cron no dia 5 (job `3dfe43219f1b` usa `$HERMES_HOME/id-nfse-motor` com fallback).
-- Atenção: o motor nfelib (`id-nfse-motor/.venv`) é o venv que tem `googleapiclient` instalado neste host — usar `/opt/mercurio-data/id-nfse-motor/.venv/bin/python` para os scripts de Gmail/Drive.
+- Atenção: o motor nfelib (`id-nfse-motor/.venv`) é o venv que tem `googleapiclient` instalado neste host — usar `/data/data/com.termux/files/home/capitolium/id-nfse-motor/.venv/bin/python` para os scripts de Gmail/Drive.
 
 ---
 
@@ -403,7 +403,7 @@ Padrão consolidado (jul/ago/set 2026). Ao receber o PDF da NFS-e da parcela:
 **Busca executada (sem ligar contêiner `hermes_mercurio`):**
 - `ssh ubuntu@129.146.163.107` via `deploy_key.pem` (skills `devops-artemishub`/`moodle-id-operacoes`) → `sudo cat /home/ubuntu/selfhost/hermes/data/google_token_admin.json` (origem) → `base64` → gravado em `$HERMES_HOME/google_token.json` (+ `.secrets/`), `chmod 600`, validado `gmail.getProfile → admin@idconsultoria.ai` (1663 msgs).
 - `sudo ls /home/ubuntu/selfhost/hermes/data/google_token*.json` → `google_token.json` / `.bak` / `google_token_admin.json` / `google_token_gustavo.json`; os 3 primeiros eram `gustavomelloenciv@gmail.com` (refresh `04YzGys...`), apenas `google_token_admin.json` era `admin@idconsultoria.ai` (refresh `042KPgOStXCe...`). `grep -l idteal` só achou sessions — nenhum token `idteal` existia antes.
-- `find /opt/mercurio-data -maxdepth 4 -name "*token*"` antes da recuperação: só fallback `gustavomelloenciv`.
+- `find /data/data/com.termux/files/home/capitolium -maxdepth 4 -name "*token*"` antes da recuperação: só fallback `gustavomelloenciv`.
 - Após OAuth `setup.py --auth-url` → `--auth-code http://localhost:1/?state=kFF6...&code=4/0ATs...` → gerado `$HERMES_HOME/google_token.gustavo_idteal.json` (e `.secrets/`), validado `gmail.getProfile → gustavo.idteal@gmail.com` (3117 msgs, refresh `06X0c7_Lvvm...`). Admin preservado em `/tmp/google_token_admin_backup.json` e restaurado em `google_token.json` para não sobrescrever.
 - `grep -c gustavomelloenciv` nos dois tokens ativos = 0; `contêiner hermes_mercurio` **não foi ligado** em nenhum momento (só `docker export`/`cat` via SSH).
 

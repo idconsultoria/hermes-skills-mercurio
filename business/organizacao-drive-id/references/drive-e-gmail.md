@@ -6,7 +6,7 @@
 import os, json
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
-HH = os.environ.get("HERMES_HOME", "/opt/mercurio-data")
+HH = os.environ.get("HERMES_HOME", "/data/data/com.termux/files/home/capitolium")
 d = json.loads(open(f"{HH}/google_token.json").read()); d.setdefault("type", "authorized_user")
 c = Credentials.from_authorized_user_info(d, d.get("scopes"))   # usa os escopos que ele já tem
 if not c.valid:

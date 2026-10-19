@@ -12,7 +12,7 @@ Todo o procedimento é **leitura pura**. Nenhum restart, reset ou edição sem o
 Duas linhas delimitam o turno. Busque-as pelo `session_key` (`agent:<perfil>:<plataforma>:<chat>`):
 
 ```bash
-P=/opt/mercurio-data/profiles/<perfil>
+P=/data/data/com.termux/files/home/capitolium/profiles/<perfil>
 grep -E "inbound message|response ready" $P/logs/gateway.log | tail -12
 ```
 
@@ -39,7 +39,7 @@ grep -F "<session_id>" $P/logs/agent.log | tail -30
 `state.db` é SQLite com WAL — **abra em read-only** para não disputar o lock com o gateway vivo:
 
 ```bash
-cd /opt/mercurio-data/profiles/<perfil>
+cd /data/data/com.termux/files/home/capitolium/profiles/<perfil>
 python3 -c "
 import sqlite3
 c=sqlite3.connect('file:state.db?mode=ro', uri=True)

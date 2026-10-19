@@ -11,7 +11,7 @@ NFS-e. A fonte é o email mensal da contabilidade da ID.
 - **Corpo (exemplo):** "A alíquota de ISS a ser utilizada no mês de agosto é 2,0100%."
 
 ## Storage (facilmente recuperável pelo motor)
-- **`/opt/data/id-nfse-motor/dados/aliquota_iss.json`** (schema):
+- **`/data/data/com.termux/files/home/capitolium/id-nfse-motor/dados/aliquota_iss.json`** (schema):
   ```json
   {
     "aliquota_iss": 2.01,
@@ -25,8 +25,8 @@ NFS-e. A fonte é o email mensal da contabilidade da ID.
 
 ## Cron
 - Nome `Alíquota ISS mensal (ID)` · job `3dfe43219f1b` · schedule `0 10 5 * *` (dia 5, 10h BRT).
-- Wrapper em `/opt/data/scripts/buscar_aliquota_iss.sh` → chama o venv do Google:
-  `/opt/data/venvs/google/bin/python /opt/data/id-nfse-motor/scripts/buscar_aliquota_iss.py`.
+- Wrapper em `/data/data/com.termux/files/home/capitolium/scripts/buscar_aliquota_iss.sh` → chama o venv do Google:
+  `/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/id-nfse-motor/scripts/buscar_aliquota_iss.py`.
 
 ## Script — decisões implementadas
 - **Query Gmail:** `from:setorfiscal subject:"ALÍQUOTA DE ISS"` (maxResults=5; usa o email mais

@@ -11,8 +11,8 @@ gateway's `send` CLI, which reuses platform credentials — **no LLM, no agent l
 
 ```bash
 # Target forms: platform, platform:chat_id, platform:chat_id:thread_id
-HERMES_HOME=/opt/mercurio-data hermes send --to telegram:6171996969 "📖 História 1/5 — ..."
-HERMES_HOME=/opt/mercurio-data hermes send --to telegram:6171996969 "📖 História 2/5 — ..."
+HERMES_HOME=/data/data/com.termux/files/home/capitolium hermes send --to telegram:6171996969 "📖 História 1/5 — ..."
+HERMES_HOME=/data/data/com.termux/files/home/capitolium hermes send --to telegram:6171996969 "📖 História 2/5 — ..."
 ```
 
 - `--to` target examples: `telegram`, `telegram:6171996969`, `telegram:<chat_id>:<thread_id>`,

@@ -9,7 +9,7 @@ parágrafos.
 
 ```bash
 PY=/path/to/venv/bin/python   # python com google-auth instalado
-CONV="$PY /opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py"
+CONV="$PY /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/md-to-gdoc.py"
 
 # Criar documento novo em uma pasta do Drive
 $CONV documento.md --title "Título do Doc" --parent FOLDER_ID
@@ -25,7 +25,7 @@ $CONV relatorio.md --title "Relatório" --parent 1sl-uFwjOnGQAsk-...
 - `--parent` move o doc criado para a pasta (via Drive API)
 - `--doc-id` atualiza um doc existente (apaga o conteúdo e reconstrói)
 - Token OAuth: usa `$GOOGLE_TOKEN_PATH` se definido, senão
-  `$HERMES_HOME/google_token.json`, senão `/opt/data/google_token.json`
+  `$HERMES_HOME/google_token.json`, senão `/data/data/com.termux/files/home/capitolium/google_token.json`
 
 ## Formatos suportados (markdown)
 

@@ -36,7 +36,7 @@ SCOPES = [
 ]
 
 flow = InstalledAppFlow.from_client_secrets_file(
-    "/opt/data/google_client_secret.json", SCOPES, redirect_uri="http://localhost"
+    "/data/data/com.termux/files/home/capitolium/google_client_secret.json", SCOPES, redirect_uri="http://localhost"
 )
 
 auth_url, _ = flow.authorization_url(
@@ -52,7 +52,7 @@ state_data = {
     "redirect_uri": flow.redirect_uri,
     "scopes": SCOPES,
 }
-with open("/opt/data/google_oauth_state.json", "w") as f:
+with open("/data/data/com.termux/files/home/capitolium/google_oauth_state.json", "w") as f:
     json.dump(state_data, f, indent=2)
 
 print(auth_url)
@@ -64,11 +64,11 @@ print(auth_url)
 from google_auth_oauthlib.flow import InstalledAppFlow
 import json, sys, urllib.parse
 
-with open("/opt/data/google_oauth_state.json") as f:
+with open("/data/data/com.termux/files/home/capitolium/google_oauth_state.json") as f:
     state = json.load(f)
 
 flow = InstalledAppFlow.from_client_secrets_file(
-    "/opt/data/google_client_secret.json",
+    "/data/data/com.termux/files/home/capitolium/google_client_secret.json",
     state["scopes"],
     redirect_uri=state["redirect_uri"],
 )
@@ -86,7 +86,7 @@ code = urllib.parse.parse_qs(parsed.query)["code"][0]
 flow.fetch_token(code=code)
 creds = flow.credentials
 
-with open("/opt/data/google_token.json", "w") as f:
+with open("/data/data/com.termux/files/home/capitolium/google_token.json", "w") as f:
     f.write(creds.to_json())
 
 print("TOKEN_OK")

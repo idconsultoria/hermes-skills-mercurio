@@ -95,10 +95,10 @@ the owner block + empty cells (since 1 task = 1 block), so arrows never cross a 
    CHROME=/opt/data/.playwright/chromium-1117/chrome-linux/chrome
    "$CHROME" --headless=new --disable-gpu --no-sandbox --hide-scrollbars \
      --window-size=1700,1400 --virtual-time-budget=6000 \
-     --screenshot=/opt/data/page.png "file:///opt/data/f-html"
+     --screenshot=/data/data/com.termux/files/home/capitolium/page.png "file:///data/data/com.termux/files/home/capitolium/f-html"
    ```
    `--virtual-time-budget` fast-forwards timers so Google Fonts load and arrows redraw
-   before the capture. Then load `/opt/data/page.png` with `vision_analyze` and ask it
+   before the capture. Then load `/data/data/com.termux/files/home/capitolium/page.png` with `vision_analyze` and ask it
    to confirm arrows are orthogonal, don't cross cards, and spacing is OK.
 
 ## Iteration discipline

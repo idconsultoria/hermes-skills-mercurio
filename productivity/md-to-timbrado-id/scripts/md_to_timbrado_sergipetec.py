@@ -26,7 +26,7 @@ from pathlib import Path
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-HERMES_HOME = os.environ.get("HERMES_HOME", "/opt/mercurio-data")
+HERMES_HOME = os.environ.get("HERMES_HOME", "/data/data/com.termux/files/home/capitolium")
 TOKEN = Path(HERMES_HOME) / "google_token.json"
 SCRIPT = f"{HERMES_HOME}/skills/productivity/google-workspace/scripts/md-to-gdoc.py"
 MODEL_SERGIPETEC = "1R8PCezBW8QtjHA1g4Qi6fZulxJkIBQ62IesN3Uqx3bM"

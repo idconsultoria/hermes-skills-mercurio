@@ -1,6 +1,6 @@
 # Slide da Phronesis — deck HTML da reunião de operações
 
-Gerador: `/opt/mercurio-data/phronesis-slide/montar_slide.py` (+ `assets/`, `saida/`).
+Gerador: `/data/data/com.termux/files/home/capitolium/phronesis-slide/montar_slide.py` (+ `assets/`, `saida/`).
 Saída: `saida/phronesis-slide-<AAAA-MM-DD>.html` e `saida/ultimo.html`.
 
 ## Estrutura (a ordem é o rito)
@@ -66,7 +66,7 @@ como respiro do fundo topográfico).
 ## Entrega (sob demanda)
 
 O deck é gerado **quando pedido**, não por cron. Rode o wrapper
-(`bash /opt/mercurio-data/scripts/phronesis_slide.sh [AAAA-MM-DD]`), confira o `STATUS=OK` e as
+(`bash /data/data/com.termux/files/home/capitolium/scripts/phronesis_slide.sh [AAAA-MM-DD]`), confira o `STATUS=OK` e as
 flags de sanidade (`TEM_METAS`, `TEM_GRAFICO`, `TEM_ATAH`) e entregue o HTML no Telegram com a
 linha `MEDIA:<caminho>` como a **primeira** da resposta, sozinha. Deck sem a seção de metas só
 sai com `--sem-metas` e com aviso explícito no texto — nunca em silêncio.

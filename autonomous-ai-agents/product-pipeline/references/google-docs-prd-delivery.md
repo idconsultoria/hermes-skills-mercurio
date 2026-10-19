@@ -5,18 +5,18 @@ seguir este fluxo.
 
 ## Pré-requisitos
 
-- Google Workspace OAuth configurado (token em `/opt/data/google_token.json`)
-- Venv Google em `/opt/data/venvs/google/`
-- API scripts em `/opt/data/skills/productivity/google-workspace/scripts/`
-- Scripts auxiliares em `/opt/data/google_oauth_gen.py` + `/opt/data/google_oauth_exchange.py`
+- Google Workspace OAuth configurado (token em `/data/data/com.termux/files/home/capitolium/google_token.json`)
+- Venv Google em `/data/data/com.termux/files/home/capitolium/venvs/google/`
+- API scripts em `/data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/`
+- Scripts auxiliares em `/data/data/com.termux/files/home/capitolium/google_oauth_gen.py` + `/data/data/com.termux/files/home/capitolium/google_oauth_exchange.py`
 
 ## Fluxo
 
 ### 1. Verificar token
 
 ```bash
-SETUP_PY="/opt/data/skills/productivity/google-workspace/scripts/setup.py"
-/opt/data/venvs/google/bin/python "$SETUP_PY" --check-live
+SETUP_PY="/data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/setup.py"
+/data/data/com.termux/files/home/capitolium/venvs/google/bin/python "$SETUP_PY" --check-live
 ```
 
 Se retornar `LIVE_CHECK_OK`, pular para passo 3.
@@ -30,17 +30,17 @@ A troca do código falha com `Missing code verifier`. Usar fluxo alternativo:
 **Passo 2a — Gerar URL com PKCE salvo:**
 
 ```bash
-/opt/data/venvs/google/bin/python /opt/data/google_oauth_gen.py
+/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/google_oauth_gen.py
 ```
 
-Isso gera a URL e salva o estado em `/opt/data/google_oauth_state.json`.
+Isso gera a URL e salva o estado em `/data/data/com.termux/files/home/capitolium/google_oauth_state.json`.
 
 **Passo 2b — Usuário abre a URL, autoriza e cola o redirect.**
 
 **Passo 2c — Trocar código por token:**
 
 ```bash
-/opt/data/venvs/google/bin/python /opt/data/google_oauth_exchange.py "URL_DO_REDIRECT"
+/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/google_oauth_exchange.py "URL_DO_REDIRECT"
 ```
 
 Isso salva o novo token e já cria um documento de teste.
@@ -50,7 +50,7 @@ Isso salva o novo token e já cria um documento de teste.
 ### 3. Criar o Google Doc
 
 ```bash
-GAPI="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/google_api.py"
+GAPI="/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/google_api.py"
 $GAPI docs create --title "PRD NomeDoProjeto v1.x"
 ```
 
@@ -66,7 +66,7 @@ from googleapiclient.discovery import build
 
 DOC_ID = "ID_DO_DOC"
 creds = Credentials.from_authorized_user_file(
-    "/opt/data/google_token.json",
+    "/data/data/com.termux/files/home/capitolium/google_token.json",
     ["https://www.googleapis.com/auth/documents", "https://www.googleapis.com/auth/drive"],
 )
 
@@ -94,7 +94,7 @@ tabelas), é necessário parsear o markdown e aplicar estilos via requests adici
 ### 5. Compartilhar para comentários
 
 ```bash
-GAPI="/opt/data/venvs/google/bin/python .../google_api.py"
+GAPI="/data/data/com.termux/files/home/capitolium/venvs/google/bin/python .../google_api.py"
 $GAPI drive share DOC_ID --type anyone --role commenter
 ```
 
@@ -118,7 +118,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
 DOC_ID = "ID_DO_DOC"
-creds = Credentials.from_authorized_user_file("/opt/data/google_token.json", ["https://www.googleapis.com/auth/documents"])
+creds = Credentials.from_authorized_user_file("/data/data/com.termux/files/home/capitolium/google_token.json", ["https://www.googleapis.com/auth/documents"])
 service = build("docs", "v1", credentials=creds)
 doc = service.documents().get(documentId=DOC_ID).execute()
 

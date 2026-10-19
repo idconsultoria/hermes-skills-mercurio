@@ -44,6 +44,6 @@ charcoal sobre cream/off-white = **11–12:1** (AAA). teal puro como texto = **~
 `#01706f`). branco sobre teal #029190 = **3.85:1** (aprofunde botão p/ `#01807f`+).
 
 ## Entregas
-- `biotechse-design-system-v1/v2/v3.html` em `/opt/mercurio-data/deliverables/`.
+- `biotechse-design-system-v1/v2/v3.html` em `/data/data/com.termux/files/home/capitolium/deliverables/`.
 - v3 = contraste corrigido + identidade (motivo orgânico DNA/folha). Fonte Tomato ainda pendente
   (aguardando woff2 licenciados do cliente).

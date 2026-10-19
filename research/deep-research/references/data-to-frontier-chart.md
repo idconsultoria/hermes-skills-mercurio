@@ -90,8 +90,8 @@ for p in sorted(param_max.keys()):
 Requirements: `venv` (system python3 is PEP 668-managed), `matplotlib`, `scipy`.
 
 ```bash
-python3 -m venv /opt/data/venvs/chart
-/opt/data/venvs/chart/bin/pip install matplotlib scipy
+python3 -m venv /data/data/com.termux/files/home/capitolium/venvs/chart
+/data/data/com.termux/files/home/capitolium/venvs/chart/bin/pip install matplotlib scipy
 ```
 
 Key chart elements:

@@ -10,7 +10,7 @@ Use 3 parallel `delegate_task` subagents, each reading ~31 SKILL.md files and de
 
 ### 1. Split skills into 3 batches
 ```bash
-cd /opt/data/skills
+cd /data/data/com.termux/files/home/capitolium/skills
 find . -name 'SKILL.md' -type f | sed 's|./||; s|/SKILL.md||' | sort | split -l 31 - batch_
 ```
 

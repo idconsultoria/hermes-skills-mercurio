@@ -65,7 +65,7 @@ O Hermes Agent tem **dois guias de estilo distintos**. Escolha baseado no TIPO d
 
 Para landing pages, showcases de produto, páginas de marketing, demos interativas, e qualquer conteúdo que PRECISE parecer "retro-futurista Hermes".
 
-- **Arquivo:** `/opt/data/hermes-agent-style-guide.md`
+- **Arquivo:** `/data/data/com.termux/files/home/capitolium/hermes-agent-style-guide.md`
 - **Estética:** Amber/blue inversion, CRT scanlines, vignette, mix-blend-mode:difference, cores invertidas
 - **Vibe:** Terminal cyber-brutalista, laboratório de pesquisa, manifesto visual
 - **Fontes:** Cormorant Garamond (títulos), Syncopate (seções), VT323 (tags), Space Mono (corpo)
@@ -74,7 +74,7 @@ Para landing pages, showcases de produto, páginas de marketing, demos interativ
 
 Para relatórios densos, análises de dados, benchmarks, tabelas comparativas, documentação técnica, dashboards — qualquer conteúdo onde **legibilidade e hierarquia de informação são prioridade**.
 
-- **Arquivo:** `/opt/data/hermes-agent-design-style-guide.md` (782 linhas, guia completo)
+- **Arquivo:** `/data/data/com.termux/files/home/capitolium/hermes-agent-design-style-guide.md` (782 linhas, guia completo)
 - **Estética:** Blue royal (#0000FF) sobre branco, layout clean, grid modular, sem overlays CRT
 - **Vibe:** Site oficial do Hermes Agent — profissional, técnico, informativo
 - **Paleta:** `--blue-primary: #0000FF`, `--blue-bg: #F0F5FF`, `--blue-border: #CCD9FF`, `--white: #FFFFFF`
@@ -132,6 +132,43 @@ O usuário explicitou a estrutura preferida (após correção). Sempre use esta 
 - Anexos técnicos (fórmulas, listagem de arquivos)
 
 ---
+
+## Mobile — todo relatório HTML precisa abrir bem no celular
+
+O destinatário lê no Telegram, no celular. Entregar HTML sem estas cinco coisas é entregar documento quebrado. Aplicar SEMPRE:
+
+1. **`<meta name="viewport" content="width=device-width, initial-scale=1">`** — sem isso o navegador móvel renderiza a largura de desktop e a página sai minúscula. É o conserto nº 1 e o mais esquecido.
+2. **Tabelas viram cartões empilhados** no breakpoint, com o nome da coluna como rótulo acima do valor. Truque: `th{display:none}`, `tr{display:block;border:1px solid;border-radius:9px}`, `td{display:block}`, `td:before{content:attr(data-label)}` — e o `data-label` é injetado por script a partir do cabeçalho de cada tabela (receita abaixo). Tabela larga com 5 colunas rolando de lado é ilegível no celular; empilhada, lê-se de cima para baixo.
+3. **Grids com `grid-template-columns:1fr`** no breakpoint (`@media (max-width:720px)`), inclusive os que têm estilo inline (`!important`).
+4. **Sumário com âncoras** no topo (`<nav class="toc">` + `id` em cada `h2` + `scroll-margin-top`) — relatório longo no celular sem índice obriga a rolar às cegas.
+5. **Tipografia fluida**: h1 ~25px, h2 ~20px, corpo 15,5px/1,7 no mobile; padding lateral 16px; barras de gráfico viram bloco único (rótulo, barra, valor empilhados).
+
+Receita: viewport + `data-label` + CSS mobile (validada no estudo da SuperCasa, 13/10/2026 — 8 tabelas, 280 células rotuladas, 0 inconsistências):
+
+```python
+import re
+h=open(src,encoding='utf-8').read()
+h=h.replace('<meta charset="utf-8">','<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">')
+def strip_tags(s):
+    return re.sub(r'\s+',' ',re.sub(r'<[^>]+>','',s)).strip()
+def fix(m):
+    t=m.group(0); rows=re.findall(r'<tr>.*?</tr>',t,re.S)
+    heads=[strip_tags(x) for x in re.findall(r'<th\b[^>]*>(.*?)</th>',rows[0],re.S)]
+    new=t
+    for r in rows[1:]:
+        i=[0]
+        def repl(mm):
+            lab=heads[i[0]] if i[0]<len(heads) else ''; i[0]+=1
+            return f'<td data-label="{lab}"{mm.group(1)}>{mm.group(2)}</td>'
+        new=new.replace(r, re.sub(r'<td\b([^>]*)>(.*?)</td>',repl,r,flags=re.S),1)
+    return new
+h=re.sub(r'<table>.*?</table>',fix,h,flags=re.S)
+open(dst,'w',encoding='utf-8').write(h)
+```
+
+CSS mínimo (dentro de `@media (max-width:720px){...}`): `table{display:block} th{display:none} tr{display:block;border:1px solid var(--line);border-radius:9px;margin-bottom:10px} td{display:block;border:0;border-bottom:1px dashed;padding:9px 13px} td:before{content:attr(data-label);display:block;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--teal);font-weight:700;margin-bottom:4px}`.
+
+**Verificação obrigatória:** screenshot em `--window-size=390,6000` e leitura por `vision_analyze` (capa, sumário e uma tabela larga) + testar que cada `data-label` pertence ao cabeçalho da sua tabela em script (contar células e comparar com a lista de `th`). O `@media print`/PDF não muda: o PDF continua A4 com o nº de páginas anterior.
 
 ## Telegram Delivery
 
@@ -232,6 +269,6 @@ Se o usuário pedir explicitamente OUTRA estética (ex: "faz no estilo da Vercel
 
 ### Referências
 
-- Style guide (CRT): `/opt/data/hermes-agent-style-guide.md`
-- Style guide (Official): `/opt/data/hermes-agent-design-style-guide.md`
+- Style guide (CRT): `/data/data/com.termux/files/home/capitolium/hermes-agent-style-guide.md`
+- Style guide (Official): `/data/data/com.termux/files/home/capitolium/hermes-agent-design-style-guide.md`
 - Pesquisa multi-fonte: `references/research-compilation-workflow.md` — fallback chain quando web_search falha, estrutura de HTML ranqueado, fontes prioritárias

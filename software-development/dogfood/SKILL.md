@@ -165,6 +165,13 @@ Save the report to `{output_dir}/report.md`.
 - **Don't forget edge cases**: empty states, very long text, special characters, rapid clicking.
 - When reporting screenshots to the user, include `MEDIA:<screenshot_path>` so they can see the evidence inline.
 
+## Ambiente Mercúrio (Termux/proot)
+
+Ver `references/qa-harness-mercurio-cdp.md`: o terminal não devolve stdout, o
+browser_exec não tem WebGL nem clique real e a aba pode ser roubada — o caminho
+que funciona é subir o Chromium do cache do playwright e dirigir CDP por
+websocket (clique real, screenshot, download de PDF, emulação de viewport).
+
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN e p5.js): usar o Chromium ARM64 compartilhado em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`; não instalar outro browser.

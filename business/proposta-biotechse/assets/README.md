@@ -3,7 +3,7 @@
 Fonte: `img_ee8ef7278ecc.jpg` (1280×720, fundo preto) — logo principal enviado em 27/08/2026.
 
 ## Pasta
-`/opt/mercurio-data/deliverables/biotechse-assets/logos/`
+`/data/data/com.termux/files/home/capitolium/deliverables/biotechse-assets/logos/`
 
 ## Variantes
 

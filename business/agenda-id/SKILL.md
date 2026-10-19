@@ -1,8 +1,8 @@
 ---
 name: agenda-id
-description: "Use ao criar ou ajustar reunião na agenda da ID.
+description: "Use ao criar ou ajustar reunião ou lembrete datado da ID.
 
-Carregue esta skill quando um sócio pedir para criar, ajustar ou conferir reunião na agenda da ID — convites, choques de horário, gates de ok para convidados externos e leitura de volta do evento."
+Carregue esta skill quando um sócio pedir para criar, ajustar ou conferir reunião na agenda da ID — convites, choques de horário, gates de ok para convidados externos e leitura de volta do evento — e também quando pedir um lembrete datado (ex.: me lembra dia 19 de reenviar um aviso), que sai por cron no DM do sócio."
 category: business
 type: Reference
 license: MIT
@@ -40,7 +40,9 @@ agenda, convida fulano, põe o link na descrição").
    e-mail. Nunca invente endereço de e-mail.
 4. **Choque de agenda se reporta**, não se esconde: sobrepor é decisão do dono.
 5. **Nada é "feito" sem leitura de volta.** `create` responde só `{status, id, summary, htmlLink}`
-   — não prova convite enviado nem descrição íntegra.
+   — não prova convite enviado nem descrição íntegra. Retorno **vazio** também não é falha: um
+   `create` pode não imprimir nada e ter criado o evento — **ler a janela de volta antes de
+   repetir**, porque repetir duplica o compromisso na agenda dos convidados.
 6. **Duração e campos ausentes não se inventam, se declaram.** Pedido sem horário final → assuma
    **1h**, escreva o horário final na resposta ("8h30–9h30, assumi 1h") e deixe o dono corrigir em
    uma linha. Campo que só o dono tem (endereço de local presencial) entra como **pergunta**, nunca
@@ -74,6 +76,47 @@ agenda, convida fulano, põe o link na descrição").
 
 Rodar o `google_api.py` com o python do venv que tem `googleapiclient`
 (`$HERMES_HOME/id-nfse-motor/.venv/bin/python`, detalhado em `auxiliar-adm-id`).
+
+## Avisar o compromisso (aviso ao grupo, e-mail e lembrete na véspera)
+
+Pedido típico de sócio: *"avisa todo mundo, me manda e-mail, me lembra na véspera e põe na
+agenda"* — um compromisso, quatro canais. Cada canal tem função própria, e entregar só a agenda
+deixa o pedido pela metade:
+
+| Canal | Função |
+|---|---|
+| **Agenda** | o compromisso em si (dia, hora, local, convidados) |
+| **Grupo** | aviso a todos — quem não lê a agenda precisa saber |
+| **E-mail** | registro que sobrevive ao chat e chega no celular dele |
+| **DM na véspera** | lembrete, quando esquecer custa caro |
+
+- **Grupo da equipe:** `[ID] Núcleo` = `-1004359358267`. Aviso com o helper, que reusa as
+  credenciais do gateway: `hermes send --to telegram:-1004359358267 "..."` (registro e pitfalls
+  do relay em `id-comunicacao-multiusuario`).
+- **Lembrete datado = one-shot de cron, ISO absoluto, `repeat=1`, `deliver` no DM do sócio.**
+  Nada de "em 24h": errar o dia do lembrete é o defeito que o lembrete existia para evitar.
+  O ISO absoluto é lido em **UTC**, não no fuso do dono — 09:00 BRT = `T12:00:00`; confira
+  `schedule.run_at` (volta com `+00:00`) antes de dizer o horário ao dono.
+- **Lembrete de texto fixo sai como `no_agent` + script, não em modo agente.** Escreva o texto
+  em `$HERMES_HOME/scripts/<nome>.sh` (o stdout é entregue verbatim; sem timestamp na saída) e
+  faça `cronjob_manage action=update job_id=<id> script="<nome>.sh" no_agent=true` no job
+  criado com `action=create`. Modo agente fica para lembrete que precisa **compor** texto com a
+  base: job unpinned pode ser **pulado em silêncio** pelo guarda de drift quando o provider/modelo
+  global muda, e o lembrete simplesmente não chega. Mecânica em `hermes-cron-script-dispatch`.
+- **A data que o lembrete cita não se inventa.** Se o prazo não está na base, no e-mail nem no
+  Drive, o texto sai com "o prazo" genérico e a **pergunta** volta ao dono na mesma resposta
+  ("qual é o prazo?") — nunca uma data plausível. O mesmo vale para o canal: se não se sabe se
+  o aviso anterior saiu por e-mail ou WhatsApp, o lembrete manda repetir o canal onde a
+  contraparte responde.
+- **Não dispare teste de lembrete datado:** `action=run` entrega o texto de verdade, com a data
+  errada. Prove o conteúdo rodando o script à mão e lendo a saída de volta.
+- **Confirme o gravado** em `$HERMES_HOME/cron/jobs.json`: `id`, `no_agent`, `script`,
+  `schedule.run_at` e `origin.chat_id` — o `origin` é o que prova para qual DM o
+  `deliver="origin"` vai entregar (o `action=list` não o mostra).
+- **E-mail de lembrete** sai do `admin@idconsultoria.ai` para o endereço **que o dono ditar**
+  (nunca um endereço inferido). O retorno do `send` não prova entrega: conferir depois com
+  `gmail search` na caixa de saída.
+- **Reportar 1–2 linhas por canal** no fim (o que saiu e onde), não um parágrafo.
 
 ## Armadilhas
 

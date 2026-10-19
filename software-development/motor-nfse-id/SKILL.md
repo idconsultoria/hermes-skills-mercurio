@@ -25,10 +25,10 @@ metadata:
 - Ao concluir/avançar uma etapa do motor, atualizar o "ESTADO ATUAL" e as pendências aqui.
 
 ## ESTADO ATUAL (2026-08-30) — RECRIADO (código-fonte perdido na migração)
-**Status geral: motor recriado em `/opt/mercurio-data/id-nfse-motor/` (Fase 1 gera DPS).
+**Status geral: motor recriado em `/data/data/com.termux/files/home/capitolium/id-nfse-motor/` (Fase 1 gera DPS).
 Pausado para emissão em produção até A1 renovado.**
 
-- **Motivo do replay:** na migração `/opt/data → /opt/mercurio-data` o código-fonte do
+- **Motivo do replay:** na migração `/opt/data → /data/data/com.termux/files/home/capitolium` o código-fonte do
   motor (e do iData) NÃO veio — só restaram os `.venv` e `__pycache__`, nos dois lados
   (container atual e host Oracle). O repo `idconsultoria/iData` existe no GitHub e foi
   re-clonado; o motor NFS-e **não está em nenhum repo da org** → foi **recriado** a partir
@@ -61,20 +61,20 @@ Pausado para emissão em produção até A1 renovado.**
   **usuário/senha, não por certificado** → emissão manual segue ok mesmo com A1 vencido.
 
 ## Estrutura / caminhos
-- Motor em **`/opt/data/id-nfse-motor/`**:
+- Motor em **`/data/data/com.termux/files/home/capitolium/id-nfse-motor/`**:
   - `emitir_nfse.py` — gera DPS (CLI; homologação por padrão `--tpAmb 2`). Validado.
   - `Dockerfile` (multi-stage ARM64, python:3.13-slim, não-root) · `requirements.txt` (pinado) ·
     `DEPLOY.md` (build/uso/pendências) · `dados/` (alíquota) · `scripts/` (buscador ISS).
 - **Cron `Alíquota ISS mensal (ID)`** (job `3dfe43219f1b`, dia 5 10h BRT, **job de AGENTE com
   fallback**): busca "ALÍQUOTA DE ISS MM.YYYY" em `gustavo.idteal@gmail.com`, grava
-  `/opt/data/id-nfse-motor/dados/aliquota_iss.json` (o motor lê p/ `pAliq`).
-  Ex.: 2,01% (08/2026). Script: `/opt/data/scripts/buscar_aliquota_iss.sh`.
+  `/data/data/com.termux/files/home/capitolium/id-nfse-motor/dados/aliquota_iss.json` (o motor lê p/ `pAliq`).
+  Ex.: 2,01% (08/2026). Script: `/data/data/com.termux/files/home/capitolium/scripts/buscar_aliquota_iss.sh`.
 
 ## Acessos / infra (para o motor)
-- Venv do motor: `/opt/data/id-nfse-motor/.venv` (nfelib 2.5.2, pynfse-nacional 0.9.5,
+- Venv do motor: `/data/data/com.termux/files/home/capitolium/id-nfse-motor/.venv` (nfelib 2.5.2, pynfse-nacional 0.9.5,
   erpbrasil.*, xsdata, signxml, zeep, lxml).
-- Google: token **`/opt/data/google_token.gustavo_idteal.json`** (conta do ISS/contabilidade);
-  primário `google_token.json` = **admin@idconsultoria.ai**. Venv Google: `/opt/data/venvs/google`.
+- Google: token **`/data/data/com.termux/files/home/capitolium/google_token.gustavo_idteal.json`** (conta do ISS/contabilidade);
+  primário `google_token.json` = **admin@idconsultoria.ai**. Venv Google: `/data/data/com.termux/files/home/capitolium/venvs/google`.
 - **Daemon Docker NÃO acessível do container do Mercúrio** → build de imagem no Oracle host.
 
 ## Fase 2 — como habilitar (quando houver A1 válido)
@@ -89,7 +89,7 @@ Pausado para emissão em produção até A1 renovado.**
 - **A1 quase nunca vem por email** — é gerado localmente (não procurar só em caixa de email).
 - `cp -n` NÃO sobrescreve (clobber) — usar `-f` ao restaurar token primário.
 - Regex do ISS: corpo usa `*agosto*` (marcador) → `mês de[^\w]*(\w+)` na extração.
-- Cron `script` deve ser caminho RELATIVO ao dir de scripts (aqui `/opt/data/scripts`), não absoluto.
+- Cron `script` deve ser caminho RELATIVO ao dir de scripts (aqui `/data/data/com.termux/files/home/capitolium/scripts`), não absoluto.
 - OAuth Google: token é de UMA conta por vez; guardar contas em arquivos separados
   (`google_token.<conta>.json`) para não clobber.
 

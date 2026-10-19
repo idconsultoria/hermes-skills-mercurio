@@ -63,6 +63,33 @@ timestamp: 2026-08-25
   rodada — o que estava sendo pedido era o conteúdo.
 - **Sinal de corte** (reclamação de que a resposta está complicada): parar na hora,
   entregar o que já está pronto e não reabrir o assunto depois.
+- **Pedido de "mais simples / didático"** (vale também para o Gustavo): trocar a linguagem por
+  **uma imagem concreta** do dia a dia (ex.: caderno da conversa + bastão de revezamento) e
+  **religar cada termo técnico a ela**; depois o encadeamento (o que aconteceu, em ordem
+  numerada), o que foi verificado no estado atual e, por fim, as opções de conserto. "Sem perder
+  profundidade" = mantém mecanismo, causa raiz e evidência; simplifica só o vocabulário.
+  Nunca responder a esse pedido com lista de logs ou narração de comando.
+
+### Maxwell — tarefa vira checklist em cadeia (padrão permanente)
+
+Maxwell declarou **TDAH** e pediu isso como regra, não como pedido do dia: **toda tarefa que a ID
+passa a ele** sai como **checklist de ações em cadeia, em Markdown, entregue como arquivo**, mais
+uma **mensagem curta de confirmação** ("checklist enviado para Maxwell").
+
+O que "em cadeia" exige — lista solta não serve:
+
+- **Cadeias nomeadas e ordenadas**, cada passo com **dono** e **pré-requisito** explícito (o que
+  precisa estar fechado antes de começar). A ordem *é* a informação.
+- **Construída da fonte de verdade**, com os números reais do dia (painel de metas, planilha de
+  Symplexis, base da ID). Checklist sem número é lembrete; com número, é plano.
+- **Dono real por etapa.** Tarefa que é de outro sócio (Kel, Tácio, Gustavo) entra com o dono
+  nomeado e a ação dele é **cobrar e fechar data**, nunca executar. Tarefa sem dono nomeado volta
+  para quem atribuiu — não fica com ele por omissão. Ele já corrigiu isso em campo: uma tarefa
+  apontada como dele era do Kel.
+- **Recorte de carga no fim** (do que ele responde integralmente, do que só cobra) e uma **ordem
+  sugerida para os próximos dias**, para a decisão de "o que faço agora" não voltar para ele.
+
+Arquivo versionado (`...-v1.md`), nunca reaproveitando nome.
 
 ## Como identificar o interlocutor com confiança
 
@@ -119,6 +146,6 @@ Pedido do tipo "passe uma mensagem para o Gustavo mencionando X":
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

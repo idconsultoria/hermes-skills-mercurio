@@ -13,7 +13,7 @@ consequências:
 
 1. o script tem de resolver a chave sozinho nos `.env` candidatos; e
 2. o caminho do script na config não pode ser um HERMES_HOME fixo se o home migra
-   (`/opt/data` ⇄ `/opt/mercurio-data`, host Oracle, perfis).
+   (`/opt/data` ⇄ `/data/data/com.termux/files/home/capitolium`, host Oracle, perfis).
 
 Solução: **um ponto de entrada único** no `command` — a linha `for c in ...` que testa candidatos
 em ordem e faz `exec`. Ela funciona mesmo sem o dispatcher instalado.
@@ -65,7 +65,7 @@ cp gemini-stt.py "$HERMES_HOME/scripts/gemini-stt.py"
 install -m 755 gemini-stt /usr/local/bin/gemini-stt   # sh, resolve HERMES_HOME e afins
 
 # 3. config por perfil (HERMES_HOME aponta o perfil; repita para cada um)
-export HERMES_HOME=/opt/mercurio-data/profiles/<nome>
+export HERMES_HOME=/data/data/com.termux/files/home/capitolium/profiles/<nome>
 hermes config set stt.enabled true
 hermes config set stt.provider gemini --force          # SEM --force o CLI recusa a chave
 hermes config set stt.providers.gemini.type command --force

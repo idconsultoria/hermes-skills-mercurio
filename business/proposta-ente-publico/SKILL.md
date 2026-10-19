@@ -138,7 +138,7 @@ pelo Chromium) e `scripts/checar_paginas.sh` (densidade por página, página ór
 Depois: `pdftoppm -png -r 110` e **olhar** capa, matriz, uma frente e o fecho antes de declarar pronto.
 
 **Passo 6 — Entrega e arquivamento.** PDF + HTML versionados (nunca reutilizar nome) em
-`/opt/mercurio-data/entregas/<cliente>/` e no Drive, na pasta do cliente sob `4.3.1. Odigeí`.
+`/data/data/com.termux/files/home/capitolium/entregas/<cliente>/` e no Drive, na pasta do cliente sob `4.3.1. Odigeí`.
 O documento vai ao órgão; a circulação interna é revisão dos sócios.
 
 ### Quando o órgão pedir versão com preço

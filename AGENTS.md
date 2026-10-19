@@ -245,14 +245,14 @@ Scripts vivem em `scripts/` na raiz do repositório. São permitidos exclusivame
 Gera o arquivo `skills_graph.html` com um grafo de força (force-directed graph) interativo a partir dos dados do index.md.
 
 ```bash
-cd /opt/data/skills
+cd /data/data/com.termux/files/home/capitolium/skills
 python3 scripts/generate_graph.py              # gera skills_graph.html + graph_data.json
 python3 scripts/generate_graph.py --json       # só graph_data.json (sem HTML)
 ```
 
 **O que faz:**
 1. Lê o index.md e extrai as relações de cada skill (blocos `**Relações:**` com formato ``- `tipo` → `path` ``)
-2. Se o index.md não tiver relações parseáveis, usa fallback para JSON prévio em `/opt/data/skills_relations_merged.json`
+2. Se o index.md não tiver relações parseáveis, usa fallback para JSON prévio em `/data/data/com.termux/files/home/capitolium/skills_relations_merged.json`
 3. Varre todos os SKILL.md do repositório extraindo: nome, título, tamanho, categoria, sumário e descrição
 4. Constrói a estrutura de nós e arestas, deduplicando relações bidirecionais
 5. Injeta os dados no template `skills_graph_template.html` (substitui `__DATA__` pelos dados JSON)

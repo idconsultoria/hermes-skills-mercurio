@@ -23,7 +23,7 @@
 Chromium x86 falha com `Exec format error` em ARM64 (ver skill `html-to-pdf-chromium`). Usar WeasyPrint:
 
 ```python
-# venv: uv venv /opt/data/venvs/pdf && uv pip install --python /opt/data/venvs/pdf/bin/python weasyprint
+# venv: uv venv /data/data/com.termux/files/home/capitolium/venvs/pdf && uv pip install --python /data/data/com.termux/files/home/capitolium/venvs/pdf/bin/python weasyprint
 import re
 content = open('caso1-extrato-bancario.html').read()
 content = re.sub(r'<link[^>]*fonts\.googleapis[^>]*>', '', content)

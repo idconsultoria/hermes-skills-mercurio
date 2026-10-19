@@ -25,4 +25,4 @@ Portfólio estável em 118. Nenhum candidato a merge: as 4 novas ocupam nichos v
 ## Git
 - Ref local `refs/heads/master` apontava p/ objeto inexistente `c3d0d49` (symlink /.l2s quebrado pela camada de overlay após 03/10). RECUPERADO via `git update-ref refs/heads/master 46a214d` (último commit íntegro = prune 122→41 de 23/08; histórico 03/10–11/10 em working tree).
 - Working tree contém o acumulado 23/08→12/10 (324 arquivos: ciclo 114→118 + trabalho ID 09–10/10 + drift histórico). `git diff` funcional contra HEAD restaurado.
-- Push: script `/opt/data/scripts/push-skills-mercurio.sh` INEXISTENTE (path do prompt não existe neste ambiente); .env tem GITHUB_TOKEN mas sem script validador NÃO há push seguro — push pendente, reportado como erro.
+- Push: script `/data/data/com.termux/files/home/capitolium/scripts/push-skills-mercurio.sh` INEXISTENTE (path do prompt não existe neste ambiente); .env tem GITHUB_TOKEN mas sem script validador NÃO há push seguro — push pendente, reportado como erro.

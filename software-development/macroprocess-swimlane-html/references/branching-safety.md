@@ -52,4 +52,4 @@ const FASE3 = [{num:"3.1", ...}, ...5]
 
 ## Arquivo de referência
 
-`/opt/mercurio-data/deliverables/safety-macroprocesso-v13.html` — abrir como exemplo antes de gerar novo branching. Para docs lineares (Telecom v12, Medical v13) não usar branching.
+`/data/data/com.termux/files/home/capitolium/deliverables/safety-macroprocesso-v13.html` — abrir como exemplo antes de gerar novo branching. Para docs lineares (Telecom v12, Medical v13) não usar branching.

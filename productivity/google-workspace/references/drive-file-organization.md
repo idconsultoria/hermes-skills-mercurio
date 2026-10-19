@@ -15,7 +15,7 @@ Move all files matching a name pattern into a folder, then deduplicate:
 
 ```bash
 # Move all Monster_Vol13_Q85 files into the Monster folder
-python3 /opt/data/skills/productivity/google-workspace/scripts/drive-move-to-folder.py \
+python3 /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/drive-move-to-folder.py \
     "1lGbMpWC7PvP7FOQtgqV8c4nkgjDuNOrD" \
     "Monster_Vol13_Q85"
 ```
@@ -32,7 +32,7 @@ After a series is fully uploaded, loop through all volumes:
 ```bash
 FOLDER_ID="1lGbMpWC7PvP7FOQtgqV8c4nkgjDuNOrD"
 for v in $(seq 1 18); do
-  python3 /opt/data/skills/productivity/google-workspace/scripts/drive-move-to-folder.py \
+  python3 /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/drive-move-to-folder.py \
     "$FOLDER_ID" \
     "Monster_Vol$(printf '%02d' $v)_Q85"
 done

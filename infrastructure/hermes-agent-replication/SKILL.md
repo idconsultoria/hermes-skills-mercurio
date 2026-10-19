@@ -47,8 +47,8 @@ venvs, scripts, cron, motores. Equivalente só existe se conferido contra o vivo
   **anexe seções via `patch` sequenciais**, usando como forra o texto final de cada bloco e
   trocando-o por si mesmo + a seção nova. Mantenha cada chamada **< ~8K tokens**. Encerre com
   `</body></html>` no último bloco.
-- **Diretório de entrega sem permissão.** No container do Mercúrio, `/opt/data/deliverables`
-  é de root e **não é gravável**; use `/opt/data/entregas/` (hermes:hermes). Confirme com
+- **Diretório de entrega sem permissão.** No container do Mercúrio, `/data/data/com.termux/files/home/capitolium/deliverables`
+  é de root e **não é gravável**; use `/data/data/com.termux/files/home/capitolium/entregas/` (hermes:hermes). Confirme com
   `ls -la` o dono antes de escrever.
 - **Mudanças locais não-commitadas em skills** (working tree ≠ origin/master). Decida — e
   deixe explícito no guia — se replica commitado ou working-tree. Recomendação: sincronizar/commit

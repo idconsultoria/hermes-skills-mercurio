@@ -4,12 +4,12 @@ O usuário quer ver a sessão do Pi progredindo **como se tivesse invocado a TUI
 custo, tool calls, footer — SEM anexar ao processo (anexar = 2 escritores no mesmo JSONL = corrupção).
 Construído e validado no Zera (14/08/2026). Três níveis de espectador, todos read-only:
 
-## 1. Texto formatado — `pi_follow.py` (`/opt/data/scripts/pi_follow.py`)
+## 1. Texto formatado — `pi_follow.py` (`/data/data/com.termux/files/home/capitolium/scripts/pi_follow.py`)
 
 Faz tail do JSONL e formata falas (ciano), tool calls (verde), resultados (dim), thinking (dim).
 `--replay` mostra o histórico antes de seguir ao vivo. Não escreve no arquivo — seguro.
 
-## 2. Browser com a interface do Pi — `pi_follow_web.py` (`/opt/data/scripts/pi_follow_web.py`)
+## 2. Browser com a interface do Pi — `pi_follow_web.py` (`/data/data/com.termux/files/home/capitolium/scripts/pi_follow_web.py`)
 
 - Watcher + HTTP server (porta 8100) que **re-exporta a sessão via `pi --export <session> <out.html>`**
   a cada mudança do JSONL (o export usa os componentes REAIS da TUI — tema `#8abeb7`, fidelidade total).
@@ -23,7 +23,7 @@ Faz tail do JSONL e formata falas (ciano), tool calls (verde), resultados (dim),
 Copia para dentro da árvore do pacote e roda com node. Reusa os componentes reais do Pi:
 
 ```bash
-cp /opt/data/scripts/pi_follow_tui.mjs /opt/data/pi-global/lib/node_modules/@earendil-works/pi-coding-agent/
+cp /data/data/com.termux/files/home/capitolium/scripts/pi_follow_tui.mjs /opt/data/pi-global/lib/node_modules/@earendil-works/pi-coding-agent/
 cd /opt/data/pi-global/lib/node_modules/@earendil-works/pi-coding-agent && node pi_follow_tui.mjs
 ```
 

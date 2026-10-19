@@ -16,7 +16,7 @@ Não trocar por link do Google Fonts: o Chromium headless trava em fonte remota.
 ## Render (rodapé numerado pelo Chromium)
 
 ```bash
-/opt/mercurio-data/node/bin/node \
+/data/data/com.termux/files/home/capitolium/node/bin/node \
   skills/business/proposta-ente-publico/scripts/render_doc.cjs \
   /caminho/ID-Solucoes-<Orgao>-<UF>-vX.Y.html \
   /caminho/ID-Solucoes-<Orgao>-<UF>-vX.Y.pdf \
@@ -27,7 +27,7 @@ O script usa o Chromium compartilhado (`/opt/data/.playwright/chromium-1129/chro
 `displayHeaderFooter: true` e `footerTemplate` — a numeração de página sai do Chromium. **Nunca
 digitar "página N" no HTML.**
 
-Node errado derruba o render: usar `/opt/mercurio-data/node/bin/node` (o node do Termux reporta
+Node errado derruba o render: usar `/data/data/com.termux/files/home/capitolium/node/bin/node` (o node do Termux reporta
 `platform: android` e o Playwright aborta). CommonJS (`.cjs`), não ESM.
 
 ## Verificação de densidade

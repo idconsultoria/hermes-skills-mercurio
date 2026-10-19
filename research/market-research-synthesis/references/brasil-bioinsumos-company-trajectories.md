@@ -55,4 +55,4 @@ Seed R$ 2–5 mi (Tarvos R$ 5 mi 06/2023; Ecotrace R$ 2 mi 04/2024; Guarda R$ 4,
 - Otimista: R$ 60–150 mi/ano (0,5–1,2%) — produto registrado + distribuição nacional + contrato âncora escalado.
 - Condicionantes das fontes: registro MAPA 12–18 meses (sem registro, teto = serviços + on-farm); margens caindo por comoditização; gargalo de distribuição/crédito (caso AgroGalaxy/Biotrop R$ 115 mi); rodada realista para o perfil: R$ 5–30 mi.
 
-Relatório completo da sessão: `/opt/data/relatorio_trajetorias_receita_bioinsumos.md`.
+Relatório completo da sessão: `/data/data/com.termux/files/home/capitolium/relatorio_trajetorias_receita_bioinsumos.md`.

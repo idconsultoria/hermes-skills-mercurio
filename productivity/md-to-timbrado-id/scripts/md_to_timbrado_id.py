@@ -1,4 +1,4 @@
-#!/opt/data/venvs/google/bin/python
+#!/data/data/com.termux/files/home/capitolium/venvs/google/bin/python
 """md_to_timbrado_id.py — MD -> Google Doc no papel timbrado da ID, formatado perfeito.
 
 RECEITA PADRÃO (validada 2026-08-20 com o PRD da Solution Master):
@@ -29,7 +29,7 @@ from googleapiclient.discovery import build
 HERMES_HOME = os.environ.get("HERMES_HOME", "/opt/data")
 TOKEN = Path(HERMES_HOME) / "google_token.json"
 # Motor md->gdoc: resolver pelo HERMES_HOME (as skills vivem dentro dele) em vez de
-# caminho absoluto fixo — o host muda de /opt/data para /opt/mercurio-data e o
+# caminho absoluto fixo — o host muda de /opt/data para /data/data/com.termux/files/home/capitolium e o
 # caminho fixo quebrava o script sem aviso.
 SCRIPT = os.environ.get("MD_TO_GDOC") or str(
     Path(HERMES_HOME) / "skills/productivity/google-workspace/scripts/md-to-gdoc.py"

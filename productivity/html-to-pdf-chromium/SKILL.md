@@ -18,7 +18,7 @@ Este proot usa **uma única cópia funcional do Chromium ARM64**. Não instale n
 ```bash
 CHROMIUM=/opt/data/.playwright/chromium-1129/chrome
 PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright
-NODE_PATH=/opt/mercurio-data/node_modules
+NODE_PATH=/data/data/com.termux/files/home/capitolium/node_modules
 ```
 
 - **Arquivos locais** (HTML→PDF, screenshot, DOM, SVG/PNG, Mermaid e BPMN): use o Chromium compartilhado acima, preferencialmente via Playwright ou pelo binário com `executablePath`.
@@ -32,7 +32,7 @@ O runtime já está instalado. Para validar sem baixar nada:
 ```bash
 /opt/data/.playwright/chromium-1129/chrome --version
 PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright \
-NODE_PATH=/opt/mercurio-data/node_modules \
+NODE_PATH=/data/data/com.termux/files/home/capitolium/node_modules \
 node -e "const {chromium}=require('playwright'); console.log(chromium.executablePath())"
 ```
 
@@ -74,9 +74,9 @@ Dois erros silenciosos derrubam o render local. Confira sempre antes de culpar o
 1. **Node do Termux quebra o Playwright.** `/data/data/com.termux/files/usr/bin/node`
    reporta `process.platform === 'android'`, e o `playwright-core` aborta com
    `Error: Unsupported platform: android`. **Use o Node do runtime:**
-   `/opt/mercurio-data/node/bin/node` (linux, v22).
+   `/data/data/com.termux/files/home/capitolium/node/bin/node` (linux, v22).
 2. **Import ESM falha no proot** (`import { chromium } from 'playwright'` → mesmo erro de
-   platform). **Usar CommonJS:** `const { chromium } = require('/opt/mercurio-data/node_modules/playwright')`.
+   platform). **Usar CommonJS:** `const { chromium } = require('/data/data/com.termux/files/home/capitolium/node_modules/playwright')`.
 
 O Chromium compartilhado foi **atualizado de 1117 para 1129** e o layout mudou: agora é
 `/opt/data/.playwright/chromium-1129/chrome` — **sem** o subdiretório `chrome-linux/`.
@@ -87,7 +87,7 @@ cópia ARM64, nada instalado por perfil). Chromium verificado: **128.0.0.0**.
 ### Receita verificada — documento A4 com rodapé numerado
 
 ```js
-const { chromium } = require('/opt/mercurio-data/node_modules/playwright');
+const { chromium } = require('/data/data/com.termux/files/home/capitolium/node_modules/playwright');
 const b = await chromium.launch({ executablePath:'/opt/data/.playwright/chromium-1129/chrome',
   args:['--no-sandbox','--disable-dev-shm-usage'] });
 const p = await b.newPage();
@@ -99,7 +99,7 @@ await p.pdf({ path:OUT, printBackground:true, preferCSSPageSize:true,
   margin:{top:'15mm',bottom:'15mm',left:'18mm',right:'18mm'} });
 ```
 
-Rodar com `/opt/mercurio-data/node/bin/node render.cjs` (script **.cjs**, não .mjs).
+Rodar com `/data/data/com.termux/files/home/capitolium/node/bin/node render.cjs` (script **.cjs**, não .mjs).
 
 ### Paginação de documento A4 (pitfall de layout real)
 
@@ -121,7 +121,7 @@ Rodar com `/opt/mercurio-data/node/bin/node render.cjs` (script **.cjs**, não .
 ```bash
 CHROMIUM=/opt/data/.playwright/chromium-1129/chrome
 "$CHROMIUM" --version
-PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright NODE_PATH=/opt/mercurio-data/node_modules \
+PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright NODE_PATH=/data/data/com.termux/files/home/capitolium/node_modules \
   node -e "const {chromium}=require('playwright'); console.log(chromium.executablePath())"
 ```
 
@@ -145,6 +145,6 @@ Depois de gerar o PDF, conferir `stat`/`pdfinfo` para existência, tamanho e pá
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1129/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

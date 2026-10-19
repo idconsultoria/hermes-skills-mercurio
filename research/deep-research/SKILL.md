@@ -433,7 +433,7 @@ When creating issues with large markdown research reports:
 
 ### Subagent timeout: recovery via state.db
 
-When subagents timeout after 20+ tool calls, their sessions persist in `/opt/data/state.db`.
+When subagents timeout after 20+ tool calls, their sessions persist in `/data/data/com.termux/files/home/capitolium/state.db`.
 Use the queries and code in `references/subagent-session-recovery.md` to extract partial results.
 This is especially valuable when subagents collected URLs or extracted pages before timeout.
 

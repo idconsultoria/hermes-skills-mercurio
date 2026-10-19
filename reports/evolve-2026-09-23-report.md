@@ -46,4 +46,4 @@ NFS-e SergipeTec (auxiliar-adm-id + cobranca-nfse-clientes.md), Symplexis víncu
 - Commit único `update+evolve 2026-09-23` (ciclo combinado: update indexou + evolve relacionou; mesma mudança lógica).
 - Arquivos: index.md, 3 SKILL.md fix, 14 modified ID, ~25 untracked ID, reports ×2, grafo + JSON.
 - Excluído do commit: .locks/ (lixo), 6 DESCRIPTION.md drift (prune pendente).
-- Push via /opt/data/scripts/push-skills-mercurio.sh.
+- Push via /data/data/com.termux/files/home/capitolium/scripts/push-skills-mercurio.sh.

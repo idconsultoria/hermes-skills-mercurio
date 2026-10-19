@@ -1,8 +1,8 @@
 # Fontes da Pesquisa — Planejamento Estratégico 2h
 
 Pesquisa deep-research (Quick) em 15/08/2026: 3 frentes paralelas, 39 referências.
-Relatórios completos: `/opt/data/relatorio-frameworks-planejamento-estrategico.md`,
-`/opt/data/relatorio-workshop-planejamento-2h.md`, `/opt/data/relatorio-planejamento-estrategico-pme-brasil.md`.
+Relatórios completos: `/data/data/com.termux/files/home/capitolium/relatorio-frameworks-planejamento-estrategico.md`,
+`/data/data/com.termux/files/home/capitolium/relatorio-workshop-planejamento-2h.md`, `/data/data/com.termux/files/home/capitolium/relatorio-planejamento-estrategico-pme-brasil.md`.
 
 ## Frameworks (adequação 2h)
 

@@ -33,8 +33,8 @@ O renderer usa `/opt/data/.playwright/chromium-1117/chrome-linux/chrome` via Pla
 ## Chromium compartilhado
 
 - Browser: `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`
-- Runtime Playwright: `/opt/mercurio-data/node_modules/playwright`
-- Bundle bpmn-js: `/opt/mercurio-data/node_modules/bpmn-js/dist/bpmn-viewer.production.min.js`
+- Runtime Playwright: `/data/data/com.termux/files/home/capitolium/node_modules/playwright`
+- Bundle bpmn-js: `/data/data/com.termux/files/home/capitolium/node_modules/bpmn-js/dist/bpmn-viewer.production.min.js`
 - Cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`
 
 ## Renderizar um BPMN
@@ -69,7 +69,7 @@ with open('diagram.bpmn', 'w') as f:
 Usar `scripts/render_bpmn.js`.
 
 ```javascript
-const { chromium } = require('/opt/mercurio-data/node_modules/playwright');
+const { chromium } = require('/data/data/com.termux/files/home/capitolium/node_modules/playwright');
 const fs = require('fs');
 
 const bpmnXML = fs.readFileSync('diagram.bpmn', 'utf8');
@@ -216,6 +216,6 @@ Tudo orquestrado pelo `run_one.py`, que usa exponential backoff (`agemini/backof
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

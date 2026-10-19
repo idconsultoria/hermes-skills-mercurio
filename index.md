@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 118 skills** em 13 categorias.
+**Total: 123 skills** em 13 categorias.
 
 ---
 
@@ -37,6 +37,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `agenda-id` | Reference | Use ao criar ou ajustar reunião na agenda da ID. |
 | `proposta-ente-publico` | Orchestrator | Use ao elaborar proposta/documento para órgão público. |
 | `organizacao-drive-id` | Orchestrator | Use ao organizar pastas e docs de cliente no Drive da ID. |
+| `documento-a4-marca-id` | Orchestrator | Documento A4 com identidade ID (HTML→PDF). |
 
 ## legal — Direito brasileiro e contratos ID
 
@@ -157,6 +158,10 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `stack2-mesh-failback` | Orchestrator | Failover e failback da Stack 2 (mesh) sem loop e sem perda. |
 | `dns-dominios-id` | Reference | Use quando um nome/domínio da ID não resolve no DNS. |
 | `telegram-group-bot-diagnosis` | Reference | Use quando um bot do Telegram não responde em grupo. |
+| `auditoria-automacoes-google-script` | ToolIntegration | Auditar/desativar automações de Apps Script. |
+| `hermes-gateway-stall-diagnosis` | Reference | Diagnóstico de sessão travada e gateway reiniciado (lease, watchdog). |
+| `hermes-memory-file-curation` | Reference | Compactar MEMORY.md/USER.md acima do limite de chars. |
+| `hermes-session-forensics` | Orchestrator | Buscar histórico de sessões fora do perfil atual (state.db read-only). |
 
 ## cicd-oracle-preview — Deploy & preview
 
@@ -279,6 +284,15 @@ Similar:
 - `moodle-id-operacoes` → `devops-artemishub`
 - `artemishub-onboarding-patterns` → `devops-artemishub`
 - `artemishub-onboarding-patterns` → `react-fastapi-debugging`
+- `documento-a4-marca-id` → `md-to-timbrado-id`
+- `documento-a4-marca-id` → `html-pdf-fidelity`
+- `documento-a4-marca-id` → `brand-design-system-html`
+- `auditoria-automacoes-google-script` → `auxiliar-adm-id`
+- `hermes-gateway-stall-diagnosis` → `hermes-session-forensics`
+- `hermes-gateway-stall-diagnosis` → `telegram-group-bot-diagnosis`
+- `hermes-gateway-stall-diagnosis` → `messaging-platforms`
+- `hermes-memory-file-curation` → `id-comunicacao-multiusuario`
+- `hermes-session-forensics` → `peer-session-audit`
 
 Uses:
 - `agenda-id` → `google-workspace`
@@ -391,7 +405,11 @@ Uses:
 - `painel-metas-id` → `contratos-justos-id`
 - `organizacao-drive-id` → `google-workspace`
 - `organizacao-drive-id` → `md-to-timbrado-id`
-- `organizacao-drive-id` → `formalizacao-acordo-cliente`
+- `documento-a4-marca-id` → `html-to-pdf-chromium`
+- `documento-a4-marca-id` → `elaboracao-proposta-comercial`
+- `auditoria-automacoes-google-script` → `google-workspace`
+- `hermes-session-forensics` → `hermes-gateway-stall-diagnosis`
+- `hermes-memory-file-curation` → `hermes-session-forensics`
 
 ---
 

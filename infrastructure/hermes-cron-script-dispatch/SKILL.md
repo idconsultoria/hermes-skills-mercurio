@@ -12,7 +12,7 @@ timestamp: 2026-08-30T00:00:00Z
 # Hermes cron — script dispatch resiliente a HERMES_HOME
 
 Como fazer com que os crons do Hermes usem scripts em `HERMES_HOME/scripts` e sobrevivam
-à variação do diretório home (migração `/opt/data` → `/opt/mercurio-data`, ou volta ao host
+à variação do diretório home (migração `/opt/data` → `/data/data/com.termux/files/home/capitolium`, ou volta ao host
 Oracle onde o bind antigo era `/opt/data`).
 
 ## Restrição dura do scheduler (verificada em produção)
@@ -22,8 +22,19 @@ arquivo* resolvido contra `~/.hermes/scripts/` (ou seja, `/root/.hermes/scripts/
 
 > `Script path must be relative to ~/.hermes/scripts/. Got absolute or home-relative path: '...'`
 
-Portanto NÃO dá para apontar o cron direto para `/opt/mercurio-data/scripts/foo.sh`.
+Portanto NÃO dá para apontar o cron direto para `/data/data/com.termux/files/home/capitolium/scripts/foo.sh`.
 A solução é o padrão de dois arquivos abaixo.
+
+**Atualização (15/10/2026, build em produção no Mercúrio):** nesta versão o nome do script é
+resolvido contra `HERMES_HOME/scripts/` (aqui `/data/data/com.termux/files/home/capitolium/scripts/`). Colocar o
+arquivo só em `~/.hermes/.hermes/scripts/` e criar o job por nome falha com:
+
+> `Script file not found: /data/data/com.termux/files/home/capitolium/scripts/foo.sh. Create it in /data/data/com.termux/files/home/capitolium/scripts/ first.`
+
+Regra prática: **coloque o script (ou um launcher `.sh` que descobre o python e executa o
+`.py` vizinho) em `$HERMES_HOME/scripts/`**, e mantenha um dispatcher em `~/.hermes/scripts/`
+só como fallback de builds antigos. Antes de agendar, rode o caminho real à mão:
+`bash $HERMES_HOME/scripts/<nome>.sh --dry-run`.
 
 ## Padrão de dois arquivos (resiliente)
 1. **Dispatcher magro** em `~/.hermes/scripts/<nome>.sh` (é o que o cron referencia pelo
@@ -31,14 +42,14 @@ A solução é o padrão de dois arquivos abaixo.
    ```bash
    #!/usr/bin/env bash
    set -euo pipefail
-   HH="${HERMES_HOME:-/opt/mercurio-data}"
+   HH="${HERMES_HOME:-/data/data/com.termux/files/home/capitolium}"
    [[ ! -d "$HH" ]] && HH=/opt/data
    TARGET="$HH/scripts/<nome>.sh"
    [[ ! -f "$TARGET" ]] && { echo "ERRO: $TARGET ausente"; exit 4; }
    exec "$TARGET" "$@"
    ```
 2. **Lógica real** em `$HERMES_HOME/scripts/<nome>.sh` — com resolução multi-home para
-   backend, venv e dados (ex.: procura em `/opt/mercurio-data` E `/opt/data`).
+   backend, venv e dados (ex.: procura em `/data/data/com.termux/files/home/capitolium` E `/opt/data`).
 
 Assim o cron aponta para um nome (permitido) e a execução sempre cai no HERMES_HOME correto,
 funcione qual for o home ativo. O wrapper real deve também varrer múltiplos candidatos de
@@ -60,9 +71,36 @@ nunca encontra nada, lista que volta vazia, contagem zero em campo que deveria t
 Ao criar um watchdog novo, exercite-o com um caso que **deve** casar e outro que **deve**
 falhar — silêncio validado só no caso mudo não prova nada.
 
+## Lembrete datado one-shot: script puro, não agente
+
+Para um lembrete cuja função é chegar no dia certo (pedido do tipo "me lembra dia 19 de
+reenviar X"), o job é `no_agent=true` com o texto já pronto no script — o stdout é entregue
+verbatim:
+
+1. Escreva `$HERMES_HOME/scripts/<nome>.sh` imprimindo **só o texto do lembrete**
+   (`cat <<'TXT'`) — modelo pronto em `templates/lembrete-datado-one-shot.sh` (`chmod +x`
+   depois de copiar). Sem timestamp nem "gerado em": a saída é uma mensagem humana, e a data já
+   está escrita no corpo.
+2. `action=create` com `schedule="<AAAA-MM-DD>T<HH>:00:00"`, `repeat=1`, `deliver="origin"`;
+   depois `action=update` com `script="<nome>.sh"` + `no_agent=true`.
+3. Leia de volta `$HERMES_HOME/cron/jobs.json` (ver Pitfalls) antes de responder ao dono.
+
+Por que não modo agente: job unpinned é **pulado em silêncio** pelo guarda de drift quando o
+provider/modelo global muda (`drift_skip`), e ainda depende de provedor no ar — num lembrete de
+uma data só isso é o risco inteiro da tarefa entregue a quem não devia carregá-lo. Modo agente
+fica para lembrete que precisa **compor** texto com a base.
+
+**ISO absoluto é interpretado em UTC**, independente do fuso do dono: 09:00 BRT = `12:00:00`, e
+"23h de quinta" num job de véspera aparece como `02:00:00` do dia seguinte. Confirme
+`schedule.run_at` antes de afirmar o horário.
+
+**Não dispare teste de um lembrete que carrega data.** `action=run` entrega o texto de verdade
+na hora e o dono recebe um lembrete com a data errada. Prove o conteúdo rodando o script à mão;
+o caminho de entrega já está provado pelos jobs `no_agent` que rodam todo dia.
+
 ## Verificação (produção)
 No job `e60e713b0b62` (iData diário) o teste manual retornou `exit 4` com:
-`ERRO: runner-idata-diario.sh não encontrado em /opt/mercurio-data/scripts/runner-idata-diario.sh /opt/data/scripts/runner-idata-diario.sh`
+`ERRO: runner-idata-diario.sh não encontrado em /data/data/com.termux/files/home/capitolium/scripts/runner-idata-diario.sh /data/data/com.termux/files/home/capitolium/scripts/runner-idata-diario.sh`
 — provando que o dispatcher achou o HERMES_HOME e o wrapper varreu os dois homes. O erro era
 de *backend ausente*, não de caminho. ✓ (A resiliência de caminho está validada; o que falta
 é restaurar o backend do host/repo.)
@@ -213,10 +251,31 @@ Resolvendo DNS: se `/etc/resolv.conf` aponta para `100.64.0.0/10`, é MagicDNS d
 resolver** — e se vários jobs caíram no mesmo minuto, é o resolver, não cada script.
 
 ## Pitfalls
+- `no_agent` + `exit 0` + stdout **não vazio** = stdout é ENTREGUE verbatim ao destino; só
+  `exit 0` **com stdout vazio** é silêncio. Use isso para um job script-only que envia
+  mensagens por conta própria (Bot API/curl) e imprime uma confirmação curta
+  (`Fulano: entregue (msg 123)`) — o principal recebe o recibo sem pagar chamada de LLM.
+- Job script-only que **envia mensagem** só se prova enviando: dê ao script um modo
+  `--test` que manda apenas para o principal com prefixo `[teste]` e rode à mão antes de
+  agendar. Para validar auth+chat sem sujar a caixa dos outros, use `sendChatAction`
+  (`action=typing`) nos chat_ids de destino — não cria mensagem e prova o caminho.
 - Nunca mapear destinatário por @handle ou nome de exibição — o Telegram permite nickname divergente e o erro vira falso "não entregue"; casar sempre pelo `telegram:<chat_id>` do campo `deliver`.
 - Nunca passar caminho absoluto no campo `script` — o scheduler recusa com erro claro.
+- `cronjob_manage action=create` **não persiste** `model`/`provider`: o job nasce com
+  `"model": null` mesmo com os campos passados, e `action=update` os recusa com
+  `No updates provided`. Para pinear inferência, use a CLI
+  (`hermes cron edit <id> --model <m> --provider <p>`); se a tarefa não precisa de LLM, resolva
+  pelo `no_agent` em vez de brigar com o pin.
+- **Formato do `cron/jobs.json`**: cada job tem `id` (o `job_id` só existe no retorno das
+  tools) e `origin` = `{platform, chat_id, chat_name, thread_id, user_id}` capturado na criação.
+  `origin` é o único campo que prova para onde um `deliver="origin"` entrega — `action=list`
+  não o mostra. Case por `id` (ou `name`) no arquivo, não por substring do JSON inteiro.
+- **Saída de script se confirma por arquivo**: rode
+  `bash script.sh > /tmp/x.out 2>&1; echo rc=$?` e **leia o arquivo**. `exit 0` com stdout vazio
+  é o caso mudo do watchdog — silêncio legítimo e script que não imprimiu nada são
+  indistinguíveis sem ler o conteúdo.
 - `HERMES_HOME` pode NÃO estar no `.env` (neste ambiente não estava); por isso o dispatcher
-  tem fallback `${HERMES_HOME:-/opt/mercurio-data}` + checagem de existência do dir.
+  tem fallback `${HERMES_HOME:-/data/data/com.termux/files/home/capitolium}` + checagem de existência do dir.
 - `cronjob list` pode reportar `gateway_running: false` — os jobs ficam agendados mas não
   disparam até `hermes gateway start`. Sempre avisar o usuário se o gateway estiver parado.
 - Jobs com `drift_skip` (provider/modelo global mudou e o job é unpinned) ficam pausados por

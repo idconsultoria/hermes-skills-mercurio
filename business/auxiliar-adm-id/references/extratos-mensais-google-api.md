@@ -1,6 +1,6 @@
 # Google API — download de anexo do Gmail e upload no Drive (extratos mensais)
 
-Técnica validada em 20/08/2026 ao arquivar extratos/faturas de julho/2026. Atualizada 01/09/2026 para HERMES_HOME=/opt/mercurio-data.
+Técnica validada em 20/08/2026 ao arquivar extratos/faturas de julho/2026. Atualizada 01/09/2026 para HERMES_HOME=/data/data/com.termux/files/home/capitolium.
 **Muitos anexos NÃO vêm embutidos no corpo da mensagem** — vêm como `attachmentId`
 separado, exigindo uma 2ª chamada à API para baixar. Código mínimo que funciona:
 
@@ -12,10 +12,10 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 
-# 01/09/2026 — HERMES_HOME correto é /opt/mercurio-data, não /opt/data
+# 01/09/2026 — HERMES_HOME correto é /data/data/com.termux/files/home/capitolium, não /opt/data
 # NUNCA usar gustavomelloenciv@gmail.com — usar exclusivamente admin e gustavo.idteal
 import os
-HH = os.environ.get("HERMES_HOME", "/opt/mercurio-data")
+HH = os.environ.get("HERMES_HOME", "/data/data/com.termux/files/home/capitolium")
 TOKEN_GMAIL = f"{HH}/google_token.gustavo_idteal.json"   # caixa de origem do email (gustavo.idteal@gmail.com)
 d=json.loads(open(TOKEN_GMAIL).read())
 if not d.get("type"): d["type"]="authorized_user"

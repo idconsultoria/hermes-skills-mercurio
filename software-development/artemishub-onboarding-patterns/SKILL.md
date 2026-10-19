@@ -24,7 +24,7 @@ Classe de problemas do fluxo de cadastro público (`POST /api/empresas` + `PUT /
 ## Diagnóstico relâmpago
 
 ```bash
-K=/opt/mercurio-data/skills/cicd-oracle-preview/devops-artemishub/references/deploy_key.pem
+K=/data/data/com.termux/files/home/capitolium/skills/cicd-oracle-preview/devops-artemishub/references/deploy_key.pem
 ssh -i "$K" ubuntu@129.146.163.107 'cd /home/ubuntu/selfhost/artemishub && docker compose logs --tail=200 | grep -A2 CheckViolation'
 docker exec artemishub-db psql -U app -d artemishub -c "SELECT conname, pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid='public.empresas_parque'::regclass"
 docker exec artemishub-db psql -U app -d artemishub -c "SELECT conname, pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid='public.empresas'::regclass"

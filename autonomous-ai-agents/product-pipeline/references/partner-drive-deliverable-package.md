@@ -8,7 +8,7 @@ Um parceiro de domínio (CFP certificado, especialista, consultor) tem disponibi
 
 1. **Mapear a pasta do projeto no Drive** primeiro:
    ```bash
-   GAPI="/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/google_api.py"
+   GAPI="/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/google_api.py"
    $GAPI drive search "'<FOLDER_ID>' in parents" --raw-query --max 30
    ```
    Identificar subpastas existentes (Fontes, Produto, Diretrizes, etc.) antes de criar novas.
@@ -36,7 +36,7 @@ Um parceiro de domínio (CFP certificado, especialista, consultor) tem disponibi
 
 5. **Mover arquivos entre pastas** via PATCH na API (o google_api.py não tem `move`):
    - GET `files/{id}?fields=parents` → PATCH `files/{id}?addParents={target}&removeParents={current}`
-   - Token OAuth em `/opt/data/google_token.json` (campo `token`).
+   - Token OAuth em `/data/data/com.termux/files/home/capitolium/google_token.json` (campo `token`).
    - Script reutilizável: `scripts/drive_move.py` no repo do projeto (ou recriar).
 
 6. **Reescrever o guia mestre (v2)** com links diretos por entrega e por documento, e **mover o guia antigo para a lixeira** (`drive delete` → trashed, reversível). Compartilhar docs como `--type anyone --role writer` para o parceiro responder inline.

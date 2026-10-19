@@ -42,7 +42,7 @@ A autenticação exige 4 elementos (o "par" certificado+chave e as credenciais d
 | `client_secret` | topo de `etl/extratores/api_inter.py` |
 
 - Os arquivos estão versionados no repo **`idconsultoria/iData`** (privado). Clone/atualize
-  localmente (ex.: `/opt/data/work/idata`) antes de usar a skill.
+  localmente (ex.: `/data/data/com.termux/files/home/capitolium/work/idata`) antes de usar a skill.
 - Conta corrente PJ: **352969059** (consta no código como `x-conta-corrente`).
 - Endpoints (produção, CDPJ partners):
   - token: `https://cdpj.partners.bancointer.com.br/oauth/v2/token` (grant `client_credentials`, scope `extrato.read`)
@@ -58,10 +58,10 @@ A autenticação exige 4 elementos (o "par" certificado+chave e as credenciais d
 ```bash
 # clonar o motor (se ainda não existir)
 TOKEN=$(grep -E "^GITHUB_TOKEN=" /opt/data/.env | head -1 | cut -d= -f2- | tr -d '"')
-git clone "https://x-access-token:${TOKEN}@github.com/idconsultoria/iData.git" /opt/data/work/idata
+git clone "https://x-access-token:${TOKEN}@github.com/idconsultoria/iData.git" /data/data/com.termux/files/home/capitolium/work/idata
 # venv
-uv venv /opt/data/work/idata/.venv -q
-uv pip install -q -p /opt/data/work/idata/.venv/bin/python -r /opt/data/work/idata/requirements.txt
+uv venv /data/data/com.termux/files/home/capitolium/work/idata/.venv -q
+uv pip install -q -p /data/data/com.termux/files/home/capitolium/work/idata/.venv/bin/python -r /data/data/com.termux/files/home/capitolium/work/idata/requirements.txt
 ```
 
 REPO e PY são ajustáveis no script por env var (ver `scripts/inter_api.py`) caso o clone
@@ -72,8 +72,8 @@ viva em outro caminho.
 Comandos (read-only por padrão; relatório apenas gera arquivo HTML local):
 
 ```bash
-PY=/opt/data/work/idata/.venv/bin/python
-SC=/opt/data/skills/business/inter-api-id-consultoria/scripts/inter_api.py
+PY=/data/data/com.termux/files/home/capitolium/work/idata/.venv/bin/python
+SC=/data/data/com.termux/files/home/capitolium/skills/business/inter-api-id-consultoria/scripts/inter_api.py
 
 # saldo atual
 $PY $SC saldo
@@ -84,7 +84,7 @@ $PY $SC extrato --inicio 2026-06-01 --fim 2026-06-30
 # extrato resumido (data, tipo, titulo, valor)
 $PY $SC extrato --inicio 2026-06-01 --fim 2026-06-30 --resumo
 # relatório financeiro HTML (identidade ID) de um período
-$PY $SC relatorio --inicio 2026-06-01 --fim 2026-06-30 --o /opt/data/work/id-inter-relatorio_v1.html
+$PY $SC relatorio --inicio 2026-06-01 --fim 2026-06-30 --o /data/data/com.termux/files/home/capitolium/work/id-inter-relatorio_v1.html
 ```
 
 Flags globais: `--repo /caminho/idata`.

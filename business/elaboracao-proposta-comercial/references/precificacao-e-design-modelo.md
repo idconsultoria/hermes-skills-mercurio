@@ -43,21 +43,21 @@ Metodologia/cronograma → ROI antes do preço → Prova social → Investimento
 
 ## Arquivos de referência (estado da sessão 14/08)
 
-- **Guia de Princípios (12 princípios)**: `/opt/data/Guia_Principios_Propostas_Comerciais.md`
+- **Guia de Princípios (12 princípios)**: `/data/data/com.termux/files/home/capitolium/Guia_Principios_Propostas_Comerciais.md`
   (entregável canônico; condensado em `references/guia-principios.md`).
 - **Modelo HTML (15 slides, marca ID, ~87 placeholders)**:
-  `/opt/data/Modelo_Proposta_Comercial_ID.html`
-- **Builder Python do modelo**: `/opt/data/work/minuzzo/build_template_v2.py` —
+  `/data/data/com.termux/files/home/capitolium/Modelo_Proposta_Comercial_ID.html`
+- **Builder Python do modelo**: `/data/data/com.termux/files/home/capitolium/work/minuzzo/build_template_v2.py` —
   alterar o modelo é editar o builder e rodar
   `work/minuzzo/.venv/bin/python work/minuzzo/build_template_v2.py`
   (gera o HTML com fontes/assets base64 embutidos).
-- **Assets de marca**: `/opt/data/work/minuzzo/logo_id.svg` (logo completa com
+- **Assets de marca**: `/data/data/com.termux/files/home/capitolium/work/minuzzo/logo_id.svg` (logo completa com
   tagline — capa/final), `logo_id_mark.svg` (símbolo + "ID"),
   `logo_id_diamond.svg` (símbolo teal puro — slides padrão),
   `bg_cover.svg` / `bg_content.svg` (fundos do deck), fontes Neulis Neue Bold +
   Nunito Sans em `work/minuzzo/fonts/`.
 - **Deck de referência visual** (aprovado pelo usuário):
-  `/opt/data/Proposta_Minuzzo_slides_v3.html` — "compare com o v3" = extrair
+  `/data/data/com.termux/files/home/capitolium/Proposta_Minuzzo_slides_v3.html` — "compare com o v3" = extrair
   posições/cores/estilos reais dele por inspeção programática.
 
 ## Pitfalls

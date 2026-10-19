@@ -18,6 +18,8 @@ timestamp: 2026-08-23T00:00:00Z
 - Criar/verificar um "fork" e garantir que é um repo **independente** (não um rename do mesmo repo).
 - Tornar um repo privado; empurrar com `GITHUB_TOKEN` sem deixar token em `git config`/URL/scripts.
 - Qualquer ambiente com múltiplos repos/ramas onde push no remote errado causa contaminação.
+- **Mudar o dono de um repo** entre a conta pessoal do dono e a conta da ID (§4) — inclusive
+  na véspera de uma entrega, quando o ativo precisa passar para a conta da casa.
 
 ## 1. Fork real vs rename — SEMPRE verificar via API
 
@@ -61,7 +63,7 @@ Padrão `push-<projeto>.sh` (validado como `push-skills-mercurio.sh`):
 ```bash
 #!/bin/bash
 set -e
-cd /opt/data/skills
+cd /data/data/com.termux/files/home/capitolium/skills
 # 1) valida o remote ANTES — aborta se não for o repo da rama
 case "$(git remote get-url origin)" in
   *"idconsultoria/hermes-skills-mercurio.git"*) echo "[push] remote OK";;
@@ -80,7 +82,60 @@ exit $RC
 - Pós-push: confirmar `git status -sb` sincronizado e `git remote -v | grep -c gho_` == 0 (sem token
   residual no config). `chmod 700` no script. Apagar scripts temporários que embutem token.
 
-## 4. Pitfalls
+**Clone autenticado — mesma disciplina, com o header certo.** No git sobre HTTPS o header
+`Bearer` **não** autentica: o git volta a pedir usuário (`fatal: could not read Username for
+'https://github.com'`). Use Basic com `x-access-token` e confira depois que o token não ficou
+gravado no config:
+```bash
+B64=$(printf 'x-access-token:%s' "$TOK" | base64 -w0)
+git -c http.extraheader="Authorization: Basic $B64" clone https://github.com/<owner>/<repo>.git <dir>
+grep -c "$TOK" <dir>/.git/config   # tem que dar 0
+```
+
+## 4. Mudança de dono do repo (transferência entre contas)
+
+`POST /repos/{owner}/{repo}/transfer` com `{"new_owner": "<destino>"}` devolve **202** — a
+transferência é assíncrona: **não está concluída só porque o POST voltou**. O aceite é do
+destino e, para **conta pessoal, não existe API de aceite**: `GET /user/repository_invitations`
+autenticado como o destino volta **vazio** (esse endpoint serve convite de colaboração/org), e o
+link de aceite é de uso único e só funciona com **sessão de navegador logada na conta destino**.
+Corolário: PAT nenhum, de nenhum dos dois lados, completa o aceite — quem clica é o dono. Não
+prometa `PATCH /user/repository_invitations/{id}` para transferência entre contas pessoais: o id
+não existe.
+
+**Conferir se há transferência pendente:** o e-mail do GitHub é a evidência autoritativa (vai
+para a caixa do destino, validade ~24 h, e expira em silêncio):
+`from:github.com subject:"Repository transfer"`, corpo com
+`github.com/repositories/transfers/<token>`.
+
+**Antes de aceitar, MEÇA o "você vai perder" do e-mail em vez de acreditar nele** — a lista
+(Pages, wikis, Insights, draft PRs, branch/tag protection, codeowners) depende do plano do
+destino. Leia do repo: `has_pages`, `has_wiki`, `branches/<branch>/protection` (404 = não há
+nada configurado), `rulesets` (**403 "Upgrade to GitHub Pro" = aquele lado está em Free**, logo
+não havia nada a perder), contagem de `hooks` / `keys` / `actions/workflows` / `forks` /
+`issues`. Plano de cada lado: `.plan.name` em `GET /user`. Com os dois lados em Free e o repo sem
+nada disso, a perda é **zero** — e isso se afirma com número, não com "provavelmente não perde".
+
+**Verificação pós-aceite (read-back, sempre):**
+- destino `GET /repos/<novo-dono>/<repo>` → **200**;
+- origem → **301 + `Location`** (redirect: remote, clone e link antigos continuam funcionando —
+  mesmo mecanismo do rename da §1);
+- `full_name`, `size`, `default_branch`, `created_at`, `pushed_at` e o **HEAD sha** preservados;
+- `collaborators`: dono novo `admin`; dono antigo **rebaixado a colaborador (`write`)** — não some.
+
+Transferir **não** mexe em deploy externo: site estático publicado pelo CLI (Vercel) não tem
+integração git com o repo — 0 workflows e 0 hooks no repo confirmam que não há auto-deploy a
+quebrar. O risco real da transferência é o **clone local** (que já pode não existir mais) e a
+janela de 24 h do aceite — diga isso ao principal antes que ele tema pela entrega.
+
+**Pitfall: descobrir de qual conta é o token ANTES de agir.** Num nó com vários Hermes convivem
+vários `.env` (`$HERMES_HOME/.env` = conta da ID; `~/.hermes/.env` do default nativo = conta
+pessoal do dono), e um loop que lê vários arquivos deixa **o último** token lido — o mesmo
+comando passa a agir como outra conta sem avisar. Imprima `GET /user` → `login` e decida por
+esse resultado quem pode aceitar/pushar; sem isso a conclusão sai invertida ("não há convite"
+quando o convite está na outra conta).
+
+## 5. Pitfalls
 
 - **`error in libcrypto` ao usar chave → checar newline/bytes antes de culpar corrupção.** Uma chave
   PEM criptograficamente íntegra falha no `ssh-keygen` se faltar o `\n` final ou um byte. Comparar

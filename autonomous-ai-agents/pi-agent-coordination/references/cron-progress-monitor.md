@@ -17,7 +17,7 @@
 
 ```bash
 terminal(
-  command="cd /opt/data/PROJETO && pi -p \"$(cat /tmp/prompt.md)\" --provider opencode-go --model glm-5.2 --name \"projeto-tarefa\"",
+  command="cd /data/data/com.termux/files/home/capitolium/PROJETO && pi -p \"$(cat /tmp/prompt.md)\" --provider opencode-go --model glm-5.2 --name \"projeto-tarefa\"",
   background=true,
   notify_on_complete=true
 )

@@ -407,7 +407,7 @@ curl -s -X POST http://127.0.0.1:3000/send-media \
   -H "Content-Type: application/json" \
   -d '{
     "chatId":"120363XXXXX@g.us",
-    "filePath":"/opt/data/report.html",
+    "filePath":"/data/data/com.termux/files/home/capitolium/report.html",
     "caption":"Optional caption text",
     "mediaType":"document",
     "fileName":"Report.html"
@@ -438,7 +438,7 @@ The WhatsApp bridge depends on `link-preview-js` for generating link previews. I
 
 **Fix:**
 ```bash
-cd /opt/data/scripts/whatsapp-bridge && npm install link-preview-js
+cd /data/data/com.termux/files/home/capitolium/scripts/whatsapp-bridge && npm install link-preview-js
 ```
 
 Verify with `ls node_modules/link-preview-js/package.json`.
@@ -456,7 +456,7 @@ System cleanups (Docker prune, disk reclaim) often remove `node_modules/` from t
 
 **Symptoms in gateway.log:**
 ```
-Bridge found at /opt/data/scripts/whatsapp-bridge/bridge.js
+Bridge found at /data/data/com.termux/files/home/capitolium/scripts/whatsapp-bridge/bridge.js
 (no "Dependencies installed" message)
 ~500ms later -> Reconnect whatsapp failed, next retry in 300s
 ```
@@ -464,11 +464,11 @@ Bridge found at /opt/data/scripts/whatsapp-bridge/bridge.js
 **Fix:**
 ```bash
 # 1. Make bridge files writable
-chmod u+w /opt/data/scripts/whatsapp-bridge/*.json
-chmod u+w /opt/data/scripts/whatsapp-bridge/*.js /opt/data/scripts/whatsapp-bridge/*.mjs
+chmod u+w /data/data/com.termux/files/home/capitolium/scripts/whatsapp-bridge/*.json
+chmod u+w /data/data/com.termux/files/home/capitolium/scripts/whatsapp-bridge/*.js /data/data/com.termux/files/home/capitolium/scripts/whatsapp-bridge/*.mjs
 
 # 2. Install dependencies
-cd /opt/data/scripts/whatsapp-bridge && npm ci
+cd /data/data/com.termux/files/home/capitolium/scripts/whatsapp-bridge && npm ci
 
 # 3. Create the .hermes-pkg-hash stamp so the adapter skips npm install next time
 python3 -c "
@@ -515,7 +515,7 @@ Run this before diving into tools:
 
 1. **Are ALL platforms slow?** Check gateway logs for both platforms:
    ```
-   grep "response ready" /opt/data/logs/gateway.log | tail -10
+   grep "response ready" /data/data/com.termux/files/home/capitolium/logs/gateway.log | tail -10
    ```
    If both Telegram AND WhatsApp show high response times (e.g., `time=60.0s api_calls=14`), the bottleneck is in the **shared LLM provider/model path**, not in platform latency.
 
@@ -568,7 +568,7 @@ The user ID comes from the gateway transcript (`messages.content` carries `[Name
 
 If you then try to "fix" the mention with `editMessageCaption` and pass the same caption, Telegram answers `400 Bad Request: message is not modified: specified new message content and reply markup are exactly the same` — that rejection is proof the first send was already correct. Check `caption_entities` before re-editing.
 
-**Prefer one profile's token per bot.** When a multiplexed gateway runs several profiles, each profile's `.env` holds its own `TELEGRAM_BOT_TOKEN`. To post as a specific persona, read the token from that profile's `.env` (e.g. `/opt/mercurio-data/profiles/<profile>/.env`) and call the Bot API directly — do not use the `send_message` tool, which always sends as the active profile's bot. The group chat ID comes from `gateway.log` (`inbound message: ... chat=-100...`) or from the group session row in the profile's `state.db`.
+**Prefer one profile's token per bot.** When a multiplexed gateway runs several profiles, each profile's `.env` holds its own `TELEGRAM_BOT_TOKEN`. To post as a specific persona, read the token from that profile's `.env` (e.g. `/data/data/com.termux/files/home/capitolium/profiles/<profile>/.env`) and call the Bot API directly — do not use the `send_message` tool, which always sends as the active profile's bot. The group chat ID comes from `gateway.log` (`inbound message: ... chat=-100...`) or from the group session row in the profile's `state.db`.
 
 ## Related Files
 
@@ -583,6 +583,6 @@ If you then try to "fix" the mention with `editMessageCaption` and pass the same
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

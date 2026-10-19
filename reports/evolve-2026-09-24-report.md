@@ -66,4 +66,4 @@ library-audit×repo-curator (triagem vs operação), humanizer sem par.
   negotiation + valuation frontmatter, −2 arquivos proposta, reports ×2,
   grafo + JSON (103 nós/129 arestas/0 órfãos).
 - Excluído: .locks/, 6 DESCRIPTION.md drift.
-- Push via /opt/data/scripts/push-skills-mercurio.sh.
+- Push via /data/data/com.termux/files/home/capitolium/scripts/push-skills-mercurio.sh.

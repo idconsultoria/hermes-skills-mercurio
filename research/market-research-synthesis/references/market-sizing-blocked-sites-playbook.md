@@ -1,7 +1,7 @@
 # Market sizing — blocked-sites playbook & data bank (tested ago/2026)
 
 From the wastewater-treatment/bioaumentação valuation research session (15/08/2026).
-Full deliverable: `/opt/data/mercado_tratamento_efluentes_bioaumentacao.md`.
+Full deliverable: `/data/data/com.termux/files/home/capitolium/mercado_tratamento_efluentes_bioaumentacao.md`.
 
 ## 1. Source access matrix (tested ago/2026)
 
@@ -64,10 +64,10 @@ Full deliverable: `/opt/data/mercado_tratamento_efluentes_bioaumentacao.md`.
 - Base legal: CONAMA 430/2011 (padrões de lançamento); licenciamento obrigatório em SP desde 1976; Marco Legal do Saneamento (Lei 14.026/2020): 99% água / 90% esgoto até 2033.
 
 ## 4. Sessão-referência
-Relatório completo (formato: número principal / tabela dado|valor|fonte|data|confiança / nicho / fontes): `/opt/data/mercado_tratamento_efluentes_bioaumentacao.md`
+Relatório completo (formato: número principal / tabela dado|valor|fonte|data|confiança / nicho / fontes): `/data/data/com.termux/files/home/capitolium/mercado_tratamento_efluentes_bioaumentacao.md`
 
 ## 5. Data bank — PLAYERS, TICKETS e CRESCIMENTO (sessão 15/08/2026, p/ SOM)
-Relatório completo: `/opt/data/mercado_bioaumentacao_players_tickets_som.md`
+Relatório completo: `/data/data/com.termux/files/home/capitolium/mercado_bioaumentacao_players_tickets_som.md`
 
 ### Players verificados (site extraído, ALTA)
 - **Superbac** (Cotia-SP/biofábrica Mandaguari-PR): líder nacional em blends microbianos (efluentes, O&G, agro, papel/celulose, consumo). Trajetória: faturamento <R$ 20 mi até 2015 (est. CEO) → meta R$ 1 bi em 2022; plano 25% a.a.×10 anos; 50 mil L/24h; ~70 pesquisadores. Exame 21/10/2021 (URL no relatório). MÉDIA (autodeclarado; nota: artigo ambíguo R$100 mi vs US$100 mi em aportes).

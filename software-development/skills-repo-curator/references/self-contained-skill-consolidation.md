@@ -76,8 +76,8 @@ description: "...Zero external skill dependencies."
 ### 4. Save reference files
 
 ```bash
-mkdir -p /opt/data/skills/<category>/<skill-name>/references/
-cp /tmp/DEP.md /tmp/DESIGN.md /tmp/HTML-REPORT.md /opt/data/skills/<category>/<skill-name>/references/
+mkdir -p /data/data/com.termux/files/home/capitolium/skills/<category>/<skill-name>/references/
+cp /tmp/DEP.md /tmp/DESIGN.md /tmp/HTML-REPORT.md /data/data/com.termux/files/home/capitolium/skills/<category>/<skill-name>/references/
 ```
 
 ### 5. Verify

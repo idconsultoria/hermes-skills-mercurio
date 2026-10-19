@@ -24,14 +24,14 @@ timestamp: 2026-06-12T02:23:22Z
 
 - Pi Agent acessível via `oracle-host` → `pi-agent`
 - Skill `ideation-drilling` instalada no Pi em `~/.pi/agent/skills/ideation-drilling/`
-- Shared Volume ativo: `/opt/data/code/<projeto>` (Hermes) = `/workspace/code/<projeto>` (Pi)
+- Shared Volume ativo: `/data/data/com.termux/files/home/capitolium/code/<projeto>` (Hermes) = `/workspace/code/<projeto>` (Pi)
 - Modelos definidos: `best` = `opencode-go/minimax-m3`, `cost-effective` = `deepseek/deepseek-v4-flash`
 
 ## Fluxo
 
 ```
 1. Hermes pergunta o nome/natureza do projeto
-2. Hermes cria estrutura: /opt/data/code/<projeto>/
+2. Hermes cria estrutura: /data/data/com.termux/files/home/capitolium/code/<projeto>/
    ├── product/
    │   └── ideation/
    │       └── (vazio por enquanto)
@@ -105,7 +105,7 @@ ssh oracle-host "LC_DIR=code/<projeto> pi-agent \\
 
 > **Nota:** O Pi precisa de permissão para escrever arquivos. A skill instrui
 > o Pi a criar o `ideation-result.md`. Como o shared volume já está montado,
-> o Pi escreve em `/workspace/code/<projeto>/` que = `/opt/data/code/<projeto>/`.
+> o Pi escreve em `/workspace/code/<projeto>/` que = `/data/data/com.termux/files/home/capitolium/code/<projeto>/`.
 
 ### Passo 3b: Alternativa — Hermes faz o drilling diretamente
 
@@ -167,7 +167,7 @@ Após invocar o Pi, aguarde. O Pi pode levar vários turns para completar o dril
 
 ```bash
 # Verificar se o arquivo foi criado
-ls -la /opt/data/code/<projeto>/product/ideation/ideation-result.md
+ls -la /data/data/com.termux/files/home/capitolium/code/<projeto>/product/ideation/ideation-result.md
 ```
 
 > **Nota:** Hermes não pode `mv` ou escrever no shared volume. O contexto do Pi
@@ -336,7 +336,7 @@ Esta skill é a **Fase 1** do pipeline de produto. Após a conclusão:
 
 ```bash
 # Verificar resultado
-ls -la /opt/data/code/<projeto>/product/ideation/ideation-result.md
+ls -la /data/data/com.termux/files/home/capitolium/code/<projeto>/product/ideation/ideation-result.md
 
 # Commitar via Pi (Hermes não escreve no shared volume)
 ssh oracle-host 'pi-shell "cd /workspace/code/PROJETO && \
@@ -358,6 +358,6 @@ ssh oracle-host 'pi-shell "cd /workspace/code/PROJETO && \
 
 ⚠️ **Permissão de escrita no Pi:** O Pi pode não ter permissão para escrever no shared volume se o dono não for `pi`. Verificar `chmod` se necessário.
 
-⚠️ **Shared volume: Hermes READ-ONLY:** `/opt/data/code/` é owned por uid 1001, Hermes roda como uid diferente. Hermes **não pode criar nem escrever** arquivos/pastas no shared volume. Todo `mkdir`, `touch`, `git init`, `mv` precisa ser delegado ao Pi via `ssh oracle-host 'pi-shell "comando"'`. Ambos os agentes leem sem problema.
+⚠️ **Shared volume: Hermes READ-ONLY:** `/data/data/com.termux/files/home/capitolium/code/` é owned por uid 1001, Hermes roda como uid diferente. Hermes **não pode criar nem escrever** arquivos/pastas no shared volume. Todo `mkdir`, `touch`, `git init`, `mv` precisa ser delegado ao Pi via `ssh oracle-host 'pi-shell "comando"'`. Ambos os agentes leem sem problema.
 
 ⚠️ **Rota SSH correta:** Não usar IP público direto (timeout). A rota correta é via Docker gateway: `ssh oracle-host "pi-agent 'pi ...'"` ou `ssh oracle-host 'pi-shell "bash cmd"'`.

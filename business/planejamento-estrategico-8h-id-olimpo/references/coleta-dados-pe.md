@@ -4,8 +4,8 @@ Este arquivo documenta como compilar os 4 relatórios (R1–R4) que embasam o PE
 
 ## Credenciais
 
-- **Sheets/Drive:** `google_token.json` em `/opt/mercurio-data/google_token.json` (scopes: drive + spreadsheets + docs + gmail + calendar) — usar venv `/opt/mercurio-data/work/idata/.venv/bin/python`
-- **Fathom:** `FATHOM_API_KEY` em `/opt/mercurio-data/.secrets/fathom.env` — helper em `/opt/mercurio-data/skills/productivity/fathom/scripts/fathom_api.py`
+- **Sheets/Drive:** `google_token.json` em `/data/data/com.termux/files/home/capitolium/google_token.json` (scopes: drive + spreadsheets + docs + gmail + calendar) — usar venv `/data/data/com.termux/files/home/capitolium/work/idata/.venv/bin/python`
+- **Fathom:** `FATHOM_API_KEY` em `/data/data/com.termux/files/home/capitolium/.secrets/fathom.env` — helper em `/data/data/com.termux/files/home/capitolium/skills/productivity/fathom/scripts/fathom_api.py`
 
 ## R1 — Receita & Pipeline (Symplexis)
 
@@ -16,7 +16,7 @@ Este arquivo documenta como compilar os 4 relatórios (R1–R4) que embasam o PE
 ```python
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-creds = Credentials.from_authorized_user_file('/opt/mercurio-data/google_token.json')
+creds = Credentials.from_authorized_user_file('/data/data/com.termux/files/home/capitolium/google_token.json')
 service = build('sheets', 'v4', credentials=creds)
 ID='1qV_L-WMOMDKQwIgLj_l9frokFVO032nsVbM_Qbw8kR0'
 vals = service.spreadsheets().values().get(spreadsheetId=ID, range='recebimentos!A1:L65').execute().get('values',[])

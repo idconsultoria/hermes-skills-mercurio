@@ -2,8 +2,8 @@
 """Audit description format compliance across all SKILL.md files.
 
 Usage:
-    cd /opt/data/skills && python3 software-development/skills-repo-curator/scripts/audit-descriptions.py
-    cd /opt/data/skills && python3 software-development/skills-repo-curator/scripts/audit-descriptions.py --drift
+    cd /data/data/com.termux/files/home/capitolium/skills && python3 software-development/skills-repo-curator/scripts/audit-descriptions.py
+    cd /data/data/com.termux/files/home/capitolium/skills && python3 software-development/skills-repo-curator/scripts/audit-descriptions.py --drift
 
 Checks:
 - Quoted string format (no block scalars |, |-, >, >-)

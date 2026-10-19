@@ -11,7 +11,7 @@
 
 ## Banco e schema
 
-- Banco: `/opt/data/state.db` (SQLite).
+- Banco: `/data/data/com.termux/files/home/capitolium/state.db` (SQLite).
 - Tabela `sessions`: `id` (TEXT, chave), `source`, `model`, `title`, `started_at` (REAL epoch),
   `last_activity_at`, `end_reason`, `message_count`, `archived`, `chat_id`, `parent_session_id`.
 - Tabela `messages`: `id` (INTEGER), `session_id`, `role` (user/assistant/tool), `content`,
@@ -26,7 +26,7 @@ prefixo `20260813_123130_dda538`). Sempre casar com `LIKE '<prefixo>%'`, nunca c
 
 ```python
 import sqlite3, datetime
-con = sqlite3.connect("/opt/data/state.db")
+con = sqlite3.connect("/data/data/com.termux/files/home/capitolium/state.db")
 con.row_factory = sqlite3.Row
 
 # 1. Listar sessões recentes (por atividade)

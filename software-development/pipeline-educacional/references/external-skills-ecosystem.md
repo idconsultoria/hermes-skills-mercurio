@@ -29,7 +29,7 @@ O hub de skills do Hermes (`hermes skills search`) é enxuto. A maioria das skil
 ```bash
 # Opção 1: git clone + cópia manual (mais confiável)
 git clone --depth 1 <repo-url> /tmp/skills-temp
-cp -r /tmp/skills-temp/skills/<skill-name> /opt/data/skills/<category>/<skill-name>
+cp -r /tmp/skills-temp/skills/<skill-name> /data/data/com.termux/files/home/capitolium/skills/<category>/<skill-name>
 
 # Opção 2: hermes skills tap add (se suportado)
 hermes skills tap add <repo-url>

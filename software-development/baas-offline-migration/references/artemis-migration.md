@@ -67,4 +67,4 @@ o `any` no destructuring do código legado).
 
 Pipeline escrito mas NÃO commitado (aguardando Gustavo): IP do host, usuário SSH,
 `SSH_PRIVATE_KEY`, `GHCR_TOKEN`, `POSTGRES_PASSWORD`, rede `proxy_network`, DNS wildcard
-de preview. Arquivos prontos em `/opt/data/artemishub`.
+de preview. Arquivos prontos em `/data/data/com.termux/files/home/capitolium/artemishub`.

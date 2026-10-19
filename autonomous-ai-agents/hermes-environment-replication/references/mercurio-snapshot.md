@@ -13,9 +13,9 @@ modelo de detalhe para auditorias de outras instâncias.
 | Bloco | Comando/leitura | O que registrar |
 |-------|-----------------|-----------------|
 | Estrutura | `ls -la /opt/data` + `du -sh */` | dirs de estado, venvs, scripts, motores |
-| config.yaml | `read_file /opt/data/config.yaml` | model/provider+fallbacks, web/browser, auxiliary, tts, plugins, cron |
+| config.yaml | `read_file /data/data/com.termux/files/home/capitolium/config.yaml` | model/provider+fallbacks, web/browser, auxiliary, tts, plugins, cron |
 | .env | extrair só nomes: loop `IFS='=' read` | nomes de chaves (rotacionar valores) |
-| Identidade | `read_file /opt/data/SOUL.md` integral | persona da rama (copiar 1:1) |
+| Identidade | `read_file /data/data/com.termux/files/home/capitolium/SOUL.md` integral | persona da rama (copiar 1:1) |
 | Memória | memories/ | MEMORY.md + user profile |
 | Skills | `git -C skills remote -v` + `status -sb` | origem do fork + working-tree sujo |
 | Plugin KB | `grep KB_ROOT plugins/context-kb/engine.py` | resolução de caminho + filtro scope:id |

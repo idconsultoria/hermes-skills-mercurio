@@ -35,7 +35,7 @@ do motor e a lista de pendências fiscais reais.
   tributária (IBS/CBS, CNPJ alfanumérico). Conector municipal = reserva, nunca default.
 
 ## Motor
-- **Local:** `/opt/data/id-nfse-motor/`
+- **Local:** `/data/data/com.termux/files/home/capitolium/id-nfse-motor/`
   - `emitir_nfse.py` — CLI que monta a DPS (nfelib) e serializa XML (xsdata), round-trip valida.
   - `requirements.txt` — stack pinada (nfelib 2.5.2, pynfse-nacional 0.9.5, erpbrasil.*,
     xsdata, signxml, zeep, lxml).

@@ -62,7 +62,7 @@ CH=/opt/data/.playwright/chromium-1117/chrome-linux/chrome
 "$CH" --headless=new --disable-gpu --no-sandbox --disable-dev-shm-usage \
   --user-data-dir=/tmp/cf-shot --hide-scrollbars \
   --window-size=1700,1400 --virtual-time-budget=5000 \
-  --screenshot=/opt/data/map-v7.png "file:///tmp/map_screenshot.html"
+  --screenshot=/data/data/com.termux/files/home/capitolium/map-v7.png "file:///tmp/map_screenshot.html"
 ```
 Then inspect with `vision_analyze` on the PNG (check: arrows connect blocks, 90°
 corners, nothing crosses a card, spacing). On a headless box, a stale/broken

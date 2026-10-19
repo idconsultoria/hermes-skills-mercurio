@@ -25,7 +25,7 @@ Usuário pede relatório de custos do projeto X, breakdown de gastos, quanto cus
 
 ```bash
 # state.db das sessões
-sqlite3 /opt/data/state.db "
+sqlite3 /data/data/com.termux/files/home/capitolium/state.db "
   SELECT id, title, source, model,
          input_tokens, output_tokens,
          cache_read_tokens, cache_write_tokens, reasoning_tokens,
@@ -64,7 +64,7 @@ end = datetime(2026, 6, 7, tzinfo=timezone.utc).timestamp()
 ### Sessões de Cron (Pipeline Automatizado)
 
 ```bash
-sqlite3 /opt/data/state.db "
+sqlite3 /data/data/com.termux/files/home/capitolium/state.db "
   SELECT id, started_at, input_tokens, output_tokens,
          cache_read_tokens, cache_write_tokens, reasoning_tokens
   FROM sessions
@@ -86,7 +86,7 @@ O campo `source` diferencia tipos de sessão:
 python3 -c "
 import sqlite3
 from datetime import datetime, timezone
-conn = sqlite3.connect('/opt/data/state.db')
+conn = sqlite3.connect('/data/data/com.termux/files/home/capitolium/state.db')
 start = datetime(2026, 6, 6, tzinfo=timezone.utc).timestamp()
 end = datetime(2026, 6, 7, tzinfo=timezone.utc).timestamp()
 rows = conn.execute('''
@@ -109,7 +109,7 @@ Sempre que a versão do Hermes mudar, descubra as colunas reais:
 ```bash
 python3 -c "
 import sqlite3
-conn = sqlite3.connect('/opt/data/state.db')
+conn = sqlite3.connect('/data/data/com.termux/files/home/capitolium/state.db')
 for col in conn.execute('PRAGMA table_info(sessions)').fetchall():
     print(f'{col[1]:30s} {col[2]:10s} nullable={not col[3]} default={col[4]}')
 conn.close()

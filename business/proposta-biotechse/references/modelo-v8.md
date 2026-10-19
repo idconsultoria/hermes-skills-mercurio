@@ -1,6 +1,6 @@
 # Modelo v8 — referência consolidada (2026-09-09)
 
-Arquivo vivo: `templates/biotechse-proposta-modelo-v8.html` (+ PDF homônimo em `/opt/mercurio-data/deliverables/`).
+Arquivo vivo: `templates/biotechse-proposta-modelo-v8.html` (+ PDF homônimo em `/data/data/com.termux/files/home/capitolium/deliverables/`).
 Aprovado pelo operador como referência da skill. Não editar o v8 — evoluir em `v9+`.
 
 ## Formato
@@ -31,7 +31,7 @@ Aprovado pelo operador como referência da skill. Não editar o v8 — evoluir e
 ```bash
 CHROME=/opt/data/.playwright/chromium-1117/chrome-linux/chrome
 $CHROME --headless --no-sandbox --disable-gpu --no-pdf-header-footer \
-  --print-to-pdf=out.pdf "file:///opt/data/work/proposta_<cliente>/Proposta_<cliente>_BiotechSe.html"
+  --print-to-pdf=out.pdf "file:///data/data/com.termux/files/home/capitolium/work/proposta_<cliente>/Proposta_<cliente>_BiotechSe.html"
 ```
 HTML com ~1MB de base64 leva ~85s; se travar, referenciar PNGs como arquivos externos.
 

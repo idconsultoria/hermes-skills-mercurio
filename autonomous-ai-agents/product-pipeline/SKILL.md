@@ -12,7 +12,7 @@ timestamp: 2026-06-14T05:19:11Z
 
 > **Orquestrador:** Hermes
 > **Executores:** Pi Agent (local, v0.78.1) + Antigravity (revisor visual)
-> **Shared volume:** `/opt/data/code/` ↔ `/workspace/code/`
+> **Shared volume:** `/data/data/com.termux/files/home/capitolium/code/` ↔ `/workspace/code/`
 
 ## Retomar sessão do Pi (REQUISITO do usuário)
 
@@ -318,7 +318,7 @@ Com marcador `<!-- PHASE_COMPLETE: ideation -->`
 ### Detecção de conclusão
 
 ```bash
-grep "PHASE_COMPLETE" /opt/data/code/<projeto>/product/ideation/ideation-result.md
+grep "PHASE_COMPLETE" /data/data/com.termux/files/home/capitolium/code/<projeto>/product/ideation/ideation-result.md
 ```
 
 ### Revisão pelo usuário
@@ -803,7 +803,7 @@ product/management/
    Com o design system aprovado, usar Stitch MCP para gerar cada tela.
 
    **Pré-requisitos:**
-   - Stitch MCP configurado como HTTP direto no `/opt/data/config.yaml` (NÃO no `.hermes/config.yaml`)
+   - Stitch MCP configurado como HTTP direto no `/data/data/com.termux/files/home/capitolium/config.yaml` (NÃO no `.hermes/config.yaml`)
    - Design system verificado e atualizado ANTES de gerar — conferir: `colorMode` (DARK/LIGHT), fontes, cores primárias
    - `/reload-mcp` feito para ativar as tools
 
@@ -815,7 +815,7 @@ product/management/
    c) **Gerar mobile primeiro** (`deviceType=MOBILE`), depois desktop (`deviceType=DESKTOP`)
       - Usar `generate_screen_from_text` com prompts detalhados (mencionar tokens exatos: hex colors, font names, radius)
       - Incluir sempre `designSystem: assets/<id>` para consistência visual
-   d) **Baixar screenshots** full-res: URL + `=s0` → salvar em `/opt/data/delfos-screens/`
+   d) **Baixar screenshots** full-res: URL + `=s0` → salvar em `/data/data/com.termux/files/home/capitolium/delfos-screens/`
    e) **Enviar via MEDIA** para o usuário
    f) **Gerar protótipo HTML** via agy após Stitch screens aprovadas:
       ```bash
@@ -1145,7 +1145,7 @@ Itens a verificar:
 
 ⚠️ **agy via SSH pode quebrar permissões do container** — agy (SSH host, uid 1001) pode executar `sudo chown -R ubuntu:ubuntu` no diretório do projeto, e o container Hermes (uid 10000) perde escrita. **Fix REAL (comprovado CFP IA ago/2026):** `sudo chmod -R 777` pelo hermes FALHA com "Operation not permitted" quando o diretório pertence ao uid 1001 — o hermes não é dono nem tem permissão de escrita no pai. A correção que funciona é pelo host: `ssh oracle-host 'sudo chown -R 10000:10000 /home/ubuntu/selfhost/shared/code/workstation/PROJETO'`. Verificar permissões após agy executar. **Prevenir:** antes de cada invocação do agy, rodar o chown de ida; depois, o chown de volta — ou conferir com `ls -ld` se o dono é `hermes`.
 
-⚠️ **Stitch MCP — config no `/opt/data/config.yaml`, NÃO no `.hermes/config.yaml`** — O override (`~/.hermes/config.yaml`) funciona para desenvolvimento rápido, mas o config principal (`/opt/data/config.yaml`) é o repositório oficial. Stitch MCP HTTP não funciona via npx proxy — usar `url:` + `headers:` + `transport: http`. A API key vai no header `X-Goog-Api-Key`. Editar via SSH no host com Python (não sed) para evitar YAML malformado.
+⚠️ **Stitch MCP — config no `/data/data/com.termux/files/home/capitolium/config.yaml`, NÃO no `.hermes/config.yaml`** — O override (`~/.hermes/config.yaml`) funciona para desenvolvimento rápido, mas o config principal (`/data/data/com.termux/files/home/capitolium/config.yaml`) é o repositório oficial. Stitch MCP HTTP não funciona via npx proxy — usar `url:` + `headers:` + `transport: http`. A API key vai no header `X-Goog-Api-Key`. Editar via SSH no host com Python (não sed) para evitar YAML malformado.
 
 ⚠️ **Stitch MCP — design system ANTES das screens** — Sempre verificar/atualizar o design system no Stitch antes de gerar screens. Screens geradas com tokens errados (LIGHT em vez de DARK, fonte errada) precisam ser descartadas e regeneradas.
 
@@ -1434,7 +1434,7 @@ grep -c "MIP e MID" index.html js/app.js
 
 Quando o usuário pede "verifique em que ponto estamos" em projeto de ciclo quinzenal (ex: CFP IA), o fluxo comprovado é: **triangular** repo local (`git log` + `git status` + `git log origin/main`) + `session_search` + Google Docs (transcrição da reunião e docs do parceiro via `$GAPI docs get`), **cruzar** decisões da reunião vs. PRD/roadmap para achar lacunas, e entregar DOIS arquivos .md no repo: relatório de status + plano de ação com responsáveis e dependências.
 
-**Referência completa:** `skill_view(name='product-pipeline', file_path='references/quinzenal-status-audit.md')` — extração de transcrições Fathom/Google Docs (JSON → body separado → ler em blocos), estrutura do relatório, formato do plano de ação por blocos (A–G) e pitfalls (Write denied fora de /opt/data, token expirado, decisão ≠ implementação). Se `session_search` não achar a sessão (FTS5 não indexa a mais recente), consultar `/opt/data/state.db` direto — `references/hermes-recent-session-lookup.md` (IDs truncados: casar com `LIKE '<prefixo>%'`).
+**Referência completa:** `skill_view(name='product-pipeline', file_path='references/quinzenal-status-audit.md')` — extração de transcrições Fathom/Google Docs (JSON → body separado → ler em blocos), estrutura do relatório, formato do plano de ação por blocos (A–G) e pitfalls (Write denied fora de /opt/data, token expirado, decisão ≠ implementação). Se `session_search` não achar a sessão (FTS5 não indexa a mais recente), consultar `/data/data/com.termux/files/home/capitolium/state.db` direto — `references/hermes-recent-session-lookup.md` (IDs truncados: casar com `LIKE '<prefixo>%'`).
 
 ### Reorganização do plano em Workstreams (quando o usuário decide execução simultânea)
 

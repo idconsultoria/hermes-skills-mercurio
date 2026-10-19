@@ -33,7 +33,7 @@ Fork Mercúrio estável: **94 skills**, **0 merges**, **0 deletes**, **0 órfão
 - Grafo regenerado: generate_catalog_graph.py idempotente
 - Log.md: update + evolve + offload SKIP
 - Commit: update+evolve 2026-09-07 (log + reports + grafo)
-- Push: via /opt/data/scripts/push-skills-mercurio.sh
+- Push: via /data/data/com.termux/files/home/capitolium/scripts/push-skills-mercurio.sh
 
 ## Próximos passos
 - Manter prune de drift canônico (apple/creative/media/mlops/note-taking/social-media/github/DESCRIPTION.md) se reaparecer

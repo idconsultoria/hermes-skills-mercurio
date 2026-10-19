@@ -57,9 +57,9 @@ curl -s 'https://api.github.com/search/repositories?q=valuation+skill&sort=stars
 
 Cada subagente grava um log append-only em:
 ```
-/opt/data/cache/delegation/live/<delegation_id>/task-<N>.log
+/data/data/com.termux/files/home/capitolium/cache/delegation/live/<delegation_id>/task-<N>.log
 ```
-Contém: goal completo, todo do subagente, TODAS as chamadas de tool com resultados (web_extract às vezes com o conteúdo inteiro), caminhos de arquivos cacheados (`/opt/data/cache/web/<domain>-<hash>.md` — reler com read_file em vez de re-extrair), outputs de execute_code/terminal. Nesta sessão: 3 subagentes timeout (600s) → ~100 achados recuperados lendo os 3 logs (34KB, 9,7KB, 28KB). Ler os logs ANTES do state.db; mostrar onde cada agente parou evita re-pesquisar o que já foi coletado.
+Contém: goal completo, todo do subagente, TODAS as chamadas de tool com resultados (web_extract às vezes com o conteúdo inteiro), caminhos de arquivos cacheados (`/data/data/com.termux/files/home/capitolium/cache/web/<domain>-<hash>.md` — reler com read_file em vez de re-extrair), outputs de execute_code/terminal. Nesta sessão: 3 subagentes timeout (600s) → ~100 achados recuperados lendo os 3 logs (34KB, 9,7KB, 28KB). Ler os logs ANTES do state.db; mostrar onde cada agente parou evita re-pesquisar o que já foi coletado.
 
 ## 6. Padrões de URL de autoridade — finanças/valuation (domínio novo, validado 15/08/2026)
 

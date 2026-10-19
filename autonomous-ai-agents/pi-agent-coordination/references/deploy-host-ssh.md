@@ -11,7 +11,7 @@ Pi (uid 10000, hermes) **não consegue escrever** em diretórios owned por uid 1
 ## Volumes Montados
 
 ```yaml
-host:/home/ubuntu/selfhost/shared/code/  →  container:/opt/data/code/
+host:/home/ubuntu/selfhost/shared/code/  →  container:/data/data/com.termux/files/home/capitolium/code/
 host:/home/ubuntu/selfhost/hermes/data/  →  container:/opt/data/
 ```
 
@@ -54,18 +54,18 @@ o repoo para local writable, copiar as mudanças, commitar de lá:
 
 ```bash
 # 1. Clonar do working tree
-git clone /opt/data/code/workstation/taskflow /opt/data/taskflow-pr
+git clone /opt/data/code/workstation/taskflow /data/data/com.termux/files/home/capitolium/taskflow-pr
 
 # 2. Copiar todas as mudanças (excluindo __pycache__ e .pyc)
 cd /opt/data/code/workstation/taskflow
 git diff --name-only HEAD | grep -v __pycache__ | grep -v '\.pyc$' | \
   while IFS= read -r f; do
-    mkdir -p "/opt/data/taskflow-pr/$(dirname "$f")"
-    cp "$f" "/opt/data/taskflow-pr/$f"
+    mkdir -p "/data/data/com.termux/files/home/capitolium/taskflow-pr/$(dirname "$f")"
+    cp "$f" "/data/data/com.termux/files/home/capitolium/taskflow-pr/$f"
   done
 
 # 3. Commitar e push do clone
-cd /opt/data/taskflow-pr
+cd /data/data/com.termux/files/home/capitolium/taskflow-pr
 git remote set-url origin https://github.com/USER/REPO.git
 git push -u origin BRANCH
 
@@ -82,7 +82,7 @@ some mesmo assim.
 **Recuperação via clone:**
 
 ```bash
-cd /opt/data/taskflow-pr
+cd /data/data/com.termux/files/home/capitolium/taskflow-pr
 # Listar arquivos novos (diff-filter=A)
 git diff --name-only origin/master HEAD --diff-filter=A | \
   while IFS= read -r f; do

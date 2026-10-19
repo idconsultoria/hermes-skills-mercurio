@@ -30,7 +30,7 @@ o slide importa o motor do painel — número digitado à mão em qualquer um do
 
 - Planilha **[ID] Gestão de Symplexis** (`1qV_L-WMOMDKQwIgLj_l9frokFVO032nsVbM_Qbw8kR0`),
   abas `contratos`, `recebimentos`, `symplexis`.
-- Interpretador que tem `googleapiclient`: `/opt/mercurio-data/id-nfse-motor/.venv/bin/python`.
+- Interpretador que tem `googleapiclient`: `/data/data/com.termux/files/home/capitolium/id-nfse-motor/.venv/bin/python`.
 - Token: `$HERMES_HOME/google_token.json` (admin@idconsultoria.ai, escopo Sheets).
 - Detalhes de planilha, tokens e vínculo de parcela recebida: skill `gestao-financeira-id`.
 
@@ -64,8 +64,8 @@ preencher a data na Symplexis.
 Painel (gera HTML versionado + histórico + resumo no stdout):
 
 ```bash
-/opt/mercurio-data/id-nfse-motor/.venv/bin/python \
-  /opt/mercurio-data/painel-metas/painel_metas.py [--pdf] [--json] [--sem-html] [--hoje AAAA-MM-DD]
+/data/data/com.termux/files/home/capitolium/id-nfse-motor/.venv/bin/python \
+  /data/data/com.termux/files/home/capitolium/painel-metas/painel_metas.py [--pdf] [--json] [--sem-html] [--hoje AAAA-MM-DD]
 ```
 
 - `--json --sem-html --sem-historico` = só leitura, para responder "onde estamos".
@@ -77,11 +77,11 @@ Painel (gera HTML versionado + histórico + resumo no stdout):
 Slide da Phronesis (importa o motor do painel; ver `references/phronesis-slide.md`):
 
 ```bash
-/opt/mercurio-data/id-nfse-motor/.venv/bin/python \
-  /opt/mercurio-data/phronesis-slide/montar_slide.py [--data AAAA-MM-DD] [--sem-metas]
+/data/data/com.termux/files/home/capitolium/id-nfse-motor/.venv/bin/python \
+  /data/data/com.termux/files/home/capitolium/phronesis-slide/montar_slide.py [--data AAAA-MM-DD] [--sem-metas]
 ```
 
-Wrapper para cron: `bash /opt/mercurio-data/scripts/phronesis_slide.sh [AAAA-MM-DD]` — imprime
+Wrapper para cron: `bash /data/data/com.termux/files/home/capitolium/scripts/phronesis_slide.sh [AAAA-MM-DD]` — imprime
 caminho do deck, contagem de slides e flags de sanidade (`TEM_METAS`, `TEM_GRAFICO`, `TEM_ATAH`).
 
 ## Execução sob demanda (slide da Phronesis)
@@ -95,7 +95,7 @@ Fluxo a seguir quando pedirem o slide:
 1. Definir a data: por padrão, a **próxima segunda** (é o dia da Phronesis); com `--data` se a
    reunião for em outro dia.
 2. Rodar o wrapper (ele imprime caminho do deck + sanidade):
-   `bash /opt/mercurio-data/scripts/phronesis_slide.sh [AAAA-MM-DD]`
+   `bash /data/data/com.termux/files/home/capitolium/scripts/phronesis_slide.sh [AAAA-MM-DD]`
 3. **Conferir o `STATUS` antes de anunciar.** Exigir `STATUS=OK`, `QTD_SLIDES` coerente e
    `TEM_METAS=1`, `TEM_GRAFICO=1`, `TEM_ATAH=1`. Qualquer um zerado = deck incompleto, refazer.
 4. Entregar o HTML com `MEDIA:<caminho absoluto>` como **primeira linha** da resposta (sozinha).
@@ -192,6 +192,6 @@ atravessa a régua e precisa da ressalva.
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

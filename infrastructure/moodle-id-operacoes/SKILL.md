@@ -47,7 +47,7 @@ pastas do Drive dos cases. Boa para manutenção corrente da *Jornada de IA*.
 ## 2. Executar comandos no host
 
 ```bash
-K=/opt/mercurio-data/skills/infrastructure/moodle-id-operacoes/references/deploy_key.pem
+K=/data/data/com.termux/files/home/capitolium/skills/infrastructure/moodle-id-operacoes/references/deploy_key.pem
 chmod 600 "$K"
 # validar (só a pub, nunca a privada): ssh-keygen -y -f "$K"
 timeout 25 ssh -i "$K" -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=15 \
@@ -196,8 +196,8 @@ As pastas dos cases ficam sob a pasta "Cases" do Drive da ID. Para os guias de a
 compartilhar as pastas **Prática 1** e **Prática 2** com os **emails dos alunos** (papel leitor).
 
 ```bash
-GAPI="python3 /opt/mercurio-data/skills/productivity/google-workspace/scripts/google_api.py"
-export HERMES_HOME=/opt/mercurio-data
+GAPI="python3 /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/google_api.py"
+export HERMES_HOME=/data/data/com.termux/files/home/capitolium
 $GAPI drive share <FOLDER_ID> --email <aluno> --role reader
 ```
 

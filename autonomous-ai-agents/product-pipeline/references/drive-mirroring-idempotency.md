@@ -17,7 +17,7 @@ Bug real encontrado ao fechar quinzena: scripts de espelhamento usavam
    ```bash
    python3 -c "
    import json, urllib.request, urllib.parse, importlib.util
-   spec = importlib.util.spec_from_file_location('md', '/opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py')
+   spec = importlib.util.spec_from_file_location('md', '/data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/md-to-gdoc.py')
    md = importlib.util.module_from_spec(spec); spec.loader.exec_module(md)
    tok = md.get_token()
    q = urllib.parse.quote(f\"'<FOLDER_ID>' in parents and trashed=false\")
@@ -40,4 +40,4 @@ em sequência no fechamento de quinzena; o design v2 também re-renderiza mermai
 IDs das pastas (Produto no Drive): Gestão `1KKYtedSpNDYTVJENjRk42yHdBB0scHMJ`,
 Engenharia `17lBPefqbH4CcbnwFZkJYSeXTLzMIcK-j`, Design
 `12J-LRtfjOwErYQzRERl1PkJb8iFghStD`. Conversor:
-`/opt/data/venvs/google/bin/python /opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py`.
+`/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/md-to-gdoc.py`.

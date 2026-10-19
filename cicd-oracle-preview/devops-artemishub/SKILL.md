@@ -200,7 +200,7 @@ Uso correto (o conteúdo do doc `artemishub_deploy_ed25519_v1.txt` é íntegro; 
 re-codificar/re-parsear — testar sempre direto do arquivo):
 
 ```bash
-K=/opt/data/skills/cicd-oracle-preview/devops-artemishub/references/deploy_key.pem
+K=/data/data/com.termux/files/home/capitolium/skills/cicd-oracle-preview/devops-artemishub/references/deploy_key.pem
 chmod 600 "$K"
 timeout 25 ssh -i "$K" -o StrictHostKeyChecking=no -o BatchMode=yes \
   -o ConnectTimeout=15 ubuntu@129.146.163.107 'comando...'
@@ -253,6 +253,7 @@ Modelo versionado: `.env.example`. Manual entregue em 22/08/2026 (zip) contém b
 | Pipeline roda mas **`DeepSeek extraiu 0`** em todos os batches (resultado sai só do rule-based, com títulos-lixo tipo `Fonte: worldbank.org`) | o OpenCode Go passou a exigir o header **`x-opencode-session`** para rotear a chamada; sem ele a API responde `400 MissingSessionID`, `call_deepseek` devolve `None` e o runner cai no rule-based **em silêncio** (139 batches assim entre ~11/09 e 09/10/2026) | enviar `x-opencode-session: <uuid4>` em TODA chamada ao OpenCode — `backend/pipeline/llm.py` (`call_deepseek`) e `backend/main.py` (`_llm_headers()`, usado pelo proxy `/api/ia/chat`, pelo enriquecimento e por `POST /api/config/testar-llm`); logar a falha total (`[llm] falha total ...`) em vez de devolver `None` mudo; `testar-llm` com `max_tokens=8` sempre falha em modelo de reasoning → usar ≥1024 |
 | `POST /api/pipeline/run` → `{"detail":"API key inválida ou ausente"}` usando a chave do `.env` | `ARTEMISHUB_API_KEY` está **vazia** em produção; com `API_KEY=""` nenhum `X-API-Key` casa e o caminho máquina-a-máquina fica morto (só sessão de usuário passa) | disparar a busca sem sessão rodando o runner **dentro do container** (não mexe no estado do processo do servidor): `docker cp` de um script que chama `start_run()` e imprime `RUNNER.state`, depois `docker exec -d artemishub-backend sh -c 'cd /app/backend && python -u /tmp/run_pipeline.py > /tmp/pipeline_run.log 2>&1 < /dev/null'`; a saída vai para o arquivo, **não** para `docker logs` |
 | Deploy pelo CI **reverteria produção** | a cópia de produção no host (`/home/ubuntu/selfhost/artemishub`) tem arquivos que **não existem no GitHub main** (trabalho aplicado direto no host, ex. hotfix ICT do onboarding, `src/lib/report/*`, `src/lib/cadastro-hints.ts`, `src/lib/config.ts`, `InfoTooltip`, `ExportEmpresaMatchReportButton`) | **sempre diffar antes de qualquer deploy**: `find src backend -type f ! -path "*/__pycache__/*" -exec md5sum {} +` no host contra o clone do main; se divergir, NÃO deixar o CI deployar (push em branch + deploy manual no host) e levar a reconciliação ao principal |
+| **401 intermitente** com sessão válida: login retorna 200 e a tela volta para `/auth?sessao=expirada`; nos logs, 200 e 401 na MESMA rota no MESMO segundo | a stack de **preview** (por PR) sobe na mesma rede `artemishub_app-net` e publica o alias de serviço `backend`; o nginx do frontend de produção resolvia `backend` para vários IPs e **alternava entre produção e preview** — as chamadas que caíam no backend de preview consultavam o banco de TESTE (`artemishub_pr_<N>`), não achavam a sessão e devolviam 401 | apontar sempre para o **nome único do container** (`BACKEND_HOST=artemishub-backend`, nunca `backend`); ao subir preview, derrubar stacks antigas (`docker compose -p artemishub_pr_<N> -f docker-compose.preview.yml down`); diagnosticar com N chamadas seguidas à mesma rota usando a mesma sessão válida — 200/401 alternando = alias compartilhado (`docker inspect <c> --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}={{.Aliases}} {{end}}'` mostra o alias) |
 
 ## 10.1 Deploy manual no host quando produção diverge do main (padrão de 09/10/2026)
 
@@ -263,6 +264,43 @@ Modelo versionado: `.env.example`. Manual entregue em 22/08/2026 (zip) contém b
 5. Registrar o fix no GitHub em **branch** (nunca em `main` enquanto a divergência existir).
 
 Detalhes de UI/escala e a técnica de QA visual sem login: `references/ui-escala-global-e-qa-visual-2026-10-09.md`.
+
+### 10.2 Diagnóstico rápido de sessão/login (13/10/2026)
+
+Sintomas que parecem "senha errada" e não são: o usuário diz que a senha está certa e a
+plataforma volta para o login. Sequência de diagnóstico (do mais barato ao mais caro):
+
+1. `docker logs -t artemishub-backend | grep -E 'auth/login|/api/'` — ver se o POST devolveu
+   **200** (senha correta) e se os GETs seguintes ficaram **mistos 200/401** na mesma rota.
+2. Misto 200/401 = alias de rede compartilhado com preview (§10). Conferir
+   `docker ps | grep artemishub` (deveria existir só a stack de produção) e derrubar previews.
+3. Confirmar com N chamadas seguidas numa sessão válida (script no host): 12/12 em 200 = resolvido.
+4. Só depois suspeitar de credencial. Conta inativa também devolve 401 no login — checar
+   `select email, papel, ativo, left(senha_hash,20) from usuarios;` (formato esperado:
+   `PBKDF2$600000$...`, 111 chars).
+5. O botão **"Esqueci minha senha" não tem fluxo implementado** (não existe endpoint de reset) —
+   se a senha realmente se perdeu, é preciso criar o fluxo antes de prometer recuperação.
+
+Sessão temporária para QA sem senha (o hash é o que fica no banco; token opaco em `sessoes`):
+
+```sql
+insert into sessoes (token, usuario_id, expira_em)
+select md5(random()::text || clock_timestamp()::text), id, now() + interval '30 minutes'
+  from usuarios where email='<email-de-teste>' returning token;
+```
+
+Depois basta setar `artemishub_token` + `artemishub_usuario` no localStorage e abrir o app.
+**Apagar a sessão ao terminar** e registrar o uso.
+
+Defesas que ficaram no código depois deste incidente (não regredir):
+
+- `src/lib/offline-api.ts` — o handler de 401 guarda o **token que a chamada enviou** e só
+  expulsa quando (a) a chamada levou token e (b) esse token ainda é o atual. Chamada
+  pré-login (sem token) e token trocado no meio do caminho **não** expulsam.
+- `src/lib/app-data-context.tsx` — não busca dados em `/auth` nem em rota pública.
+- `backend/main.py` — `_auth_context` devolve **503** em falha de banco (não 401) e o
+  middleware não rebaixa 5xx para 401: qualquer 401 vira logout no cliente, então 401 só
+  com sessão realmente inválida.
 
 ## 11. Pendências atuais
 - Conta OpenCode: modelo DeepSeek no `zen/go/v1` requer **opt-in região China**

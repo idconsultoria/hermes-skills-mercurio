@@ -63,9 +63,9 @@ Seguir o **Guia de Princípios** (references/guia-principios.md): storytelling p
 Copiar o modelo para o diretório de trabalho e **editar o HTML inteiro como agente de IA**:
 
 ```bash
-mkdir -p /opt/data/work/proposta_<cliente>
+mkdir -p /data/data/com.termux/files/home/capitolium/work/proposta_<cliente>
 cp skills/business/elaboracao-proposta-comercial/templates/modelo_proposta.html \
-   /opt/data/work/proposta_<cliente>/Proposta_<cliente>.html
+   /data/data/com.termux/files/home/capitolium/work/proposta_<cliente>/Proposta_<cliente>.html
 ```
 
 Regras de edição:
@@ -82,14 +82,14 @@ Verificar visualmente no navegador (browser_navigate no arquivo local) — zero 
 O usuário pode validar o HTML diretamente ou pedir PDF. Se PDF:
 
 ```bash
-node scripts/render_pdf.mjs /opt/data/work/proposta_<cliente>/Proposta_<cliente>.html \
-  /opt/data/work/proposta_<cliente>/Proposta_<cliente>.pdf
+node scripts/render_pdf.mjs /data/data/com.termux/files/home/capitolium/work/proposta_<cliente>/Proposta_<cliente>.html \
+  /data/data/com.termux/files/home/capitolium/work/proposta_<cliente>/Proposta_<cliente>.pdf
 ```
 
 Requisito: o runtime único já está instalado; **não baixar nem instalar outro Chromium**:
 ```bash
 export PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright
-export NODE_PATH=/opt/mercurio-data/node_modules
+export NODE_PATH=/data/data/com.termux/files/home/capitolium/node_modules
 ```
 
 O executável canônico é `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`. Usar `scripts/render_pdf.mjs`; o PDF sai com 1 página por slide (1920×1080). Para sites externos, usar `browser_exec`, não este renderer local.
@@ -150,6 +150,6 @@ O executável canônico é `/opt/data/.playwright/chromium-1117/chrome-linux/chr
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

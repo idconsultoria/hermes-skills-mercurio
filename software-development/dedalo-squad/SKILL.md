@@ -38,8 +38,8 @@ O pipeline pode ser usado de duas formas:
 O repositório Dédalo Squad deve estar clonado. Se não estiver:
 
 ```bash
-git clone https://github.com/idconsultoria/dedalo_squad.git /opt/data/dedalo_squad
-cd /opt/data/dedalo_squad
+git clone https://github.com/idconsultoria/dedalo_squad.git /data/data/com.termux/files/home/capitolium/dedalo_squad
+cd /data/data/com.termux/files/home/capitolium/dedalo_squad
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -312,7 +312,7 @@ for pasta_id in [PASTA_RAIZ_ID, PASTA_SUBPRODUTOS_ID, PASTA_COLETAS_ID]:
 Sempre ativar o venv e exportar o cliente:
 
 ```bash
-cd /opt/data/dedalo_squad && source .venv/bin/activate
+cd /data/data/com.termux/files/home/capitolium/dedalo_squad && source .venv/bin/activate
 export DEDALO_CLIENT=meu_cliente
 ```
 
@@ -517,7 +517,7 @@ O modelo é configurável por agente em `agemini/agentes/*.py` (constante `MODEL
 | Recurso | Caminho / URL |
 |---------|---------------|
 | Repositório | `https://github.com/idconsultoria/dedalo_squad` |
-| Clone local | `/opt/data/dedalo_squad/` |
+| Clone local | `/data/data/com.termux/files/home/capitolium/dedalo_squad/` |
 | README | `/opt/data/dedalo_squad/README.md` |
 | Orquestrador | `elaboracao_de_pops_e_diagramas.py` |
 | Runner individual | `run_one.py` |
@@ -531,6 +531,6 @@ O modelo é configurável por agente em `agemini/agentes/*.py` (constante `MODEL
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e decks): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

@@ -51,7 +51,7 @@ Combinando com um watcher + servidor HTTP, dá para ter a TUI do Pi ao vivo no b
 ## Script de referência
 
 `scripts/pi_follow_web.py` (não commitado como script aqui — versão funcional mantida em
-`/opt/data/scripts/pi_follow_web.py`): watcher + servidor + injeção do script live com polling e
+`/data/data/com.termux/files/home/capitolium/scripts/pi_follow_web.py`): watcher + servidor + injeção do script live com polling e
 scroll preservation. Para acompanhar no terminal (sem browser), usar `scripts/pi_follow.py`.
 
 ## Alternativa descartada (por que)

@@ -48,7 +48,7 @@ hermes config set model.provider <provider>
 hermes config set fallback_providers '[{"base_url":"...","model":"...","provider":"..."}, ...]'
 ```
 
-`HERMES_HOME=/opt/mercurio-data` — always set it so config edits land on the right
+`HERMES_HOME=/data/data/com.termux/files/home/capitolium` — always set it so config edits land on the right
 profile, not the default home.
 
 ## Defining a provider entry
@@ -116,7 +116,7 @@ stt:
   providers:
     gemini:
       type: command
-      command: for c in /usr/local/bin/gemini-stt "${HERMES_HOME:-/opt/mercurio-data}"/scripts/gemini-stt.py /opt/mercurio-data/scripts/gemini-stt.py /opt/data/scripts/gemini-stt.py /opt/data/.hermes/scripts/gemini-stt.py; do [ -f "$c" ] || continue; case "$c" in *.py) exec python3 "$c" --input {input_path} --output {output_path} --language {language} ;; *) exec "$c" --input {input_path} --output {output_path} --language {language} ;; esac; done; echo "STT nenhum script gemini-stt encontrado" >&2; exit 127
+      command: for c in /usr/local/bin/gemini-stt "${HERMES_HOME:-/data/data/com.termux/files/home/capitolium}"/scripts/gemini-stt.py /data/data/com.termux/files/home/capitolium/scripts/gemini-stt.py /data/data/com.termux/files/home/capitolium/scripts/gemini-stt.py /opt/data/.hermes/scripts/gemini-stt.py; do [ -f "$c" ] || continue; case "$c" in *.py) exec python3 "$c" --input {input_path} --output {output_path} --language {language} ;; *) exec "$c" --input {input_path} --output {output_path} --language {language} ;; esac; done; echo "STT nenhum script gemini-stt encontrado" >&2; exit 127
       language: pt-BR
       timeout: 300
       env_passthrough: [GOOGLE_API_KEY, GEMINI_API_KEY]
@@ -135,6 +135,36 @@ the job dies instead of falling back.
 - **Make a cron inherit the global default + chain:**
   `hermes cron edit <id> --model "" --provider ""` (empty string clears the pin)
 - **Force a cron onto a fixed reliable model:** `hermes cron edit <id> --model X --provider Y`
+
+### Despinado NÃO é o mesmo que snapshot fresco — use `resnap`
+
+`model: null` / `provider: null` no job só diz que ele **segue** a resolução global; não diz
+que o que ele guardou continua vivo. Todo job criado sob uma resolução antiga carrega
+`provider_snapshot`/`model_snapshot` daquele momento — e é **o snapshot que o agendador usa**.
+Quando a rota global muda (ou o modelo do snapshot é descontinuado), o job despinado falha com
+erro de provider no `last_error` (`HTTP 410 ... has been deprecated`, `HTTP 403 ... free tier`)
+em vez do `[drift_skip]`.
+
+```
+cronjob_manage(action='resnap', job_id='<id>')     # um job: adota a resolução global atual, segue despinado
+cronjob_manage(action='resnap', all=true)          # todos os não-pinados de uma vez
+cronjob_manage(action='run', job_id='<id>')        # re-executar (roda em BACKGROUND; o resultado volta como mensagem)
+```
+
+`resnap` é a via preferida sobre o truque `--model "" --provider ""` (que só recalcula se a
+chamada mudar eixo de fato); ele nunca pina e continua acompanhando trocas futuras.
+
+Auditoria de uma linha — mostra pin/snapshot/último erro de todo job (rode a cada troca de
+resolução global):
+
+```bash
+python3 -c "import json;d=json.load(open('$HERMES_HOME/cron/jobs.json'));jobs=d.get('jobs',d);[print(j['id'],'|',(j.get('name') or '')[:38],'| pinned:',bool(j.get('model') or j.get('provider')),'| snap:',j.get('provider_snapshot'),'/',j.get('model_snapshot'),'| enabled:',j.get('enabled'),'| last:',j.get('last_status')) for j in jobs]"
+```
+
+Ao corrigir, **conserte todos os jobs não-pinados** (`all=true`) e re-execute **apenas** os que
+falharam por causa da rota morta: one-shot já concluído/desabilitado e job que falhou por outra
+causa (script, módulo ausente, credencial) não entram no `run`. `action='run'` só dispara em
+background — confirme o efeito lendo o snapshot no `jobs.json` e não fique esperando.
 
 ### Drift-guard (why unpin doesn't silently fail-closed)
 
@@ -192,6 +222,8 @@ Logs at `$HERMES_HOME/logs/errors.log` and `agent.log`.
 |----------|------------------|
 | `HTTP 403 ... requires explicit opt in` | Data-collection model (e.g. Muse Spark Contributor) needs a **one-time opt-in** at the provider's workspace URL. Provider-side consent, not a Hermes bug. After opt-in, use the model normally. |
 | `HTTP 401` com `{'type':'AuthError','message':'Missing API key.'}` | A requisição saiu **sem** credencial — não é chave morta (chave inválida tem outra mensagem). Controle: POST sem header `Authorization` devolve exatamente esse corpo. Prove o caminho em processo novo: `hermes -z "ok" --provider <p> -m <modelo>` — se responder texto, o defeito é o processo antigo do gateway → reinicie. |
+| `HTTP 410: Model <x> has been deprecated` | Modelo do **snapshot** de um cron não-pinado morreu. O job tentou rodar com ele em vez de pular — conserte com `resnap` e re-execute. |
+| `HTTP 403 ... free tier can only be used from within OpenCode` | Snapshot aponta para a rota do tier gratuito, que só aceita tráfego de dentro do OpenCode. Mesma classe do 410: eixo modelo/rota, não credencial → `resnap`. |
 | `HTTP 401: Model <x> is not supported` | O modelo não existe no endpoint resolvido. Ex.: `deepseek-flash` só existe na rota Go; resolvido para `opencode-zen` dá esse 401. Nome de modelo é por endpoint, não global. |
 | `Fallback to <X> failed: provider not configured` | A named provider in `fallback_providers` has no matching `providers.<name>` entry / no env key. Add it or fix the key. |
 | `Model only supports text input; received unsupported content type 'image_url'` | That model has no vision. Images route through the auxiliary model (`auxiliary.vision`), not the main one. |
@@ -204,6 +236,22 @@ Gateway needs a restart for config changes to apply to new sessions:
 `/restart` (in gateway session) or `hermes gateway restart`. A model switch made via
 OpenCode Go / session override applies to that session immediately; the config `default`
 persists across restarts until changed.
+
+**Provar a rota candidata ANTES de persistir a troca.** Nome de modelo que aparece no catálogo
+pode estar indisponível no endpoint — `hermes config set model.default` grava sem reclamar e o
+perfil fica apontando para uma rota morta até o próximo turno falhar. Sonde com chamada curta e
+**limitada** (timeout explícito; sem ele a sondagem pendura) e, além do `ok`, peça uma frase no
+**idioma de trabalho** para conferir que o modelo responde limpo:
+
+```bash
+export HERMES_HOME=<perfil>
+timeout 90 hermes -z "Responda apenas: ok" --provider <p> -m <modelo_candidato>
+```
+
+`HTTP 400 ... Model is unavailable` = rota não serve aquele nome; teste o próximo candidato. Só
+depois de responder texto é que a troca vale a pena ser gravada (`model.default` + `model.provider`,
+nessa ordem) — e a gravação ainda emite o aviso de **drift** dos crons não-pinados (ver a seção
+CRITICAL acima).
 
 ## Host Hermes (Termux, FORA do proot) — chaves e perfis
 

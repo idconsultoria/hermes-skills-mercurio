@@ -11,7 +11,7 @@ timestamp: 2026-07-26T05:20:00Z
 
 # Skills Repository Curator
 
-> Gerencia o skills repo em `/opt/data/skills/` com controle de versão Git.
+> Gerencia o skills repo em `/data/data/com.termux/files/home/capitolium/skills/` com controle de versão Git.
 > Macro: **Ciclo de Consolidação** — `Update → log → commit → Evolve → log → Offload → commit → git push`.
 > Sub-etapa: **evolve** (9 passos) — estudo → plano → execução → orphan review → report → grafo → commit.
 
@@ -37,8 +37,8 @@ O ciclo é executado periodicamente (**SEMANALMENTE, toda segunda via cron `0 2 
 O usuário corrigiu explicitamente quando o ciclo foi executado manualmente sem reler as fontes: *"Leia agora mesmo a skill associada a essa operação, o que o Cron Job instrui e também o agents.md no repositório de Skills. Você está descumprindo protocolos."* **ANTES de rodar o ciclo — manual em sessão OU re-execução após interrupção — carregue as 3 fontes nesta ordem:**
 
 1. `skill_view(name='skills-repo-curator')` — a skill completa (etapas, passos, pitfalls)
-2. `read_file('/opt/data/skills/AGENTS.md')` — regras do repo (index.md é território LLM, convenções de commit, estrutura)
-3. O prompt do cron: `cronjob(action='list')` ou `/opt/mercurio-data/cron/jobs.json` → job `Ciclo de Consolidação de Skills (Mercúrio)` (id `8a7f5f65ed76`, skill `skills-repo-curator`, semanal `0 2 * * 1`) — etapas exatas + formato de resposta final `REPORT:/GRAPH:/SUMMARY:/PUSH:`
+2. `read_file('/data/data/com.termux/files/home/capitolium/skills/AGENTS.md')` — regras do repo (index.md é território LLM, convenções de commit, estrutura)
+3. O prompt do cron: `cronjob(action='list')` ou `/data/data/com.termux/files/home/capitolium/cron/jobs.json` → job `Ciclo de Consolidação de Skills (Mercúrio)` (id `8a7f5f65ed76`, skill `skills-repo-curator`, semanal `0 2 * * 1`) — etapas exatas + formato de resposta final `REPORT:/GRAPH:/SUMMARY:/PUSH:`
 
 Sem isso, NÃO começar o ciclo. Ter lido a skill "mais cedo na sessão" não basta — a skill evolui entre sessões e o AGENTS.md é a regra vigente do repo.
 
@@ -86,8 +86,8 @@ Cobre o workflow completo de curadoria externa:
    # 2. Baixar SKILL.md
    curl -sL 'https://raw.githubusercontent.com/<user>/<repo>/main/skills/<cat>/<name>/SKILL.md' -o /tmp/SKILL.md
    # 3. Criar diretório e escrever
-   mkdir -p /opt/data/skills/<category>/<skill-name>/references
-   cp /tmp/SKILL.md /opt/data/skills/<category>/<skill-name>/SKILL.md
+   mkdir -p /data/data/com.termux/files/home/capitolium/skills/<category>/<skill-name>/references
+   cp /tmp/SKILL.md /data/data/com.termux/files/home/capitolium/skills/<category>/<skill-name>/SKILL.md
    # 4. Baixar references se houver (DEEPENING.md, HTML-REPORT.md, etc.)
    ```
    Se a skill tem dependências externas (`/codebase-design`, `/grilling`, etc.), baixe todas, leia, e consolide os vocabulários e workflows numa única SKILL.md autossuficiente — sem referências a skills externas. Arquivos de referência (formatos, templates) ficam em `references/` e são carregados com `skill_view(name, file_path='references/<file>')`.
@@ -200,7 +200,7 @@ Após corrigir SKILL.md, rode `audit-descriptions.py --drift`. Para cada DRIFT:
        with open('index.md') as f: content = f.read()
        def update_sizes(m):
            name = m.group(1)
-           sk_path = f'/opt/data/skills/{name}/SKILL.md'
+           sk_path = f'/data/data/com.termux/files/home/capitolium/skills/{name}/SKILL.md'
            if os.path.exists(sk_path):
                size = os.path.getsize(sk_path)
                prefix = m.group(0).rsplit('**Tamanho:**', 1)[0]
@@ -325,7 +325,7 @@ grep "|- \`" index.md
 Se existir, corrigir com:
 ```bash
 # Use patch tool com replace_all=true
-patch(path='/opt/data/skills/index.md', old_string='|- `', new_string='- `', replace_all=True)
+patch(path='/data/data/com.termux/files/home/capitolium/skills/index.md', old_string='|- `', new_string='- `', replace_all=True)
 ```
 
 ---
@@ -349,7 +349,7 @@ Memória guarda **preferências do usuário e fatos estáveis do ambiente**. Ski
 ### Passos
 
 1. Leia as entradas da memória a partir do prompt (sessão normal) ou do prompt do cron (se explicitamente incluídas)
-2. Para cada entrada, verifique se existe skill em `/opt/data/skills/` cobrindo o mesmo assunto (conteúdo procedural, workflow, ou receita). **Método concreto de verificação (validado 12/08/2026):** para cada entrada candidata, rode `search_files` com keywords da entrada sobre `/opt/data/skills/` (ex: `mermaid|headless_shell|mmdc`, `--session`, `insertInlineImage|Pageless`). Se o procedimento/pitfall está literalmente numa SKILL.md ou `references/`, pode sair da memória. Na entrada do log.md, cite o caminho exato da cobertura (`→ google-docs-formatting/references/mermaid-rendering.md`). ⚠️ **Padrões `search_files` iniciando com `--` são lidos como flag pelo rg** (`unrecognized flag`; ex: `--session|retomad|resume` falhou, `-{2}session` também) — usar keyword simples (`session`) ou sem o hífen inicial. Validado 12/08/2026. Preferências do usuário e env facts (contatos, IDs, tokens, caminhos de projeto, avisos operacionais) NÃO saem — só conteúdo procedural coberto por skill.
+2. Para cada entrada, verifique se existe skill em `/data/data/com.termux/files/home/capitolium/skills/` cobrindo o mesmo assunto (conteúdo procedural, workflow, ou receita). **Método concreto de verificação (validado 12/08/2026):** para cada entrada candidata, rode `search_files` com keywords da entrada sobre `/data/data/com.termux/files/home/capitolium/skills/` (ex: `mermaid|headless_shell|mmdc`, `--session`, `insertInlineImage|Pageless`). Se o procedimento/pitfall está literalmente numa SKILL.md ou `references/`, pode sair da memória. Na entrada do log.md, cite o caminho exato da cobertura (`→ google-docs-formatting/references/mermaid-rendering.md`). ⚠️ **Padrões `search_files` iniciando com `--` são lidos como flag pelo rg** (`unrecognized flag`; ex: `--session|retomad|resume` falhou, `-{2}session` também) — usar keyword simples (`session`) ou sem o hífen inicial. Validado 12/08/2026. Preferências do usuário e env facts (contatos, IDs, tokens, caminhos de projeto, avisos operacionais) NÃO saem — só conteúdo procedural coberto por skill.
 3. Remova da memória usando **operações em lote** — uma única chamada `memory(operations=[{action:'remove', old_text:...}, ...])` com múltiplos removes — em vez de chamadas individuais. Economiza tool calls e evita escritas redundantes.
 4. Registre no log.md com prefixo `offload` listando as entradas removidas
 5. git add -A && git commit -m "offload: ..." — **se o offload é manual (fora do ciclo completo), stage SÓ os arquivos da etapa** (ex: `git add log.md`). Se o working tree tem WIP de outras sessões (skill nova untracked, SKILL.md modificadas), não varrer tudo para dentro do commit de offload — o próximo ciclo `update` pega o resto (validado 12/08/2026: pi-agent-internals + refs ficaram para o cron seguinte).
@@ -364,7 +364,7 @@ Cada ciclo deixa artefatos que o usuário pode pedir como arquivos (`MEDIA:` —
 - `log.md` — diário append-only de todos os ciclos
 - `index.md` — catálogo atual das skills (fonte da verdade)
 
-O output bruto da sessão cron fica em `/opt/data/cron/output/<job_id>/<timestamp>.md` (prompt completo + resposta final no formato `REPORT:/GRAPH:/SUMMARY:`). Para histórico de ciclos antigos: `git log` do repo + `reports/`.
+O output bruto da sessão cron fica em `/data/data/com.termux/files/home/capitolium/cron/output/<job_id>/<timestamp>.md` (prompt completo + resposta final no formato `REPORT:/GRAPH:/SUMMARY:`). Para histórico de ciclos antigos: `git log` do repo + `reports/`.
 
 ---
 
@@ -373,7 +373,7 @@ O output bruto da sessão cron fica em `/opt/data/cron/output/<job_id>/<timestam
 Sempre que múltiplos subagentes precisarem modificar o index.md:
 
 1. Cada subagente produz um **relatório de saída** (ex: `relations-batch1.md`) com as modificações
-2. Relatórios são salvos via `write_file` em `/opt/data/skills/`
+2. Relatórios são salvos via `write_file` em `/data/data/com.termux/files/home/capitolium/skills/`
 3. **Um único** agente principal lê os relatórios e aplica **todos os patches sequencialmente** no index.md
 
 Isso garante atomicidade e evita corrupção do arquivo por escrita concorrente.
@@ -409,7 +409,7 @@ Prefixos:
 ### `scripts/generate_graph.py` — Grafo Interativo D3.js
 
 ```bash
-cd /opt/data/skills
+cd /data/data/com.termux/files/home/capitolium/skills
 python3 scripts/generate_graph.py              # gera skills_graph.html + graph_data.json
 python3 scripts/generate_graph.py --json       # só graph_data.json
 ```
@@ -421,7 +421,7 @@ Dependências: Python 3 stdlib. Nenhum pacote externo.
 ### `scripts/audit-descriptions.py` — Auditoria de Descrições
 
 ```bash
-cd /opt/data/skills
+cd /data/data/com.termux/files/home/capitolium/skills
 python3 software-development/skills-repo-curator/scripts/audit-descriptions.py           # escaneia todas as SKILL.md
 python3 software-development/skills-repo-curator/scripts/audit-descriptions.py --drift   # compara Resumo index.md vs summary real
 ```
@@ -453,7 +453,7 @@ Operations that reference OKF:
 ## Verification
 
 ```bash
-cd /opt/data/skills
+cd /data/data/com.termux/files/home/capitolium/skills
 git log --oneline -5
 python3 scripts/generate_graph.py
 grep "|- \`" index.md  # deve retornar vazio
@@ -572,7 +572,7 @@ else:
 
 ⚠️ **Ciclo pode morrer no meio e deixar working directory sujo.** O cron job tem timeout — se o ciclo não completa, SKILL.md ficam modificados mas sem commit, index.md desatualizado, log.md sem entrada. **Recuperação:**
 
-   1. **Diagnóstico** — `cronjob(action='list')` → ver `last_status: error`. O campo `last_error` no `jobs.json` (`/opt/data/cron/jobs.json`) tem a mensagem de erro completa. O output do cron está em `/opt/data/cron/output/<job_id>/<timestamp>.md` — contém o prompt completo + a seção `## Error` com o trace.
+   1. **Diagnóstico** — `cronjob(action='list')` → ver `last_status: error`. O campo `last_error` no `jobs.json` (`/data/data/com.termux/files/home/capitolium/cron/jobs.json`) tem a mensagem de erro completa. O output do cron está em `/data/data/com.termux/files/home/capitolium/cron/output/<job_id>/<timestamp>.md` — contém o prompt completo + a seção `## Error` com o trace.
    2. **Avaliação** — `git status` + `git diff --stat` mostra quais skills foram tocadas. `git diff <file>` pra ver se as mudanças são válidas ou corrompidas.
    3. **Se válido** — complete o ciclo manualmente: `git add -A`, escreva entrada no `log.md`, atualize `index.md`, `git commit -m "update: ..."`, `git push`.
    4. **Se corrompido** — `git restore .` pra limpar o working directory. O próximo cron (segunda 02:00 UTC) recomeça do zero.
@@ -726,6 +726,6 @@ Procedimento:
 ## Browser policy — Mercúrio proot
 
 - **Renderer local** (HTML→PDF, screenshots, Mermaid, BPMN, p5.js e visual local): usar a única cópia ARM64 do Chromium em `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`.
-- **Runtime Playwright:** `/opt/mercurio-data/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
+- **Runtime Playwright:** `/data/data/com.termux/files/home/capitolium/node_modules/playwright`; cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`.
 - Não instalar outro Chromium/Puppeteer por perfil; não usar caches antigos ou browsers remotos.
 - **Sites externos com internet:** usar a ferramenta `browser_exec` para navegação, interação, extração e verificação visual.

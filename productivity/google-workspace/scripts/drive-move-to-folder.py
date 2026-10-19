@@ -14,8 +14,8 @@ Examples:
 """
 import sys, os
 
-TOKEN_PATH = "/opt/data/google_token.json"
-TOKEN_PATH = "/opt/data/google_token.json"
+TOKEN_PATH = "/data/data/com.termux/files/home/capitolium/google_token.json"
+TOKEN_PATH = "/data/data/com.termux/files/home/capitolium/google_token.json"
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 from google.auth.transport.requests import Request

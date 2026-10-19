@@ -119,7 +119,7 @@ Before diagnosing latency, verify the gateway is healthy:
 ps aux | grep "hermes gateway"
 
 # Gateway recent errors (filter out noise)
-tail -50 /opt/data/logs/gateways/default/current 2>/dev/null | \
+tail -50 /data/data/com.termux/files/home/capitolium/logs/gateways/default/current 2>/dev/null | \
   grep -v "Self-improvement review\|Memory updated\|Patched SKILL\|User profile"
 
 # WhatsApp bridge status
@@ -158,7 +158,7 @@ uptime
 ### How to Detect in Gateway Logs
 
 ```bash
-grep "response ready" /opt/data/logs/gateway.log | tail -10
+grep "response ready" /data/data/com.termux/files/home/capitolium/logs/gateway.log | tail -10
 ```
 
 Look for entries where:
@@ -184,7 +184,7 @@ compression:
   in_place: true
 ```
 
-**Config path caveat:** Hermes reads from `get_config_path()` — on this host it's `/opt/data/config.yaml`, NOT `~/.hermes/config.yaml`. Always verify:
+**Config path caveat:** Hermes reads from `get_config_path()` — on this host it's `/data/data/com.termux/files/home/capitolium/config.yaml`, NOT `~/.hermes/config.yaml`. Always verify:
 
 ```bash
 /opt/hermes/.venv/bin/python3 -c "
@@ -195,10 +195,10 @@ print(get_config_path())
 
 #### 2. Edit the Real Config File — Tool Restriction
 
-The `patch` tool refuses to edit `/opt/data/config.yaml` (flagged as security-sensitive). Use `sed` directly via terminal instead:
+The `patch` tool refuses to edit `/data/data/com.termux/files/home/capitolium/config.yaml` (flagged as security-sensitive). Use `sed` directly via terminal instead:
 
 ```bash
-sed -i 's/  in_place: false/  in_place: true/' /opt/data/config.yaml
+sed -i 's/  in_place: false/  in_place: true/' /data/data/com.termux/files/home/capitolium/config.yaml
 ```
 
 Then verify the change was picked up by `load_config()`:

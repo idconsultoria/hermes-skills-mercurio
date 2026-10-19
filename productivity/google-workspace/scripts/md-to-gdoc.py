@@ -22,7 +22,7 @@ import urllib.error
 TOKEN_PATH = os.environ.get("GOOGLE_TOKEN_PATH") or os.path.join(
     os.environ.get("HERMES_HOME", os.path.expanduser("~/.hermes")), "google_token.json")
 if not os.path.exists(TOKEN_PATH):
-    alt = "/opt/data/google_token.json"
+    alt = "/data/data/com.termux/files/home/capitolium/google_token.json"
     if os.path.exists(alt):
         TOKEN_PATH = alt
 HEADING_STYLES = {1: "HEADING_1", 2: "HEADING_2", 3: "HEADING_3", 4: "HEADING_4"}

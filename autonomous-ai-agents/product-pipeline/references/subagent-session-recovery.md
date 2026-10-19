@@ -14,7 +14,7 @@ Subagentes `delegate_task` que timeoutam perdem o summary final, mas suas sessõ
 ## Localização
 
 ```bash
-/opt/data/state.db  # (ou caminho configurado no Hermes)
+/data/data/com.termux/files/home/capitolium/state.db  # (ou caminho configurado no Hermes)
 ```
 
 ## Schema
@@ -42,7 +42,7 @@ Subagentes `delegate_task` que timeoutam perdem o summary final, mas suas sessõ
 
 ```python
 import sqlite3
-conn = sqlite3.connect('/opt/data/state.db')
+conn = sqlite3.connect('/data/data/com.termux/files/home/capitolium/state.db')
 
 # Encontrar subagentes (parent_session_id não nulo)
 subs = conn.execute('''

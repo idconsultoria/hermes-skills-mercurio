@@ -4,7 +4,7 @@ Placeholder template for the D3.js skills graph. The `__DATA_PLACEHOLDER__` toke
 
 ## Usage
 ```bash
-cd /opt/data/skills
+cd /data/data/com.termux/files/home/capitolium/skills
 python3 scripts/generate_graph.py
 ```
 
@@ -21,7 +21,7 @@ python3 scripts/generate_graph.py
 - Parent→child and uses→used_by edges deduplicated (one edge per pair)
 
 ## Template location
-`/opt/data/skills/skills_graph_template.html`
+`/data/data/com.termux/files/home/capitolium/skills/skills_graph_template.html`
 
 ## Output
-`/opt/data/skills/skills_graph.html`
+`/data/data/com.termux/files/home/capitolium/skills/skills_graph.html`

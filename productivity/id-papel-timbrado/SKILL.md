@@ -31,8 +31,8 @@ placeholders de texto editável, depois páginas de corpo com masthead ID + cabe
 - Tokens com escopo **full** (Drive+Docs+Sheets): `google_token.admin_idconsultoria.json`
   (conta admin) e `google_token.backup_gustavomelloenciv.json` (conta pessoal — dona da
   pasta FINEP/Sergipetec; use esta quando o alvo for arquivo da conta pessoal).
-- Usar o wrapper: `export GAPI_TOKEN=/opt/data/google_token.<escolhido>.json` e
-  `/opt/data/venvs/google/bin/python /opt/data/gapi_token.py <cmd>`.
+- Usar o wrapper: `export GAPI_TOKEN=/data/data/com.termux/files/home/capitolium/google_token.<escolhido>.json` e
+  `/data/data/com.termux/files/home/capitolium/venvs/google/bin/python /data/data/com.termux/files/home/capitolium/gapi_token.py <cmd>`.
 
 ## Procedimento (copiar modelo → editar lugares certos)
 
@@ -71,7 +71,7 @@ reimplementar o parser manualmente. Reusar o builder do próprio script:
 
 ```python
 import importlib.util, sys
-spec=importlib.util.spec_from_file_location('mdg','/opt/data/skills/productivity/google-workspace/scripts/md-to-gdoc.py')
+spec=importlib.util.spec_from_file_location('mdg','/data/data/com.termux/files/home/capitolium/skills/productivity/google-workspace/scripts/md-to-gdoc.py')
 mdg=importlib.util.module_from_spec(spec); sys.modules['mdg']=mdg; spec.loader.exec_module(mdg)
 
 # após copiar o modelo + preencher placeholders (capa/cabeçalho) com a conta certa:
@@ -165,7 +165,7 @@ em negrito fica sem bold (e piora depois de tabelas).
   em branco finais para não sobrar página vazia.
 Fluxo final validado: copiar → preencher capa+cabeçalho → deletar `\ue907` → build motor
 (Nunito Sans sem weight) → adicionar contracapa → limpar linhas finais.
-Ferramenta de referência: `/opt/data/work/md_to_timbrado_id.py`.
+Ferramenta de referência: `/data/data/com.termux/files/home/capitolium/work/md_to_timbrado_id.py`.
 
 ## Pitfall CRÍTICO — corpo vira "título 1" gigante (style bleeding por herança)
 Ao inserir o corpo logo após o título da capa (que é um heading GRANDE), TODO parágrafo inserido
@@ -190,11 +190,11 @@ headings. Regra de ouro:
   HEADING_2 18pt. Página A4, margens 72pt. Corpo justificado + margens largas ⇒
   documentos longos se estendem por várias páginas (normal).
 - A ferramenta `docs get` mostra bullets como `#` e headings como `#`/`##` — usar p/ conferir.
-- Scripts de referência desta sessão: `/opt/data/finep_trabalho/{copy_template.py,
+- Scripts de referência desta sessão: `/data/data/com.termux/files/home/capitolium/finep_trabalho/{copy_template.py,
   build_doc.py, style_doc.py, fill_headers.py, check_headers.py, inspect_doc.py}`.
 
 ## Verificação
 
 Exportar a PDF e renderizar (pypdfium2 + Pillow no venv
-`/opt/data/venvs/google/bin/python`) e conferir capa + páginas de corpo com
+`/data/data/com.termux/files/home/capitolium/venvs/google/bin/python`) e conferir capa + páginas de corpo com
 `vision_analyze`. Confirmar capa com logo/cores e corpo com masthead ID.

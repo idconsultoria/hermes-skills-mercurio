@@ -40,6 +40,6 @@ SKIP — memória não pré-injetada no cron (skip_memory=true), tool memory sem
 
 ## Git
 - Commit: log.md + reports/evolve-2026-09-29-0200.md + este report.
-- Push: via /opt/data/scripts/push-skills-mercurio.sh (registrar output no SUMMARY final).
+- Push: via /data/data/com.termux/files/home/capitolium/scripts/push-skills-mercurio.sh (registrar output no SUMMARY final).
 - Working tree restante: drift untracked (16 SKILL.md + .locks/ + DESCRIPTION.md) — remoção
   adiada 12ª vez (guard bloqueia rm em lote no cron). Grafo imune (lê só index.md).

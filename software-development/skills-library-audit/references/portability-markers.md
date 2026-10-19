@@ -10,7 +10,7 @@ universal" de "só funciona com os dados do dono".
 - **Sócios:** `Gustavo`, `Maxwell`, `Cleverton`, `Tácio`, `n0ztr`.
 - **Clientes / projetos internos:** `Famosa`, `El Niño`, `SEMAC`, `SergipeTec`, `Olimpo`, `Odigeí`,
   `ArtemisHub`, `Vulcano`, `Dédalo`, `Hephaistos`, `Axia`, `Alithea`, `Moodle`.
-- **Caminhos internos:** `/opt/mercurio-data`, `mercurio_id_bot`, `context-kb`.
+- **Caminhos internos:** `/data/data/com.termux/files/home/capitolium`, `mercurio_id_bot`, `context-kb`.
 - **Credenciais / contas:** `google_token`, `GITHUB_TOKEN`, `admin@idconsultoria`, `\.env`,
   `refresh_token`, `client_secret`.
 - **Identificadores de nuvem e conta (família fácil de esquecer):** id de projeto em nuvem
@@ -90,6 +90,6 @@ sem ter rodado a passada 1 e classificado cada acerto.
   critério de seleção e o ajuste necessário (caminhos, contas, marca).
 - **Nunca** incluir arquivo de credencial (token, `.env`, `client_secret`) nem deixar caminho
   absoluto do dono como obrigatório — o pacote existe para rodar em outra máquina.
-- Nomear com versão e salvar em `/opt/mercurio-data/deliverables/`.
+- Nomear com versão e salvar em `/data/data/com.termux/files/home/capitolium/deliverables/`.
 - Conferir depois: listar o zip (contagem de arquivos + nomes de skill presentes) contra a lista
   prometida ao usuário.

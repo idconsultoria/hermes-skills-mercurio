@@ -25,8 +25,8 @@ cd render && bash setup.sh    # instala somente bpmn-js; o browser é compartilh
 O renderer usa exclusivamente o Chromium ARM64 compartilhado e o runtime Playwright do Mercúrio:
 
 - Browser: `/opt/data/.playwright/chromium-1117/chrome-linux/chrome`
-- Runtime: `/opt/mercurio-data/node_modules/playwright`
-- Biblioteca: `/opt/mercurio-data/node_modules/bpmn-js/dist/bpmn-viewer.production.min.js`
+- Runtime: `/data/data/com.termux/files/home/capitolium/node_modules/playwright`
+- Biblioteca: `/data/data/com.termux/files/home/capitolium/node_modules/bpmn-js/dist/bpmn-viewer.production.min.js`
 - Cache: `PLAYWRIGHT_BROWSERS_PATH=/opt/data/.playwright`
 
 Não baixar, instalar ou selecionar browser por perfil. Para sites externos com internet, usar `browser_exec`; este renderer é local.

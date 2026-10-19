@@ -10,7 +10,7 @@ Selecione a sessao por `chat_id` + `ended_at IS NULL`. O `session_id` ordena por
 atividade: uma sessao antiga pode ser a ativa.
 
 ```bash
-P=/opt/mercurio-data/profiles/<perfil>/state.db
+P=/data/data/com.termux/files/home/capitolium/profiles/<perfil>/state.db
 sqlite3 "$P" "SELECT id, chat_type, display_name, datetime(started_at,'unixepoch'),
                      datetime(COALESCE(ended_at,0),'unixepoch'), end_reason, message_count,
                      tool_call_count FROM sessions ORDER BY started_at DESC LIMIT 12;"

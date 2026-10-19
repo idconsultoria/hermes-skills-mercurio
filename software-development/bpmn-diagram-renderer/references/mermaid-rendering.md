@@ -6,9 +6,9 @@ renderização via headless browser. Fundo **transparente** + escala **2x**.
 
 ## Requisitos
 
-- **mmdc** (mermaid-cli) em `/opt/data/mmdc`:
+- **mmdc** (mermaid-cli) em `/data/data/com.termux/files/home/capitolium/mmdc`:
   ```bash
-  mkdir -p /opt/data/mmdc && cd /opt/data/mmdc && npm init -y >/dev/null 2>&1
+  mkdir -p /data/data/com.termux/files/home/capitolium/mmdc && cd /data/data/com.termux/files/home/capitolium/mmdc && npm init -y >/dev/null 2>&1
   npm install @mermaid-js/mermaid-cli --no-audit --no-fund --ignore-scripts
   ```
   `--ignore-scripts` evita o postinstall do puppeteer (baixa Chrome x64 quebrado em ARM64 e falha sem
@@ -23,7 +23,7 @@ renderização via headless browser. Fundo **transparente** + escala **2x**.
   rodar `snap remove`/instalar browser no host (erro real ago/2026: `sudo snap remove chromium` quebrou
   outra sessão). Se precisar de browser no host, usar o já existente (`/snap/bin/chromium`).
 
-## puppeteer-config.json (salvar em /opt/data/mmdc/)
+## puppeteer-config.json (salvar em /data/data/com.termux/files/home/capitolium/mmdc/)
 
 ```json
 {
@@ -35,7 +35,7 @@ renderização via headless browser. Fundo **transparente** + escala **2x**.
 ## Renderizar
 
 ```bash
-cd /opt/data/mmdc
+cd /data/data/com.termux/files/home/capitolium/mmdc
 node_modules/.bin/mmdc -i input.mmd -o output.png -b transparent -s 2 -p puppeteer-config.json
 ```
 
