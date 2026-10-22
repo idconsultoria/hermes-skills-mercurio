@@ -21,3 +21,17 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `revisao-de-proposta-existente` — Revisar proposta já entregue, preservando o resto.
 - `roteiro-de-qualificacao` — Roteiro de qualificação: descoberta ou sabatina.
 - `organizacao-drive-id` — Organizar pastas e docs de cliente no Drive da ID + e-mail.
+
+## finanças / métricas (skills.sh, instaladas 2026-10-22)
+
+- `revenue-kpi-framework` — Desenhar a árvore de KPIs de receita (math reconciliante, dono por ramo, guardrails).
+- `revenue-reporting` — Espinha de métricas + narrativa de relatório executivo/board e cadência.
+- `revenue-leakage` — Rastrear vazamento de receita no funil e dimensionar o recuperável.
+- `sales-forecast-diagnostic` — Diagnosticar previsão de vendas não confiável (stage inflation, happy ears).
+- `financial-analyst` — Ratios, DCF, variação orçamentária e forecast (com scripts Python).
+- `cfo-advisor` — Lente de CFO: runway, unit economics, pacote mensal de métricas.
+- `business-intelligence` — Framework de KPIs, design de dashboard e automação de relatório.
+- `kpi-dashboard-design` — Desenho de dashboard executivo e armadilhas de cálculo inconsistente.
+- `financial-modeling` — Modelo integrado 3 demonstrações (DRE, BP, DFC) com linkages.
+- `variance-analysis` — Decompor variação orçado vs realizado em drivers com waterfall.
+- `invoice-chase` — Cobrança de fatura em atraso: tom, escalonamento e o que não fazer.
