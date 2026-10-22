@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 123 skills** em 13 categorias.
+**Total: 134 skills** em 13 categorias.
 
 ---
 
@@ -38,6 +38,17 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `proposta-ente-publico` | Orchestrator | Use ao elaborar proposta/documento para órgão público. |
 | `organizacao-drive-id` | Orchestrator | Use ao organizar pastas e docs de cliente no Drive da ID. |
 | `documento-a4-marca-id` | Orchestrator | Documento A4 com identidade ID (HTML→PDF). |
+| `revenue-kpi-framework` | Orchestrator | Árvore de KPIs de receita: math reconciliante, dono por ramo, guardrails. |
+| `revenue-reporting` | Orchestrator | Espinha de métricas + narrativa de board e cadência de revisão. |
+| `revenue-leakage` | Orchestrator | Rastrear vazamento de receita e dimensionar o recuperável. |
+| `sales-forecast-diagnostic` | Orchestrator | Diagnosticar previsão de vendas não confiável (stage inflation, happy ears). |
+| `financial-analyst` | ToolIntegration | Ratios, DCF, variação orçamentária e forecast (com scripts Python). |
+| `cfo-advisor` | Orchestrator | Lente de CFO: runway, unit economics, pacote mensal de métricas. |
+| `business-intelligence` | Orchestrator | Framework de KPIs, design de dashboard e automação de relatório. |
+| `kpi-dashboard-design` | Reference | Desenho de dashboard executivo e armadilhas de cálculo inconsistente. |
+| `financial-modeling` | Reference | Modelo integrado de 3 demonstrações (DRE, BP, DFC) com linkages. |
+| `variance-analysis` | Orchestrator | Decompor orçado vs realizado em drivers com waterfall. |
+| `invoice-chase` | Orchestrator | Cobrança de fatura em atraso: tom, escalonamento, o que não fazer. |
 
 ## legal — Direito brasileiro e contratos ID
 
@@ -293,6 +304,15 @@ Similar:
 - `hermes-gateway-stall-diagnosis` → `messaging-platforms`
 - `hermes-memory-file-curation` → `id-comunicacao-multiusuario`
 - `hermes-session-forensics` → `peer-session-audit`
+- `revenue-kpi-framework` → `revenue-reporting`
+- `revenue-kpi-framework` → `business-intelligence`
+- `revenue-kpi-framework` → `kpi-dashboard-design`
+- `revenue-leakage` → `revenue-kpi-framework`
+- `sales-forecast-diagnostic` → `revenue-leakage`
+- `financial-analyst` → `financial-modeling`
+- `financial-analyst` → `variance-analysis`
+- `cfo-advisor` → `financial-analyst`
+- `valuation-consultivo` → `financial-modeling`
 
 Uses:
 - `agenda-id` → `google-workspace`
@@ -410,6 +430,14 @@ Uses:
 - `auditoria-automacoes-google-script` → `google-workspace`
 - `hermes-session-forensics` → `hermes-gateway-stall-diagnosis`
 - `hermes-memory-file-curation` → `hermes-session-forensics`
+- `revenue-reporting` → `variance-analysis`
+- `financial-modeling` → `financial-analyst`
+- `business-intelligence` → `kpi-dashboard-design`
+- `kpi-dashboard-design` → `xlsx`
+- `variance-analysis` → `xlsx`
+- `financial-analyst` → `xlsx`
+- `invoice-chase` → `emissao-nfse`
+- `revenue-kpi-framework` → `cfo-advisor`
 
 ---
 
