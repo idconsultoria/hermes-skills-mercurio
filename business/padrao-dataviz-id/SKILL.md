@@ -22,7 +22,8 @@ Skills de origem do padrão: `data-storytelling`, `data-visualization`, `impecca
 **Tinta que não carrega dado é dívida.** Antes de acrescentar qualquer elemento, responda o que
 ele informa. Se a resposta for "organiza", "embeleza" ou "separa", ele não entra.
 
-Meta mensurável: **≥ 40% da tela é vazio** e **≤ 4 elementos de chrome por gráfico**.
+Meta mensurável, literal do projeto de origem: **"pelo menos 60% da área do gráfico é dado ou
+espaço; no máximo 4 elementos de chrome por gráfico"** — equivalente a ≥ 40% de área vazia na tela.
 
 ## 2. Remover por padrão
 
