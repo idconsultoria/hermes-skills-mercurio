@@ -154,7 +154,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `messaging-platforms` | Reference | Mensageria cross-platform — Telegram, IDs, entrega de arquivos. |
 | `opencode` | ToolIntegration | Delegate coding to OpenCode CLI (features, PR review). |
 | `pi-agent-coordination` | ToolIntegration | Invocar Pi Agent localmente via Hermes (hierarquia provider/model). |
-| `product-pipeline` | Orchestrator | Pipeline multi-agente de produto — ideia a MVP via sprints. |
+| `product-pipeline` | Orchestrator | Pipeline de produto em 5 fases — ideação a MVP, portões e ACORDO do agy. |
 | `hermes-inference-config` | Reference | Configure Hermes model/provider/fallback; route crons. |
 | `facilitacao-grupo-agentes` | Orchestrator | Facilitar reuniões de agentes: pauta, turnos e devolução. |
 | `peer-session-audit` | Reference | Auditar sessão ruim de um agente par: conversa real, defeitos, postmortem. |
