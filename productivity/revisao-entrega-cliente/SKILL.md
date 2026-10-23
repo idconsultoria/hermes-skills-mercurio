@@ -38,10 +38,16 @@ Peça visual não se julga pela descrição do autor: conte os elementos. Em SVG
 
 - Fator de escala = largura útil da página ÷ largura do canvas; multiplique o corpo da fonte. Abaixo de ~6pt a peça não serve impressa.
 - Canvas fixo em px **sem `@media print`** cai em 1 página A4: canvas de 3740px dá fator ~0,16 → corpo de 11,5px vira ~1,8pt. Saída: paisagem pré-dimensionada, tiling em páginas, ou exportar PNG/PDF em resolução nativa.
+- **PDF A4 paginado: meça o overflow, não olhe.** Com `.page{height:297mm;overflow:hidden}` a página que "parece pronta" está cortando o pé do último parágrafo. Injete um medidor que grave `scrollHeight - clientHeight` de cada `.page` num `<div id="MEASURE">` no evento `load` (+`setTimeout` curto), renderize com `chromium-browser --headless --virtual-time-budget=6000 --dump-dom file://_measure.html` e leia `MEASURE:pg1=…`. Excesso de 7 px já é conteúdo cortado. Script: `scripts/medir-overflow-paginas.sh <arquivo.html>`. Receita de layout para documento técnico A4 em fundo branco (tokens, cabeçalho de seção, tabelas de referência, diagrama de linha em SVG e orçamento de páginas): `references/layout-documento-tecnico-a4.md`.
+- **Renderer de PDF local:** `chromium-browser --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --no-pdf-header-footer --print-to-pdf=saida.pdf "file://$PWD/entrada.html"`. É o pacote nativo e não precisa de Node nem de Playwright. O Chromium baixado pelo Playwright (`~/.hermes/.cache/ms-playwright/.../chrome-linux/chrome`) é ligado contra glibc e não executa solto no Termux; e o `node` do Termux reporta `platform=android`, o que o playwright-core aborta. stderr com `Failed to connect to the bus` é ruído: a linha válida é `NNNN bytes written to file`.
+- **Ritmo vertical entre filete e texto.** Filete a menos de 5 mm do bloco é o desconforto que o leitor sente e não nomeia: ≥6,5 mm acima e ≥7 mm de `margin-top` no primeiro título abaixo; `2,5–3,4 mm` de padding vertical em linha de tabela.
 
 ### 4. Conferir identidade da ID
 
 Peça de cliente sai em teal `#14b8a6` + navy `#0a1929`, Neulis Neue nos títulos e Nunito Sans no corpo. Cor de template genérico (azul de sistema, roxo de dashboard) destoa da marca — aponte.
+
+- **Logo branco sobre fundo branco desaparece sem erro.** O logo da ID que vem do template da proposta é `fill:#ffffff`; em página clara ele simplesmente não renderiza. Troque o fill pelo navy antes de inlinar (`.replace('#ffffff','#0A1929')`) e confirme o logo na imagem final — ausência de erro não é presença de logo.
+- **Variante do logo do cliente:** medir com PIL a média RGB dos pixels opacos antes de escolher; versão negativa (footer de site) some em fundo claro e versão escura some em fundo escuro.
 
 ### 5. Cruzar artefato × decisão registrada
 
@@ -212,6 +218,10 @@ documento no timbrado gerado a partir de markdown): `references/checklists-revis
 
 ## Pitfalls
 
+- **Presunção apresentada como observação.** Em documento de diagnóstico ou modelo, toda frase que descreve a dor do cliente ("o boletim atrasa", "a nota sai tarde", "uma área comemora o que a outra não vê") é afirmação sobre um dado que ninguém examinou. O teste é simples: essa frase sobrevive à pergunta "qual registro prova isso?" Se não, ela vira declaração de escopo ("nenhum dado foi analisado; o modelo é o instrumento, o diagnóstico vem da aplicação") ou sai. Vale também para cena de abertura e para exemplo numérico — este só entra rotulado como fictício.
+- **Título de slogan em documento técnico.** Seção com nome de efeito ("O número só vale se tiver hora marcada") lê como post, não como estudo. Nomeie o objeto ("Rito de gestão") e ponha o conteúdo no subtítulo ("Periodicidade, pauta e critério de cobrança").
+- **Confundir simples com despojado.** Período completo e vocabulário técnico preciso é o que faz a peça parecer sóbria; frase curta em série e travessão decorativo fazem parecer raso. Na revisão, conte travessões e negritos: um travessão por documento e negrito só em nome de termo.
+
 - **"Já que estou aqui, vou corrigir"** — alterar material do cliente sem OK é o pior erro possível neste trabalho, mesmo quando a correção é óbvia e a divergência é factual.
 - **Opinar sem abrir a peça.** Renderize/leia e conte elementos; impressão visual de descrição de terceiro não é revisão.
 - **Julgar layout sem testar a conversão.** SVG estilizado só por custom property CSS (`var(--x)`) vira mancha preta em conversor que não é navegador — a variável não resolve e o default do SVG é preto. Para PDF, cor literal no SVG (atributo `fill` ou `<style>` interno com hex) ou geração pelo próprio navegador.
@@ -261,4 +271,6 @@ artefato do cliente é achado de revisão, não detalhe.
   `python3 roteiro-de-qualificacao/scripts/scan-integridade-texto.py ARQUIVO.md`. O vazamento de
   caractere de outro alfabeto e a pontuação duplicada são **invisíveis na leitura** e aparecem na
   frente do cliente; ao corrigir, reescrever a **linha inteira** e revalidar a estrutura depois.
+- [ ] Documento A4: overflow medido página a página (`scripts/medir-overflow-paginas.sh`), contagem de páginas igual ao combinado, logo do cliente **e** da ID visíveis no fundo usado.
+- [ ] Registro do texto: nenhuma afirmação sobre a situação do cliente sem registro que a sustente; exemplos numéricos rotulados como fictícios; títulos nomeando o objeto, não slogans.
 - [ ] Retorno em quatro blocos (completo / lacunas / conflitos / sugestões).

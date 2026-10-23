@@ -444,6 +444,16 @@ use `valueRenderOption="FORMULA"` e varra **todas as colunas** (algumas abas tê
   (refresh com escopo a menos = `invalid_scope`; escopo ausente na conta = 403).
 - E-mail de parcelas/NFS-e ao cliente (cobrança) tem molde e histórico próprios — ver a
   seção "Envio da NFS-e ao cliente" da skill `emissao-nfse`.
+- **Dependência compilada no Termux se instala por `pkg`, nunca por pip.** O venv do iData
+  (`work/idata/.venv`, criado por uv, python 3.14, `include-system-site-packages=true`) não
+  carrega pandas das próprias wheels: wheel manylinux do PyPI não roda em Android/bionic.
+  Sintoma no cron das 07:00 (job `no_agent`, calado): `ERRO: não consegui importar o motor do
+  Inter em …` com exit 2. Conserto: `pkg install python-pandas` (TUR; veio 3.0.6) e conferir com
+  `work/idata/.venv/bin/python -c 'import etl.extratores.api_inter'`. Vale para qualquer venv
+  da casa — googleapiclient é puro Python e funciona; pandas/numpy/pillow têm que vir do Termux.
+- **Nunca re-execute o iData para o mesmo dia.** `adicionador_de_linhas` faz `append` sem dedupe:
+  rodar de novo para "ontem" duplica as linhas na aba `transações`. Se o cron das 07:00 falhou e
+  você rodou o watchdog à mão com sucesso, o dia está coberto — deixe o próximo tick seguir.
 - A skill irmã `inter-api-id-consultoria` cobre a API do Banco Inter em si (consultas/relatórios);
   esta cobre o ecossistema de planilhas e acesso. Ao usar o script dela
   (`scripts/inter_api.py`), passe **sempre** `--repo <clone vivo do iData>` e o venv ao lado do

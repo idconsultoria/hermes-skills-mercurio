@@ -121,6 +121,25 @@ Nada de "foi movido", "foi compartilhado", "foi salvo" baseado no retorno da cha
 - **Email/rascunho:** `labelIds` contém `DRAFT` e **não** contém `SENT`; corpo decodificado
   é byte-a-byte igual ao aprovado; `threadId` é o da conversa.
 
+## Gate 6 · Achar entregável e responder com o link
+
+Pedido do tipo *"me manda o link do doc de <processo>"* se resolve em quatro passos:
+
+1. **Buscar pelo termo do negócio, não pela árvore de pastas**: `google_api.py drive search
+   "<termo>"` (fullText) devolve de uma vez POP, transcrição, áudio da coleta, pastas do
+   processo e as versões — mais rápido que descer pasta por pasta, e revela artefato que você
+   não sabia que existia.
+2. **Resolver o caminho real subindo os pais** (`files.get(fields="id,name,parents")` em
+   laço) e citar a cadeia inteira na resposta. O caminho prova que é a pasta certa e o dono
+   confere sem abrir o documento.
+3. **Pasta homônima: escolher a que CONTÉM o artefato**, listando filhos por
+   `'<id>' in parents`. O mesmo nome pode existir duas vezes (duplicata entre
+   `Processos priorizados` e `01 - Subprodutos Dédalo`) e a primeira do resultado pode ser a
+   cópia vazia — diga também onde está a outra, para o dono não trabalhar no lugar errado.
+4. **Responder link + caminho + versão.** Se só existe `v1` — sem a v2 consolidada que o
+   resto do lote ganhou —, dizer isso explicitamente: o dono precisa saber que não há versão
+   mais nova antes de repassar o link ao cliente.
+
 ## Pitfalls
 
 - **`gustavomelloenciv@gmail.com` é fallback VETADO** — e é `owner` de muito material da

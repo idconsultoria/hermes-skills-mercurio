@@ -5,8 +5,9 @@ Usar quando a demanda for "encaminhe/cobre a nota do <cliente>".
 
 ## 1 · Achar os envios anteriores (Gmail, `admin@idconsultoria.ai`)
 
-Interpretador: `$HERMES_HOME/id-nfse-motor/.venv/bin/python` (tem `googleapiclient`);
-token `$HERMES_HOME/google_token.json`.
+Interpretador com `googleapiclient`: `$HERMES_HOME/venvs/google/bin/python`; token
+`$HERMES_HOME/google_token.json`. Confira o caminho antes de rodar — o venv do motor
+(`id-nfse-motor/.venv`) pode não existir no host, e `googleapiclient` é o que decide.
 
 Roteiro: `users().messages().list(q=..., maxResults=30)` → triagem com
 `messages().get(format="metadata", metadataHeaders=["From","To","Subject","Date"])` →

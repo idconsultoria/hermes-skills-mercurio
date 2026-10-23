@@ -35,3 +35,4 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `financial-modeling` — Modelo integrado 3 demonstrações (DRE, BP, DFC) com linkages.
 - `variance-analysis` — Decompor variação orçado vs realizado em drivers com waterfall.
 - `invoice-chase` — Cobrança de fatura em atraso: tom, escalonamento e o que não fazer.
+- `padrao-dataviz-id` — Contrato de dado da ID (herdado de Métricas nas Nuvens): data-to-ink, título-conclusão, composição sem grade de cards, portão de acabamento.

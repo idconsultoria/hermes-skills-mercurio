@@ -114,6 +114,33 @@ projeto de sistema; **4 a 6** para treinamento. Se passar disso, há anexo descr
 | Foro de consumidor quando é B2B | Em B2B, segue a regra da empresa | Foro da Comarca de Aracaju/SE (padrão ID) |
 | Jargão sem explicar (ex.: "clawback") | Cliente não entende e não assina | Descrever o efeito em português claro |
 
+## Entrega — SEMPRE no papel timbrado da ID (não improvisar formato)
+
+Documento da ID para cliente **não** sai como import de HTML no Drive nem como doc cru: sai no
+**papel timbrado** (capa escura ID com linhas topográficas + masthead nas páginas de corpo +
+cabeçalho de duas linhas + rodapé numerado), pela receita da skill `md-to-timbrado-id`, com o
+modelo `1dFY0Mb0X0OAS8TjnIW6rqAP3A-dhA1nTMS3HETht5To`:
+
+```bash
+HERMES_HOME=<home> venvs/google/bin/python \
+  skills/productivity/md-to-timbrado-id/scripts/md_to_timbrado_id.py \
+  <corpo.md> --folder <PASTA_DO_CLIENTE> --doc-name "Contrato X — vN — DD-MM-AAAA" \
+  --tipo "CONTRATO DE PRESTAÇÃO DE SERVIÇOS" --titulo-exp "<título grande da capa>" \
+  --titulo "<hero curto>" --titulo-res "<linha 1 do cabeçalho>" --cliente "<linha 2 do cabeçalho>"
+```
+
+- O `.md` é **só o corpo** (começa em `PARTES`): a capa, o masthead e a contracapa vêm do modelo.
+  Uma linha `<!-- pagebreak -->` vira quebra de página — usar antes de cada ANEXO.
+- Escrever o conteúdo primeiro (HTML/markdown) e converter; o corpo entra pelo motor md→gdoc
+  (tabelas nativas, negrito íntegro). Pitfalls de script: `id-papel-timbrado` (glifo `\ue907`,
+  patch do `DocBuilder`, negrito que perde a 1ª letra).
+- Conferir no PDF exportado: capa escura com logo, masthead em todas as páginas de corpo,
+  **rodapé com número de página**, cabeçalho com as duas linhas, negritos íntegros e zero
+  página órfã.
+- Entrega em doc sem essa identidade é **entrega errada**, mesmo com o conteúdo certo —
+  aconteceu na minuta de sustentação do ArtemisHub (20/10/2026): conteúdo aprovado, formato
+  fora da identidade, teve de ser refeito.
+
 ## Checklist do "contrato justo" — revisão antes de enviar
 
 ### Clareza

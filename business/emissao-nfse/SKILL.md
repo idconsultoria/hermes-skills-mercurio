@@ -51,6 +51,31 @@ do motor e a lista de pendências fiscais reais.
 - Build da imagem: o daemon Docker **não é acessível do container do Mercúrio** — o Hermes
   canônico builda no Oracle host (`docker build -t id-nfse-motor:1.0.0 .`, ver DEPLOY.md).
 
+## Canal manual — portal WebISS de Aracaju (emissão quando o motor está bloqueado)
+
+Emissão de NFS-e da ID **não depende só do motor**: o WebISS entra por **usuário/senha**, não por
+certificado. Enquanto o A1 não está em mãos, o canal operativo é o portal — mesmo gate, mesmo rigor.
+Detalhe operacional em `references/portal-webiss-aracaju.md`.
+
+1. **Portal:** `https://aracajuse.webiss.com.br` (o `/inicio` cai em `/autenticacao/entrar`).
+   Formulário: `#Login` (CPF/CNPJ ou usuário), `#Senha`, botão `#botao-logar`.
+2. **Identificador pode ser digitado; senha, nunca.** O CPF/usuário entra por
+   `fill_input('#Login', ...)`; a senha só pelo cofre (`browser_vault_fill`). Sem item salvo para a
+   origem, `browser_vault_save_login` **não consegue pedir em sessão não interativa**
+   (Telegram/API/cron devolvem `prompt_unavailable`): peça ao principal, uma vez,
+   `hermes vault add --kind login` (origem = origem exata do portal, identificador = CPF) ou
+   Desktop → Settings → Passwords & Logins. Depois disso a sessão segue sem nova digitação.
+3. **Emissão:** menu lateral **NFS-e → Criar**; havendo nota anterior do tomador, **carregar a
+   última NFS-e** (traz tomador, código de serviço e discriminação prontos) e corrigir o que mudou
+   de objeto/valor.
+4. **Parcela e valor saem da planilha, nunca da memória:** `[ID] Gestão de Symplexis` → aba
+   `recebimentos` (`iD.contrato`, `Discriminação`, `Valor`, `Status`, `Data prevista`) + aba
+   `contratos` (valor total, datas, oferta). Rodar `scripts/parcelas_symplexis.py <iD>` antes de
+   tocar no portal. O número da NFS-e é sequencial anual e **não** diz qual é a parcela.
+5. **Gate do rascunho:** conduzir cada nota até o rascunho final e **parar**. Print do rascunho →
+   ok do principal → só então emitir. **Uma nota por vez**, na ordem pedida, com os dados da nota
+   já conferidos antes de mandar o print.
+
 ## Fluxo de emissão (gate obrigatório)
 1. Coletar tomador, serviço, valor, competência, série/nDPS.
 2. Validar contra perfil fiscal ID (serviço/ISS) e, se aplicável, KB do cliente.
@@ -89,6 +114,40 @@ estão em `references/cobranca-nfse-clientes.md` (seção 5). Regra que não se 
 cobra depois de confirmar, no extrato, que o valor não entrou** — e se a consulta ao banco
 falhar, reporta ao principal em vez de concluir que o cliente não pagou.
 
+## Emissão manual no WebISS de Aracaju (quando não há A1 válido)
+
+Rota operacional enquanto o certificado A1 não é renovado: emitir pelo portal
+**https://aracajuse.webiss.com.br** (login CPF/CNPJ + senha).
+
+1. **Login pela vault**, nunca digitando a senha: `fill_input('#Login', <CPF>)` + `browser_vault_fill`
+   (o item precisa estar no `HERMES_HOME` do perfil certo — vault do Olimpo não vale para o Mercúrio;
+   copiar `vault.json.enc` + `vault.key` resolve). A sessão cai em ~30 min → refazer o login.
+2. **Criar** (`/issqn/nfse/criar`) → bloco "Carregar dados de uma nota anterior":
+   *Última NFS-e emitida* (traz tomador, serviço, descrição e valores da nota anterior) ou
+   *Por documento do tomador*. Preencha e clique Carregar; depois `#btnProximo` → Passo 2 → Passo 3.
+   Carregar por documento falha se o tomador tem rascunho aberto (`criar/para/null`) — use a última nota.
+3. **Passo 3 — a armadilha**: `#valores-documento-fiscal-aliquota` ("Alíquota % (Simples Nacional)")
+   volta **5,00** em boa parte das vezes. Corrigir para a alíquota do mês antes de salvar
+   (`id-nfse-motor/dados/aliquota_iss.json`, cron do dia 5) — conferir o resultado em
+   Consultar › situação *Em edição* (Alíq. e ISSQN).
+4. **Salvar rascunho** (`salvar-rascunho`) → confere em *Em edição* → `#botao-emitir-nota-fiscal`
+   emite e devolve a **Chave de Acesso** (o número sequencial sai na Consultar).
+5. **PDF para o cliente**: o botão Imprimir do portal é `window.print()`. Gerar o PDF com
+   `Page.printToPDF` injetando CSS `body * {visibility:hidden} #nota-eletronica-html, … * {visibility:visible}`
+   + `scale=0.92`, A4 → **1 página**, igual aos envios anteriores (a página inteira gera 2 páginas).
+6. **Enquadramento** (ficha cadastral da ID): CNAEs 8599604 (principal), 5819100, 6204000, 7020400.
+   Item de serviço: 1701 (consultoria/mapeamento), 0101 (análise e desenvolvimento de sistemas),
+   0802 (instrução/treinamento). Todo par item+CNAE novo deve existir na ficha; o precedente de
+   cada contrato manda (Sergipetec/Artemishub = 0802 + 6204000).
+
+### Pitfalls do portal
+- O browser daemon abre abas internas `about:blank`; `js()` pode avaliar na aba errada. Chamar
+  `ensure_real_tab()` no início de **cada** `browser_exec` (e fechar as `about:blank` via
+  `Target.closeTarget`) antes de ler/escrever.
+- Clique só via `js(...).click()`; `click_at_xy`/mouse CDP não chegam à página.
+- A nota emitida avisa que o tomador **recebe automaticamente** o link — o e-mail de cobrança
+  da ID é adicional, não substitui nem é substituído por isso.
+
 ## Pendências reais (bloqueiam a 1ª nota em produção)
 1. **Certificado A1 (e-CNPJ)**: NÃO está em email/Drive da ID — está num PC pessoal do
    principal. Guardar a **senha** em env/volume seguro, **nunca em chat/texto plano**.
@@ -110,6 +169,13 @@ falhar, reporta ao principal em vez de concluir que o cliente não pagou.
 - **Cobrança exige trava no extrato**: e-mail de cobrança disparado sem conferir o banco
   chega pedindo dinheiro já recebido. Falha de leitura do extrato → não cobra, reporta.
 - Senha do certificado nunca em arquivo de config versionado nem em relatório.
+- **Alíquota do Simples não vem preenchida**: o assistente do portal abre/recalcula com **5,00%** e isso gera ISS 2,5x maior que o devido. A alíquota do mês sai de `id-nfse-motor/dados/aliquota_iss.json` (gravado pelo cron do dia 5, ex.: 2,01% para 10/2026) — **confira o campo antes de salvar o rascunho** e o `ISSQN(R$)` na lista de rascunhos, não só o painel de cálculo da tela.
+- **Senha que chega no chat não autoriza digitá-la**: o que entra em comando/JS fica gravado no
+  histórico da sessão — exatamente a exposição que se quer evitar em portal fiscal. Use o cofre e,
+  ao final, recomende a troca da senha no portal (uma linha, sem alarmismo).
+- **Contrato novo não herda a discriminação do antigo**: carregar a última NFS-e é atalho de
+  cadastro, não de escopo. Objeto diferente (treinamento, sistema, sustentação) pede discriminação
+  e código de serviço próprios, tirados do objeto do contrato.
 
 ## Referências
 - `references/cobranca-nfse-clientes.md` — envio da nota ao cliente: queries Gmail p/ achar
@@ -119,8 +185,15 @@ falhar, reporta ao principal em vez de concluir que o cliente não pagou.
 - `references/dps-nfelib-mapping.md` — árvore de classes/campos do binding NFS-e Nacional
   (`dps_v1_00`, `tipos_complexos_v1_00`) + DPS de exemplo, para estender o motor sem
   redescobrir.
+- `references/portal-webiss-aracaju.md` — canal manual: portal, formulário, rota da credencial
+  pelo cofre, origem dos dados da nota, gate do rascunho e, em **§6–§9**, o passo a passo do
+  assistente com os seletores, a conferência da alíquota do mês, a escolha de serviço/CNAE por
+  tipo de objeto e a receita de print/verificação.
 
 ## Scripts
+- `scripts/parcelas_symplexis.py` — parcelas/valores/vencimentos de um cliente (`recebimentos` +
+  `contratos`) da planilha `[ID] Gestão de Symplexis`; read-only, rode com
+  `$HERMES_HOME/venvs/google/bin/python`.
 - `$HERMES_HOME/scripts/sm_verificar_pagamento.py` — o cliente pagou? (`PAGO` / `NAO_PAGO` / `ERRO` na
   primeira linha, read-only, sem side effects). Rodar antes de qualquer cobrança a cliente.
   Padrão 26/09 (caso Solution Master SM1): verificador separado do script que envia

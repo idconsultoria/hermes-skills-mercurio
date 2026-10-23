@@ -270,10 +270,11 @@ resolver** — e se vários jobs caíram no mesmo minuto, é o resolver, não ca
   tools) e `origin` = `{platform, chat_id, chat_name, thread_id, user_id}` capturado na criação.
   `origin` é o único campo que prova para onde um `deliver="origin"` entrega — `action=list`
   não o mostra. Case por `id` (ou `name`) no arquivo, não por substring do JSON inteiro.
-- **Saída de script se confirma por arquivo**: rode
-  `bash script.sh > /tmp/x.out 2>&1; echo rc=$?` e **leia o arquivo**. `exit 0` com stdout vazio
-  é o caso mudo do watchdog — silêncio legítimo e script que não imprimiu nada são
-  indistinguíveis sem ler o conteúdo.
+- **Saída de script se confirma por arquivo, e o arquivo vai para o scratch do home**: rode
+  `bash script.sh > "$HOME/_out.txt" 2>&1; echo rc=$?` e **leia o arquivo** — não conte com
+  `/tmp` (no shell nativo do Termux ele pode não existir e o redirect falha antes de o script
+  rodar). `exit 0` com stdout vazio é o caso mudo do watchdog — silêncio legítimo e script que
+  não imprimiu nada são indistinguíveis sem ler o conteúdo.
 - `HERMES_HOME` pode NÃO estar no `.env` (neste ambiente não estava); por isso o dispatcher
   tem fallback `${HERMES_HOME:-/data/data/com.termux/files/home/capitolium}` + checagem de existência do dir.
 - `cronjob list` pode reportar `gateway_running: false` — os jobs ficam agendados mas não

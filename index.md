@@ -49,6 +49,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `financial-modeling` | Reference | Modelo integrado de 3 demonstrações (DRE, BP, DFC) com linkages. |
 | `variance-analysis` | Orchestrator | Decompor orçado vs realizado em drivers com waterfall. |
 | `invoice-chase` | Orchestrator | Cobrança de fatura em atraso: tom, escalonamento, o que não fazer. |
+| `padrao-dataviz-id` | Reference | Contrato de dado da ID: data-to-ink, título-conclusão, composição, portão de acabamento. |
 
 ## legal — Direito brasileiro e contratos ID
 

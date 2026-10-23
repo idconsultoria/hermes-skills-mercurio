@@ -25,16 +25,24 @@ agenda, convida fulano, põe o link na descrição").
 ## Regras sempre-válidas
 
 1. **A "agenda da ID" é o calendário primário do `admin@idconsultoria.ai`** (token
-   `$HERMES_HOME/google_token.json`): usar `--calendar primary` / `calendarId="primary"`.
+   `$HERMES_HOME/google_token.json`): `calendarId="primary"` e `admin@idconsultoria.ai` são o
+   mesmo calendário — o segundo é aceito e é o que a leitura de volta confirma.
 2. **Data e hora não se inventam.** Pedido sem dia/hora → perguntar antes (2–3 opções já
-   checadas contra a agenda real). Antes de agendar algo sensível a prazo, confirmar a data em
-   **fonte externa** (header `Date` de um `HEAD https://...`) — o relógio do contêiner e o
-   cabeçalho de contexto já divergiram; exibir em BRT e escrever o ISO do evento com offset
-   explícito (`-03:00`).
+   checadas contra a agenda real). Quando o dia exato for sensível a prazo, confirmar em **fonte
+   externa que não venha de cache** e cruzar **duas** delas — p.ex. `curl -s
+   'https://timeapi.io/api/Time/current/zone?timeZone=America/Maceio'` e um carimbo de servidor de
+   API autenticada (o `modifiedTime` que o Drive devolve). O relógio do contêiner, o cabeçalho de
+   contexto **e o header `Date` de uma página pública** já divergiram (o `Date` chega por CDN e pode
+   vir com um dia de atraso — datar entrega só por ele erra por 24 h). Exibir em BRT e escrever o
+   ISO do evento com offset explícito (`-03:00`).
 3. **O gate de ok vale para o CONVITE, não para a linha na agenda.** Criar o evento sem
    convidados (só a casa vê, e dá para apagar) é rotina: crie e reporte. Enviar convite
    (`sendUpdates="all"`) exige mostrar antes (título, dia/hora, e-mails, descrição) e esperar o
-   ok — convite disparado não se recolhe. **Convidado externo sem e-mail na base** (interlocutor
+   ok — convite disparado não se recolhe. **Mas não repita a pergunta com os mesmos dados:** se
+   o pedido do dono já nomeia título, convidados e o conteúdo da descrição, o ok do horário cobre
+   o convite (mostrar de novo é burocracia, e ele cobra isso). O que exige mostrar antes é o que
+   **você** escolheu: horário oferecido, destinatário que ele não ditou, texto de descrição que
+   você redigiu. **Convidado externo sem e-mail na base** (interlocutor
    de órgão/empresa que só apareceu em conversa ou transcrição): crie o evento com o nome dele no
    **título** e sem `attendees`, e diga na resposta que **nenhum convite saiu** e que falta o
    e-mail. Nunca invente endereço de e-mail.
@@ -50,32 +58,50 @@ agenda, convida fulano, põe o link na descrição").
 
 ## Fluxo
 
-1. `google_api.py calendar list --start <ISO> --end <ISO>` — ver o que já existe na janela e
-   reportar choque.
-2. Criar:
-   ```bash
-   $GAPI calendar create --summary "..." \
-     --start 2026-10-09T14:00:00-03:00 --end 2026-10-09T15:00:00-03:00 \
-     --attendees "a@x.com,b@y.com" --description "..."
+1. `google_api.py calendar list --start <ISO do dia> --end <ISO do dia seguinte>` — **o dia
+   inteiro**, nunca só a janela pedida. Evento recorrente curto (a Diária de Vendas, 09:00–09:30)
+   some de uma consulta a 09:00–10:00 de outra data e você conclui "livre" errado. Não escreva
+   "a agenda está livre": liste o que existe e o que encosta, e diga onde há sobreposição.
+2. **Criar já com convite, numa chamada só.** `calendar create` usa `events.insert` **sem
+   `sendUpdates`** e a CLI não expõe a flag: o convidado entra como `needsAction` e **nenhum
+   e-mail sai**. Vá direto na API — `from google_api import build_service` (importe da pasta
+   `scripts/` da skill `google-workspace`) e insira com `sendUpdates="all"`, o que já resolve
+   convite e newline real de uma vez:
+   ```python
+   import sys, json; sys.path.insert(0, f"{HERMES_HOME}/skills/productivity/google-workspace/scripts")
+   from google_api import build_service
+   svc = build_service("calendar", "v3")
+   body = {"summary": "...",
+           "description": "linha 1\nlinha 2",          # \n real, não literal
+           "start": {"dateTime": "2026-10-23T09:00:00-03:00", "timeZone": "America/Sao_Paulo"},
+           "end":   {"dateTime": "2026-10-23T10:00:00-03:00", "timeZone": "America/Sao_Paulo"},
+           "attendees": [{"email": "a@x.com"}, {"email": "b@y.com"}]}
+   ev = svc.events().insert(calendarId="admin@idconsultoria.ai", body=body, sendUpdates="all").execute()
    ```
-3. **Convidado NÃO recebe convite por padrão.** O `create` usa `events.insert` **sem
-   `sendUpdates`** e a CLI não expõe a flag: os convidados entram como `needsAction` e **nenhum
-   e-mail sai**. Refazer logo depois com
-   `events().patch(calendarId="primary", eventId=..., body={...}, sendUpdates="all")`,
-   repetindo summary/start/end/description/attendees.
-4. **Descrição com quebra de linha não sobrevive ao CLI.** `--description "l1\nl2"` grava o `\n`
-   **literal** (a barra é comida no caminho shell→API). Setar a descrição no patch da API, com
-   newline real.
-5. **Verificar**: `events().get()` e conferir summary, `start`/`end`, `location`, `description` e a
-   lista de `attendees`. Só então responder ao sócio. A CLI expõe apenas `list/create/delete` —
-   **não tem `get` nem `patch`**: para ler de volta ou ajustar campo que ela não aceita (location,
-   descrição com newline real), use `scripts/event_get_patch.py` da própria skill, ou o mesmo
-   padrão à mão: `sys.path.insert` na pasta `scripts/` da skill `google-workspace`,
-   `from google_api import get_credentials`, depois `build("calendar","v3",credentials=...)`.
+   `calendar create` (CLI) só serve para evento **sem** convidados — e aí `--description` ainda
+   grava `\n` literal (a barra é comida no caminho shell→API).
+3. **Convidado citado pelo nome, e-mail não ditado**: recupere o endereço de um evento anterior
+   que o dono já aprovou (`events().get(...)` do mesmo cliente/projeto) ou da base — **nunca**
+   monte o endereço a partir do nome, e não troque por um e-mail achado na web.
+4. **Verificar**: `events().get()` e conferir summary, `start`/`end`, `location`, `description` e a
+   lista de `attendees` (o `responseStatus: needsAction` é o estado inicial normal — o que prova
+   convite é o `sendUpdates="all"` na chamada). A CLI expõe apenas `list/create/delete` —
+   **não tem `get` nem `patch`**: para ler de volta ou ajustar campo que ela não aceita use
+   `scripts/event_get_patch.py` da própria skill, ou o mesmo padrão à mão (`build_service`).
    Evento só entra como "feito" quando a leitura de volta mostra o mesmo que você disse ao dono.
 
-Rodar o `google_api.py` com o python do venv que tem `googleapiclient`
-(`$HERMES_HOME/id-nfse-motor/.venv/bin/python`, detalhado em `auxiliar-adm-id`).
+Rodar o `google_api.py` com um python que tenha `googleapiclient` — **descubra, não decore**:
+caminho de venv escrito de memória envelhece a cada migração de ambiente (o
+`id-nfse-motor/.venv` já foi o certo e hoje pode não existir). Probe antes de usar:
+
+```bash
+for P in "$HERMES_HOME/venvs"/*/bin/python "$HERMES_HOME/hermes-agent/venv/bin/python"; do
+  "$P" -c "import googleapiclient" 2>/dev/null && { echo "PY=$P"; break; }
+done
+```
+
+Se nenhum candidato passar, o problema é o ambiente, não o acesso Google — reporte assim em
+vez de concluir que o token caiu. Tokens e venvs em detalhe na skill `auxiliar-adm-id` §Geral.
 
 ## Avisar o compromisso (aviso ao grupo, e-mail e lembrete na véspera)
 

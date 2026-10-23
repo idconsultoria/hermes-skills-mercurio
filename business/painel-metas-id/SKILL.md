@@ -93,7 +93,14 @@ executada quando alguém pedir (antes da reunião de operações ou em uma sess�
 Fluxo a seguir quando pedirem o slide:
 
 1. Definir a data: por padrão, a **próxima segunda** (é o dia da Phronesis); com `--data` se a
-   reunião for em outro dia.
+   reunião for em outro dia. **Confirme "hoje" em fonte externa antes de escolher a data — e
+   triangulando, não em uma única fonte.** Peça o header `Date` a ≥3 hosts distintos
+   (`curl -sI https://www.google.com`, `https://api.github.com`, `https://www.timeanddate.com`)
+   e cruze com metadados de artefatos gerados por serviço externo (título/data de Docs e PDFs,
+   nome de arquivo versionado). Um único header `Date` pode vir de cache/proxy e mentir por
+   dias — o relógio do container e o header de contexto não são árbitro. Deck datado errado é
+   pior do que deck regerado: se a data conferida divergir da usada, avise e regere com
+   `--data <correta>`.
 2. Rodar o wrapper (ele imprime caminho do deck + sanidade):
    `bash /data/data/com.termux/files/home/capitolium/scripts/phronesis_slide.sh [AAAA-MM-DD]`
 3. **Conferir o `STATUS` antes de anunciar.** Exigir `STATUS=OK`, `QTD_SLIDES` coerente e

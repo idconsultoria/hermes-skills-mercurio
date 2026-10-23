@@ -89,6 +89,25 @@ ler o critério e o fluxo antes de ver arquivo; executar direto queima a rodada.
   (contagem + `vision_analyze`) antes de mandar. As fontes da marca saem do template de proposta
   da ID — receita em `html-pdf-fidelity`.
 
+## Importar de um diretório externo (skills.sh)
+
+Pedido do tipo "vasculhe e instale skills sobre <domínio>" ⇒ receita completa em
+`references/importar-de-skills-sh.md`. O resumo que evita retrabalho:
+
+- **Buscar pela API** (`https://www.skills.sh/api/search?q=`), nunca parsear a página — é Next.js
+  pesado e depende do crawler local. A resposta só traz `id` + `installs`.
+- **`installs` não é critério de relevância** e a busca não devolve descrição: baixe o `SKILL.md` e
+  leia antes de aceitar ou descartar.
+- **`npx skills add` não escreve no acervo:** ele instala em `.claude/skills`, `.cursor/skills` etc.
+  relativos ao CWD. Use como descoberta (`-l` lista com descrição) e instale de verdade baixando a
+  pasta via GitHub tree + raw (`references/`, `scripts/`, `assets/` inclusos; `evals/` fora).
+- **Ao gravar, mexer só no frontmatter:** acrescentar `type`/`timestamp`/`source` e converter
+  `description: >` para string quoted — block scalar quebra o parser do grafo do acervo.
+- **Commit cirúrgico:** só os paths novos + `index.md` + `log.md`; `git add -A` leva o WIP de outras
+  sessões junto.
+- **Descartar a variante errada do modelo de negócio:** framework de métricas de assinatura não
+  serve para cliente intensivo em mão de obra, mesmo sendo a skill mais instalada do termo.
+
 ## Formato da entrega (preferência do usuário)
 
 - Pedido de seleção ⇒ **três blocos de nomes** (T1/T2/T3), agrupados por área, **o critério de

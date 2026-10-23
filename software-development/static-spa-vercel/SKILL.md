@@ -45,6 +45,31 @@ app/  → index.html, styles.css, app.js, data/mock.js, assets/... , vercel.json
    Retorna `Production https://<x>-xxx.vercel.app` + `Aliased https://<proj>.vercel.app` (URL estável).
 4. **Verificar e2e na URL pública** com Playwright headless (não confiar só no build local).
 
+## `BLOCKED` — deploy nasce e morre em "Building…"
+
+Sintoma: `vercel deploy` imprime `Building…`, o status no `vercel ls` fica `UNKNOWN` e a URL do deployment
+serve a tela "Deployment is building" para qualquer caminho. `vercel inspect --logs` não mostra nada útil.
+A causa aparece só na API: `GET https://api.vercel.com/v6/deployments?projectId=...` traz
+`readyState: BLOCKED` e `errorMessage: "The deployment was blocked because the commit author doesn't
+have permission to create deployments for this project."`
+
+Causa: o diretório é um repositório git, a CLI envia os metadados do commit e o autor do commit
+(e-mail local do git) não é membro autorizado do projeto Vercel. O primeiro deploy costuma passar
+(às vezes sem metadados), os seguintes são bloqueados — o que faz parecer instabilidade da Vercel.
+
+Correção: publicar de um **diretório limpo sem `.git`** (copiar só os arquivos estáticos +
+`vercel.json`), com `vercel link --yes --project <nome>` e `vercel deploy --prod --yes`.
+Alternativa: `git config user.email` de um e-mail que seja membro do time Vercel.
+Diagnóstico rápido do token da CLI: `~/.local/share/com.vercel.cli/auth.json` → campo `token`; usar
+em `Authorization: Bearer` para ler `readyState`/`errorMessage`.
+
+## `cleanUrls` + rewrite catch-all quebra a raiz
+
+`vercel.json` com `cleanUrls: true` e `rewrites` para `/index.html` gerou `overrides: {"index.html":
+{"path": "index"}}` no build e a raiz passou a responder 404 (`NOT_FOUND`), embora os assets
+abrissem. Em **SPA por hash** não existe rota de servidor: o `vercel.json` mínimo
+(`{"trailingSlash": false}`) basta e elimina o problema.
+
 ## Pitfalls (lições reais)
 - **SPA por hash: setar o MESMO hash não re-renderiza.** `location.hash='#/admin'` quando o hash
   já é `#/admin` NÃO dispara `hashchange` → a view fica parada. Sintoma típico: tela de login que

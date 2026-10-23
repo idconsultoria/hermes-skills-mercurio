@@ -61,6 +61,9 @@ timestamp: 2026-08-25
 - **Documento formal se oferece, não se produz por conta.** Fechar com uma pergunta única
   ("formalizo no documento com a identidade da ID?"); gerar o arquivo sem o ok queima a
   rodada — o que estava sendo pedido era o conteúdo.
+- **Pedido de parcial no meio do trabalho** ("me manda uma mensagem intermediária com o que já
+  encontrou"): entregar **já** o que está verificado — lista ou achado — marcando o que ainda falta;
+  não terminar a análise inteira para responder depois. Análise longa se reporta em partes.
 - **Sinal de corte** (reclamação de que a resposta está complicada): parar na hora,
   entregar o que já está pronto e não reabrir o assunto depois.
 - **Pedido de "mais simples / didático"** (vale também para o Gustavo): trocar a linguagem por
@@ -135,6 +138,30 @@ Pedido do tipo "passe uma mensagem para o Gustavo mencionando X":
    próprio destinatário** diretamente ligada ao assunto cabe em uma linha final (é ele quem
    age); o resto espera pedido explícito.
 6. Responder a quem pediu em 1–2 linhas, no registro dele: o que foi passado e que saiu.
+
+## Grupo da ID — enviar documento para avaliação dos sócios
+
+O grupo canônico da ID é **[ID] Núcleo** (`-1004359358267`, supergrupo) — é onde material de sócio
+vai para avaliação. Registrar isto aqui porque **o diretório de canais pode ter grupos homônimos**
+(existem dois "ID Labs", com IDs diferentes): título igual não identifica destino.
+
+1. **Confirmar o destino antes de enviar**, com `getChat(chat_id)` do próprio bot, e checar
+   `title` + `type`. Mensagem enviada **não se apaga** — destino errado é dano permanente.
+2. Token do bot em `HERMES_HOME/.env` (`TELEGRAM_BOT_TOKEN`), lido no script; **nunca ecoar** o
+   token no output.
+3. Enviar por `sendMessage` (Bot API) ou pelo helper `hermes send --to telegram:<chat_id>`; a
+   resposta traz `ok`, `message_id` e o `chat` de destino — **é essa leitura que valida a entrega**,
+   não a ausência de erro.
+4. Em grupo vale o teto de **3 linhas (~40 palavras)**: essencial na primeira frase, sem preâmbulo
+   nem lista; o trabalho extenso vai em anexo (link do documento) ou em DM. Fechar, no máximo, com
+   o que dependem de decisão dos sócios.
+5. Ao responder a quem pediu, dizer **onde** foi enviado (nome do grupo + `message_id`) e oferecer
+   correção se o grupo pretendido era outro.
+6. **Anexo em grupo (PDF de avaliação)**: o helper manda *texto de arquivo*, não documento. Levar um
+   PDF ao grupo é `sendDocument` com `multipart/form-data` montado à mão (`chat_id`, `caption`,
+   `document`); a resposta traz `ok`, `message_id` e `document.file_name`/`file_size` — **é essa
+   leitura que prova que subiu o arquivo certo**. Legenda de 2–3 linhas, com o link do documento
+   editável na linha seguinte, para os sócios comentarem no original.
 
 ## Pitfalls
 
