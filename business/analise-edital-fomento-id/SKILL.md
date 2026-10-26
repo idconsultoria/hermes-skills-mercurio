@@ -1,8 +1,10 @@
 ---
 name: analise-edital-fomento-id
-description: "Use ao analisar edital de fomento para a ID."
+description: "Use ao analisar edital de fomento para a ID.
+
+Carregue esta skill quando a ID avaliar edital de fomento: leitura das exigências, checklist de elegibilidade e documentação, aderência ao portfólio da ID e decisão de submeter ou não."
 category: business
-type: Method
+type: Orchestrator
 license: MIT
 author: Mercúrio
 version: 1.0.0

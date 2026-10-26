@@ -1,6 +1,8 @@
 ---
 name: sales-forecast-diagnostic
-description: Diagnose why an existing sales forecast is unreliable and recommend fixes - stage inflation and happy ears, sandbagging, deals without verifiable buyer evidence, stale or mass-pushed close dates, wrong forecast-category assignment, zombie and duplicate opportunities, late-created deals, manager roll-up overrides, and comp incentives that reward bias - separating data-quality from behavioral from genuine demand problems. Use whenever the user mentions forecast accuracy, a forecast miss, reps sandbagging, deals that keep slipping, "why did we miss the number", or "our commit is never right" - even if they never say "forecast". Covers B2B deal-based and B2C/high-volume. Do NOT use for pipeline coverage modeling - use mbfinotti/sales-skills@sales-pipeline-coverage-modeling instead.
+description: "Diagnose why an existing sales forecast is unreliable and recommend fixes - stage
+
+iagnose why an existing sales forecast is unreliable and recommend fixes - stage inflation and happy ears, sandbagging, deals without verifiable buyer evidence, stale or mass-pushed close dates, wrong forecast-category assignment, zombie and duplicate opportunities, late-created deals, manager roll-up overrides, and comp incentives that reward bias - separating data-quality from behavioral from genuine demand problems. Use whenever the user mentions forecast accuracy, a forecast miss, reps sandbagging, deals that keep slipping, "why did we miss the number", or "our commit is never right" - even if they never say "forecast". Covers B2B deal-based and B2C/high-volume. Do NOT use for pipeline coverage modeling - use mbfinotti/sales-skills@sales-pipeline-coverage-modeling instead."
 license: MIT
 metadata:
   author: Maya-Beth Finotti

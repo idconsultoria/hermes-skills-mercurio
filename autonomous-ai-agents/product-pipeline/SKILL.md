@@ -1,6 +1,8 @@
 ---
 name: product-pipeline
-description: "Use when construindo um produto do zero — da ideação ao MVP em produção. Orquestra Hermes (coordena), Pi Agent (gera código e documentos) e agy (revisa) em cinco fases com portões de aprovação."
+description: "Use when construindo um produto do zero — da ideação ao MVP em produção.
+
+Orquestra Hermes (coordena), Pi Agent (gera código e documentos) e agy (revisa) em cinco fases com portões de aprovação."
 category: autonomous-ai-agents
 type: Orchestrator
 timestamp: 2026-10-23T12:00:00Z

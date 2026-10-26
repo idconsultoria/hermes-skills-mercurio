@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!-- Template de edição de leitura. Substitua: KICKER, TITULO, SUBTITULO, META, SUMARIO, CONTEUDO, NOTA. -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbfaf7">
+<title>TITULO — leitura no celular</title>
+<style>
+:root{--bg:#fbfaf7;--card:#fff;--ink:#1c1c1c;--muted:#606a70;--line:#e2ded6;--accent:#0f766e;--accent-soft:#eef6f4}
+@media (prefers-color-scheme:dark){:root{--bg:#14171a;--card:#1b1f23;--ink:#e9ecee;--muted:#9aa6ad;
+ --line:#2b3237;--accent:#5eead4;--accent-soft:#15302e}}
+*{box-sizing:border-box;-webkit-text-size-adjust:100%}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-size:18.5px;line-height:1.68;
+ font-family:"Charter",Georgia,"Iowan Old Style","Times New Roman",serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:34em;margin:0 auto;padding:0 22px 96px}
+header.top{padding:44px 22px 24px;border-bottom:1px solid var(--line);background:var(--card)}
+header.top .inner{max-width:34em;margin:0 auto}
+.kicker{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.7rem;letter-spacing:.16em;
+ text-transform:uppercase;color:var(--accent);font-weight:700}
+header.top h1{font-size:clamp(1.9rem,8vw,2.5rem);line-height:1.1;margin:.55rem 0 .5rem;letter-spacing:-.02em;font-weight:600}
+header.top .sub{color:var(--muted);font-size:.95rem;margin:0;line-height:1.5;font-family:system-ui,sans-serif}
+header.top .meta{color:var(--muted);font-size:.78rem;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--line);
+ font-family:system-ui,sans-serif}
+nav.toc{margin:26px 0 10px}
+nav.toc details{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:2px 16px}
+nav.toc summary{cursor:pointer;list-style:none;font-family:system-ui,sans-serif;font-size:.9rem;font-weight:600;
+ color:var(--accent);padding:14px 0;display:flex;justify-content:space-between}
+nav.toc summary::-webkit-details-marker{display:none}
+nav.toc summary:after{content:"\25BE";font-size:.7rem;color:var(--muted)}
+nav.toc details[open] summary:after{content:"\25B4"}
+nav.toc ol,nav.toc ul{list-style:none;margin:0;padding:0 0 14px}
+nav.toc ul{padding-left:.9em}
+nav.toc a{display:block;padding:10px 0;color:var(--ink);text-decoration:none;font-size:.92rem;
+ font-family:system-ui,sans-serif;border-top:1px solid var(--line)}
+h2{font-size:1.35rem;line-height:1.25;margin:0 0 8px;letter-spacing:-.015em;font-weight:600}
+h2 .lab,h3 .lab{display:block;font-family:system-ui,sans-serif;font-size:.68rem;letter-spacing:.16em;
+ text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.35rem}
+section{margin:44px 0 0}
+p{margin:0 0 1.2em}
+.item{display:flex;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px;margin:0 0 12px}
+.item .badge{flex:0 0 auto;min-width:2rem;height:2rem;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+ font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;margin-top:.15rem}
+.item .body{flex:1 1 auto;min-width:0}
+.item .body p{margin:0 0 .7em}
+.item .body p:last-child{margin-bottom:0}
+ul.subs{margin:.5em 0 .1em;padding:0 0 0 1.1em;list-style:none}
+ul.subs li{position:relative;margin:0 0 .55em;font-size:.97rem}
+ul.subs li:before{content:"";position:absolute;left:-1em;top:.7em;width:.42em;height:.42em;border-radius:50%;
+ background:var(--accent);opacity:.6}
+.nota{margin:44px 0 0;padding:18px 20px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);
+ font-size:.86rem;line-height:1.62}
+.nota h4{font-family:system-ui,sans-serif;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+ color:var(--accent);margin:0 0 .7em}
+footer.fim{margin:44px 0 0;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:.78rem;
+ font-family:system-ui,sans-serif}
+a.totop{position:fixed;right:16px;bottom:18px;width:44px;height:44px;border-radius:50%;background:var(--ink);
+ color:var(--bg);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:1.1rem;opacity:.85}
+@media print{a.totop,nav.toc{display:none}body{font-size:11.5pt;line-height:1.5}}
+</style>
+</head>
+<body id="top">
+<header class="top"><div class="inner">
+<div class="kicker">KICKER</div>
+<h1>TITULO</h1>
+<p class="sub">SUBTITULO</p>
+<div class="meta">META</div>
+</div></header>
+<div class="wrap">
+<nav class="toc"><details><summary>Sumário — ir para uma seção</summary>
+<ol>SUMARIO</ol></details></nav>
+CONTEUDO
+<div class="nota"><h4>Nota sobre esta edição</h4><p>NOTA</p></div>
+<footer class="fim">FONTE · texto integral preservado</footer>
+</div>
+<a class="totop" href="#top" aria-label="Voltar ao início">↑</a>
+<script>
+document.querySelectorAll('nav.toc a').forEach(function(a){a.addEventListener('click',function(){
+var d=a.closest('details'); if(d) d.open=false;});});
+</script>
+</body>
+</html>

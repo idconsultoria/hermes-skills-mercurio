@@ -39,6 +39,20 @@ Peça visual não se julga pela descrição do autor: conte os elementos. Em SVG
 - Fator de escala = largura útil da página ÷ largura do canvas; multiplique o corpo da fonte. Abaixo de ~6pt a peça não serve impressa.
 - Canvas fixo em px **sem `@media print`** cai em 1 página A4: canvas de 3740px dá fator ~0,16 → corpo de 11,5px vira ~1,8pt. Saída: paisagem pré-dimensionada, tiling em páginas, ou exportar PNG/PDF em resolução nativa.
 - **PDF A4 paginado: meça o overflow, não olhe.** Com `.page{height:297mm;overflow:hidden}` a página que "parece pronta" está cortando o pé do último parágrafo. Injete um medidor que grave `scrollHeight - clientHeight` de cada `.page` num `<div id="MEASURE">` no evento `load` (+`setTimeout` curto), renderize com `chromium-browser --headless --virtual-time-budget=6000 --dump-dom file://_measure.html` e leia `MEASURE:pg1=…`. Excesso de 7 px já é conteúdo cortado. Script: `scripts/medir-overflow-paginas.sh <arquivo.html>`. Receita de layout para documento técnico A4 em fundo branco (tokens, cabeçalho de seção, tabelas de referência, diagrama de linha em SVG e orçamento de páginas): `references/layout-documento-tecnico-a4.md`.
+- **Contagem de páginas não prova que o texto coube.** Com `.page{height:297mm;overflow:hidden}` e
+rodapé em `position:absolute`, um parágrafo a mais **não** cria página: ele passa por cima do rodapé e
+`pdfinfo | grep Pages` continua dizendo 7. Depois de qualquer edição em peça fechada, gere PNG e olhe
+a faixa inferior de **todas** as páginas, perguntando "os últimos 20% colidem com o rodapé?".
+- **Sem browser no host, o WeasyPrint rende a mesma peça A4 — e o overflow continua mensurável.** Python
+  puro: `python3 -c "from weasyprint import HTML; HTML(filename='peca.html').write_pdf('peca.pdf')"` —
+  flex, SVG inline e `@font-face` base64 saem fiéis. Nesse caminho a sonda de `scrollHeight` não existe,
+  mas há uma melhor: **percorra a árvore de caixas** (`page._page_box`) e compare o fundo dos filhos com
+  o topo da caixa do rodapé — `scripts/medir-overflow-weasyprint.py peca.html` devolve o excesso em mm
+  por página. Três detalhes, errados, acusam overflow em página boa: `.page` com `box-sizing:border-box`
+  tem `box.height` de **conteúdo** (~260 mm num A4 com padding 19/18 mm); o limite é o topo do rodapé
+  absoluto, não o fim do padding; e é preciso pular a **subárvore inteira** do rodapé, porque os `span`
+  internos não carregam a classe e viram "último elemento" de toda página. Não bloqueie a entrega por
+  falta de Chromium.
 - **Renderer de PDF local:** `chromium-browser --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --no-pdf-header-footer --print-to-pdf=saida.pdf "file://$PWD/entrada.html"`. É o pacote nativo e não precisa de Node nem de Playwright. O Chromium baixado pelo Playwright (`~/.hermes/.cache/ms-playwright/.../chrome-linux/chrome`) é ligado contra glibc e não executa solto no Termux; e o `node` do Termux reporta `platform=android`, o que o playwright-core aborta. stderr com `Failed to connect to the bus` é ruído: a linha válida é `NNNN bytes written to file`.
 - **Ritmo vertical entre filete e texto.** Filete a menos de 5 mm do bloco é o desconforto que o leitor sente e não nomeia: ≥6,5 mm acima e ≥7 mm de `margin-top` no primeiro título abaixo; `2,5–3,4 mm` de padding vertical em linha de tabela.
 
@@ -48,6 +62,13 @@ Peça de cliente sai em teal `#14b8a6` + navy `#0a1929`, Neulis Neue nos título
 
 - **Logo branco sobre fundo branco desaparece sem erro.** O logo da ID que vem do template da proposta é `fill:#ffffff`; em página clara ele simplesmente não renderiza. Troque o fill pelo navy antes de inlinar (`.replace('#ffffff','#0A1929')`) e confirme o logo na imagem final — ausência de erro não é presença de logo.
 - **Variante do logo do cliente:** medir com PIL a média RGB dos pixels opacos antes de escolher; versão negativa (footer de site) some em fundo claro e versão escura some em fundo escuro.
+- **Capa com duas marcas: iguale a tinta, não a caixa.** Arquivos de logo têm padding interno próprio;
+caixas de mesma altura produzem marcas visualmente desiguais. Meça a fração de tinta de cada arquivo
+(PNG: bbox do canal alfa; SVG: rasterizar com `cairosvg` e medir o bbox) e dimensione cada caixa para
+que a **altura de tinta** coincida — lockup rasterizado costuma ter 55-65% de tinta, marca em SVG
+85-92%, logo as caixas ficam desiguais de propósito. Conta pronta e re-rodável:
+`scripts/logo-ink-align.py ARQUIVO [ARQUIVO...] --alvo 18`. Aumentou as marcas, aumente também o
+respiro do topo da capa, senão o bloco encosta na borda.
 
 ### 5. Cruzar artefato × decisão registrada
 
@@ -125,6 +146,16 @@ cena carrega é o pior modo de falha de um site de apresentação.
 (hash dos assets, contraste, controles) — correção só no clone local não chegou ao cliente. Se
 o projeto de deploy vive em outra conta/escopo, isso é bloqueio a escalar, não a ignorar
 (ver `dns-dominios-id`).
+
+   **Painel/dashboard publicado: rode a sonda do contrato de dado no DOM, não acredite no relatório de
+   quem construiu.** `[...document.querySelectorAll('*')].filter(e => getComputedStyle(e).boxShadow
+   !== 'none').length` tem de dar **0**; "caixa fechada" só conta elemento com os **quatro** lados com
+   largura > 0 (na prática, botões de navegação — nunca bloco de dado). Não leia "tem borda" como
+   reprovação: hairline de tabela e borda de controle somam centenas de elementos e não são card.
+   Texto que virou `<details>` fechado **não** está visível: verifique `innerText` e o rótulo do
+   `<summary>`, não a presença da string no HTML. Complete a conferência contando indicadores e
+   gráficos por página e lendo os títulos do DOM contra o que foi pedido — e cheque mobile com
+   `Emulation.setDeviceMetricsOverride(width=390, …)` mais `scrollWidth > innerWidth`.
 
 7. **Bug de posicionamento: suspeite dos dados antes do render.** Item no lugar errado (bolinhas
 fora das regiões, marcadores amontoados num canto, coluna vazia) costuma vir da derivação do
@@ -221,6 +252,7 @@ documento no timbrado gerado a partir de markdown): `references/checklists-revis
 - **Presunção apresentada como observação.** Em documento de diagnóstico ou modelo, toda frase que descreve a dor do cliente ("o boletim atrasa", "a nota sai tarde", "uma área comemora o que a outra não vê") é afirmação sobre um dado que ninguém examinou. O teste é simples: essa frase sobrevive à pergunta "qual registro prova isso?" Se não, ela vira declaração de escopo ("nenhum dado foi analisado; o modelo é o instrumento, o diagnóstico vem da aplicação") ou sai. Vale também para cena de abertura e para exemplo numérico — este só entra rotulado como fictício.
 - **Título de slogan em documento técnico.** Seção com nome de efeito ("O número só vale se tiver hora marcada") lê como post, não como estudo. Nomeie o objeto ("Rito de gestão") e ponha o conteúdo no subtítulo ("Periodicidade, pauta e critério de cobrança").
 - **Confundir simples com despojado.** Período completo e vocabulário técnico preciso é o que faz a peça parecer sóbria; frase curta em série e travessão decorativo fazem parecer raso. Na revisão, conte travessões e negritos: um travessão por documento e negrito só em nome de termo.
+- **Registro de IA na prosa — passe o `humanizer`, sempre.** Depois de qualquer reescrita longitudinal, rode o passe de humanização no documento inteiro (skill `humanizer`) e caça os quatro desvios que sobrevivem à revisão manual: **paralelismo negativo em série** ("não é X, é Y" repetido vira assinatura de máquina — deixe um só, onde a distinção for o próprio conteúdo), **travessão** (conte-os; acima de um por documento é ritmo de anúncio), **aforismo de fecho de seção** ("poucos indicadores em uso informam mais que muitos ignorados" soa a pôster: troque por consequência verificável) e **meta-comentário** ("cada célula mostra de onde vem o valor" antes de uma tabela que já mostra). Verifique com uma busca: `pdftotext peca.pdf - | grep -oE "(e não [a-zçãéíóú]+|não é [^,.;]{0,40}, e sim|—|não apenas)" | sort | uniq -c`.
 
 - **"Já que estou aqui, vou corrigir"** — alterar material do cliente sem OK é o pior erro possível neste trabalho, mesmo quando a correção é óbvia e a divergência é factual.
 - **Opinar sem abrir a peça.** Renderize/leia e conte elementos; impressão visual de descrição de terceiro não é revisão.
@@ -272,5 +304,10 @@ artefato do cliente é achado de revisão, não detalhe.
   caractere de outro alfabeto e a pontuação duplicada são **invisíveis na leitura** e aparecem na
   frente do cliente; ao corrigir, reescrever a **linha inteira** e revalidar a estrutura depois.
 - [ ] Documento A4: overflow medido página a página (`scripts/medir-overflow-paginas.sh`), contagem de páginas igual ao combinado, logo do cliente **e** da ID visíveis no fundo usado.
+- [ ] Documento A4 renderizado sem Chromium: overflow medido pela árvore de caixas (`scripts/medir-overflow-weasyprint.py`), sem página com excesso positivo.
+- [ ] Vocabulário trocado conferido **no PDF**, não no gerador: `pdftotext peca.pdf - | grep -c '<termo antigo>'` = `0` (título de tabela, rodapé e texto de apoio são os resíduos que sobram).
+- [ ] Entrega publicada é painel/dashboard: sonda do contrato de dado rodada na URL (sombra 0, caixa fechada só em controles, texto que virou `<details>` conferido como não-visível, contagem de indicadores e gráficos, mobile em 390 px).
+- [ ] A4 editado depois de fechado: base de **todas** as páginas inspecionada no PNG (contagem de páginas não detecta texto que passa por cima do rodapé).
+- [ ] Capa com duas marcas: alturas de **tinta** iguais (não alturas de caixa) — `scripts/logo-ink-align.py`.
 - [ ] Registro do texto: nenhuma afirmação sobre a situação do cliente sem registro que a sustente; exemplos numéricos rotulados como fictícios; títulos nomeando o objeto, não slogans.
 - [ ] Retorno em quatro blocos (completo / lacunas / conflitos / sugestões).

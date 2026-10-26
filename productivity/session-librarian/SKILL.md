@@ -1,6 +1,8 @@
 ---
 name: session-librarian
-description: "Organize sessions by prompt: find, rename, archive, prune."
+description: "Organize sessions by prompt: find, rename, archive, prune.
+
+Carregue esta skill para organizar o histórico de sessões do Hermes por prompt: encontrar, renomear, arquivar e podar sessões antigas sem perder o que importa."
 version: 1.0.0
 author: Hermes Agent + Teknium
 license: MIT
@@ -10,6 +12,8 @@ metadata:
     tags: [Sessions, Organization, Cleanup, Library, Productivity]
     category: productivity
     related_skills: [weekly-review-planning]
+type: Orchestrator
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # Session Librarian

@@ -1,6 +1,8 @@
 ---
 name: serving-llms-vllm
-description: "vLLM: high-throughput LLM serving, OpenAI API, quantization."
+description: "vLLM: high-throughput LLM serving, OpenAI API, quantization.
+
+Carregue esta skill para servir LLMs com vLLM em alta vazão: servidor compatível com API OpenAI, PagedAttention e quantização, com ajuste de throughput."
 version: 1.0.1
 author: Orchestra Research
 license: MIT
@@ -9,7 +11,8 @@ platforms: [linux, macos]
 metadata:
   hermes:
     tags: [vLLM, Inference Serving, PagedAttention, Continuous Batching, High Throughput, Production, OpenAI API, Quantization, Tensor Parallelism]
-
+type: ToolIntegration
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # vLLM - High-Performance LLM Serving

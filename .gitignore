@@ -16,3 +16,6 @@ __pycache__/
 **/references/*.pem
 **/references/*.key
 **/references/*_deploy_key*
+
+# Locks de sessão (runtime)
+.locks/

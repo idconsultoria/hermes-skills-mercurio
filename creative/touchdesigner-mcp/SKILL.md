@@ -1,6 +1,8 @@
 ---
 name: touchdesigner-mcp
-description: Control TouchDesigner via twozero MCP.
+description: "Control TouchDesigner via twozero MCP.
+
+Carregue esta skill para controlar o TouchDesigner via MCP twozero: setup automatizado, arquitetura de componentes, regras críticas de operação e notas de ambiente antes de disparar qualquer comando no projeto."
 version: 1.1.0
 author: kshitijk4poor
 license: MIT
@@ -9,7 +11,8 @@ metadata:
   hermes:
     tags: [TouchDesigner, MCP, twozero, creative-coding, real-time-visuals, generative-art, audio-reactive, VJ, installation, GLSL]
     related_skills: [ascii-video, manim-video]
-
+type: ToolIntegration
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # TouchDesigner Integration (twozero MCP)

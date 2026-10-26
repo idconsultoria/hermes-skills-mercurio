@@ -4,7 +4,9 @@
 # ═══════════════════════════════════════════════════════════════════════════════
 
 name: financial-modeling
-description: "Build integrated financial models with 3-statement projections. Create income statement, balance sheet, and cash flow models with proper linkages."
+description: "Build integrated financial models with 3-statement projections.
+
+Create income statement, balance sheet, and cash flow models with proper linkages."
 version: "1.0.0"
 author: claude-office-skills
 license: MIT

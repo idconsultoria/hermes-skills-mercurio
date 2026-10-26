@@ -1,8 +1,10 @@
 ---
 name: societario-id
-description: "Use ao responder sobre contrato social e sócios da ID."
+description: "Use ao responder sobre contrato social e sócios da ID.
+
+Carregue esta skill quando a pergunta for sobre o contrato social da ID, quotas, cláusulas vigentes ou movimentação de sócios: o que está escrito, o que exige alteração contratual e qual o efeito prático."
 category: legal
-type: Method
+type: Reference
 license: MIT
 author: Mercúrio
 version: 1.0.0

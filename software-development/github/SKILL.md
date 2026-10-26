@@ -1,6 +1,8 @@
 ---
 name: github
-description: "GitHub via gh CLI: PRs, issues, reviews, repos, auth."
+description: "GitHub via gh CLI: PRs, issues, reviews, repos, auth.
+
+Carregue esta skill como porta de entrada do GitHub no Hermes: PRs, issues, revisões, repositórios e autenticação pela CLI `gh`, com ponteiros para as skills específicas de cada fluxo."
 version: 2.0.0
 author: Ben Barclay (benbarclay), Hermes Agent
 license: MIT
@@ -10,6 +12,8 @@ metadata:
     tags: [github, gh, git, pull-requests, issues, code-review, repos, auth, ci]
     category: software-development
     related_skills: [codebase-inspection, requesting-code-review]
+type: Orchestrator
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # GitHub

@@ -35,6 +35,13 @@ agenda, convida fulano, põe o link na descrição").
    contexto **e o header `Date` de uma página pública** já divergiram (o `Date` chega por CDN e pode
    vir com um dia de atraso — datar entrega só por ele erra por 24 h). Exibir em BRT e escrever o
    ISO do evento com offset explícito (`-03:00`).
+   **A data de hoje se re-deriva no turno em que você vai agendar — nunca se herda da conversa.**
+   `Date` lido num turno anterior, a linha de início de sessão e o contexto comprimido já ficaram
+   dias atrás numa sessão longa, e o resultado foi evento criado em data passada. Rode
+   `scripts/data-de-hoje.sh` (desta skill) e compare host × fontes externas lado a lado;
+   divergência = não agende ainda. Dia relativo ("terça", "amanhã", "na segunda") resolve contra
+   esse hoje confirmado e o **dd/mm resolvido vai na resposta** ("terça 27/10, 14h"), para o dono
+   corrigir em uma linha.
 3. **O gate de ok vale para o CONVITE, não para a linha na agenda.** Criar o evento sem
    convidados (só a casa vê, e dá para apagar) é rotina: crie e reporte. Enviar convite
    (`sendUpdates="all"`) exige mostrar antes (título, dia/hora, e-mails, descrição) e esperar o
@@ -121,8 +128,15 @@ deixa o pedido pela metade:
   do relay em `id-comunicacao-multiusuario`).
 - **Lembrete datado = one-shot de cron, ISO absoluto, `repeat=1`, `deliver` no DM do sócio.**
   Nada de "em 24h": errar o dia do lembrete é o defeito que o lembrete existia para evitar.
-  O ISO absoluto é lido em **UTC**, não no fuso do dono — 09:00 BRT = `T12:00:00`; confira
-  `schedule.run_at` (volta com `+00:00`) antes de dizer o horário ao dono.
+Passe o ISO **com offset explícito** (`2026-10-26T09:00:00-03:00`): o scheduler honra o offset e
+  grava o mesmo instante (`next_run_at` volta `-03:00`); ISO **sem** offset é lido no fuso local do
+  host, que não é necessariamente o do dono. Confira `next_run_at` em `jobs.json` antes de dizer o
+  horário ao dono.
+- **Pedido de lembrete sem hora** → escolha uma hora útil, **declare qual** e ofereça a troca em
+  uma linha (véspera de compromisso: manhã do dia anterior). Não devolva a pergunta sem proposta.
+- **`cronjob_manage` recusando um one-shot com "mais de 120s no passado" é alarme de DATA**, não de
+  formato: reconfirme o dia em fonte externa antes de mexer no horário. Ajustar a hora até "passar"
+  agenda o lembrete no dia errado e ele chega mudo na hora errada.
 - **Lembrete de texto fixo sai como `no_agent` + script, não em modo agente.** Escreva o texto
   em `$HERMES_HOME/scripts/<nome>.sh` (o stdout é entregue verbatim; sem timestamp na saída) e
   faça `cronjob_manage action=update job_id=<id> script="<nome>.sh" no_agent=true` no job
@@ -147,6 +161,9 @@ deixa o pedido pela metade:
 ## Armadilhas
 
 - **E-mail do convidado: usar LITERALMENTE o que o dono ditou.** Nunca "consertar" grafia nem trocar pelo endereço achado no site/busca do interlocutor (caso real: o dono ditou `sandesassessoria@gmail.com`, foi usado o `sandassessoria@gmail.com` do site da empresa → convite saiu para o endereço errado e convite disparado não se recolhe). Se o ditado divergir do endereço público, **perguntar antes** de convidar; corrigir convidado já convidado = `patch` de `attendees` com `sendUpdates="all"` (o removido recebe cancelamento).
+- **Evento criado em data errada: apague e recrie.** Sem convidados é seguro e reversível
+  (`events().delete` → `events().insert`); reportar em uma linha com o erro, o id antigo e o novo,
+  e provar com leitura de volta dos dois. Não apresente como "ajustado" sem isso.
 - **`needsAction` não é convite enviado** — é só o estado inicial do convidado no evento.
 - **Descrição com link do Drive**: buscar o link no Drive real (ID da pasta), não montar por
   nome — pasta homônima existe em mais de um lugar.

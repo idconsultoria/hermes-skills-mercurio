@@ -1,8 +1,11 @@
 ---
 name: analise-edital-fomento
 description: "Use ao analisar edital de fomento e montar checklist."
+
+Carregue esta skill quando a ID avaliar edital de fomento e precisar do checklist de submissão: leitura do edital, exigências de elegibilidade, documentação obrigatória, prazos e aderência ao portfólio.
 category: business
 type: Orchestrator
+timestamp: 2026-10-22T21:27:05-03:00
 license: MIT
 author: Mercúrio
 version: 1.0.0

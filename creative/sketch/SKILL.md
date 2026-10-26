@@ -1,6 +1,8 @@
 ---
 name: sketch
-description: "Throwaway HTML mockups: 2-3 design variants to compare."
+description: "Throwaway HTML mockups: 2-3 design variants to compare.
+
+Load this skill when you want 2–3 throwaway HTML mockups to compare design directions before committing to implementation."
 version: 1.0.1
 author: Hermes Agent (adapted from gsd-build/get-shit-done)
 license: MIT
@@ -9,6 +11,8 @@ metadata:
   hermes:
     tags: [sketch, mockup, design, ui, prototype, html, variants, exploration, wireframe, comparison]
     related_skills: [spike, claude-design, popular-web-designs, excalidraw]
+type: Creative
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # Sketch

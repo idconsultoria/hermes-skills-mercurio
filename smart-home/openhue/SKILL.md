@@ -1,6 +1,8 @@
 ---
 name: openhue
-description: "Control Philips Hue lights, scenes, rooms via OpenHue CLI."
+description: "Control Philips Hue lights, scenes, rooms via OpenHue CLI.
+
+Carregue esta skill para controlar luzes, cenas e salas Philips Hue pela CLI OpenHue: listar pontes e lâmpadas, acender/apagar, ajustar brilho e cor e aplicar cenas salvas."
 version: 1.0.1
 author: community
 license: MIT
@@ -11,6 +13,8 @@ metadata:
     homepage: https://www.openhue.io/cli
 prerequisites:
   commands: [openhue]
+type: ToolIntegration
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # OpenHue CLI

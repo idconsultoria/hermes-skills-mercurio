@@ -1,6 +1,8 @@
 ---
 name: pretext
-description: Build creative browser demos with DOM-free text layout.
+description: "Build creative browser demos with DOM-free text layout.
+
+Carregue esta skill para construir demos criativos no navegador com layout de texto livre de DOM — tipografia cinética, texto em trajetória e composição de página controlada por código, com padrão criativo e stack descritos na skill."
 version: 1.0.0
 author: Hermes Agent
 license: MIT
@@ -9,6 +11,8 @@ metadata:
   hermes:
     tags: [creative-coding, typography, pretext, ascii-art, canvas, generative, text-layout, kinetic-typography]
     related_skills: [p5js, claude-design, excalidraw, architecture-diagram]
+type: Creative
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # Pretext Creative Demos

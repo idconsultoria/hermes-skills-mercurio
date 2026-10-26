@@ -1,6 +1,8 @@
 ---
 name: nano-pdf
-description: "Edit text in existing PDFs via natural-language prompts."
+description: "Edit text in existing PDFs via natural-language prompts.
+
+Carregue esta skill para editar texto de um PDF existente por instrução em linguagem natural, sem reconstruir o documento."
 version: 1.0.0
 author: community
 license: MIT
@@ -10,6 +12,8 @@ metadata:
     tags: [PDF, Documents, Editing, NLP, Productivity]
     homepage: https://pypi.org/project/nano-pdf/
     related_skills: [pdf, ocr-and-documents]
+type: ToolIntegration
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # nano-pdf

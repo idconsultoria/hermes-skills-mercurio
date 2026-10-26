@@ -22,7 +22,8 @@ na primeira leitura e confiar no número.
 
 Se a peça é um PDF A4 com a identidade visual, combine com `documento-a4-marca-id` (marca e
 template) e volte aqui para a prosa. A verificação final de página, espaçamento e renderização está
-em `references/verificacao-da-peca.md`.
+em `references/verificacao-da-peca.md`. Se a peça vai levar print de tela (painel, protótipo, app),
+a receita de captura, recorte e verificação da figura está em `figuras-em-documento-pdf`.
 
 ## Ordem de trabalho
 
@@ -74,7 +75,19 @@ Violar uma reprova a peça, por bem escrita que esteja.
 Travessão em série · negrito mecânico · regra de três forçada · lista com cabeçalho em negrito
 seguido de dois-pontos · fragmento dramático de duas ou três palavras fechando o parágrafo ·
 pergunta retórica respondida na frase seguinte · variação elegante (sinônimos ciclando para o mesmo
-objeto) · aspas curvas · emoji · conclusão otimista genérica.
+objeto) · aspas curvas · emoji · conclusão otimista genérica · **paralelismo negativo em série**
+("e não X", "não é X, e sim Y" repetido a cada seção) · **antítese de espelho** ("não existe para X.
+Existe para Y") · **meta-comentário de tabela** ("cada célula mostra de onde vem o valor") ·
+**aforismo de fecho** ("um painel restrito e utilizado supera um painel completo e ignorado").
+
+Varredura dos dois primeiros, que são os que mais aparecem em documento técnico:
+
+```python
+print('e não', len(re.findall(r'e não [a-zçãéíóú]+', txt)))
+print('espelho', re.findall(r'não existe para [^.]+\.[^.]*Existe para', txt))
+```
+
+Uma ocorrência de cada é conteúdo (distinção de conceito); três ou mais é tique de escrita.
 
 Conferência mecânica no HTML/markdown gerado, antes de fechar a peça:
 
@@ -90,6 +103,55 @@ print('eufemismo', re.findall(r'crucial|pivotal|vale ressaltar|cenário atual|ec
 ```
 
 Leia cada "não é" que aparecer: negação comum fica; antítese de correção só uma na peça.
+
+## Registro de proposta — intenção declarada
+
+Peça que propõe algo (proposta, estudo preliminar, plano de implantação) não é só descrição: declara
+uma intenção e a sustenta até o fim. Regras:
+
+- **Uma intenção por peça**, na abertura, ancorada no que se sabe — "do que compreendemos da
+  realidade da empresa até aqui" — nunca em fato que não foi levantado nem em dor presumida.
+- **Distribua, não repita.** A intenção volta em dois ou três pontos de decisão, cada vez com
+  formulação diferente e peso maior, e o fecho a retoma pelo nome ("é por isso que sustentamos a
+  recomendação da abertura"). A mesma frase repetida em cada seção é excesso e o leitor percebe.
+- **Texto do interlocutor: pauta por padrão, literal quando ele anunciar literal.** Pedido genérico
+  ("melhore a escrita", "dê seu melhor") autoriza reescrever no registro da peça preservando a tese.
+  Quando ele avisa que vai ditar o trecho ("escreva literalmente", "é assim que você deve escrever"),
+  entre com o texto dele inteiro, na ordem dele, sem encurtar e sem trocar registro; corrija apenas
+  erro de digitação e diga numa linha o que corrigiu. Trocar o registro nesse modo é o defeito mais
+  caro: ele já revisou a frase e vê a versão dele voltar diferente.
+- **Absorver ideia sem nomeá-la.** Quando ele pede para não citar o conceito ("não cite o método,
+  absorva a ideia"), escreva o mecanismo em linguagem de trabalho — medida, meta, ação, nova medida —
+  sem nome próprio em nenhuma página, e confira a ausência com busca no texto final.
+- **Modelo, não diagnóstico, e sem causa inventada.** Peça escrita sem examinar dado do cliente não
+  afirma o que vai bem ou mal na operação dele e não enuncia causa ("a receita não muda por falta de
+  gestão"). Declare na abertura que nenhum dado foi examinado e o que o documento é: um modelo de
+  acompanhamento. Causa é conclusão de diagnóstico, e diagnóstico exige dado.
+- **Postura se sustenta em consequência, não em adjetivo:** sem superlativo solto, sem promessa
+  numérica, sem "revolucionário". A força vem de dizer o que a proposta substitui ou destrava.
+- Cada ponto de posicionamento entra em um lugar em que já existe assunto para ele (recomendação de
+  nomenclatura na seção de nomenclatura, escopo do painel na seção do painel). Posicionamento em
+  seção própria vira discurso e é o primeiro lugar em que o leitor desiste.
+- **A seção do rito é a que convence; trate-a como prova, não como fecho.** Mostre a cadência em
+  tabela ou desenho — anual define metas gerais, tático desce para a meta de cada setor e de cada
+  página do painel, semanal foca ações com responsável e prazo — e feche com o ciclo medida → meta →
+  ação → nova medida. Duas páginas no máximo; o desenho substitui a enumeração em prosa em vez de
+  repeti-la. É o trecho que responde "isto dá resultado ou é exercício intelectual?", e é onde o
+  documento ganha ou perde a decisão.
+- **Cadência se apresenta de baixo para cima.** Abra pelo ritmo mais curto — o semanal que já roda e
+  converte número em ação, com pergunta concreta ("qual técnico está subutilizado, em qual
+  modalidade, e por quê") — e só depois suba para mensal, trimestral e anual. Quem lê precisa ver o
+  mecanismo funcionando antes de ver o organograma de reuniões; ordem anual → semanal parece
+  cronograma e não gestão.
+- **O que depende de decisão futura vai no fim, e com escala pequena.** Definição de metas não é
+  projeto: diga que os indicadores já existem nas bases da empresa, que basta uma análise
+  retrospectiva do histórico e duas reuniões (diretoria, depois gerentes) e desenhe as três etapas
+  em passo a passo numerado. Esforço com cara de longo é o que trava a aprovação do modelo.
+- **Renomear o total é reenquadrar, não recalcular.** Ao trocar o nome de um resultado ("teto de
+  receita" → "receita do período"), a fórmula fica igual e muda a moldura: os fatores passam a ser
+  alavancas acionáveis. Na mesma rodada, ajuste o rótulo, o título da seção que o apresenta e a
+  definição de cada fator; e varra a peça pela palavra antiga até zero ocorrências — resíduo em outro
+  parágrafo contradiz a nova moldura.
 
 ## Nomenclatura e sigla
 
@@ -113,12 +175,17 @@ Leia cada "não é" que aparecer: negação comum fica; antítese de correção 
    corrido; sumário só quando a peça tem seções de verdade.
 5. **Dado de cliente fictício precisa de rótulo visível** ("dados fictícios para demonstração").
    Sem o rótulo, o número inventado vira informação e volta como cobrança.
+6. **Parágrafo de posicionamento novo costuma duplicar o que já está no fecho ou na seção vizinha.**
+   Antes de acrescentar, procure a mesma ideia no documento; cortar a duplicata resolve página
+   apertada melhor do que apertar entrelinha, e evita dizer duas vezes a mesma coisa com palavras
+diferentes.
 
 ## Antes de entregar
 
 - [ ] Cada definição aparece depois do problema que a motiva
 - [ ] No máximo uma antítese, e depois da objeção
 - [ ] Nenhum "em resumo", nenhum "quase ninguém", nenhum eufemismo de marketing
+- [ ] Se a peça é proposta: intenção declarada uma vez, retomada sem repetição literal
 - [ ] Siglas com nome por extenso na primeira ocorrência
 - [ ] Conferência mecânica rodada e números conferidos
 - [ ] Leu em voz alta e não travou

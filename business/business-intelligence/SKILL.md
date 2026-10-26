@@ -1,9 +1,8 @@
 ---
 name: business-intelligence
-description: >
-  Business intelligence across dashboard design, visualization, and reporting
-  automation. Use when designing dashboards, building KPI frameworks, automating
-  reports, creating data stories, or optimizing BI tool performance.
+description: "Business intelligence across dashboard design, visualization
+
+Use when designing dashboards, building KPI frameworks, automating reports, creating data stories, or optimizing BI tool performance."
 license: MIT + Commons Clause
 metadata:
   version: 1.0.0

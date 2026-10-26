@@ -43,14 +43,20 @@ hermes profile show <nome>      # caminho, modelo, gateway rodando, nº de skill
    diretório do log não existir, o `tee` falha e o rastro do turno inteiro se perde em silêncio (o
    processo continua rodando, sem log).
 
-5. **Lançar em background**:
+5. **Lançar em background passando um ponteiro, nunca o brief inteiro.** O arquivo `task-<irmão>.txt`
+   tem de ser curto (10-20 linhas): o pedido em uma frase, o caminho do brief e o do contrato de
+   entrega. Brief de vários KB colado dentro de `-z` mata a execução — o irmão lê o primeiro arquivo,
+   não emite mais nenhuma ferramenta e encerra com sucesso falso; o mesmo brief apontado por caminho
+   roda até o fim. O ponteiro também obriga o irmão a abrir o brief, em vez de resumi-lo de memória do
+   prompt.
 
 ```bash
-HERMES_PROFILE=<nome> hermes -z "$(cat <HERMES_HOME>/work/<peça>/task-<irmão>.txt)" --yolo
+HERMES_PROFILE=<nome> hermes -z "$(cat <HERMES_HOME>/work/<peça>/task-<irmão>.txt)" --yolo > <dir>/run.log 2>&1
 ```
 
    Use `terminal(background=true, notify_on_complete=true)`. Nunca em foreground: o turno dura de
-   minutos a dezenas de minutos.
+   minutos a dezenas de minutos. `run.log` de 0 byte **não** significa que morreu: o buffer do processo
+   só descarrega no fim.
 
 6. **Contrato de entrega explícito no brief**: saída em arquivo, em caminho combinado e formato fixo —
    por exemplo `status.json` com `{url, repo, screenshots, observacoes}` — mais os arquivos de apoio
@@ -60,6 +66,23 @@ HERMES_PROFILE=<nome> hermes -z "$(cat <HERMES_HOME>/work/<peça>/task-<irmão>.
 7. **Fechar o ciclo você mesmo**: leia o `status.json`, abra a URL, conte páginas, olhe as capturas.
    Resumo de irmão é auto-relato — para efeito externo (deploy, publicação, escrita remota) exija handle
    verificável e verifique antes de dizer ao usuário que funcionou.
+
+8. **Ler o turno do irmão no `state.db` quando a pergunta é "ele está fazendo o que pedi?".** O log
+   pode estar vazio e o relatório final só chega no fim; a prova do que ele leu e fez está gravada em
+   `<HERMES_HOME>/state.db`. Abra em somente-leitura para não travar o gateway:
+
+```python
+import sqlite3
+c = sqlite3.connect('file:state.db?mode=ro', uri=True)
+c.execute("SELECT id, profile_name, title, message_count, tool_call_count FROM sessions ORDER BY last_activity_at DESC LIMIT 5")
+# depois, por sessão: mensagens de ferramenta trazem `tool_name` e `tool_calls` (JSON) — dá para
+# confirmar quais caminhos ele abriu de fato e quantas chamadas fez.
+```
+
+   Serve para dois diagnósticos: (a) o irmão leu os documentos de referência que importam, ou está
+   improvisando? (b) o turno parou depois da primeira ferramenta (sinal de brief colado inline) ou
+   está avançando? Coluna `last_activity_at` de 10 minutos atrás com `tool_call_count` parado é turno
+   morto — relance com o brief em arquivo.
 
 ## Regras
 
@@ -80,5 +103,9 @@ HERMES_PROFILE=<nome> hermes -z "$(cat <HERMES_HOME>/work/<peça>/task-<irmão>.
 - `hermes profile show <nome>` antes: gateway rodando e `.env` presente.
 - Turno de fumaça respondeu antes do brief longo.
 - `status.json` existe no caminho combinado, com os campos pedidos.
+- Arquivo do `task-<irmão>.txt` é curto e aponta para o brief; o brief, não o prompt, carrega a
+  especificação.
+- O que o irmão fez foi conferido em `state.db` (`tool_call_count` crescente, arquivos de referência
+  abertos) quando a entrega demorou ou o log ficou em branco.
 - O artefato é real: URL abre, PNG abre, contagem confere.
 - Nada do seu arquivo principal foi tocado pelo irmão (`git status` / `ls -la` no diretório).

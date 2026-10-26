@@ -1,6 +1,8 @@
 ---
 name: llama-cpp
-description: llama.cpp local GGUF inference + HF Hub model discovery.
+description: "llama.cpp local GGUF inference + HF Hub model discovery.
+
+Carregue esta skill para inferência local com llama.cpp e modelos GGUF: descoberta e download de modelos no HF Hub, quantização, servidor local e bindings Python (llama-cpp-python)."
 version: 2.1.2
 author: Orchestra Research
 license: MIT
@@ -9,6 +11,8 @@ platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [llama.cpp, GGUF, Quantization, Hugging Face Hub, CPU Inference, Apple Silicon, Edge Deployment, AMD GPUs, Intel GPUs, NVIDIA, URL-first]
+type: ToolIntegration
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # llama.cpp + GGUF

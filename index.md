@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 134 skills** em 13 categorias.
+**Total: 165 skills** em 15 categorias.
 
 ---
 
@@ -50,6 +50,11 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `variance-analysis` | Orchestrator | Decompor orçado vs realizado em drivers com waterfall. |
 | `invoice-chase` | Orchestrator | Cobrança de fatura em atraso: tom, escalonamento, o que não fazer. |
 | `padrao-dataviz-id` | Reference | Contrato de dado da ID: data-to-ink, título-conclusão, composição, portão de acabamento. |
+| `analise-edital-fomento` | Orchestrator | Use ao analisar edital de fomento e montar checklist. |
+| `analise-edital-fomento-id` | Orchestrator | Use ao analisar edital de fomento para a ID. |
+| `metricas-financeiras-servico-campo` | Orchestrator | Use ao estruturar KPIs de serviço técnico de campo. |
+| `modelo-receita-servicos-campo` | Orchestrator | Use ao modelar receita de serviço técnico de campo. |
+| `prosa-peca-id` | Reference | Use ao escrever ou revisar prosa de peça da ID. |
 
 ## legal — Direito brasileiro e contratos ID
 
@@ -59,6 +64,8 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `direito-civil-brasileiro` | Reference | Direito civil brasileiro — análise, redline de minutas e peças sob o CC/2002. |
 | `direito-do-consumidor` | Reference | Direito do consumidor brasileiro (Lei 8.078/90 — CDC) — revisão de contratos e peças. |
 | `direito-empresarial-brasileiro` | Reference | Use ao revisar/redigir contrato B2B sob direito brasileiro. |
+| `contrato-sustentacao-sla` | Orchestrator | Use ao redigir contrato de sustentação com SLA. |
+| `societario-id` | Reference | Use ao responder sobre contrato social e sócios da ID. |
 
 ## research — Pesquisa e augmentação
 
@@ -72,6 +79,8 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `market-research-synthesis` | Research | Relatórios de análise de mercado — personas, jornadas, expectativas. |
 | `systematic-research` | Research | Pesquisa profunda single-agent via URLs diretas. |
 | `user-interview` | Research | Protocolo de entrevista de usuário/proxy estruturado para pesquisa de produto. |
+| `blogwatcher` | ToolIntegration | Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool. |
+| `research-paper-writing` | Research | Write ML papers for NeurIPS/ICML/ICLR: design→submit. |
 
 ## productivity — Documentos e entrega
 
@@ -98,6 +107,11 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `revisao-entrega-cliente` | Orchestrator | Revisar entrega de cliente antes de apresentar. |
 | `edicao-incremental-de-gdoc` | Orchestrator | Use when editar/versionar um Google Doc existente. |
 | `google-docs-mirroring` | Orchestrator | Use when reescrever um Google Doc no padrão do anterior. |
+| `documento-para-leitura-mobile-e-kindle` | Orchestrator | Edição de leitura de documento: HTML mobile + EPUB/Kindle, texto integral. |
+| `figuras-em-documento-pdf` | Orchestrator | Use ao inserir prints de app em PDF: captura e recorte. |
+| `nano-pdf` | ToolIntegration | Edit text in existing PDFs via natural-language prompts. |
+| `revisao-documento-a4` | Orchestrator | Use ao revisar documento A4 já aprovado (layout e registro). |
+| `session-librarian` | Orchestrator | Organize sessions by prompt: find, rename, archive, prune. |
 
 ## email — Correio da ID
 
@@ -139,6 +153,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `artemishub-onboarding-patterns` | Orchestrator | Use when ArtemisHub onboarding fails. |
 | `test-driven-development` | Template | TDD: enforce RED-GREEN-REFACTOR, tests before code. |
 | `skills-library-audit` | Research | Triar skills: quais servem em qualquer Hermes. |
+| `github` | Orchestrator | GitHub via gh CLI: PRs, issues, reviews, repos, auth. |
 
 ## autonomous-ai-agents — Agentes & produto
 
@@ -158,6 +173,8 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `hermes-inference-config` | Reference | Configure Hermes model/provider/fallback; route crons. |
 | `facilitacao-grupo-agentes` | Orchestrator | Facilitar reuniões de agentes: pauta, turnos e devolução. |
 | `peer-session-audit` | Reference | Auditar sessão ruim de um agente par: conversa real, defeitos, postmortem. |
+| `coordenacao-perfis-hermes` | Orchestrator | Use ao delegar tarefa a outro perfil Hermes irmão. |
+| `hermes-peer-profile-delegation` | Orchestrator | Use para dirigir outro perfil Hermes do mesmo gateway. |
 
 ## infrastructure — Integrações de entrega
 
@@ -174,6 +191,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `hermes-gateway-stall-diagnosis` | Reference | Diagnóstico de sessão travada e gateway reiniciado (lease, watchdog). |
 | `hermes-memory-file-curation` | Reference | Compactar MEMORY.md/USER.md acima do limite de chars. |
 | `hermes-session-forensics` | Orchestrator | Buscar histórico de sessões fora do perfil atual (state.db read-only). |
+| `migracao-caminhos-proot-termux` | ToolIntegration | Corrigir caminhos da casa proot para o Termux nativo. |
 
 ## cicd-oracle-preview — Deploy & preview
 
@@ -206,6 +224,28 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | Skill | Type | Descrição |
 |---|---|---|
 | `humanizer` | Creative | Humanizar texto: remover AI-isms e dar voz real. |
+| `ascii-art` | Creative | ASCII art: pyfiglet, cowsay, boxes, image-to-ascii. |
+| `comfyui` | Creative | Generate images, video, and audio via diffusion workflows. |
+| `excalidraw` | Creative | Hand-drawn Excalidraw JSON diagrams (arch, flow, seq). |
+| `pretext` | Creative | Build creative browser demos with DOM-free text layout. |
+| `sketch` | Creative | Throwaway HTML mockups: 2-3 design variants to compare. |
+| `touchdesigner-mcp` | ToolIntegration | Control TouchDesigner via twozero MCP. |
+
+## mlops — Modelos locais e inferência
+
+| Skill | Type | Descrição |
+|---|---|---|
+| `huggingface-hub` | ToolIntegration | HuggingFace hf CLI: search/download/upload models, datasets. |
+| `evaluating-llms-harness` | ToolIntegration | lm-eval-harness: benchmark LLMs (MMLU, GSM8K, etc.). |
+| `weights-and-biases` | ToolIntegration | W&B: log ML experiments, sweeps, model registry, dashboards. |
+| `llama-cpp` | ToolIntegration | llama.cpp local GGUF inference + HF Hub model discovery. |
+| `serving-llms-vllm` | ToolIntegration | vLLM: high-throughput LLM serving, OpenAI API, quantization. |
+
+## smart-home — Casa
+
+| Skill | Type | Descrição |
+|---|---|---|
+| `openhue` | ToolIntegration | Control Philips Hue lights, scenes, rooms via OpenHue CLI. |
 
 ---
 
@@ -314,6 +354,48 @@ Similar:
 - `financial-analyst` → `variance-analysis`
 - `cfo-advisor` → `financial-analyst`
 - `valuation-consultivo` → `financial-modeling`
+- `analise-edital-fomento` → `analise-edital-fomento-id`
+- `analise-edital-fomento-id` → `proposta-ente-publico`
+- `analise-edital-fomento-id` → `elaboracao-proposta-comercial`
+- `metricas-financeiras-servico-campo` → `modelo-receita-servicos-campo`
+- `modelo-receita-servicos-campo` → `revenue-kpi-framework`
+- `metricas-financeiras-servico-campo` → `padrao-dataviz-id`
+- `metricas-financeiras-servico-campo` → `revenue-kpi-framework`
+- `prosa-peca-id` → `direito-civil-brasileiro`
+- `prosa-peca-id` → `revisao-entrega-cliente`
+- `contrato-sustentacao-sla` → `contratos-justos-id`
+- `contrato-sustentacao-sla` → `direito-empresarial-brasileiro`
+- `societario-id` → `direito-empresarial-brasileiro`
+- `documento-para-leitura-mobile-e-kindle` → `html-pdf-fidelity`
+- `documento-para-leitura-mobile-e-kindle` → `revisao-entrega-cliente`
+- `figuras-em-documento-pdf` → `padrao-dataviz-id`
+- `revisao-documento-a4` → `revisao-entrega-cliente`
+- `revisao-documento-a4` → `documento-a4-marca-id`
+- `nano-pdf` → `pdf`
+- `session-librarian` → `hermes-session-forensics`
+- `session-librarian` → `hermes-agent`
+- `github` → `github-pr-workflow`
+- `github` → `github-issues`
+- `github` → `github-code-review`
+- `blogwatcher` → `competitor-news-monitor`
+- `research-paper-writing` → `deep-research`
+- `research-paper-writing` → `grounded-citations`
+- `coordenacao-perfis-hermes` → `hermes-peer-profile-delegation`
+- `coordenacao-perfis-hermes` → `facilitacao-grupo-agentes`
+- `hermes-peer-profile-delegation` → `peer-session-audit`
+- `migracao-caminhos-proot-termux` → `hermes-cron-script-dispatch`
+- `migracao-caminhos-proot-termux` → `hermes-agent`
+- `ascii-art` → `sketch`
+- `comfyui` → `sketch`
+- `comfyui` → `touchdesigner-mcp`
+- `excalidraw` → `sketch`
+- `pretext` → `sketch`
+- `huggingface-hub` → `llama-cpp`
+- `evaluating-llms-harness` → `serving-llms-vllm`
+- `weights-and-biases` → `evaluating-llms-harness`
+- `serving-llms-vllm` → `llama-cpp`
+- `padrao-dataviz-id` → `kpi-dashboard-design`
+- `padrao-dataviz-id` → `business-intelligence`
 
 Uses:
 - `agenda-id` → `google-workspace`
@@ -439,6 +521,9 @@ Uses:
 - `financial-analyst` → `xlsx`
 - `invoice-chase` → `emissao-nfse`
 - `revenue-kpi-framework` → `cfo-advisor`
+- `documento-para-leitura-mobile-e-kindle` → `pdf`
+- `figuras-em-documento-pdf` → `documento-a4-marca-id`
+- `evaluating-llms-harness` → `huggingface-hub`
 
 ---
 

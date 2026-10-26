@@ -1,8 +1,8 @@
 ---
 name: financial-analyst
-description: >
-  Performs financial ratio analysis, DCF valuation, budget variance analysis,
-  and rolling forecast construction for strategic decision-making
+description: "Performs financial ratio analysis, DCF valuation, budget variance analysis
+
+Load this skill when the work needs computed financial analysis rather than narrative: ratio analysis, DCF valuation, budget variance decomposition, and rolling forecast construction with the Python scripts bundled in the skill."
 license: MIT + Commons Clause
 metadata:
   version: 1.0.0

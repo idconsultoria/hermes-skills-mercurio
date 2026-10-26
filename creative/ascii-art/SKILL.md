@@ -1,6 +1,8 @@
 ---
 name: ascii-art
-description: "ASCII art: pyfiglet, cowsay, boxes, image-to-ascii."
+description: "ASCII art: pyfiglet, cowsay, boxes, image-to-ascii.
+
+Load this skill when you need ASCII art from text or from an image: pyfiglet banners, cowsay/boxes frames, and image-to-ASCII conversion with width control."
 version: 4.0.0
 author: 0xbyt4, Hermes Agent
 license: MIT
@@ -10,7 +12,8 @@ metadata:
   hermes:
     tags: [ASCII, Art, Banners, Creative, Unicode, Text-Art, pyfiglet, figlet, cowsay, boxes]
     related_skills: [excalidraw]
-
+type: Creative
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # ASCII Art Skill

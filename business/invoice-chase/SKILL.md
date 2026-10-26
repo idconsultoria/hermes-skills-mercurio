@@ -1,16 +1,9 @@
 ---
 name: invoice-chase
 version: 0.3.0
-description: >
-  Drafts overdue-invoice reminder emails from the ledger (MYOB, NetSuite,
-  QuickBooks, Xero, or Zoho Books) plus PayPal, Stripe, and Airwallex data,
-  matched to each customer's payment history and tone (gentle for good
-  customers, firm for repeat late payers). Sends via PayPal with owner
-  approval; everything else queues as a mail draft, with the Airwallex
-  hosted pay link included where one exists. Use when the user asks "who
-  owes me money," mentions overdue invoices, or wants to follow up on
-  unpaid invoices.
-allowed-tools: Read, WebFetch
+description: "Drafts overdue-invoice reminder emails from the ledger (MYOB, NetSuite, QuickBooks
+
+Load this skill when invoices are overdue and reminders must go out: it reads the ledger (MYOB, NetSuite, QuickBooks, Xero, Zoho Books) plus PayPal, Stripe and Airwallex data, matches tone to each customer’s payment history and escalates only as far as needed."
 type: Orchestrator
 timestamp: 2026-10-22T17:59:03Z
 source: skills.sh/anthropics/knowledge-work-plugins#small-business/skills/invoice-chase

@@ -51,11 +51,24 @@ exato dos artefatos e o formato do recibo. Sem brief, o filho inventa.
 7. **Verifique o recibo você mesmo.** O resumo do irmão é auto-relato, não prova: abra o
    `status.json`, confira que as capturas existem e que a URL responde antes de dizer ao dono que
    está pronto. Se ele não gravou o recibo, relate o que existe de fato.
+8. **Para saber o que o irmão leu, consulte a sessão dele.** O banco `state.db` do HERMES_HOME tem
+   as tabelas `sessions` e `messages`: filtre por `profile_name`, ordene por `last_activity_at` e
+   procure os caminhos nos `tool_calls` de `read_file`. Serve para responder "ele está trabalhando com
+   os documentos de referência?" com evidência, em vez de repetir o que ele disse. Se a resposta dele
+   vier vazia ou duvidosa, **vá à fonte original** (os arquivos) e só então reporte — nunca repasse a
+   um sócio um resumo de irmão que você não conferiu.
 
 ## Pitfalls
 
-1. **Instrução inline longa se despedaça.** Passe o brief por `$(cat arquivo)`; aspas e quebras no
-   meio do `-z` quebram o comando.
+1. **Brief longo não vai dentro do `-z`.** O comando leva um **bilhete curto** que manda ler o
+   arquivo: escreva `task.txt` com 5 a 10 linhas apontando o caminho do brief, e chame
+   `hermes -z "$(cat task.txt)"`. Brief inteiro inline (com markdown, aspas e quebras) faz o turno
+   morrer logo depois da primeira ferramenta e o log fica com uma linha só — parece que o irmão
+   "começou e travou". O brief completo continua em arquivo, para ele ler com `read_file`.
+2. **Pergunta a irmão também termina cedo.** Em modo pergunta, o turno pode encerrar após a primeira
+   ferramenta sem responder nada. Peça explicitamente "não pare depois da primeira ferramenta; só
+   encerre com a resposta completa na última mensagem" e redirecione a saída para um log
+   (`> resposta.log 2>&1`); leia o log depois, não a notificação de conclusão.
 2. **Sem pasta criada, sem log.** Caminho inexistente no `tee` mata o log e você fica sem saber se o
    filho terminou, falhou ou fez outra coisa.
 3. **Não entregue o trabalho do irmão como concluído antes de inspecionar o artefato.** Recibo sem

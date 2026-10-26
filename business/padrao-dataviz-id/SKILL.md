@@ -32,7 +32,7 @@ espaço; no máximo 4 elementos de chrome por gráfico"** — equivalente a ≥ 
 | borda e fundo de card de gráfico | não carrega dado |
 | `box-shadow`, `backdrop-filter`, gradiente de chrome | ruído |
 | gridline, tick, linha de eixo | o rótulo direto já localiza o valor |
-| legenda em caixa | rótulo direto na série é mais rápido de ler |
+| legenda em caixa | rótulo direto no fim da linha ou da série, em mono 10 px, é mais rápido de ler |
 | rótulo repetido no eixo e no ponto | redundância |
 | parágrafo dentro do card | método vai para `<details>` |
 | ícone decorativo, emoji, ilustração de enfeite | ruído |
@@ -75,7 +75,8 @@ Uma pergunta, um gráfico. Dois gráficos que respondem à mesma pergunta: um sa
 ## 6. Composição
 
 - **Sem grade de cards idênticos.** Blocos assimétricos 7/5 ou 8/4; nunca 6/6.
-- Separação por **hairline de largura total** ou por espaço — nunca por caixa.
+- Grade de 12 colunas, gutter 24 px (`--s-5` no projeto de origem).
+- **Hairline só entre seções.** Nunca ao redor de bloco, card de gráfico ou tabela.
 - Espaço base 8 px; 96–120 px entre seções no desktop, 32–40 px no mobile.
 - Primeira dobra: **4 números + 1 gráfico** no desktop; **3 números + 1 gráfico** no mobile.
 - Cantos: 0 ou 2 px. Nunca 12/16 px.

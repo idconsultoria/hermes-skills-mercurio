@@ -128,7 +128,10 @@ Pedido do tipo *"me manda o link do doc de <processo>"* se resolve em quatro pas
 1. **Buscar pelo termo do negócio, não pela árvore de pastas**: `google_api.py drive search
    "<termo>"` (fullText) devolve de uma vez POP, transcrição, áudio da coleta, pastas do
    processo e as versões — mais rápido que descer pasta por pasta, e revela artefato que você
-   não sabia que existia.
+   não sabia que existia. **O resultado vem poluído:** homônimos de OUTROS clientes e de anos
+   anteriores (mapas de fragilidade, POPs velhos) entram na mesma busca. Só responda com o
+   documento cuja cadeia de pais chega na pasta do cliente/contrato certo — é para isso que
+   serve o passo 2.
 2. **Resolver o caminho real subindo os pais** (`files.get(fields="id,name,parents")` em
    laço) e citar a cadeia inteira na resposta. O caminho prova que é a pasta certa e o dono
    confere sem abrir o documento.

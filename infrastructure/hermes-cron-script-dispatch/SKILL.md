@@ -239,6 +239,34 @@ Depois de uma coleta que falhou, **rode de novo com a janela alargada** (`SYMX_J
 Symplexis, cujo padrão é 2) e veja se aparece registro que ficou sem tratar. Sem essa rodada
 você só sabe que "deu erro" — não se algo se perdeu.
 
+## "Dispare o cron de novo" num job com `monitor` — o disparo pode não conferir nada
+
+`action=run` num job com gate **não força a conferência**: se a saída do coletor for igual à
+gravada, o retorno é `Status: no_change (agent run suppressed)` — agente não rodou, nada foi
+conferido, nada seria entregue. Reportar isso como "rodei de novo" é mentira silenciosa.
+
+Para provar que a conferência aconteceu de fato:
+
+1. Rode o coletor à mão e leia a saída:
+   `bash $HERMES_HOME/scripts/<coletor>.sh > "$HERMES_HOME/work/tmp/out.txt" 2>&1; echo rc=$?`
+2. Compare com `cron/output/<job_id>/monitor_last_output.txt` (fonte da verdade do gate — sem o
+   `\n` final). Igual → nada novo; diferente → há evento a tratar.
+3. Só então responda: "conferiu, nada novo" ou trate as linhas do evento.
+
+**Coletor de conferência é state-based e idempotente** (lê planilha + extrato e recalcula o que
+está em aberto). Por isso ele é o caminho de recuperação de um run de agente que morreu — 429,
+quota, timeout: basta rodá-lo à mão; não tente reconstruir a saída perdida do monitor nem
+extrair conclusão do `last_error`. Se a linha constante (ex. `SYMPLEXIS_TICK`) volta, nada ficou
+sem registrar.
+
+**Cota/`HTTP 429` no run ≠ falha da conferência.** O coletor já rodou (o gate registrou a saída);
+quem morreu foi o agente que interpretaria o bloco. Diga qual das duas coisas falhou e mostre a
+coleta à mão como prova — é a diferença entre "perdi uma parcela" e "perdi uma notificação".
+
+**Pedido ambíguo tipo "desativa o cron e dispara de novo":** disparar exige job ativo, então
+desativar primeiro torna o segundo pedido impossível. Interprete como *despausar* (ou pergunte),
+e diga em uma linha qual leitura adotou — nunca pause e devolva "disparado" sem ter disparado.
+
 ## "O job irmão passou" NÃO é prova de que a rede está de pé
 
 Antes de culpar o script, confira se o job que passou depende do **mesmo** recurso. Job que
@@ -277,6 +305,10 @@ resolver** — e se vários jobs caíram no mesmo minuto, é o resolver, não ca
   não imprimiu nada são indistinguíveis sem ler o conteúdo.
 - `HERMES_HOME` pode NÃO estar no `.env` (neste ambiente não estava); por isso o dispatcher
   tem fallback `${HERMES_HOME:-/data/data/com.termux/files/home/capitolium}` + checagem de existência do dir.
+- **`action=run` em job pausado é recusado**, não enfileirado: retorna
+  `execution_skipped: "Job is paused/disabled; resume it before running."` e `executed: false`.
+  Para um disparo avulso: `resume` → `run` → `pause` de novo (o run é background; pause só depois
+  de ele terminar, senão você perde a entrega).
 - `cronjob list` pode reportar `gateway_running: false` — os jobs ficam agendados mas não
   disparam até `hermes gateway start`. Sempre avisar o usuário se o gateway estiver parado.
 - Jobs com `drift_skip` (provider/modelo global mudou e o job é unpinned) ficam pausados por

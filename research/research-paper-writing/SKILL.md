@@ -1,7 +1,9 @@
 ---
 name: research-paper-writing
 title: Research Paper Writing Pipeline
-description: "Write ML papers for NeurIPS/ICML/ICLR: design→submit."
+description: "Write ML papers for NeurIPS/ICML/ICLR: design→submit.
+
+Carregue esta skill para escrever artigo científico de ponta a ponta: estrutura de seções, revisão de literatura, redação de método e resultados, figuras e submissão."
 version: 1.1.0
 author: Orchestra Research
 license: MIT
@@ -13,7 +15,8 @@ metadata:
     category: research
     related_skills: [arxiv, subagent-driven-development, plan]
     requires_toolsets: [terminal, files]
-
+type: Research
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # Research Paper Writing Pipeline

@@ -1,8 +1,10 @@
 ---
 name: contrato-sustentacao-sla
-description: "Use ao redigir contrato de sustentação com SLA."
+description: "Use ao redigir contrato de sustentação com SLA.
+
+Carregue esta skill ao redigir contrato de sustentação com SLA para cliente da ID: escopo do serviço, níveis de serviço e prazos de resposta, medição, penalidades e renovação — receita recorrente com risco delimitado."
 category: legal
-type: Method
+type: Orchestrator
 license: MIT
 author: Mercúrio
 version: 1.0.0

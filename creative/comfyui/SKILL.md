@@ -1,6 +1,8 @@
 ---
 name: comfyui
-description: Generate images, video, and audio via diffusion workflows.
+description: "Generate images, video, and audio via diffusion workflows.
+
+Carregue esta skill para gerar imagem, vídeo ou áudio por workflows de difusão — local (ComfyUI/Comfy Desktop, com comfy-cli) ou Comfy Cloud via API. Cobre checagem de hardware, instalação, arquitetura em duas camadas e receitas de workflow."
 version: 5.1.0
 author: [kshitijk4poor, alt-glitch, purzbeats]
 license: MIT
@@ -25,6 +27,8 @@ metadata:
       - video-generation
     related_skills: [stable-diffusion]
     category: creative
+type: Creative
+timestamp: 2026-10-22T21:27:05-03:00
 ---
 
 # ComfyUI
