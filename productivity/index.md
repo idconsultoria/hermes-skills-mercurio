@@ -23,3 +23,9 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `html-deck-to-pptx` — Converter deck HTML em PPTX editável (1920x1080).
 - `reunioes-diarizadas` — Extrair encaminhamentos de reuniões diarizadas.
 - `revisao-entrega-cliente` — Revisar entrega de cliente antes de apresentar.
+- `documento-para-leitura-mobile-e-kindle` — Edição de leitura de documento: HTML mobile + EPUB/Kindle, texto integral.
+- `figuras-em-documento-pdf` — Inserir prints de app em PDF: captura e recorte.
+- `nano-pdf` — Edit text in existing PDFs via natural-language prompts.
+- `revisao-documento-a4` — Revisar documento A4 já aprovado (layout e registro).
+- `session-librarian` — Organize sessions by prompt: find, rename, archive, prune.
+- `fathom` — Cliente da API REST do Fathom (reuniões, resumos, transcrições, action items).

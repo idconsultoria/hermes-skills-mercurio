@@ -46,7 +46,42 @@ Ambiente dos scripts de Drive/Docs: rode com `venvs/google/bin/python` (o venv q
 arquivo** (`python -u script.py > work/x.log 2>&1`), lendo depois com `read_file`. Saída de script
 com chamadas de rede se perde no caminho, e silêncio não significa sucesso.
 
+### Evolução fora da mensalidade: hora técnica por orçamento (padrão da ID)
+
+Funcionalidade nova **nunca** entra na mensalidade de sustentação. Escreva uma cláusula própria
+com este mecanismo, nessa ordem — a ordem é o que garante o caixa:
+
+1. a CONTRATANTE registra a demanda por escrito no canal oficial;
+2. a CONTRATADA apresenta **pré-projeto** com escopo + **horas estimadas** + prazo + valor
+   (horas × valor da hora técnica);
+3. a CONTRATANTE **aprova ou recusa por escrito**, pelo responsável indicado junto ao órgão
+   técnico do cliente (no ArtemisHub/Sergipetec: o responsável do **CGTEC**), com prazo de
+   resposta de 5 dias úteis;
+4. **aprovado → emite-se a Nota Fiscal**;
+5. **só depois da NF** a CONTRATADA executa e entrega.
+
+Mais: **sem limite de horas por demanda** (o teto é o orçamento aprovado, não um pacote mensal);
+aprovação parcial permitida; **complemento de orçamento** se as horas estouradas, com nova
+aprovação antes de executar; reajuste da hora pelo IPCA; e a cláusula que mata o "pedido verbal":
+nenhuma solicitação verbal ou mensagem de aplicativo cria obrigação de desenvolver.
+Referência de valor praticada: **R$ 300,00/hora** no contrato ArtemisHub × Sergipetec.
+
 ## Esqueleto das cláusulas
+
+### Padrão de pagamento e mora da ID — usar em todo contrato novo sem o sócio pedir
+
+- **NF até o dia 15** de cada mês; **pagamento até o dia 20** do mesmo mês (data de caixa fixa,
+  não "15 dias da emissão"). Se o dia 20 cair em sábado, domingo ou feriado, vence no último dia
+  útil anterior — senão o caixa escorrega para o dia 22.
+- **Multa moratória de 2%** sobre o valor da parcela vencida **+ juros de mora de 1% ao mês, pro
+  rata die**, sem prejuízo da atualização monetária.
+- Cláusula de que **multa e juros são compensatórios** e não impedem perdas e danos nem resolução.
+- **Penalidade simétrica** para atraso da CONTRATADA nos prazos de SLA (mesmo 2% sobre o mensal).
+- **Suspensão** após 10 dias do vencimento, com aviso por e-mail de 5 dias úteis (inclui cortar
+  acesso ao ambiente e a renovação de insumos de IA).
+- **Vedação de retenção unilateral** de parcela por divergência técnica.
+- Textos de referência: `Contrato - Sistema de Credenciais Digitais - Solution Master` (cl. 6 e 7) e
+  `Contrato - Treinamento In Company IA - Solution Master` (cl. 6 e 7), no Drive da ID.
 
 1. Partes + 3 considerandos (plataforma entregue · aceite e transição formal · decisão de manter
    operação com nível de serviço).
@@ -71,14 +106,16 @@ com chamadas de rede se perde no caminho, e silêncio não significa sucesso.
    efeito indenizatório do SLA, sem prejuízo do direito de rescisão.
 8. **Vigência**: 12 meses com **renovação automática** por períodos iguais e aviso em contrário de
    60 dias; a sustentação é contínua e não se interrompe por ausência de chamados.
-9. **Remuneração**: mensalidade + total do período por extenso, NF até o 5º dia útil, pagamento em
-   até 15 dias, Pix com chave CNPJ, reajuste anual pelo IPCA, valores remuneram a integralidade
-   (salvo a cláusula de infraestrutura).
+9. **Remuneração**: mensalidade + total do período por extenso, **NF até o dia 15 e pagamento até
+   o dia 20** do mesmo mês (padrão da casa, ver acima), Pix com chave CNPJ, reajuste anual pelo
+   IPCA, valores remuneram a integralidade (salvo a cláusula de infraestrutura).
 10. **Infraestrutura e insumos**: o que a mensalidade cobre (com a capacidade de referência
     explícita) e que **ampliação de capacidade é do cliente**, com custo apresentado e aprovação por
     escrito antes; repasse de reajuste de fornecedor com 30 dias de aviso e comprovação.
-11. **Mora e suspensão**: 2% + 1% ao mês e correção; suspensão após 30 dias de atraso com aviso de
-    10 dias; suspensão não interrompe a vigência; penalidade **simétrica** para atraso da ID.
+11. **Mora e suspensão**: 2% sobre a parcela vencida + 1% ao mês pro rata die e correção
+    monetária; multa e juros **compensatórios**; suspensão após 10 dias do vencimento com aviso de
+    5 dias úteis por e-mail; suspensão não interrompe a vigência; penalidade **simétrica** para
+    atraso da ID; **vedada retenção unilateral** de parcela por divergência técnica.
 12. **PI**: plataforma, código, algoritmos e **as melhorias feitas na vigência** são da ID; licença
     de uso não exclusiva e não transferível ao cliente; dados e relatórios são do cliente;
     preexistentes reservados; vedada comercialização ou sublicença.
@@ -195,9 +232,29 @@ na PNG — a visão pega o que a contagem de páginas não pega (texto invadindo
   de que no período novo aquilo não se aplica. O inverso também vale: se **não houve captação** no
   contrato encerrado, a mesma cláusula tem de dizer que **nada é devido** — cláusula padrão mantida
   com "permanecem devidos" fabrica uma dívida que não existe e trava a leitura dos sócios.
-- **Versão = o MESMO arquivo do Drive.** Atualize com
-  `files().update(fileId=..., media_body=..., body={"name": "… v2 …"})`; criar um doc v2 com id
+- **Versão = o MESMO arquivo do Drive quando muda texto ou valor** (preço, prazo, cláusula isolada):
+  `files().update(fileId=..., media_body=..., body={"name": "… v2 …"})`, porque criar um doc com id
   novo quebra todos os links já distribuídos (rodapé do one-pager, mensagem no grupo).
+- **Mudança de ESTRUTURA (cláusula nova, renumeração) se faz regerando a partir do markdown-fonte**
+  em um doc novo (`… vN+1 …`) na mesma pasta, e a versão intermediária vai para a lixeira — na pasta
+  fica **uma corrente** (a última) mais o histórico que o sócio já conhece. Editar à mão um doc de 25
+  páginas para inserir cláusula no meio custa mais e erra mais do que regerar.
+- **Inserir cláusula no meio renumera TRÊS coisas, não duas:** o título (`# CLÁUSULA N`), as
+  referências cruzadas (`Cláusula N`, `item N.M`) **e o prefixo de cada item dentro das cláusulas**
+  (`N.1.`, `N.2.`…). Renumerar só títulos e referências deixa, por exemplo, a Cláusula 13 com itens
+  `12.1`, `12.2` — o cliente lê dois números para a mesma cláusula. Depois de regerar, **prove pelo
+  PDF**: extraia o texto (`pdftotext -layout`), liste os prefixos de item por cláusula e confira que
+  cada `item X.Y` citado cai na cláusula que faz sentido (pagamento, mora, PI, garantia).
+- **Não confie na memória do sócio sobre o que o contrato de origem diz** ("acho que a propriedade
+  intelectual era do parque"): abra o contrato anterior no Drive, leia a cláusula e **cite os itens
+  verbatim** (`na forma do item 9.1 do Contrato nº 2 — Artemishub, de 18/06/2026`), acrescentando que
+  aquele regime "permanece inalterado e prevalece sobre qualquer interpretação diversa". Alinhar por
+  lembrança produz cláusula que contradiz o instrumento assinado — e é o tipo de erro que só aparece
+  na mesa de assinatura.
+- **Pós-passe obrigatório depois de regerar** (quebra de página antes dos anexos + títulos alinhados à
+  esquerda): `scripts/pos_passe_contrato.py <DOC_ID> --so-quebra` e depois `--so-estilos`. O gerador
+  reporta `PAGEBREAK_OK` e ainda assim o anexo pode sair na mesma página das assinaturas — confira a
+  página de cada `ANEXO` no PDF, não o log.
 - **Confirme a substituição lendo de volta.** Exporte o texto
   (`files().export(mimeType="text/plain")`) e cheque os **dois lados**: valor novo presente E valor
   antigo ausente. Trocar preço no meio de parágrafo e no total é onde a troca passa batida.

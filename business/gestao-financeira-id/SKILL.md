@@ -357,6 +357,31 @@ Armadilhas que custam tempo se ignoradas:
 - Salvar um **snapshot das faixas antes de escrever** (`valueRenderOption="FORMULA"` em JSON no
   work/) — é o rollback se algo desalinhar.
 
+## Cobrança recorrente de parcela vencida (rotina diária, config-driven)
+
+Quando uma parcela de `recebimentos` passa do vencimento e o dono manda cobrar até ser paga,
+a rotina é automática: script no cron em `no_agent` (dias úteis, ~09h) com configuração em JSON
+— parcela, valor, vencimento, NFS-e, thread da nota, destinatários e dia de escalonamento.
+A receita completa (ordem dos passos, montagem do JSON, rotação de textos, escalonamento para o
+dono do cliente, dedupe por dia, dry-run e simulação do dia da escalada) está em
+`references/cobranca-diaria-cliente.md`.
+
+Regras que não se negociam:
+
+- **Gate no extrato antes de qualquer envio.** Janela de verificação começando no **vencimento**
+  da parcela cobrada (`SM_INICIO=<venc>`) — janela larga casa o crédito da parcela ANTERIOR e a
+  cobrança nunca sai, em silêncio.
+- **`ERRO` na leitura do banco nunca vira cobrança.** Só `NAO_PAGO` envia; `PAGO` encerra a
+  rotina e avisa uma vez.
+- **Um e-mail por dia útil, no máximo**, com `estado.json` por data (o cron pode disparar duas
+  vezes; o cliente não pode receber duas cobranças).
+- **Destinatário só o autorizado pelo dono** — herdar da NFS-e e escalar apenas quem foi mandado;
+  não incluir diretor/vice "para pressionar" por conta própria.
+- **Assinatura da ID em e-mail ao cliente:** `ID Consultoria` / `Mercúrio — IA assistente
+  administrativa da ID` / contato. Nunca assinar como pessoa física.
+- **Não inventar cláusula de multa/juros** que o contrato não cita: cobra-se o principal e pede-se
+  posição e data.
+
 ## Reconciliação automática: cron de parcelas pagas
 
 O passo a passo acima virou rotina automática — `symplexis_conferir_parcelas.py` +

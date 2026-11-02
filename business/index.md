@@ -21,6 +21,14 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `revisao-de-proposta-existente` — Revisar proposta já entregue, preservando o resto.
 - `roteiro-de-qualificacao` — Roteiro de qualificação: descoberta ou sabatina.
 - `organizacao-drive-id` — Organizar pastas e docs de cliente no Drive da ID + e-mail.
+- `agenda-id` — Criar ou ajustar reunião na agenda da ID.
+- `proposta-ente-publico` — Elaborar proposta/documento para órgão público.
+- `documento-a4-marca-id` — Documento A4 com identidade ID (HTML→PDF).
+- `analise-edital-fomento` — Analisar edital de fomento e montar checklist.
+- `analise-edital-fomento-id` — Analisar edital de fomento para a ID.
+- `metricas-financeiras-servico-campo` — Estruturar KPIs de serviço técnico de campo.
+- `modelo-receita-servicos-campo` — Modelar receita de serviço técnico de campo.
+- `prosa-peca-id` — Escrever ou revisar prosa de peça da ID.
 
 ## finanças / métricas (skills.sh, instaladas 2026-10-22)
 

@@ -141,6 +141,42 @@ HERMES_HOME=<home> venvs/google/bin/python \
   aconteceu na minuta de sustentação do ArtemisHub (20/10/2026): conteúdo aprovado, formato
   fora da identidade, teve de ser refeito.
 
+## Bloco de assinaturas — PADRÃO ID (tabela, não parágrafos)
+
+Todo contrato da ID fecha com **tabela de assinatura 3 colunas × 4 linhas**, sem bordas
+visíveis (bordas brancas 1pt), larguras fixas **208,5 pt | 33 pt (goteira) | 201,75 pt**,
+padding 5pt, `contentAlignment: TOP`, fonte Nunito Sans 10pt. Referência canônica:
+`Contrato de Sustentação ArtemisHub … v6 — 27-10-2026` (doc `194h1HVr4d5n1UFmGe4-Pev3BsmGPNYr8xvCi4tvoOIQ`,
+tabela em `startIndex` 33365).
+
+```
+r0: (vazio)                          | (vazio) | (vazio)        ← espaço para assinar
+r1: NOME / CARGO / EMPRESA           | (vazio) | NOME / CARGO / EMPRESA
+r2: (vazio)                          | (vazio) | (vazio)        ← respiro
+r3: Testemunha 1 / CPF:              | (vazio) | Testemunha 2 / CPF:
+```
+
+Usar SEMPRE esse desenho; assinatura em parágrafos corridos é entrega fora do padrão.
+Exemplo real (`contratos_justos` — NDA Vero, 30/10/2026): contratante com
+`«Nome do representante legal» / «Cargo» / «RAZÃO SOCIAL»` e ID com
+`Gustavo Alexandre Souza Mello / Sócio-Administrador / ID Consultoria`.
+
+### Receita de API (Docs) para inserir a tabela
+
+1. Localizar os parágrafos do bloco antigo e apagar a faixa inteira (`deleteContentRange`).
+2. `insertTable(rows=4, columns=3, location={index: startIndex})` — a API cria um parágrafo
+   vazio antes da tabela, e isso é esperado.
+3. Preencher células com `insertText` **de trás para frente** (maior `startIndex` primeiro).
+   O índice correto de uma célula vazia é **`paragraph.startIndex`**, não `+1`: o parágrafo
+   vazio tem extensão 1 (`startIndex+1 == endIndex`) e `insertText` em `endIndex` falha com
+   *"The insertion index must be inside the bounds of an existing paragraph"*.
+4. `updateTableColumnProperties` exige `"fields": "*"` (sem isso: *"At least one field must
+   be listed in 'fields'"*); aceita `columnIndices` (lista).
+5. Cor de borda tem **duas camadas**: `borderLeft: {color: {color: {rgbColor: …}}, width, dashStyle}`.
+   Uma camada só devolve *Unknown name "rgbColor"*.
+6. Fonte: `updateTextStyle` na faixa start..end da tabela com `weightedFontFamily: Nunito Sans`
+   e `fontSize` 10pt, `fields` explícito.
+
 ## Checklist do "contrato justo" — revisão antes de enviar
 
 ### Clareza

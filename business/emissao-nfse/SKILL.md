@@ -112,7 +112,9 @@ Depois que a nota foi aceita e o prazo passou, a demanda muda de natureza: não 
 NFS-e, é cobrança. Os passos, a trava do extrato, o molde do texto e o agendamento com cron
 estão em `references/cobranca-nfse-clientes.md` (seção 5). Regra que não se negocia: **só
 cobra depois de confirmar, no extrato, que o valor não entrou** — e se a consulta ao banco
-falhar, reporta ao principal em vez de concluir que o cliente não pagou.
+falhar, reporta ao principal em vez de concluir que o cliente não pagou. **Cliente que
+respondeu com prazo sai da cadência automática** (§5.6): nada até o prazo, verificação muda no
+dia do prazo e escalada ao dono no primeiro dia útil seguinte.
 
 ## Emissão manual no WebISS de Aracaju (quando não há A1 válido)
 

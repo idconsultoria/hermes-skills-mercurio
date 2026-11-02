@@ -217,7 +217,63 @@ $cmid = (int)$DB->get_field('course_modules','id',['course'=>2,
 course_delete_module($cmid);
 ```
 
-## 10. Pitfalls
+## 10. Clonar uma turma inteira (novo curso a partir de outro)
+
+Usado quando uma turma nova precisa do **mesmo ambiente** (ex.: in company do mesmo curso).
+Não existe cópia por linha de comando simples no admin — fazer por script PHP CLI.
+
+Receita (validada em 27/10/2026 criando "Ferramentas de IA — Turma In Company (Solution Master)"):
+
+1. `pg_dump` antes de tudo.
+2. `create_course()` com `format`, `summary`, `enablecompletion`, `category` iguais à origem.
+3. Sincronizar `course_format_options` por **UPDATE** (o `create_course` já cria as linhas; há índice
+   único em `(courseid, format, sectionid, name)` → INSERT duplica e estoura erro).
+4. `course_create_sections_if_missing($course, [números])` e copiar `name/visible/summary`.
+5. Percorrer `course_sections.sequence` (a ordem real é essa, não o id do cm) e, para cada módulo
+   `page`/`forum`, clonar a linha da tabela do módulo (unset id, trocar course) e vincular com
+   `add_course_module()` + `course_add_cm_to_section()`.
+6. `purge_all_caches()` + `rebuild_course_cache($id, true)` no fim.
+
+**Pitfall:** `create_module()`/`add_moduleinfo()` falham com `error/createmodulemissingattribute`
+quando não têm o conjunto completo de campos de formulário → usar o par
+`add_course_module()` + `course_add_cm_to_section()`.
+
+Itens extras (ex.: link da gravação em cada módulo) → inserir a instância (`mdl_url`) e vincular
+com o mesmo par; depois reordenar `course_sections.sequence` para o item ficar logo após a aula.
+
+**Matrícula por script:** use `enrol_get_plugin('manual')->enrol_user($instance, $userid, $roleid, time())`.
+NUNCA confie em `enrol_try_internal_enrol($instance->id, ...)`: o 1º parâmetro é o **courseid** (não o id
+da instância) e ela devolve `false` em silêncio — o papel fica atribuído mas sem `user_enrolments`, e a
+pessoa não aparece em Participantes (papel por `role_assign()` sozinho não dá acesso). Depois de
+`enrol_user()`, o global `$COURSE` vira stdClass: em `rebuild_course_cache()` passe o id literal.
+
+**Vídeo dentro de `mod_page` (aulas gravadas):** hospedar no próprio Moodle, nunca linkar asset do
+GitHub Releases. O GitHub serve o asset com `Content-Disposition: attachment` +
+`application/octet-stream`, e iOS/Safari recusa tocar: o aluno vê *"The media could not be loaded,
+either because the server or network failed or because the format is not supported"*.
+Guardar com `get_file_storage()->create_file_from_pathname()` em `mod_page`/`content` e **itemid 0**
+(`mod/page/lib.php` usa `file_save_draft_area_files(..., 0)` — itemid = id da página dá 404 no
+pluginfile). Cada página tem o próprio contexto de módulo, então itemid 0 não colide. No HTML usar
+`moodle_url::make_pluginfile_url($ctx->id, 'mod_page', 'content', 0, '/', $arquivo)` e incluir
+`playsinline webkit-playsinline` + `preload="metadata"` nos vídeos grandes.
+Teste de aceite: autenticado → HEAD `200` + `content-type: video/mp4` + `content-disposition: inline`
++ `accept-ranges: bytes`; GET com `Range: bytes=0-1023` → `206` com `content-range` correto;
+anônimo → `303` (login).
+
+**Testar endpoint autenticado sem senha no chat:** criar usuário descartável via CLI, gravar
+usuário/senha em `/tmp/tp.txt` (chmod 600) no servidor, logar com `curl` (GET login → `logintoken`,
+POST credenciais → **seguir o redirect `?testsession=NN`** senão a sessão não vale), rodar os testes
+e apagar o usuário (`user_delete_user`) + `purge_all_caches()` no fim.
+
+**Capa do curso:** não fica em `course_format_options`. É o arquivo do componente `course`,
+filearea `overviewfiles`, no contexto do curso (`remuiformat` lê `get_course_overviewfiles()`).
+Copiar com `get_file_storage()->create_file_from_storedfile()` do contexto de origem para o de
+destino. A opção `remuicourseimage_filemanager` costuma ter itemid órfão — ignorar.
+
+Se a falha acontecer no meio, sobra **instância órfã** (linha em `mdl_page`/`mdl_forum` sem
+`course_modules`): apagar a órfã antes de rodar de novo, senão duplica.
+
+## 11. Pitfalls
 
 | Sintoma | Causa | Correção |
 |---|---|---|
@@ -228,8 +284,17 @@ course_delete_module($cmid);
 | `mdl_forum_discussion` não existe | nome da tabela é **plural** `mdl_forum_discussions` | usar o nome correto |
 | `drive share` 400 para email sem conta Google | `invalidSharingRequest` | usar `--notify` |
 | `pg_restore: unsupported version` | dump de PG17 em PG16 | imagem `postgres:17-alpine` |
+| `Campo "course" não existe na tabela "enrol"` | a tabela `mdl_enrol` usa **`courseid`** | filtrar por `courseid` |
+| `error/createmodulemissingattribute` | `create_module()` exige todos os campos de formulário | `add_course_module()` + `course_add_cm_to_section()` |
+| `Could not open input file: public/admin/cli/...` | dirroot do container é **`/var/www/html`** (o docroot web é `public/`) | rodar CLI a partir de `/var/www/html` |
+| CLI do Moodle sem permissão em `/tmp` | arquivo copiado como 600 root | `docker exec moodle-app chmod 644 /tmp/x.php` e rodar com `-u www-data` |
 
-## 11. Verificação pós-operação
+## 12. Verificação pós-operação
+
+Antes de declarar uma turma pronta, conferir: conteúdo copiado por hash (`md5(content)` igual ao da
+origem), ordem de `course_sections.sequence`, `format_text()` do post do fórum (perde `<style>` e
+`display`, então validar `background`, cores e os links), nº de `user_enrolments` **e** de
+`role_assignments` (os dois!), e uma prova real de SMTP (`email_to_user()` com `debugdisplay=1`).
 
 1. **Papéis:** `SELECT roleid,count(*) FROM mdl_role_assignments WHERE contextid=20 GROUP BY roleid;`
    → deve haver alunos (`5`) além do professor (`3`).

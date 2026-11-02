@@ -350,6 +350,25 @@ Padrão consolidado (jul/ago/set 2026). Ao receber o PDF da NFS-e da parcela:
   - `cobrar_sm_parcela3_2aviso.py` (08/10/2026) — molde de **2º aviso**: mesma trava
     (`sm_verificar_pagamento.py` = `NAO_PAGO` **antes**), roda `--dry-run` primeiro, corpo
     citando NF + 1º lembrete + dias de atraso reais (calculados, nunca escritos à mão).
+- **Cobrança DIÁRIA de parcela em atraso — `cobranca_sm_diaria.sh` + `cobranca_sm_diaria.py`**
+  (criados 27/10/2026, ordem do dono: *"cobra todos os dias úteis até ser pago, de uma forma
+  diferente todos os dias; a partir do 3º dia manda para o Elenaldo também"*). Cron
+  `0 9 * * 1-5` em `no_agent`, entregando o relatório na DM do Gustavo.
+  - Configuração fica em `work/cobranca-sm/config.json` (parcela, valor, vencimento, NFS-e,
+    thread, destinatários, dia da escalada). **Trocar de parcela = editar o JSON, não o código.**
+  - O wrapper roda **antes** o `sm_verificar_pagamento.py` com `SM_INICIO = vencimento` (nunca
+    uma janela fixa: janela larga casa o crédito da parcela ANTERIOR e a cobrança nunca sai);
+    `PAGO` → encerra e avisa uma vez; `ERRO` → **não cobra**; `NAO_PAGO` → envia.
+  - Estado e log em `work/cobranca-sm/`: `estado.json` guarda o envio por dia (garante **um
+    e-mail por dia útil**, mesmo se o cron rodar duas vezes) e `log/<data>-diaN.json` o registro
+    com `labels`/`thread_id` relidos do Gmail.
+  - Textos: 8 templates em rotação (`(dia-1) % 8`), abertura/argumento/pedido diferentes; o
+    **dia da escalada usa o template 6** ("o que a parcela sustenta"), que é o argumento de
+    continuidade dos projetos pedido pelo dono.
+  - Assinatura dos e-mails de cobrança (ordem do dono, 27/10/2026): `ID Consultoria` /
+    `Mercúrio — IA assistente administrativa da ID` / contato.
+  - Escalar para `elenaldo@solutionmaster.com.br` **é** decisão vigente do dono (dono da SM,
+    não confundir com Gelealdo, o engenheiro); a escalada é automática a partir do 3º dia útil.
 - **Thread da NFS-e: `References` NÃO basta — o `send` precisa de `threadId`.** O lembrete de
   28/09/2026 usou `In-Reply-To`/`References` corretos, mas mudou o assunto
   (`… — parcela 3/6 em atraso`) e o Gmail criou **thread nova**: a cobrança ficou fora da

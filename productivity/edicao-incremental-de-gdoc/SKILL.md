@@ -34,10 +34,15 @@ cópia nova.
 2. Monte os pares `antes → depois` e **confirme que cada `antes` existe** antes de enviar — um par que não
    casa é erro de leitura, não um no-op inofensivo.
 3. Aplique em lote (`replaceAllText` com `containsText.matchCase: true`, ~20 requisições por chamada) e
-   confira `occurrencesChanged` de cada requisição.
+   confira `occurrencesChanged` de cada requisição — **0 ou chave ausente é falha, não no-op**: a API
+   omite a chave quando não há match, então leia com `.get`, e acento/pontuação/espaço diferente é
+   motivo suficiente para a troca não ter acontecido.
 4. **Para acrescentar** conteúdo, reescreva uma frase existente em vez de inserir parágrafo novo: sem
    deslocamento de índice e nada a recalcular. O texto novo **herda o estilo do trecho casado**, então
-   nunca inclua marcadores de markdown no `replaceText`.
+   nunca inclua marcadores de markdown no `replaceText`. Pelo mesmo motivo, case **só a cauda** da
+   frase: se o `antes` começar no rótulo (`6.2.`, `a)`, `3.1.`), o negrito do rótulo se perde. E o
+   texto novo tem de abrir com a pontuação que fecha a anterior (`"… assinatura. As obrigações…"`) —
+   trocar a cauda deixando o conector de fora emenda a frase sem ponto.
 5. **Confirme a integridade depois**: contagem de linhas e de tabelas idêntica à de antes, páginas dentro
    do teto pedido e conferência visual (screenshot + visão) das páginas alteradas.
 
@@ -104,3 +109,6 @@ documento, e é o tipo de erro que o cliente encontra antes de você.
 - `references/api-docs-receitas.md` — receitas de API: laço de `replaceAllText`, leitura do doc com
   estrutura, negrito por correspondência de markdown, recuperação de conteúdo por revisão do Drive,
   criação de rodapé em duas chamadas.
+- `references/edicao-cirurgica-e-leitura-api.md` — trocar cláusula/valor casando só a cauda do
+  parágrafo, acrescentar subitem sem renumerar, montar tabela nova (bloco de assinaturas) com os
+  campos que a API exige, e o walker recursivo para auditar o texto do doc (células, `tableRows`).

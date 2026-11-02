@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 165 skills** em 15 categorias.
+**Total: 167 skills** em 15 categorias.
 
 ---
 
@@ -66,6 +66,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `direito-empresarial-brasileiro` | Reference | Use ao revisar/redigir contrato B2B sob direito brasileiro. |
 | `contrato-sustentacao-sla` | Orchestrator | Use ao redigir contrato de sustentação com SLA. |
 | `societario-id` | Reference | Use ao responder sobre contrato social e sócios da ID. |
+| `nda-confidencialidade-id` | Orchestrator | Use ao redigir NDA/sigilo da ID (código de cliente). |
 
 ## research — Pesquisa e augmentação
 
@@ -112,6 +113,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `nano-pdf` | ToolIntegration | Edit text in existing PDFs via natural-language prompts. |
 | `revisao-documento-a4` | Orchestrator | Use ao revisar documento A4 já aprovado (layout e registro). |
 | `session-librarian` | Orchestrator | Organize sessions by prompt: find, rename, archive, prune. |
+| `fathom` | ToolIntegration | Cliente da API REST do Fathom — reuniões gravadas, resumos, transcrições e action items. |
 
 ## email — Correio da ID
 
@@ -300,6 +302,10 @@ Similar:
 - `revisao-de-proposta-existente` → `elaboracao-proposta-comercial`
 - `revisao-entrega-cliente` → `reunioes-diarizadas`
 - `reunioes-diarizadas` → `meeting-action-items`
+- `fathom` → `reunioes-diarizadas`
+- `fathom` → `meeting-action-items`
+- `gestao-financeira-id` → `invoice-chase`
+- `nda-confidencialidade-id` → `formalizacao-acordo-cliente`
 - `dogfood` → `systematic-debugging`
 - `hermes-agent-skill-authoring` → `skills-repo-curator`
 - `node-inspect-debugger` → `python-debugpy`
@@ -396,6 +402,9 @@ Similar:
 - `serving-llms-vllm` → `llama-cpp`
 - `padrao-dataviz-id` → `kpi-dashboard-design`
 - `padrao-dataviz-id` → `business-intelligence`
+- `nda-confidencialidade-id` → `contratos-justos-id`
+- `nda-confidencialidade-id` → `analise-contratual`
+- `nda-confidencialidade-id` → `direito-empresarial-brasileiro`
 
 Uses:
 - `agenda-id` → `google-workspace`
@@ -491,6 +500,7 @@ Uses:
 - `negotiation` → `contratos-justos-id`
 - `negotiation` → `direito-empresarial-brasileiro`
 - `analise-contratual` → `direito-civil-brasileiro`
+- `nda-confidencialidade-id` → `md-to-timbrado-id`
 - `revisao-de-proposta-existente` → `contratos-justos-id`
 - `elaboracao-proposta-comercial` → `edicao-incremental-de-gdoc`
 - `proposta-sergipetec-documento` → `edicao-incremental-de-gdoc`

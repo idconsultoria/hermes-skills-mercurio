@@ -49,6 +49,13 @@ resposta e a resposta a um acordo recebido de parceiro.
 8. **Não invente fato para preencher o email.** Data de aprovação, motivo da demora, etapa de
    tramitação interna ("fechado com o jurídico"), promessa de prazo — tudo isso tem de estar
    no thread ou no registro. Ausência de fato vira omissão, não invenção: corte o parágrafo.
+9. **Falta de dado do cliente não segura a entrega, e o pedido sai em bloco copiável.** Documento
+   que depende de dados do cliente vai com marcadores visíveis (`«RAZÃO SOCIAL», «CNPJ»…`) e a
+   lista de pendências vem separada — o que só o cliente informa × o que é decisão da ID. Quando é
+   o principal quem repassa o pedido (WhatsApp, por exemplo), entregue **um bloco de código único**
+   com a marcação do WhatsApp (`*negrito*`), numerado, pedindo exatamente os campos que faltam: ele
+   copia, cola e envia. Receita e dados da ID que não se pedem:
+   `references/pedido-de-dados-ao-cliente.md`.
 
 ## Tamanho e vocabulário (preferência do principal)
 
@@ -211,3 +218,6 @@ isso é afirmação que o cliente pode testar e dar falsa.
 
 - `references/gmail-thread-reply-and-verify.md` — chamadas Gmail API para achar a conversa,
   responder na thread e verificar o envio (headers, threadId, hash do corpo).
+- `references/pedido-de-dados-ao-cliente.md` — fechar documento que depende de dados do cliente:
+  marcadores no corpo, pendências em duas classes, bloco copiável de WhatsApp e os dados da ID que
+  vêm de contrato canônico em vez de pergunta.

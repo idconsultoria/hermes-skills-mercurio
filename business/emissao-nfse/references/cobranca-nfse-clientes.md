@@ -189,3 +189,39 @@ Antes de mandar, pergunte uma vez qual das três ele quer — e respeite a respo
 
 Oferecer "eu agendo e você aprova" como default só é seguro se o principal escolher a 2 —
 aprovação do texto **antes** de agendar é o que autoriza o disparo automático.
+
+### 5.6 Cliente respondeu — a cadência muda na hora
+
+**Cobrança diária existe para silêncio, não para quem respondeu.** No minuto em que o
+financeiro do cliente responde pedindo prazo ("coloco na sexta", "vou falar com o dono"), a
+cadência automática para e vira calendário:
+
+1. **Nenhum e-mail até o prazo prometido.** Insistir com quem acabou de dar uma data queima a
+   conversa e o próprio prazo.
+2. **No dia do prazo:** rodar só em modo `verificar` — lê o extrato e relata ao principal,
+   **não envia nada**. É o dia de saber se cumpriu, não de cobrar.
+3. **No primeiro dia útil seguinte sem pagamento:** escalar **direto ao dono da empresa**
+   (financeiro e o interlocutor comercial em cópia), citando o prazo que o próprio financeiro
+deu e o que aquela parcela sustenta — time dedicado, entregas em andamento, projetos que
+   começaram. Silêncio depois de prazo descumprido é o que transforma parcela em perda.
+4. **Se o comprovante cair antes**, a rotina encerra sozinha na primeira leitura `PAGO` — não
+   deixe e-mail de escalada agendado podendo sair depois do pagamento.
+
+Implementação do reagendamento: uma tabela `regras_por_dia_semana` (dia da semana → modo:
+`verificar` / `cobrar_financeiro` / `cobrar_dono`) no JSON de configuração da cobrança, e o
+wrapper lê a regra do dia antes de decidir o que fazer. O cron deixa de ser `0 9 * * 1-5` e passa a rodar só nos dias da
+regra (ex.: `0 9 * * 1,5` = verifica no dia do prazo, escala no primeiro dia útil seguinte).
+Trocar a parcela ou o estágio = editar o JSON, nunca o código.
+
+Duas armadilhas que custam uma rodada:
+
+- **Em `--dry-run` a dedupe de "um e-mail por dia" tem de ser ignorada**, senão não se testa a
+  escalada de segunda numa terça: o `estado.json` já tem o envio de hoje e o teste devolve
+  `[pulado]` sem mostrar o texto. Condicione a dedupe a `not dry_run` — em dry-run nada é
+  enviado, então não há risco.
+- **Registre o teor da resposta** (quem respondeu, data, prazo prometido, quem mais foi
+  citado) no config/log da cobrança. É isso que sustenta o tom da escalada seguinte e impede
+  cobrar como se o cliente nunca tivesse se manifestado.
+
+Escalar ao dono, mudar de destinatário e voltar à cadência diária são decisões do principal —
+não reabra a cadência diária por conta própria depois que o cliente respondeu.

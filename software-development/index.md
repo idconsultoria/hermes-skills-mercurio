@@ -32,3 +32,4 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `artemishub-onboarding-patterns` — Padrões quando o onboarding do ArtemisHub falha.
 - `react-fastapi-debugging` — Patch fallback silencioso e bugs de UI em React+FastAPI.
 - `skills-library-audit` — Triar skills: quais servem em qualquer Hermes.
+- `github` — GitHub via gh CLI: PRs, issues, reviews, repos, auth.

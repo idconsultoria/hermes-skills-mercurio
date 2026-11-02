@@ -141,6 +141,23 @@ Se um doc foi criado errado (.docx): criar o equivalente nativo, conferir, e só
 
 ## Pitfalls operacionais
 
+- **`<!-- pagebreak -->` antes de um anexo pode NÃO pegar quando o anexo vem logo depois do
+  bloco de assinaturas** (visto no contrato ArtemisHub/SergipeTec v4, 27/10/2026: o build reporta
+  `PAGEBREAK_OK`, mas o PDF sai com as assinaturas e o `ANEXO I` na MESMA página). Não confie no
+  log: **conte em que página cada anexo caiu** (`pdftotext -layout` página a página, procurando
+  `ANEXO`) e, se estiver colado, faça um pós-passe `insertPageBreak` no `startIndex` do parágrafo
+  do título do anexo. Reexporte e confirme a página — é a única prova.
+- **Cabeçalho de coluna estreita quebra NO MEIO DA PALAVRA.** `Severidade` sai como
+  `Severidad/e` e `Periodicidade` como `Periodicida/de` no PDF, e o `pdftotext` mostra isso na
+  coluna errada. Antes de gerar, encurte o cabeçalho (`Severidade`→`Nível`) e **elimine colunas**
+  em vez de confiar na largura: tabela de 3 colunas com muito texto vira 2 (o dado da 3ª entra no
+  texto da célula). Conferir com `pdftotext -layout` procurando palavra partida por `/`.
+- **Título justificado estica o espaço entre palavras** quando quebra em duas linhas
+  (`CLÁUSULA 20 —      INTEGRIDADE      E CONFORMIDADE`). Pós-passe: `updateParagraphStyle` com
+  `alignment: START` em todos os `HEADING_1/2/3`, em lotes de 25.
+- **Capa com título expandido longo vaza para a página 2** e o corpo começa na 3. Mantenha o
+  `--titulo-exp` em ~40 caracteres; se vazar, `replaceAllText` encurta na hora, sem regerar o doc.
+
 - **Preencher tabela pela API: `insertText` desloca TODOS os indices seguintes.** Num
   `batchUpdate` com várias células, os índices pré-calculados ficam *stale* e **todo o texto
   cai na primeira célula** (sintoma: a linha 0 fica com o texto de todas, as demais vazias).

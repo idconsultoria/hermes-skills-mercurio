@@ -16,3 +16,5 @@ Progressive disclosure: skills desta categoria (foco ID Consultoria).
 - `facilitacao-grupo-agentes` — Facilitar reuniões de agentes: pauta, turnos e devolução.
 - `hermes-inference-config` — Configure Hermes model/provider/fallback; route crons.
 - `peer-session-audit` — Auditar sessão ruim de um agente par (postmortem).
+- `coordenacao-perfis-hermes` — Delegar tarefa a outro perfil Hermes irmão.
+- `hermes-peer-profile-delegation` — Dirigir outro perfil Hermes do mesmo gateway.
