@@ -75,13 +75,13 @@ inheritance, not pinning, for all crons.
 hermes cron edit 8a7f5f65ed76 --model "" --provider ""  # Ciclo Consolidação
 hermes cron edit 3dfe43219f1b --model "" --provider ""  # Alíquota ISS
 # Both now show model: None / provider: None → inherit model.default + fallback chain
-# Verify:
-hermes cron list
+# Verify (HERMES_BIN="$HERMES_HOME/hermes-agent/venv/bin/hermes" — nunca o `hermes` do PATH):
+"$HERMES_BIN" cron list
 cat $HERMES_HOME/cron/jobs.json | python3 -c "import json; print([(j['id'], j['model'], j['provider']) for j in json.load(open('jobs.json'))['jobs']])"
 ```
 
 - Unpinning recalculates `model_snapshot`/`provider_snapshot` → drift guard (#44585) clears.
-- Gateway must be running: `hermes cron status` / `hermes gateway start`. Without it, unpinned jobs still won't tick.
+- Gateway must be running: `"$HERMES_BIN" cron status` / `"$HERMES_BIN" gateway start`. Without it, unpinned jobs still won't tick.
 
 ## Re-executar depois do conserto
 

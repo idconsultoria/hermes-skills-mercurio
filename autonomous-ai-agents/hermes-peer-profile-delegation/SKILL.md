@@ -25,15 +25,28 @@ trabalho.
 
 ## Procedimento
 
+0. **Use SEMPRE o binário da própria casa, nunca o `hermes` do PATH.**
+
+```bash
+HERMES_BIN="$HERMES_HOME/hermes-agent/venv/bin/hermes"
+```
+
+   O `hermes` do PATH resolve para `/usr/bin/hermes`, que aponta para a instalação do **Olimpo**
+   (`~/.hermes/hermes-agent`). Rodar esse binário com `HERMES_HOME` do Capitólio faz o CLI novo
+   classificar o gateway da casa (versão mais antiga) como dono incompatível de runtime e **pará-lo
+   do mesmo jeito que `hermes gateway stop`** — o `run_forever` ressuscita em ~40 s, o turno é
+   retomado, o comando se repete e vira laço de restart (breaker dispara após 3 boots encadeados).
+   Sintoma no log: `Received SIGTERM as a planned gateway stop` sem nenhum `gateway stop` digitado.
+
 1. **Descobrir** antes de lançar:
 
 ```bash
-hermes profile list
-hermes profile show <nome>      # caminho, modelo, gateway rodando, nº de skills, .env
+"$HERMES_BIN" profile list
+"$HERMES_BIN" profile show <nome>      # caminho, modelo, gateway rodando, nº de skills, .env
 ```
 
 2. **Teste de fumaça** — um turno trivial confirma que o perfil responde antes de investir num brief
-   longo: `HERMES_PROFILE=<nome> hermes -z "responda apenas: ok" -t ""`.
+   longo: `HERMES_PROFILE=<nome> "$HERMES_BIN" -z "responda apenas: ok" -t ""`.
 
 3. **Escrever o brief em arquivo**, autocontido. O irmão não vê a conversa: contexto do cliente,
    especificação fechada (nomes, formatos, paleta, restrições), o que **não** fazer e o contrato de
@@ -51,7 +64,7 @@ hermes profile show <nome>      # caminho, modelo, gateway rodando, nº de skill
    prompt.
 
 ```bash
-HERMES_PROFILE=<nome> hermes -z "$(cat <HERMES_HOME>/work/<peça>/task-<irmão>.txt)" --yolo > <dir>/run.log 2>&1
+HERMES_PROFILE=<nome> "$HERMES_BIN" -z "$(cat <HERMES_HOME>/work/<peça>/task-<irmão>.txt)" --yolo > <dir>/run.log 2>&1
 ```
 
    Use `terminal(background=true, notify_on_complete=true)`. Nunca em foreground: o turno dura de
@@ -100,7 +113,8 @@ c.execute("SELECT id, profile_name, title, message_count, tool_call_count FROM s
 
 ## Verificação
 
-- `hermes profile show <nome>` antes: gateway rodando e `.env` presente.
+- `"$HERMES_BIN" profile show <nome>` antes: gateway rodando e `.env` presente.
+- O comando de lançamento usou `"$HERMES_BIN"`, nunca o `hermes` do PATH (ver passo 0).
 - Turno de fumaça respondeu antes do brief longo.
 - `status.json` existe no caminho combinado, com os campos pedidos.
 - Arquivo do `task-<irmão>.txt` é curto e aponta para o brief; o brief, não o prompt, carrega a

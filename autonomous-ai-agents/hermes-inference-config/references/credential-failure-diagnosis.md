@@ -34,7 +34,9 @@ Marcador de falha recente, sem garimpar o log: `$HERMES_HOME/sessions/request_du
 ## 2. Provar a credencial fora do gateway
 
 - **Direto na API** (com a chave): prova só que ela é válida no provider; não passa pelo Hermes.
-- **Um processo novo do Hermes**: `hermes -z "responda somente: ok" --provider <p> -m <model>`.
+- **Um processo novo do Hermes**: `"$HERMES_BIN" -z "responda somente: ok" --provider <p> -m <model>`
+  (`HERMES_BIN="$HERMES_HOME/hermes-agent/venv/bin/hermes"`; o `hermes` do PATH é de outra
+  instalação e pode derrubar o gateway local ao anexar neste home).
   Se devolve texto, então env → provider → request estão sãos para esse provider/modelo.
 
 Se o comando do Hermes funciona e o gateway falha, o defeito está **no processo/estado do

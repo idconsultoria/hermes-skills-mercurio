@@ -1,8 +1,8 @@
 ---
 name: revenue-reporting
-description: "Define the metric set and narrative structure for an executive or board revenue
+description: "Define the metric set and narrative for a board revenue report.
 
-efine the metric set and narrative structure for an executive or board revenue report so it tells one coherent story - a small stable metric spine, locked definitions, an answer-first narrative around plan vs actual vs forecast, presenting a miss without surprising the board, the reconciliation and sign-off chain, and weekly vs monthly vs quarterly cadences. Use whenever the user mentions a board revenue report, exec deck metrics, the QBR revenue section, a monthly revenue review, an investor update, or a board deck that reads as a data dump - even if they never say "reporting". Covers B2B subscription, B2C, transactional, usage-based, and PLG. Do NOT use for designing the org-level KPI hierarchy - use mbfinotti/revops-skills@revenue-kpi-framework instead."
+Load this skill when the user mentions a board revenue report, exec deck metrics, the QBR revenue section, a monthly revenue review, an investor update, or a board deck that reads as a data dump. Covers the metric spine, locked definitions, answer-first narrative (plan vs actual vs forecast) and the reconciliation/sign-off chain."
 license: MIT
 metadata:
   author: Maya-Beth Finotti

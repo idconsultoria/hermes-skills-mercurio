@@ -1,8 +1,8 @@
 ---
 name: revenue-leakage
-description: "Trace where deals and revenue silently exit one specific funnel and size the loss in
+description: "Trace where deals and revenue silently exit one specific funnel.
 
-race where deals and revenue silently exit one specific funnel and size the loss in recoverable (never gross) dollars - untracked steps, unworked leads, manual handoffs, mid-funnel stalls, paper-process drops, billing and renewal misses - separating real leaks from healthy disqualification and data-capture gaps. Use whenever the user mentions revenue leakage, funnel drop-off, a leaky funnel, deals disappearing, unworked leads, handoff gaps, "where are we losing deals", or "why did pipeline vanish" - even if they never say "leakage". Covers B2B sales-led and B2C/self-serve/PLG, one funnel instance at a time. Takes stage definitions as given - to audit those, use mbfinotti/revops-skills@pipeline-stage-definition-audit instead."
+Load this skill when the user mentions revenue leakage, funnel drop-off, a leaky funnel, deals disappearing, unworked leads, handoff gaps, where are we losing deals, or why pipeline vanished. Sizes the loss in recoverable (never gross) dollars, separating real leaks from healthy disqualification. Covers B2B sales-led and B2C/self-serve/PLG."
 license: MIT
 metadata:
   author: Maya-Beth Finotti

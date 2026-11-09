@@ -1,8 +1,8 @@
 ---
 name: cfo-advisor
-description: "Financial leadership advisor on financial planning, fundraising, investor reporting
+description: "Lente de CFO: modelagem, captação, unit economics e runway.
 
-Use when building a financial model, preparing for fundraising, calculating unit economics, or managing cash runway."
+Load this skill when building a financial model, preparing for fundraising, calculating unit economics, or managing cash runway."
 license: MIT + Commons Clause
 metadata:
   version: 1.0.0

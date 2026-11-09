@@ -1,8 +1,8 @@
 ---
 name: business-intelligence
-description: "Business intelligence across dashboard design, visualization
+description: "Business intelligence: dashboards, KPIs e narrativa de dados.
 
-Use when designing dashboards, building KPI frameworks, automating reports, creating data stories, or optimizing BI tool performance."
+Load this skill when designing dashboards, building KPI frameworks, automating reports, creating data stories, or optimizing BI tool performance."
 license: MIT + Commons Clause
 metadata:
   version: 1.0.0

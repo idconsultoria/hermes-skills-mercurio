@@ -29,6 +29,19 @@ off-limits to edit); this is the operational deep-dive for the class.
 - "O cron não usa a mesma cadeia", "cron usa modelo fixo"
 - "Está dando 403 no modelo", "fallback não funcionou", "modelo não aceita imagem"
 
+## Binário: use o da casa, nunca o `hermes` do PATH
+
+```bash
+HERMES_BIN="$HERMES_HOME/hermes-agent/venv/bin/hermes"
+```
+
+Em todo comando desta skill que invoque o CLI (config, auth, `-z`, profile, cron), chame
+`"$HERMES_BIN"`. O `hermes` do PATH (`/usr/bin/hermes`) aponta para a instalação do **Olimpo**
+(`~/.hermes/hermes-agent`); rodá-lo com `HERMES_HOME` de outra casa faz o CLI novo tratar o gateway
+local (versão mais antiga) como dono incompatível de runtime e **pará-lo como `hermes gateway stop`
+faria** — sem que ninguém digite `stop`. Sintoma no log: `Received SIGTERM as a planned gateway
+stop`, seguido de respawn pelo `run_forever.sh` ~40 s depois e turno retomado → laço de restart.
+
 ## Model & provider key reads
 
 Read **one key at a time** — `hermes config get model providers fallback_providers`
@@ -221,7 +234,7 @@ Logs at `$HERMES_HOME/logs/errors.log` and `agent.log`.
 | Log line | Meaning / action |
 |----------|------------------|
 | `HTTP 403 ... requires explicit opt in` | Data-collection model (e.g. Muse Spark Contributor) needs a **one-time opt-in** at the provider's workspace URL. Provider-side consent, not a Hermes bug. After opt-in, use the model normally. |
-| `HTTP 401` com `{'type':'AuthError','message':'Missing API key.'}` | A requisição saiu **sem** credencial — não é chave morta (chave inválida tem outra mensagem). Controle: POST sem header `Authorization` devolve exatamente esse corpo. Prove o caminho em processo novo: `hermes -z "ok" --provider <p> -m <modelo>` — se responder texto, o defeito é o processo antigo do gateway → reinicie. |
+| `HTTP 401` com `{'type':'AuthError','message':'Missing API key.'}` | A requisição saiu **sem** credencial — não é chave morta (chave inválida tem outra mensagem). Controle: POST sem header `Authorization` devolve exatamente esse corpo. Prove o caminho em processo novo: `"$HERMES_BIN" -z "ok" --provider <p> -m <modelo>` — se responder texto, o defeito é o processo antigo do gateway → reinicie. |
 | `HTTP 410: Model <x> has been deprecated` | Modelo do **snapshot** de um cron não-pinado morreu. O job tentou rodar com ele em vez de pular — conserte com `resnap` e re-execute. |
 | `HTTP 403 ... free tier can only be used from within OpenCode` | Snapshot aponta para a rota do tier gratuito, que só aceita tráfego de dentro do OpenCode. Mesma classe do 410: eixo modelo/rota, não credencial → `resnap`. |
 | `HTTP 401: Model <x> is not supported` | O modelo não existe no endpoint resolvido. Ex.: `deepseek-flash` só existe na rota Go; resolvido para `opencode-zen` dá esse 401. Nome de modelo é por endpoint, não global. |
@@ -245,7 +258,7 @@ perfil fica apontando para uma rota morta até o próximo turno falhar. Sonde co
 
 ```bash
 export HERMES_HOME=<perfil>
-timeout 90 hermes -z "Responda apenas: ok" --provider <p> -m <modelo_candidato>
+timeout 90 "$HERMES_BIN" -z "Responda apenas: ok" --provider <p> -m <modelo_candidato>
 ```
 
 `HTTP 400 ... Model is unavailable` = rota não serve aquele nome; teste o próximo candidato. Só
@@ -309,10 +322,14 @@ Ordem de verificação (do mais barato ao definitivo):
    instante), **não** que a entrada está sã. Esse campo residual sobrevive ao reset e ao restart, e
    é o suspeito nº 1 quando a requisição sai sem chave.
 3. **Caminho real ponta-a-ponta** num processo novo (aceita provider explícito):
-   `hermes -z "responda somente: ok" --provider <provider> -m <modelo>` — devolver texto = env → provider → request sano.
+   `"$HERMES_BIN" -z "responda somente: ok" --provider <provider> -m <modelo>` — devolver texto = env → provider → request sano.
 4. Só depois confie no chat; o teste final é uma mensagem sua na conversa.
 
 ### NUNCA rode `hermes gateway stop` (sem `--all`) no perfil default do host
+
+> **Sem digitar `stop` também acontece.** Chamar o `hermes` do PATH (instalação do Olimpo) com
+> `HERMES_HOME` desta casa faz o CLI novo parar o gateway local como dono incompatível de runtime.
+> Use sempre `"$HERMES_BIN"` (ver topo da skill).
 
 `_matches_current_profile` (`hermes_cli/gateway.py`) decide o alvo pelo **argv**: no perfil
 default, todo gateway cujo cmdline não tenha `--profile` **nem** `HERMES_HOME=` conta como

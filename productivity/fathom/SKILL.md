@@ -1,6 +1,6 @@
 ---
 name: fathom
-description: "Cliente da API REST do Fathom — reuniões gravadas, resumos, transcrições e action items.
+description: "Cliente da API REST do Fathom - reuniões, resumos e transcrições.
 
 Carregue esta skill quando precisar puxar reuniões do Fathom (gravações, resumos, transcrições, action items) por script, quando um consumidor quebrar em `from fathom_api import FathomClient`, ou quando for mexer em `productivity/fathom/scripts/fathom_api.py`. Cobre autenticação (chave em `.secrets/fathom.env`), endpoints `/meetings` e `/meetings/{id}`, paginação por cursor, retry com backoff e o contrato mínimo que o pipeline da Phronesis consome."
 

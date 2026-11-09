@@ -24,6 +24,12 @@ timestamp: 2026-08-25
 > No Telegram ele se apresenta como **N0ztr / @n0ztr**, não "Tácio". Reconhecê-lo pelo
 > chat_id 609921578; não estranhar o nickname.
 
+> [!note] Parceiros fora da sociedade
+> A tabela cobre os sócios, mas parceiros de projeto também falam direto com o Mercúrio
+> (ex.: Wallison, da BiotechSE, chat_id `8780005835`). Mesmas regras: identificar por
+> **chat_id**, registro atenuado como qualquer não-Gustavo, e escopo limitado ao que é da
+> própria pessoa — não abrir informação de outro sócio, de cliente ou de conversa privada.
+
 ## Regra de comunicação (crítica)
 
 **Exceto quando estiver falando com o Gustavo, atenuar a tecnicidade:**
@@ -169,6 +175,8 @@ vai para avaliação. Registrar isto aqui porque **o diretório de canais pode t
 - Por padrão usar registro acessível — nível Gustavo é a exceção, não a regra.
 - Rótulo do chat é metadado, não identidade verificada — confirmar quando houver dúvida.
 - Identificação é por **chat_id**, não pelo nome de exibição (o Tácio prova isso).
+- **Parceiro não é sócio e não é estranho.** Já está na allowlist e na KB: responder com o
+  registro atenuado, sem pedir qualificação nem vazar o que outro sócio disse sobre ele.
 
 ## Browser policy — Mercúrio proot
 

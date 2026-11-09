@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 167 skills** em 15 categorias.
+**Total: 179 skills** em 15 categorias.
 
 ---
 
@@ -55,6 +55,8 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `metricas-financeiras-servico-campo` | Orchestrator | Use ao estruturar KPIs de serviço técnico de campo. |
 | `modelo-receita-servicos-campo` | Orchestrator | Use ao modelar receita de serviço técnico de campo. |
 | `prosa-peca-id` | Reference | Use ao escrever ou revisar prosa de peça da ID. |
+| `cobranca-clientes-id` | Orchestrator | Cobrar cliente inadimplente da ID com texto aprovado e escalada. |
+| `dossie-de-pessoa-id` | Reference | Montar dossiê de pessoa da ID a partir da base. |
 
 ## legal — Direito brasileiro e contratos ID
 
@@ -67,6 +69,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `contrato-sustentacao-sla` | Orchestrator | Use ao redigir contrato de sustentação com SLA. |
 | `societario-id` | Reference | Use ao responder sobre contrato social e sócios da ID. |
 | `nda-confidencialidade-id` | Orchestrator | Use ao redigir NDA/sigilo da ID (código de cliente). |
+| `contrato-prestacao-servicos-b2b` | Orchestrator | Redigir contrato de prestação de serviços B2B. |
 
 ## research — Pesquisa e augmentação
 
@@ -82,6 +85,7 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `user-interview` | Research | Protocolo de entrevista de usuário/proxy estruturado para pesquisa de produto. |
 | `blogwatcher` | ToolIntegration | Monitor blogs and RSS/Atom feeds via blogwatcher-cli tool. |
 | `research-paper-writing` | Research | Write ML papers for NeurIPS/ICML/ICLR: design→submit. |
+| `llm-wiki` | Reference | Wiki LLM de Karpathy: KB markdown interligada para pesquisa. |
 
 ## productivity — Documentos e entrega
 
@@ -113,7 +117,12 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `nano-pdf` | ToolIntegration | Edit text in existing PDFs via natural-language prompts. |
 | `revisao-documento-a4` | Orchestrator | Use ao revisar documento A4 já aprovado (layout e registro). |
 | `session-librarian` | Orchestrator | Organize sessions by prompt: find, rename, archive, prune. |
-| `fathom` | ToolIntegration | Cliente da API REST do Fathom — reuniões gravadas, resumos, transcrições e action items. |
+| `fathom` | ToolIntegration | Cliente da API REST do Fathom — reuniões, resumos e transcrições. |
+| `airtable` | ToolIntegration | Airtable REST API via curl — records CRUD, filtros e upserts. |
+| `box` | ToolIntegration | Box — upload, compartilhar, buscar e versionar arquivos na nuvem. |
+| `doc-brand-theming` | ToolIntegration | Aplicar identidade de marca em Google Doc. |
+| `microsoft-office` | ToolIntegration | Criar, ler e editar Word, PowerPoint e Excel por script. |
+| `powerpoint` | ToolIntegration | Criar, ler e editar decks .pptx com python-pptx. |
 
 ## email — Correio da ID
 
@@ -232,6 +241,14 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `pretext` | Creative | Build creative browser demos with DOM-free text layout. |
 | `sketch` | Creative | Throwaway HTML mockups: 2-3 design variants to compare. |
 | `touchdesigner-mcp` | ToolIntegration | Control TouchDesigner via twozero MCP. |
+| `design-md` | Reference | Autorar, validar e exportar arquivos DESIGN.md (design tokens). |
+
+## media — Áudio, GIF e imagens em movimento
+
+| Skill | Type | Descrição |
+|---|---|---|
+| `gif-search` | ToolIntegration | Buscar e baixar GIFs do Tenor via curl + jq. |
+| `songsee` | ToolIntegration | Espectrogramas e features de áudio (mel, chroma, MFCC) via CLI. |
 
 ## mlops — Modelos locais e inferência
 

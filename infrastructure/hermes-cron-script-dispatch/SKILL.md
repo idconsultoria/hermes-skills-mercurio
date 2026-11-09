@@ -116,6 +116,16 @@ Regras para o script do monitor:
 - **Sem o evento, emita SEMPRE a mesma linha constante** (ex.: `STATUS=NO_REPLY_...`). Nunca
   imprima timestamp, contagem de mensagens, labels/estado de leitura ou qualquer coisa que mude
   sem o evento — isso gera falso positivo e notificação inútil.
+- **Janela de contagem ancora em EVENTO, não em relógio.** Um campo tipo `falhas_na_ultima_hora`
+  muda sozinho quando o evento sai da janela, sem nada ter acontecido: hash muda, agente acorda,
+  notificação falsa. Conte a partir de um marco estável do próprio artefato — última linha
+  `Starting <serviço>` no log, primeiro PID da geração atual, `attempts` do marker — para que o
+  número só cresça quando o evento real acontecer.
+- **Vigiar OUTRA instância Hermes** (home diferente do seu) é monitor legítimo: o script recebe o
+  home como argumento, resolve o estado por caminho absoluto e não depende de `HERMES_HOME` do
+  processo do cron. Inclua na foto o interpretador do processo alvo, contagem de libs do venv
+  legado em `/proc/<pid>/maps` e a alcançabilidade dos diretórios de dados — é o que transforma
+  "sumiu do Telegram" em alerta antes do dono reclamar.
 - Com o evento, emita linhas estáveis de detalhe (id, remetente, data, assunto), uma por evento,
   ordenado — cada evento novo muda o hash uma vez.
 - Defina o evento pelo que importa, não por "qualquer mudança": p.ex. mensagem de entrada

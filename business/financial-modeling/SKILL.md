@@ -6,7 +6,7 @@
 name: financial-modeling
 description: "Build integrated financial models with 3-statement projections.
 
-Create income statement, balance sheet, and cash flow models with proper linkages."
+Load this skill when creating income statement, balance sheet, and cash flow models with proper linkages, drivers and working-capital schedules."
 version: "1.0.0"
 author: claude-office-skills
 license: MIT

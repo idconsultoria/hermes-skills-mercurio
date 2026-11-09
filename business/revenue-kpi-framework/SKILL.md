@@ -1,8 +1,8 @@
 ---
 name: revenue-kpi-framework
-description: "Design the org-wide revenue KPI framework at the macro level - which metrics matter
+description: "Design the org-wide revenue KPI framework at the macro level.
 
-esign the org-wide revenue KPI framework at the macro level - which metrics matter at each org level from board to IC, how they roll up through a reconciling metric tree with explicit math, who owns each branch, which guardrail counter-metrics ride alongside each owned number, and how the set is gated by company stage and business model. Use whenever the user mentions a revenue KPI framework, a metric hierarchy, a KPI tree, a North Star metric, driver metrics, guardrail counter-metrics, NRR, or which revenue metrics each org level should track - even if they never say "framework". Covers B2B and B2C. Do NOT use for writing the board report itself - use mbfinotti/revops-skills@revenue-reporting instead."
+Load this skill when the user mentions a revenue KPI framework, metric hierarchy, KPI tree, North Star metric, driver metrics, guardrail counter-metrics, NRR, or which revenue metrics each org level should track. Covers B2B and B2C. Do NOT use for writing the board report itself - use revenue-reporting instead."
 license: MIT
 metadata:
   author: Maya-Beth Finotti

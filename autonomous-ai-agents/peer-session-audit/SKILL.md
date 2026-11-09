@@ -41,13 +41,19 @@ acontece com o dono e no perfil dono, ou via `hermes curator adopt <skill>`.
 **comportamento acumulado** (loop de espera, retrabalho, zero entrega) e nao em nenhuma mensagem
 isolada. Entao audite direto o SQLite do perfil e tire **varias fotografias** do mesmo intervalo:
 
-```bash
-sqlite3 /data/data/com.termux/files/home/capitolium/profiles/<perfil>/state.db "
-SELECT id, source, chat_type, display_name,
-       datetime(started_at,'unixepoch'), datetime(COALESCE(ended_at,0),'unixepoch'),
-       end_reason, message_count, tool_call_count
-FROM sessions ORDER BY started_at DESC LIMIT 12;"
+```python
+import sqlite3   # o binário `sqlite3` pode não existir no ambiente: use o módulo
+p = f"/data/data/com.termux/files/home/capitolium/profiles/{perfil}/state.db"
+c = sqlite3.connect(f"file:{p}?mode=ro", uri=True)   # mode=ro: auditoria nunca escreve
+for r in c.execute("""select id, source, chat_id, display_name, started_at, last_activity_at,
+                             message_count, tool_call_count, title
+                      from sessions order by last_activity_at desc limit 12"""):
+    print(r)
 ```
+
+Colunas que existem em `sessions`: `started_at`, `last_activity_at`, `ended_at`, `end_reason`.
+**Não** existe `updated_at` — ordenar por ele aborta a apuração. Para "parou quando?" use
+`last_activity_at`; para "que horas começou?" use `started_at`.
 
 Tres medidas decidem o veredito de uma sessao viva:
 
@@ -61,6 +67,21 @@ Tres medidas decidem o veredito de uma sessao viva:
 
 O `session_id` ordena por criacao, nao por atividade: uma sessao antiga pode ser a ativa.
 Selecione por `chat_id` + `ended_at IS NULL`, nunca pelo primeiro `LIMIT`.
+
+### "Ele esta trabalhando agora?"
+
+Pergunta de estado, nao de auditoria — responda com tres provas e uma frase:
+
+1. **Turno em voo?** `select * from session_turn_leases` (leases asyncio vivem so em memoria e nao
+   aparecem; lease duravel presente = turno aberto) e `async_delegations` vazio ou nao.
+2. **Quando foi a ultima atividade?** `max(last_activity_at)` do perfil, convertido para BRT.
+3. **Tem trabalho agendado?** `cron/jobs.json` do perfil: `next_run_at`, `last_run_at`,
+   `last_status` de cada job — diz o que ele **vai** fazer mesmo sem turno.
+
+Para "faz X horas", confirme o agora com fonte externa (`date` + header HTTP `Date`): o contexto da
+conversa carrega a data do ultimo rebuild e turnos consecutivos podem estar a dias de distancia.
+Se o perfil estiver parado, feche com **o que ele fez por ultimo** (ultimas mensagens
+`role in ('user','assistant')` da sessao mais recente), nao com "esta ocioso".
 
 Quando o agente aguarda um **runtime delegado** (OpenDesign, Codex, Claude Code, qualquer
 servico com fila), o status resumido que o agente le ("timeout", "empty_output") nomeia o

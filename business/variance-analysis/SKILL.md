@@ -1,8 +1,8 @@
 ---
 name: variance-analysis
-description: "Decompose financial variances into drivers with narrative explanations and waterfall
+description: "Decompose financial variances into drivers with narrative.
 
-Use when analyzing budget vs. actual, period-over-period changes, revenue or expense variances, or preparing variance commentary for leadership. argument-hint: "<line item> <period> vs <comparison>""
+Load this skill when analyzing budget vs. actual, period-over-period changes, revenue or expense variances, or preparing variance commentary for leadership - drivers, waterfall and the narrative that explains them."
 type: Orchestrator
 timestamp: 2026-10-22T17:59:03Z
 source: skills.sh/anthropics/knowledge-work-plugins#finance/skills/variance-analysis

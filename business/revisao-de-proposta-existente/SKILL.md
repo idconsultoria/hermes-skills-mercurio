@@ -104,6 +104,14 @@ bullets **o que mudou e o que permaneceu igual**.
   objetiva na resposta. Número comercial é decisão do sócio.
 - **Revisão que toca o preço** obriga a conferir resumo executivo e condições comerciais
   (validade, pagamento) — o documento não pode sair com dois preços.
+- **Some a tabela em código antes de aprovar a peça.** Para cada mês, some os itens listados
+  (implantação, manutenção, mídia, conteúdo) e compare com o total do card e com a tabela de
+  investimento; rode em `execute_code`, nunca de cabeça. Diferença do mesmo valor em meses
+  opostos é sinal de **deslocamento de cobrança** (a implantação foi antecipada ou postergada),
+  não de erro de soma — e a correção é uma decisão de sócio, não um ajuste silencioso.
+- **Cronograma de entrega × cronograma de cobrança têm de contar a mesma história:** se o card
+  do mês 2 cobra a implantação que o card do mês 1 totaliza, e o texto de etapas entrega o
+  agente no mês 2, a peça está contraditória mesmo com a aritmética fechada.
 - **Versão nova = nome novo**, no Drive e no PDF; nunca sobrescrever nem reutilizar nome.
 - **Fechar a pendência na base de conhecimento:** se o pedido ficou registrado como
   pendente, propor o fato atualizado (`kb_note`) quando a revisão for entregue.
@@ -119,6 +127,10 @@ bullets **o que mudou e o que permaneceu igual**.
    e o que o usuário vê é o estilo.
 5. **Mexer só no trecho óbvio.** Trocar um pacote sem revisar as seções que o citam deixa a
    proposta contraditória.
+6. **Confiar em bloco de "economia/desconto" escrito à mão.** Total padrão, valor com desconto
+   e diferença mensal são três números que precisam fechar entre si e com a página de
+   condições; quando um deles diverge, o cliente lê como prova de desconto e o sócio perde
+   argumento na mesa.
 
 ## References
 

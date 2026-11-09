@@ -1,8 +1,8 @@
 ---
 name: kpi-dashboard-design
-description: "Design effective KPI dashboards with metrics selection
+description: "Design effective KPI dashboards with metrics selection.
 
-Use this skill when building an executive SaaS metrics dashboard tracking MRR, churn, and LTV/CAC ratios; designing an operations center with live service health and request throughput; creating a cohort retention analysis view for a product team; or debugging a dashboard where metrics contradict each other due to inconsistent calculation methodology."
+Load this skill when building an executive SaaS metrics dashboard tracking MRR, churn and LTV/CAC; designing an operations center with live service health; creating a cohort retention view; or debugging a dashboard where metrics contradict each other."
 type: Reference
 timestamp: 2026-10-22T17:58:05Z
 source: skills.sh/wshobson/agents#plugins/business-analytics/skills/kpi-dashboard-design
