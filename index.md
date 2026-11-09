@@ -8,7 +8,7 @@ timbrado, devops ArtemisHub). Fork real criado em `idconsultoria/hermes-skills-m
 
 Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md).
 
-**Total: 179 skills** em 15 categorias.
+**Total: 178 skills** em 15 categorias.
 
 ---
 
@@ -143,7 +143,6 @@ Formatos: [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/k
 | `ideation-drilling` | Orchestrator | Ideação de produto (Fase 1) — refinar ideias brutas. |
 | `inspecting-hermes-desktop-dom` | ToolIntegration | Read the live Hermes desktop DOM/CSS over CDP. |
 | `internal-python-job-executor` | ToolIntegration | Executor interno Python p/ pipeline no backend FastAPI. |
-| `local-postgres-sandbox` | ToolIntegration | Verify DB behavior via local Postgres sandbox from app dump. |
 | `macroprocess-swimlane-html` | Orchestrator | Mapa macroprocesso swimlane em HTML interativo p/ clientes da ID (a partir do doc do Drive). |
 | `motor-nfse-id` | Orchestrator | Resume/update the ID NFS-e emission motor (living state). |
 | `node-inspect-debugger` | ToolIntegration | Debug Node.js via --inspect + Chrome DevTools Protocol CLI. |
@@ -328,7 +327,6 @@ Similar:
 - `node-inspect-debugger` → `python-debugpy`
 - `react-fastapi-debugging` → `systematic-debugging`
 - `react-fastapi-debugging` → `dogfood`
-- `local-postgres-sandbox` → `postgres-sandbox-verification`
 - `plan` → `spike`
 - `simplify-code` → `requesting-code-review`
 - `hermes-environment-replication` → `hermes-agent-replication`
@@ -551,6 +549,35 @@ Uses:
 - `documento-para-leitura-mobile-e-kindle` → `pdf`
 - `figuras-em-documento-pdf` → `documento-a4-marca-id`
 - `evaluating-llms-harness` → `huggingface-hub`
+- `cobranca-clientes-id` → `invoice-chase`
+- `cobranca-clientes-id` → `emissao-nfse`
+- `cobranca-clientes-id` → `gestao-financeira-id`
+- `cobranca-clientes-id` → `google-workspace`
+- `dossie-de-pessoa-id` → `id-comunicacao-multiusuario`
+- `contrato-prestacao-servicos-b2b` → `contratos-justos-id`
+- `contrato-prestacao-servicos-b2b` → `direito-empresarial-brasileiro`
+- `contrato-prestacao-servicos-b2b` → `formalizacao-acordo-cliente`
+- `contrato-prestacao-servicos-b2b` → `md-to-timbrado-id`
+- `doc-brand-theming` → `google-docs-formatting`
+- `doc-brand-theming` → `md-to-timbrado-id`
+- `doc-brand-theming` → `brand-design-system-html`
+- `doc-brand-theming` → `contrato-prestacao-servicos-b2b`
+- `microsoft-office` → `powerpoint`
+- `microsoft-office` → `docx`
+- `microsoft-office` → `xlsx`
+- `microsoft-office` → `pdf`
+- `powerpoint` → `html-deck-to-pptx`
+- `powerpoint` → `design-md`
+- `design-md` → `brand-design-system-html`
+- `design-md` → `documento-a4-marca-id`
+- `airtable` → `google-sheets-automation`
+- `airtable` → `xlsx`
+- `box` → `google-workspace`
+- `gif-search` → `songsee`
+- `gif-search` → `comfyui`
+- `songsee` → `comfyui`
+- `llm-wiki` → `systematic-research`
+- `llm-wiki` → `deep-research`
 
 ---
 

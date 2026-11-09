@@ -70,6 +70,12 @@ mkdir -p "$PGDATA" /data/data/com.termux/files/home/capitolium/pgtest/sock
   esquema do backend para injetar um usuário autenticável.
 - **Proteja o último-admin**: ao testar desativação/edição de master, inclua a checagem
   "último master ativo" (o app frequentemente bloqueia removê-lo — o teste deve respeitar).
+- **Upsert `ON CONFLICT (email)`** na criação de usuário torna o driver idempotente: re-rodar
+  o teste não duplica registro.
+- **FKs antes do DELETE:** confira `information_schema` (ou `\d`) para saber a `delete_rule` —
+  `CASCADE` em `sessoes→usuarios` limpa sessões; sem `CASCADE` o DELETE estoura 500.
+- **O dump pode ter schema fora de `public`:** liste com `pg_restore -l` (binário nativo) e
+  confira `\d`/`information_schema` depois de restaurar antes de assumir onde está a tabela.
 - Trabalho real executado: ver `references/artemis-auth-verification.md`.
 
 ## Verificação da entrega
